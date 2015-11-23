@@ -29,11 +29,16 @@ public class MosMetro extends Activity
 				messages.setText(new String(outputStream.toByteArray()));
 			}
 		}));
-    }
-    
-    // Handling connection button
-    public void connect (View view) {
-    	HttpRequest request = new HttpRequest("http://curlmyip.org").connect();
-    	System.out.println("Your IP: " + request.getContent() + "\n");
-    }
+	}
+
+	// Handling connection button
+	public void connect (View view) {
+		HttpClient client = new HttpClient();
+
+		// Check network
+		if (client.navigate("http://1.1.1.1/login.html").getContent() == null) {
+			System.out.println("[MosMetro] Wrong network");
+			return;
+		}
+	}
 }
