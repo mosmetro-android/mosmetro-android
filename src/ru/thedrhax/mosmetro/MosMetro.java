@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.*;
+import java.util.regex.*;
 
 import ru.thedrhax.httpclient.*;
 
@@ -38,6 +39,12 @@ public class MosMetro extends Activity
 		// Check network
 		if (client.navigate("http://1.1.1.1/login.html").getContent() == null) {
 			System.out.println("[MosMetro] Wrong network");
+			return;
+		}
+		
+		// Check internet connection
+		if (client.navigate("https://wtfismyip.com/text").getContent() != null) {
+			System.out.println("[MosMetro] Already connected");
 			return;
 		}
 	}
