@@ -35,6 +35,7 @@ public class MosMetro extends Activity
 	// Handling connection button
 	public void connect (View view) {
 		HttpClient client = new HttpClient();
+		String temp;
 
 		// Check network
 		if (client.navigate("http://1.1.1.1/login.html").getContent() == null) {
@@ -45,6 +46,20 @@ public class MosMetro extends Activity
 		// Check internet connection
 		if (client.navigate("https://wtfismyip.com/text").getContent() != null) {
 			System.out.println("[MosMetro] Already connected");
+			return;
+		}
+		
+		// Get initial redirect
+		temp = client.navigate("http://vmet.ro").getContent();
+		
+		final Pattern pLink = Pattern.compile(".*(https?:[^\"]*).*");
+		Matcher mRedirectLink = pLink.matcher(temp);
+		
+		if (mRedirectLink.matches()) {
+			temp = mRedirectLink.group(1);
+			System.out.println("[MosMetro] Redirect link received: " + temp);
+		} else {
+			System.out.println("[MosMetro] Redirect link receiving failed");
 			return;
 		}
 	}
