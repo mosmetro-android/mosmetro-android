@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import android.view.View;
-import android.widget.TextView;
+import android.widget.EditText;
 
 import java.io.*;
 import java.util.regex.*;
@@ -21,7 +21,7 @@ public class MosMetro extends Activity
         setContentView(R.layout.main);
         
         // Redirect stdout to TextView "messages"
-		final TextView messages = (TextView)findViewById(R.id.messages);
+		final EditText messages = (EditText)findViewById(R.id.messages);
 		System.setOut(new PrintStream(new OutputStream() {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
