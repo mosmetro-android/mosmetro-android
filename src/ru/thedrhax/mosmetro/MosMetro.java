@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.io.*;
-import java.util.regex.*;
 
 import ru.thedrhax.httpclient.*;
 
