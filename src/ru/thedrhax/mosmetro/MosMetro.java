@@ -51,7 +51,13 @@ public class MosMetro extends Activity
 		
 		// Get initial redirect
 		temp = client.navigate("http://vmet.ro").getContent();
-		
+
+		System.out.println(
+			"==== 1. redirect page ====\n" +
+			temp +
+			"\n===="
+		);
+
 		final Pattern pLink = Pattern.compile(".*(https?:[^\"]*).*");
 		Matcher mRedirectLink = pLink.matcher(temp);
 		
