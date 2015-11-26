@@ -35,35 +35,51 @@ public class MosMetro extends Activity
 	// Handling connection button
 	public void connect (View view) {
 		HttpClient client = new HttpClient();
-		String temp;
+		HTMLFormParser parser = new HTMLFormParser();
+		
+		String page,fields,link;
 
 		// Check network
 		if (client.navigate("http://1.1.1.1/login.html").getContent() == null) {
-			System.out.println("[MosMetro] Wrong network");
+			System.out.println("Wrong network");
 			return;
 		}
 		
 		// Check internet connection
 		if (client.navigate("https://wtfismyip.com/text").getContent() != null) {
-			System.out.println("[MosMetro] Already connected");
+			System.out.println("Already connected");
 			return;
 		}
+		
+		client.setIgnoreSSL(true);
 		
 		// Get initial redirect
-		temp = client.navigate("http://vmet.ro").getContent();
+		page = client.navigate("http://vmet.ro").getContent();
+		System.out.println("== 1. redirect ==\n" + page + "\n=========");
 
-		final Pattern pLink = Pattern.compile(
-			".*(https?:[^\"]*).*",
-			Pattern.DOTALL
-		);
-		Matcher mRedirectLink = pLink.matcher(temp);
+		Pattern pLink = Pattern.compile("https?:[^\"]*");
+		Matcher mLinkRedirect = pLink.matcher(page);
 		
-		if (mRedirectLink.matches()) {
-			temp = mRedirectLink.group(1);
-			System.out.println("[MosMetro] Redirect link received: " + temp);
+		if (mLinkRedirect.find()) {
+			link = mLinkRedirect.group(0);
+			System.out.println("Redirect link received: " + link);
 		} else {
-			System.out.println("[MosMetro] Redirect link receiving failed");
+			System.out.println("Redirect failed");
 			return;
 		}
+		
+		// Get auth page
+		page = client.navigate(link).getContent();
+		System.out.println("== 2. auth ==\n" + page + "\n=========");
+		
+		// Send parsed fields
+		fields = parser.parse(page).toString();
+		page = client.navigate(link, fields).getContent();
+		System.out.println("== 3. hidden auth ==\n" + page + "\n=========");
+		
+		// Send parsed fields to router
+		fields = parser.parse(page).toString();
+		page = client.navigate("http://1.1.1.1/login.html", fields).getContent();
+		System.out.println("== 4. router ==\n" + page + "\n=========");
 	}
 }
