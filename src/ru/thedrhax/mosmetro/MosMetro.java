@@ -58,7 +58,10 @@ public class MosMetro extends Activity
 			"\n===="
 		);
 
-		final Pattern pLink = Pattern.compile(".*(https?:[^\"]*).*");
+		final Pattern pLink = Pattern.compile(
+			".*(https?:[^\"]*).*",
+			Pattern.DOTALL
+		);
 		Matcher mRedirectLink = pLink.matcher(temp);
 		
 		if (mRedirectLink.matches()) {
