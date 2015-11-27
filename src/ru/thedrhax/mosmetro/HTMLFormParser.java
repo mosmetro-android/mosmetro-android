@@ -18,6 +18,7 @@ public class HTMLFormParser {
 	public HTMLFormParser parse (String content) {
 		fields = new ArrayList<String>();
 		
+		if (content == null) return this;
 		Matcher mInputs = pInputs.matcher(content);
 		while (mInputs.find()) {
 			Matcher mFieldName = pFieldName.matcher(mInputs.group(0));
