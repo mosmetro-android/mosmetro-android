@@ -71,11 +71,13 @@ public class MosMetro extends Activity
 		// Get auth page
 		page = client.navigate(link).getContent();
 		System.out.println("== 2. auth ==\n" + page + "\n=========");
+		if (page == null) return;
 		
 		// Send parsed fields
 		fields = parser.parse(page).toString();
 		page = client.navigate(link, fields).getContent();
 		System.out.println("== 3. hidden auth ==\n" + page + "\n=========");
+		if (page == null) return;
 		
 		// Send parsed fields to router
 		fields = parser.parse(page).toString();
