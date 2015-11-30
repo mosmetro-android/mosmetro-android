@@ -35,6 +35,8 @@ public class MosMetro extends Activity
 	// Handling connection button
 	public void connect (View view) {
 		HttpClient client = new HttpClient();
+		client.setUserAgent("Mozilla/5.0 (Linux; Android 5.1.1; A0001 Build/LMY48B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
+		
 		HTMLFormParser parser = new HTMLFormParser();
 		
 		String page,fields,link;
