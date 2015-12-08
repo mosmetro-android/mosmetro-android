@@ -135,9 +135,14 @@ public class HttpRequest {
 							.getErrorStream();
 			}
 			
-			BufferedReader reader = new BufferedReader(
-				new InputStreamReader(stream)
-			);
+			BufferedReader reader;
+			try {
+				reader = new BufferedReader(
+					new InputStreamReader(stream)
+				);
+			} catch (Exception ex) {
+				return this;
+			}
 			
 			String input;
 			StringBuffer buffer = new StringBuffer();
@@ -170,6 +175,7 @@ public class HttpRequest {
 	}
 	
 	public String getCookies() {
+		if (header == null) return "";
 		List<String> cookies = header.get("Set-Cookie");
 		if (cookies == null) return "";
 		
