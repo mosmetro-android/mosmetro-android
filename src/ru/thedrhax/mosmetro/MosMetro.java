@@ -68,8 +68,10 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Error getting redirect page");
 				return;
+			} else {
+				log(page);
 			}
-
+			
 			// Выделение ссылки на страницу авторизации
 			Pattern pLink = Pattern.compile("https?:[^\"]*");
 			Matcher mLinkRedirect = pLink.matcher(page);
@@ -77,6 +79,7 @@ public class MosMetro extends Activity
 			log(">> Parsing redirect");
 			if (mLinkRedirect.find()) {
 				link = mLinkRedirect.group(0);
+				log(link);
 			} else {
 				log("<< Failed to parse redirect");
 				return;
@@ -90,6 +93,8 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Failed to get auth page");
 				return;
+			} else {
+				log(page);
 			}
 			
 			// Парсинг формы авторизации
@@ -100,6 +105,8 @@ public class MosMetro extends Activity
 			if (fields == null) {
 				log("<< Failed to parse auth form");
 				return;
+			} else {
+				log(fields);
 			}
 			
 			// Отправка запроса с данными формы
@@ -110,6 +117,8 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Failed to get second auth page");
 				return;
+			} else {
+				log(page);
 			}
 			
 			// Парсинг второй формы
@@ -120,6 +129,8 @@ public class MosMetro extends Activity
 			if (fields == null) {
 				log("<< Failed to parse second auth form");
 				return;
+			} else {
+				log(fields);
 			}
 			
 			// Отправка запроса с данными второй формы
@@ -130,6 +141,8 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Failed to send second form data");
 				return;
+			} else {
+				log(page);
 			}
 			
 			log("Finished successfully");
