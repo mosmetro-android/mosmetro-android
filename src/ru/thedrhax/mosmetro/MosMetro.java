@@ -49,7 +49,7 @@ public class MosMetro extends Activity
 			// Проверка соединения с интернетом
 			log(">> Checking connection");
 			if (client
-					.navigate("https://wtfismyip.com/text")
+					.navigate("https://google.ru")
 					.getContent() != null
 				) {
 				log("<< Already connected");
@@ -110,39 +110,13 @@ public class MosMetro extends Activity
 			}
 			
 			// Отправка запроса с данными формы
-			log(">> Getting second auth page");
+			log(">> Submitting auth form");
 			page = client
 					.navigate(link, fields)
 					.getContent();
 			if (page == null) {
-				log("<< Failed to get second auth page");
+				log("<< Failed to submit auth form");
 				return;
-			} else {
-				log(page);
-			}
-			
-			// Парсинг второй формы
-			log(">> Parsing second auth form");
-			fields = parser
-						.parse(page)
-						.toString();
-			if (fields == null) {
-				log("<< Failed to parse second auth form");
-				return;
-			} else {
-				log(fields);
-			}
-			
-			// Отправка запроса с данными второй формы
-			log(">> Sending second form data");
-			page = client
-					.navigate("http://1.1.1.1/login.html", fields)
-					.getContent();
-			if (page == null) {
-				log("<< Failed to send second form data");
-				return;
-			} else {
-				log(page);
 			}
 			
 			log("Finished successfully");
