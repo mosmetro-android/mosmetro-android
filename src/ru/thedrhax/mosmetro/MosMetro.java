@@ -26,59 +26,113 @@ public class MosMetro extends Activity
 	private Thread thread;
 	private Runnable runnable = new Runnable () {
 		public void run () {
+			// Блок объявлений
 			HttpClient client = new HttpClient();
 			client.setUserAgent("Mozilla/5.0 (Linux; Android 5.1.1; A0001 Build/LMY48B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
+			client.setTimeout(3000);
 			
+			// Парсер HTML форм
 			HTMLFormParser parser = new HTMLFormParser();
 			
 			String page,fields,link;
 
-			// Check network
-			if (client.navigate("http://1.1.1.1/login.html")
-					.getContent() == null) {
-				log("Wrong network");
+			// Проверка сети
+			log(">> Checking network");
+			if (client
+					.navigate("http://1.1.1.1/login.html")
+					.getContent() == null
+				) {
+				log("<< Wrong network");
 				return;
 			}
 			
-			// Check internet connection
-			if (client.navigate("https://wtfismyip.com/text")
-					.getContent() != null) {
-				log("Already connected");
+			// Проверка соединения с интернетом
+			log(">> Checking connection");
+			if (client
+					.navigate("https://wtfismyip.com/text")
+					.getContent() != null
+				) {
+				log("<< Already connected");
 				return;
 			}
+			
+			log("<< All checks passed\n>> Connecting...");
 			
 			client.setIgnoreSSL(true);
 			
-			// Get initial redirect
-			page = client.navigate("http://vmet.ro").getContent();
-			log("== 1. redirect ==\n" + page + "\n=========");
+			// Получение страницы с редиректом
+			log(">> Getting redirect page");
+			page = client
+					.navigate("http://vmet.ro")
+					.getContent();
+			if (page == null) {
+				log("<< Error getting redirect page");
+				return;
+			}
 
+			// Выделение ссылки на страницу авторизации
 			Pattern pLink = Pattern.compile("https?:[^\"]*");
 			Matcher mLinkRedirect = pLink.matcher(page);
 			
+			log(">> Parsing redirect");
 			if (mLinkRedirect.find()) {
 				link = mLinkRedirect.group(0);
-				log("Redirect link received: " + link);
 			} else {
-				log("Redirect failed");
+				log("<< Failed to parse redirect");
 				return;
 			}
 			
-			// Get auth page
-			page = client.navigate(link).getContent();
-			log("== 2. auth ==\n" + page + "\n=========");
-			if (page == null) return;
+			// Получение страницы авторизации
+			log(">> Getting auth page");
+			page = client
+					.navigate(link)
+					.getContent();
+			if (page == null) {
+				log("<< Failed to get auth page");
+				return;
+			}
 			
-			// Send parsed fields
-			fields = parser.parse(page).toString();
-			page = client.navigate(link, fields).getContent();
-			log("== 3. hidden auth ==\n" + page + "\n=========");
-			if (page == null) return;
+			// Парсинг формы авторизации
+			log(">> Parsing auth form");
+			fields = parser
+						.parse(page)
+						.toString();
+			if (fields == null) {
+				log("<< Failed to parse auth form");
+				return;
+			}
 			
-			// Send parsed fields to router
-			fields = parser.parse(page).toString();
-			page = client.navigate("http://1.1.1.1/login.html", fields).getContent();
-			log("== 4. router ==\n" + page + "\n=========");
+			// Отправка запроса с данными формы
+			log(">> Getting second auth page");
+			page = client
+					.navigate(link, fields)
+					.getContent();
+			if (page == null) {
+				log("<< Failed to get second auth page");
+				return;
+			}
+			
+			// Парсинг второй формы
+			log(">> Parsing second auth form");
+			fields = parser
+						.parse(page)
+						.toString();
+			if (fields == null) {
+				log("<< Failed to parse second auth form");
+				return;
+			}
+			
+			// Отправка запроса с данными второй формы
+			log(">> Sending second form data");
+			page = client
+					.navigate("http://1.1.1.1/login.html", fields)
+					.getContent();
+			if (page == null) {
+				log("<< Failed to send second form data");
+				return;
+			}
+			
+			log("Finished successfully");
 		}
 		
 		private void log(String text) {
