@@ -1,3 +1,0 @@
-[submodule "src/ru/thedrhax/httpclient"]
-	path = src/ru/thedrhax/httpclient
-	url = git@local.thedrhax.pw:Java/HttpClient
