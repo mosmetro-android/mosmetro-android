@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import android.view.View;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.*;
 import java.util.regex.*;
@@ -143,7 +143,7 @@ public class MosMetro extends Activity
 	
 	private final Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
-			EditText messages = (EditText)findViewById(R.id.messages);
+			TextView messages = (TextView)findViewById(R.id.text_messages);
 			messages.append(msg.getData().getString("text"));
 		}
 	};

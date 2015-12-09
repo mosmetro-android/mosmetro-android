@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 >
-    
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-    >
-    
-        <EditText android:id="@+id/messages"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:textSize="12sp"
-        />
-        
-    </ScrollView>
-    
+
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_connect"
-        android:onClick="connect"
-    />
+        android:id="@+id/button_connect"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:onClick="connect" />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_messages"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/button_connect"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:enabled="true"
+        android:textIsSelectable="true" />
+</RelativeLayout>
 
 
