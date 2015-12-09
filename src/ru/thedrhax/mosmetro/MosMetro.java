@@ -59,6 +59,7 @@ public class MosMetro extends Activity
 			log("<< All checks passed\n>> Connecting...");
 			
 			client.setIgnoreSSL(true);
+			client.setMaxRetries(3);
 			
 			// Получение страницы с редиректом
 			log(">> Getting redirect page");
