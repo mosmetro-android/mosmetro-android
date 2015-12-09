@@ -6,6 +6,7 @@ public class HttpClient {
 	private String userAgent;
 	private boolean ignoreSSL = false;
 	private int timeout = 1000;
+	private int retries = 0;
 	
 	/*
 	 * Set initial request headers
@@ -31,7 +32,9 @@ public class HttpClient {
 	public HttpClient setTimeout(int timeout) {
 		this.timeout = timeout; return this;
 	}
-	
+	public HttpClient setMaxRetries (int retries) {
+		this.retries = retries; return this;
+	}
 	
 	/*
 	 * Methods
@@ -46,7 +49,7 @@ public class HttpClient {
 		if (ignoreSSL) request.setIgnoreSSL();
 		if (timeout != 1000) request.setTimeout(timeout);
 		
-		request.connect();
+		request.connect(retries);
 		
 		cookies += request.getCookies();
 		referer = address;

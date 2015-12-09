@@ -127,8 +127,8 @@ public class HttpRequest {
 		try {
 			InputStream stream;
 			if (((HttpURLConnection)connection)
-					.getResponseCode() / 100 == 2) {
-				stream = ((HttpURLConnection)connection)
+					.getResponseCode() < 400) {
+				stream = connection
 							.getInputStream();
 			} else {
 				stream = ((HttpURLConnection)connection)
@@ -166,6 +166,13 @@ public class HttpRequest {
 		return this;
 	}
 	
+	public HttpRequest connect (int retries) {
+		for (int i = 0; i < retries + 1; i++) {
+			connect();
+			if (content != null) break;
+		}
+		return this;
+	}
 	/*
 	 * Get request results 
 	 */
