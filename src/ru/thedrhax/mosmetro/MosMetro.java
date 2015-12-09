@@ -29,7 +29,7 @@ public class MosMetro extends Activity
 			// Блок объявлений
 			HttpClient client = new HttpClient();
 			client.setUserAgent("Mozilla/5.0 (Linux; Android 5.1.1; A0001 Build/LMY48B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
-			client.setTimeout(3000);
+			client.setTimeout(2000);
 			
 			// Парсер HTML форм
 			HTMLFormParser parser = new HTMLFormParser();
