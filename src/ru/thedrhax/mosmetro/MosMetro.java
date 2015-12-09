@@ -120,7 +120,16 @@ public class MosMetro extends Activity
 				return;
 			}
 			
-			log("Finished successfully");
+			// Проверка соединения с интернетом
+			log(">> Checking connection");
+			if (client
+					.navigate("https://google.ru")
+					.getContent() != null
+				) {
+				log("<< Connected successfully! :3");
+			} else {
+				log("<< Something wrong happened :C");
+			}
 		}
 		
 		private void log(String text) {
