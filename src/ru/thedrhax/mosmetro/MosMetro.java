@@ -69,8 +69,6 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Error getting redirect page");
 				return;
-			} else {
-				log(page);
 			}
 			
 			// Выделение ссылки на страницу авторизации
@@ -80,7 +78,6 @@ public class MosMetro extends Activity
 			log(">> Parsing redirect");
 			if (mLinkRedirect.find()) {
 				link = mLinkRedirect.group(0);
-				log(link);
 			} else {
 				log("<< Failed to parse redirect");
 				return;
@@ -94,8 +91,6 @@ public class MosMetro extends Activity
 			if (page == null) {
 				log("<< Failed to get auth page");
 				return;
-			} else {
-				log(page);
 			}
 			
 			// Парсинг формы авторизации
@@ -106,8 +101,6 @@ public class MosMetro extends Activity
 			if (fields == null) {
 				log("<< Failed to parse auth form");
 				return;
-			} else {
-				log(fields);
 			}
 			
 			// Отправка запроса с данными формы
