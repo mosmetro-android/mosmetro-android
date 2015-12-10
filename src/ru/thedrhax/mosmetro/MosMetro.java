@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.*;
+import java.net.*;
+import javax.net.ssl.*;
 import java.util.regex.*;
 
 import ru.thedrhax.httpclient.*;
@@ -37,23 +39,24 @@ public class MosMetro extends Activity
 
 			// Проверка сети
 			log(">> Checking network");
-			if (client
+			try {
+				client
 					.navigate("http://1.1.1.1/login.html")
-					.getContent() == null
-				) {
+					.getContent();
+			} catch (Exception ex) {
 				log("<< Wrong network");
 				return;
 			}
 			
 			// Проверка соединения с интернетом
 			log(">> Checking connection");
-			if (client
+			try {
+				client
 					.navigate("https://google.ru")
-					.getContent() != null
-				) {
+					.getContent();
 				log("<< Already connected");
 				return;
-			}
+			} catch (Exception ex) {}
 			
 			log("<< All checks passed\n>> Connecting...");
 			
@@ -62,11 +65,15 @@ public class MosMetro extends Activity
 			
 			// Получение страницы с редиректом
 			log(">> Getting redirect page");
-			page = client
-					.navigate("http://vmet.ro")
-					.getContent();
-			if (page == null) {
-				log("<< Error getting redirect page");
+			try {
+				page = client
+						.navigate("http://vmet.ro")
+						.getContent();
+			} catch (IOException ex) {
+				log("<< Failed to get redirect page: " + ex.toString());
+				return;
+			} catch (Exception ex) {
+				log("<< Unknown exception: " + ex.toString());
 				return;
 			}
 			
@@ -78,17 +85,27 @@ public class MosMetro extends Activity
 			if (mLinkRedirect.find()) {
 				link = mLinkRedirect.group(0);
 			} else {
-				log("<< Failed to parse redirect");
+				log("<< Redirect link not found");
 				return;
 			}
 			
 			// Получение страницы авторизации
 			log(">> Getting auth page");
-			page = client
-					.navigate(link)
-					.getContent();
-			if (page == null) {
-				log("<< Failed to get auth page");
+			try {
+				page = client
+						.navigate(link)
+						.getContent();
+			} catch (MalformedURLException ex) {
+				log("<< Incorrect redirect URL: " + ex.toString());
+				return;
+			} catch (SSLHandshakeException ex) {
+				log("<< SSL handshake failed: " + ex.toString());
+				return;
+			} catch (IOException ex) {
+				log("<< Failed to get auth page: " + ex.toString());
+				return;
+			} catch (Exception ex) {
+				log("<< Unknown exception: " + ex.toString());
 				return;
 			}
 			
@@ -104,22 +121,29 @@ public class MosMetro extends Activity
 			
 			// Отправка запроса с данными формы
 			log(">> Submitting auth form");
-			page = client
-					.navigate(link, fields)
-					.getContent();
-			if (page == null) {
-				log("<< Failed to submit auth form");
+			try {
+				page = client
+						.navigate(link, fields)
+						.getContent();
+			} catch (SSLHandshakeException ex) {
+				log("<< SSL handshake failed: " + ex.toString());
+				return;
+			} catch (IOException ex) {
+				log("<< Failed to submit auth form: " + ex.toString());
+				return;
+			} catch (Exception ex) {
+				log("<< Unknown exception: " + ex.toString());
 				return;
 			}
 			
 			// Проверка соединения с интернетом
 			log(">> Checking connection");
-			if (client
+			try {
+				client
 					.navigate("https://google.ru")
-					.getContent() != null
-				) {
+					.getContent();
 				log("<< Connected successfully! :3");
-			} else {
+			} catch (Exception ex) {
 				log("<< Something wrong happened :C");
 			}
 		}

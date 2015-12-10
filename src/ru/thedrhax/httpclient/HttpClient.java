@@ -1,11 +1,15 @@
 package ru.thedrhax.httpclient;
 
+import java.net.*;
+import javax.net.ssl.*;
+import java.io.*;
+
 public class HttpClient {
-	private String cookies = "";
-	private String referer = "";
+	private String cookies;
+	private URL referer;
 	private String userAgent;
+	private int timeout = 5000;
 	private boolean ignoreSSL = false;
-	private int timeout = 1000;
 	private int retries = 0;
 	
 	/*
@@ -15,8 +19,11 @@ public class HttpClient {
 	public HttpClient setCookies (String cookies) {
 		this.cookies = cookies; return this;
 	}
-	public HttpClient setReferer (String referer) {
+	public HttpClient setReferer (URL referer) {
 		this.referer = referer; return this;
+	}
+	public HttpClient setReferer (String referer) throws MalformedURLException {
+		return setReferer(new URL(referer));
 	}
 	public HttpClient setUserAgent (String userAgent) {
 		this.userAgent = userAgent; return this;
@@ -40,24 +47,32 @@ public class HttpClient {
 	 * Methods
 	 */
 	
-	public HttpRequest navigate (String address, String params) {
-		HttpRequest request = new HttpRequest(address, params);
+	public HttpRequest navigate (URL url, String params) throws IOException, SSLHandshakeException {
+		HttpRequest request = new HttpRequest(url, params);
 		
-		request.setCookies(cookies);
-		request.setReferer(referer);
-		request.setUserAgent(userAgent);
-		if (ignoreSSL) request.setIgnoreSSL();
-		if (timeout != 1000) request.setTimeout(timeout);
+		if (cookies != null)	request.setCookies(cookies);
+		if (referer != null)	request.setReferer(referer);
+		if (userAgent != null)	request.setUserAgent(userAgent);
+		if (ignoreSSL)			request.setIgnoreSSL();
+		request.setTimeout(timeout);
 		
 		request.connect(retries);
 		
 		cookies += request.getCookies();
-		referer = address;
+		referer = url;
 		
 		return request;
 	}
 	
-	public HttpRequest navigate (String address) {
-		return navigate(address, null);
+	public HttpRequest navigate (URL url) throws IOException, SSLHandshakeException {
+		return navigate(url, null);
 	}
+	
+	public HttpRequest navigate (String address, String params) throws MalformedURLException, IOException, SSLHandshakeException {
+		return navigate(new URL(address), params);
+	}
+	
+	public HttpRequest navigate (String address) throws MalformedURLException, IOException, SSLHandshakeException {
+		return navigate(address, null);
+	}	
 }

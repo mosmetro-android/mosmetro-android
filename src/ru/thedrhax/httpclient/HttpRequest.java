@@ -7,7 +7,7 @@ import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
 
 public class HttpRequest {
-	private String address;
+	private URL url;
 	private String params;
 	
 	private URLConnection connection;
@@ -24,8 +24,8 @@ public class HttpRequest {
 		connection.addRequestProperty("Cookie", cookies);
 		return this;
 	}
-	public HttpRequest setReferer (String referer) {
-		connection.addRequestProperty("Referer", referer);
+	public HttpRequest setReferer (URL referer) {
+		connection.addRequestProperty("Referer", referer.toString());
 		return this;
 	}
 	public HttpRequest setUserAgent (String userAgent) {
@@ -70,53 +70,37 @@ public class HttpRequest {
 	 *  Public constructors
 	 */
 	
-	public HttpRequest (String address, String params) {
-		this.address = address;
+	public HttpRequest (URL url, String params) throws IOException {
+		this.url = url;
 		this.params = params;
 		
-		URL url;
-		try {
-			url = new URL(address);
-		} catch (MalformedURLException ex) {
-			System.out.println("Wrong URL: " + ex.toString());
-			return;
-		}
 		isHttps = url.getProtocol().equals("https");
 		
-		try {
-			connection = url.openConnection();
-		} catch (IOException ex) {
-			System.out.println("Connection error: " + ex.toString());
-			return;
-		}
-		
-		setTimeout(1000);
+		connection = url.openConnection();
 	}
 	
-	public HttpRequest (String address) {
-		this(address, null);
+	public HttpRequest (URL  url) throws IOException {
+		this(url, null);
 	}
 	
 	// Request sequence
-	public HttpRequest connect() {
+	public HttpRequest connect() throws IOException, SSLHandshakeException {
 		// Send POST data if defined
 		if (params != null) {
 			try{
 				((HttpURLConnection)connection).setRequestMethod("POST");
 			} catch (ProtocolException ex) {}
-			try {
-				connection.setDoOutput(true);
-
-				OutputStreamWriter writer = new OutputStreamWriter (
-					connection.getOutputStream()
-				);
 			
-				writer.write(params);
-				writer.flush();
-				writer.close();
-			} catch (IOException ex) {
-				System.out.println("Error sending data: " + ex.toString());
-			}
+			
+			connection.setDoOutput(true);
+
+			OutputStreamWriter writer = new OutputStreamWriter (
+				connection.getOutputStream()
+			);
+		
+			writer.write(params);
+			writer.flush();
+			writer.close();
 		} else {
 			try {
 				((HttpURLConnection)connection).setRequestMethod("GET");
@@ -124,53 +108,43 @@ public class HttpRequest {
 		}
 			
 		// Read server answer
-		try {
-			InputStream stream;
-			if (((HttpURLConnection)connection)
-					.getResponseCode() < 400) {
-				stream = connection
-							.getInputStream();
-			} else {
-				stream = ((HttpURLConnection)connection)
-							.getErrorStream();
-			}
-			
-			BufferedReader reader;
-			try {
-				reader = new BufferedReader(
-					new InputStreamReader(stream)
-				);
-			} catch (Exception ex) {
-				return this;
-			}
-			
-			String input;
-			StringBuffer buffer = new StringBuffer();
-			
-			while ((input = reader.readLine()) != null) {
-				buffer.append(input + "\r\n");
-			}
-			
-			reader.close();
-			
-			content = buffer.toString();
-		} catch (SSLHandshakeException ex) {
-			System.out.println("SSL handshake error: " + ex.toString());
-			content = null;
-		} catch (IOException ex) {
-			System.out.println("Error receiving data: " + ex.toString());
-			content = null;
+		InputStream stream;
+		if (((HttpURLConnection)connection).getResponseCode() < 400) {
+			stream = connection
+				.getInputStream();
+		} else {
+			stream = ((HttpURLConnection)connection)
+				.getErrorStream();
 		}
+		
+		BufferedReader reader;
+		reader = new BufferedReader(
+			new InputStreamReader(stream)
+		);
+		
+		String input;
+		StringBuffer buffer = new StringBuffer();
+		
+		while ((input = reader.readLine()) != null) {
+			buffer.append(input + "\r\n");
+		}
+		
+		reader.close();
+		
+		content = buffer.toString();
 		header = connection.getHeaderFields();
 		
 		return this;
 	}
 	
-	public HttpRequest connect (int retries) {
-		for (int i = 0; i < retries + 1; i++) {
-			connect();
-			if (content != null) break;
+	public HttpRequest connect (int retries) throws IOException, SSLHandshakeException {
+		for (int i = 0; i < retries; i++) {
+			try {
+				connect();
+				break;
+			} catch (Exception ex) {}
 		}
+		connect(); // Last try
 		return this;
 	}
 	/*
