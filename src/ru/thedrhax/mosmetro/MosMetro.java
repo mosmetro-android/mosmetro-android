@@ -70,10 +70,10 @@ public class MosMetro extends Activity
 						.navigate("http://vmet.ro")
 						.getContent();
 			} catch (IOException ex) {
-				log("<< Failed to get redirect page: " + ex.toString());
+				log("<< Failed to get redirect page: " + exToStr(ex));
 				return;
 			} catch (Exception ex) {
-				log("<< Unknown exception: " + ex.toString());
+				log("<< Unknown exception: " + exToStr(ex));
 				return;
 			}
 			
@@ -96,16 +96,16 @@ public class MosMetro extends Activity
 						.navigate(link)
 						.getContent();
 			} catch (MalformedURLException ex) {
-				log("<< Incorrect redirect URL: " + ex.toString());
+				log("<< Incorrect redirect URL: " + exToStr(ex));
 				return;
 			} catch (SSLHandshakeException ex) {
-				log("<< SSL handshake failed: " + ex.toString());
+				log("<< SSL handshake failed: " + exToStr(ex));
 				return;
 			} catch (IOException ex) {
-				log("<< Failed to get auth page: " + ex.toString());
+				log("<< Failed to get auth page: " + exToStr(ex));
 				return;
 			} catch (Exception ex) {
-				log("<< Unknown exception: " + ex.toString());
+				log("<< Unknown exception: " + exToStr(ex));
 				return;
 			}
 			
@@ -126,13 +126,13 @@ public class MosMetro extends Activity
 						.navigate(link, fields)
 						.getContent();
 			} catch (SSLHandshakeException ex) {
-				log("<< SSL handshake failed: " + ex.toString());
+				log("<< SSL handshake failed: " + exToStr(ex));
 				return;
 			} catch (IOException ex) {
-				log("<< Failed to submit auth form: " + ex.toString());
+				log("<< Failed to submit auth form: " + exToStr(ex));
 				return;
 			} catch (Exception ex) {
-				log("<< Unknown exception: " + ex.toString());
+				log("<< Unknown exception: " + exToStr(ex));
 				return;
 			}
 			
@@ -154,6 +154,12 @@ public class MosMetro extends Activity
 			bundle.putString("text", text + "\n");
 			msg.setData(bundle);
 			handler.sendMessage(msg);
+		}
+		
+		private String exToStr (Exception ex) {
+			StringWriter wr = new StringWriter();
+			ex.printStackTrace(new PrintWriter(wr));
+			return wr.toString();
 		}
 	};
 	
