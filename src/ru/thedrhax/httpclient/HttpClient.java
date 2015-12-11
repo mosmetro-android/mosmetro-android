@@ -56,7 +56,18 @@ public class HttpClient {
 		if (ignoreSSL)			request.setIgnoreSSL();
 		request.setTimeout(timeout);
 		
-		request.connect(retries);
+		for (int i = 0; i < retries + 1; i++) {
+			try {
+				request.connect();
+				break;
+			} catch (IOException|SSLHandshakeException ex) {
+				if (i == retries - 1) {
+					throw(ex);
+				} else {
+					request = new HttpRequest(url, params);
+				}
+			}
+		}
 		
 		cookies += request.getCookies();
 		referer = url;

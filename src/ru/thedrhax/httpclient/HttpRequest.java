@@ -140,16 +140,6 @@ public class HttpRequest {
 		return this;
 	}
 	
-	public HttpRequest connect (int retries) throws IOException, SSLHandshakeException {
-		for (int i = 0; i < retries; i++) {
-			try {
-				connect();
-				break;
-			} catch (Exception ex) {}
-		}
-		connect(); // Last try
-		return this;
-	}
 	/*
 	 * Get request results 
 	 */
