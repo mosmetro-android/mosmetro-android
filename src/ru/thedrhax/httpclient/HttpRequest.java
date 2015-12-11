@@ -106,7 +106,15 @@ public class HttpRequest {
 			
 		// Read server answer
 		InputStream stream;
-		if (((HttpURLConnection)connection).getResponseCode() < 400) {
+		int responseCode = 200;
+
+		try {
+			responseCode = ((HttpURLConnection) connection).getResponseCode();
+		} catch (Exception ex) {
+			responseCode = ((HttpURLConnection) connection).getResponseCode();
+		}
+
+		if (responseCode < 400) {
 			stream = connection
 				.getInputStream();
 		} else {
