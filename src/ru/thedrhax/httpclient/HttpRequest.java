@@ -7,7 +7,6 @@ import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
 
 public class HttpRequest {
-	private URL url;
 	private String params;
 	
 	private URLConnection connection;
@@ -71,7 +70,6 @@ public class HttpRequest {
 	 */
 	
 	public HttpRequest (URL url, String params) throws IOException {
-		this.url = url;
 		this.params = params;
 		
 		isHttps = url.getProtocol().equals("https");
@@ -121,7 +119,7 @@ public class HttpRequest {
 		);
 		
 		String input;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		try {
 			while ((input = reader.readLine()) != null) {
@@ -152,7 +150,7 @@ public class HttpRequest {
 		List<String> cookies = header.get("Set-Cookie");
 		if (cookies == null) return "";
 		
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		for (String cookie : cookies) {
 			buffer.append(cookie.substring(0, cookie.indexOf(';')) + "; ");

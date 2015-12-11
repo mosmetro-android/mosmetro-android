@@ -22,10 +22,10 @@ public class HTMLFormParser {
 		Matcher mInputs = pInputs.matcher(content);
 		while (mInputs.find()) {
 			Matcher mFieldName = pFieldName.matcher(mInputs.group(0));
-			mFieldName.find();
+			if (!mFieldName.find()) return this;
 			
 			Matcher mFieldValue = pFieldValue.matcher(mInputs.group(0));
-			mFieldValue.find();
+			if (!mFieldValue.find()) return this;
 
 			try {		
 				fields.add(mFieldName.group(1) + "=" + mFieldValue.group(1));
@@ -39,7 +39,7 @@ public class HTMLFormParser {
 	
 	// Get parsed fields as String
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		for (int i = 0; i < fields.size(); i++) {
 			buffer.append(fields.get(i));
