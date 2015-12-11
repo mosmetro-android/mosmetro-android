@@ -84,7 +84,7 @@ public class HttpRequest {
 	}
 	
 	// Request sequence
-	public HttpRequest connect() throws IOException, SSLHandshakeException {
+	public HttpRequest connect() throws IOException {
 		// Send POST data if defined
 		if (params != null) {
 			try{

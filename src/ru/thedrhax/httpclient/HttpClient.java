@@ -1,7 +1,6 @@
 package ru.thedrhax.httpclient;
 
 import java.net.*;
-import javax.net.ssl.*;
 import java.io.*;
 
 public class HttpClient {
@@ -47,7 +46,7 @@ public class HttpClient {
 	 * Methods
 	 */
 	
-	public HttpRequest navigate (URL url, String params) throws IOException, SSLHandshakeException {
+	public HttpRequest navigate (URL url, String params) throws IOException {
 		HttpRequest request = new HttpRequest(url, params);
 		
 		if (cookies != null)	request.setCookies(cookies);
@@ -60,7 +59,7 @@ public class HttpClient {
 			try {
 				request.connect();
 				break;
-			} catch (IOException|SSLHandshakeException ex) {
+			} catch (IOException ex) {
 				if (i == retries) {
 					throw(ex);
 				} else {
@@ -75,15 +74,15 @@ public class HttpClient {
 		return request;
 	}
 	
-	public HttpRequest navigate (URL url) throws IOException, SSLHandshakeException {
+	public HttpRequest navigate (URL url) throws IOException {
 		return navigate(url, null);
 	}
 	
-	public HttpRequest navigate (String address, String params) throws MalformedURLException, IOException, SSLHandshakeException {
+	public HttpRequest navigate (String address, String params) throws IOException {
 		return navigate(new URL(address), params);
 	}
 	
-	public HttpRequest navigate (String address) throws MalformedURLException, IOException, SSLHandshakeException {
+	public HttpRequest navigate (String address) throws IOException {
 		return navigate(address, null);
 	}	
 }
