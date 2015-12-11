@@ -56,12 +56,12 @@ public class HttpClient {
 		if (ignoreSSL)			request.setIgnoreSSL();
 		request.setTimeout(timeout);
 		
-		for (int i = 0; i < retries + 1; i++) {
+		for (int i = 0; i <= retries; i++) {
 			try {
 				request.connect();
 				break;
 			} catch (IOException|SSLHandshakeException ex) {
-				if (i == retries - 1) {
+				if (i == retries) {
 					throw(ex);
 				} else {
 					request = new HttpRequest(url, params);
