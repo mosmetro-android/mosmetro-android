@@ -1,7 +1,8 @@
 package ru.thedrhax.httpclient;
 
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class HttpClient {
 	private String cookies;

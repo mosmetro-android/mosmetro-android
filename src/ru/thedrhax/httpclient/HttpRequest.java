@@ -1,10 +1,14 @@
 package ru.thedrhax.httpclient;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
 import javax.net.ssl.*;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
 
 public class HttpRequest {
 	private String params;
