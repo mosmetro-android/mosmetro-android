@@ -14,8 +14,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentLeft="true"
             android:onClick="connect" android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"/>
+            android:layout_margin="5dp"/>
     <TextView
             android:layout_width="match_parent"
             android:layout_height="204dp"
@@ -26,9 +25,8 @@
             android:layout_alignParentRight="true"
             android:enabled="true"
             android:textIsSelectable="true"
-            android:layout_gravity="center_horizontal|top" android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp" android:layout_marginRight="10dp" android:layout_marginBottom="5dp"
-            android:background="#cdcdcd" android:textSize="14dp"/>
+            android:layout_gravity="center_horizontal|top"
+            android:background="#cdcdcd" android:textSize="14dp" android:layout_margin="5dp" android:padding="5dp"/>
 </RelativeLayout>
 
 
