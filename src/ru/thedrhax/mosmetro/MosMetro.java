@@ -138,6 +138,8 @@ public class MosMetro extends Activity
 				return;
 			}
 			
+			client.setIgnoreSSL(false);
+			
 			// Проверка соединения с интернетом
 			log(">> Checking connection");
 			try {
