@@ -125,6 +125,8 @@ public class MosMetro extends Activity
 				page = client
 						.navigate(link, fields)
 						.getContent();
+			} catch (IllegalStateException ex) {
+				log("Non critical error: " + exToStr(ex));
 			} catch (SSLHandshakeException ex) {
 				log("<< SSL handshake failed: " + exToStr(ex));
 				return;

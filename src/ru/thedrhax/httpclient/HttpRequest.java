@@ -91,7 +91,6 @@ public class HttpRequest {
 				((HttpURLConnection)connection).setRequestMethod("POST");
 			} catch (ProtocolException ex) {}
 			
-			
 			connection.setDoOutput(true);
 
 			OutputStreamWriter writer = new OutputStreamWriter (
@@ -117,16 +116,20 @@ public class HttpRequest {
 				.getErrorStream();
 		}
 		
-		BufferedReader reader;
-		reader = new BufferedReader(
+		BufferedReader reader = new BufferedReader(
 			new InputStreamReader(stream)
 		);
 		
 		String input;
 		StringBuffer buffer = new StringBuffer();
 		
-		while ((input = reader.readLine()) != null) {
-			buffer.append(input + "\r\n");
+		// TODO: ??????, ??? ???, ????, ??????????
+		try {
+			while ((input = reader.readLine()) != null) {
+				buffer.append(input + "\r\n");
+			}
+		} catch (IOException ex) {
+			return this;
 		}
 		
 		reader.close();
