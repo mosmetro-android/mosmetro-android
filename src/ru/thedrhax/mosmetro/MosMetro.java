@@ -18,15 +18,18 @@ public class MosMetro extends Activity
 
 	// Push received messages to the UI thread
 	private final Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
+		public void handleMessage(Message message) {
+			String text = message.getData().getString("text");
+			if (text == null) return;
+
 			TextView messages = (TextView)findViewById(R.id.text_messages);
-			messages.append(msg.getData().getString("text"));
+			messages.append(text);
 		}
 	};
 
 	// Connection sequence
 	final MosMetroConnection connection = new MosMetroConnection() {
-		// Send log messages to Hadler
+		// Send log messages to Handler
 		public void log (String message) {
 			Message msg = handler.obtainMessage();
 			Bundle bundle = new Bundle();
