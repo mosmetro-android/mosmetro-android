@@ -2,14 +2,22 @@ package ru.thedrhax.mosmetro;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class MosMetro extends Activity {
 	// UI Elements
 	private TextView text_messages;
+
+	// Log file writer
+	FileWriter log_writer;
 
     /** Called when the activity is first created. */
     @Override
@@ -18,6 +26,18 @@ public class MosMetro extends Activity {
 		setContentView(R.layout.main);
 
 		text_messages = (TextView)findViewById(R.id.text_messages);
+
+		// Open log file
+		try {
+			File log_file = new File(
+					Environment.getExternalStorageDirectory().getPath() + "/MosMetro_Log.txt"
+			);
+			if (!log_file.exists()) log_file.createNewFile();
+
+			log_writer = new FileWriter(log_file);
+		} catch (IOException ex) {
+			text_messages.append("Failed to open log file");
+		}
 	}
 
 	// Push received messages to the UI thread
@@ -27,6 +47,12 @@ public class MosMetro extends Activity {
 			if (text == null) return;
 
 			text_messages.append(text);
+			try {
+				if (log_writer != null) {
+					log_writer.write(text);
+					log_writer.flush();
+				}
+			} catch (IOException ignored) {}
 		}
 	};
 
