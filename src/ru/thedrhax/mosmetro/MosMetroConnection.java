@@ -6,11 +6,17 @@ import ru.thedrhax.util.Util;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class MosMetroConnection {
     public void connect() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        log(">> " + dateFormat.format(new Date()));
+
         // Блок объявлений
         HttpClient client = new HttpClient();
         client.setTimeout(2000);
@@ -133,6 +139,8 @@ public abstract class MosMetroConnection {
         } catch (Exception ex) {
             log("<< Something wrong happened :C");
         }
+
+        log("<< " + dateFormat.format(new Date()));
     }
 
     public abstract void log(String message);
