@@ -7,13 +7,17 @@ import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 
-public class MosMetro extends Activity
-{
+public class MosMetro extends Activity {
+	// UI Elements
+	TextView text_messages;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		text_messages = (TextView)findViewById(R.id.text_messages);
 	}
 
 	// Push received messages to the UI thread
@@ -22,8 +26,7 @@ public class MosMetro extends Activity
 			String text = message.getData().getString("text");
 			if (text == null) return;
 
-			TextView messages = (TextView)findViewById(R.id.text_messages);
-			messages.append(text);
+			text_messages.append(text);
 		}
 	};
 
