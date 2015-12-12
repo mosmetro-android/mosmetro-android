@@ -91,7 +91,7 @@ public class HttpRequest {
 		if (params != null) {
 			try{
 				((HttpURLConnection)connection).setRequestMethod("POST");
-			} catch (ProtocolException ex) {}
+			} catch (ProtocolException ignored) {}
 			
 			connection.setDoOutput(true);
 
@@ -105,12 +105,12 @@ public class HttpRequest {
 		} else {
 			try {
 				((HttpURLConnection)connection).setRequestMethod("GET");
-			} catch (ProtocolException ex) {}
+			} catch (ProtocolException ignored) {}
 		}
 			
 		// Read server answer
 		InputStream stream;
-		int responseCode = 200;
+		int responseCode;
 
 		try {
 			responseCode = ((HttpURLConnection) connection).getResponseCode();
@@ -135,7 +135,8 @@ public class HttpRequest {
 		
 		try {
 			while ((input = reader.readLine()) != null) {
-				buffer.append(input + "\r\n");
+				buffer.append(input);
+				buffer.append("\r\n");
 			}
 		} catch (IOException ex) {
 			return this;
@@ -165,7 +166,8 @@ public class HttpRequest {
 		StringBuilder buffer = new StringBuilder();
 		
 		for (String cookie : cookies) {
-			buffer.append(cookie.substring(0, cookie.indexOf(';')) + "; ");
+			buffer.append(cookie.substring(0, cookie.indexOf(';')));
+			buffer.append("; ");
 		}
 		
 		return buffer.toString();

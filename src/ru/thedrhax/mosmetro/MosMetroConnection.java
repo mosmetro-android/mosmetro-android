@@ -39,7 +39,7 @@ public abstract class MosMetroConnection {
                     .getContent();
             log("<< Already connected");
             return;
-        } catch (Exception ex) {}
+        } catch (Exception ignored) {}
 
         log("<< All checks passed\n>> Connecting...");
 
@@ -105,9 +105,9 @@ public abstract class MosMetroConnection {
         // Отправка запроса с данными формы
         log(">> Submitting auth form");
         try {
-            page = client
-                    .navigate(link, fields)
-                    .getContent();
+            client
+                .navigate(link, fields)
+                .getContent();
         } catch (IllegalStateException ex) {
             log("Non critical error: " + Util.exToStr(ex));
         } catch (SSLHandshakeException ex) {
