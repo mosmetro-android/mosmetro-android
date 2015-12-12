@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 public class MosMetro extends Activity {
 	// UI Elements
-	TextView text_messages;
+	private TextView text_messages;
 
     /** Called when the activity is first created. */
     @Override
