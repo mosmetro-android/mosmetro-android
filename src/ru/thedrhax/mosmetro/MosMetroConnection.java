@@ -1,22 +1,16 @@
 package ru.thedrhax.mosmetro;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import ru.thedrhax.httpclient.HttpClient;
+import ru.thedrhax.util.Util;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MosMetroRunnable implements Runnable {
-    private Handler handler;
-
-    public void run () {
+public abstract class MosMetroConnection {
+    public void connect() {
         // Блок объявлений
         HttpClient client = new HttpClient();
         client.setTimeout(2000);
@@ -59,10 +53,10 @@ public class MosMetroRunnable implements Runnable {
                     .navigate("http://vmet.ro")
                     .getContent();
         } catch (IOException ex) {
-            log("<< Failed to get redirect page: " + exToStr(ex));
+            log("<< Failed to get redirect page: " + Util.exToStr(ex));
             return;
         } catch (Exception ex) {
-            log("<< Unknown exception: " + exToStr(ex));
+            log("<< Unknown exception: " + Util.exToStr(ex));
             return;
         }
 
@@ -85,16 +79,16 @@ public class MosMetroRunnable implements Runnable {
                     .navigate(link)
                     .getContent();
         } catch (MalformedURLException ex) {
-            log("<< Incorrect redirect URL: " + exToStr(ex));
+            log("<< Incorrect redirect URL: " + Util.exToStr(ex));
             return;
         } catch (SSLHandshakeException ex) {
-            log("<< SSL handshake failed: " + exToStr(ex));
+            log("<< SSL handshake failed: " + Util.exToStr(ex));
             return;
         } catch (IOException ex) {
-            log("<< Failed to get auth page: " + exToStr(ex));
+            log("<< Failed to get auth page: " + Util.exToStr(ex));
             return;
         } catch (Exception ex) {
-            log("<< Unknown exception: " + exToStr(ex));
+            log("<< Unknown exception: " + Util.exToStr(ex));
             return;
         }
 
@@ -115,15 +109,15 @@ public class MosMetroRunnable implements Runnable {
                     .navigate(link, fields)
                     .getContent();
         } catch (IllegalStateException ex) {
-            log("Non critical error: " + exToStr(ex));
+            log("Non critical error: " + Util.exToStr(ex));
         } catch (SSLHandshakeException ex) {
-            log("<< SSL handshake failed: " + exToStr(ex));
+            log("<< SSL handshake failed: " + Util.exToStr(ex));
             return;
         } catch (IOException ex) {
-            log("<< Failed to submit auth form: " + exToStr(ex));
+            log("<< Failed to submit auth form: " + Util.exToStr(ex));
             return;
         } catch (Exception ex) {
-            log("<< Unknown exception: " + exToStr(ex));
+            log("<< Unknown exception: " + Util.exToStr(ex));
             return;
         }
 
@@ -141,23 +135,5 @@ public class MosMetroRunnable implements Runnable {
         }
     }
 
-    private void log(String text) {
-        if (handler == null) return;
-
-        Message msg = handler.obtainMessage();
-        Bundle bundle = new Bundle();
-        bundle.putString("text", text + "\n");
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
-
-    private String exToStr (Exception ex) {
-        StringWriter wr = new StringWriter();
-        ex.printStackTrace(new PrintWriter(wr));
-        return wr.toString();
-    }
-
-    public MosMetroRunnable (Handler handler) {
-        this.handler = handler;
-    }
+    public abstract void log(String message);
 }
