@@ -20,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".DebugActivity"
+                  android:icon="@drawable/ic_launcher"
+                  android:label="@string/debug_activity_name"
+                  android:theme="@style/AppBaseTheme">
+        </activity>
         
         <service android:name=".ConnectionService">
 

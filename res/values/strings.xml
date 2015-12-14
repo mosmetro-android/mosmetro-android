@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Wi-Fi в метро</string>
     <string name="button_connect">Подключиться</string>
+    <string name="debug_activity_name">Ручное подключение</string>
 </resources>
