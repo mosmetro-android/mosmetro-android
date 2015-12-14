@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,18 +20,31 @@ public class DebugActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.debug);
 
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ignored) {}
+
         text_messages = (TextView)findViewById(R.id.text_messages);
     }
 
-    // Going back to main layout
+    // Going back to main layout on hardware back button press
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent main = new Intent(this, MainActivity.class);
-            startActivity(main);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-            return true;
+            goBack(); return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+    // ... or on menu back button press
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home: goBack(); break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    public void goBack() {
+        Intent main = new Intent(this, MainActivity.class);
+        startActivity(main);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     // Push received messages to the UI thread

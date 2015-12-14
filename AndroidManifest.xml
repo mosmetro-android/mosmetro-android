@@ -24,7 +24,8 @@
         <activity android:name=".DebugActivity"
                   android:icon="@drawable/ic_launcher"
                   android:label="@string/debug_activity_name"
-                  android:theme="@style/AppBaseTheme">
+                  android:theme="@style/AppBaseTheme"
+                  android:parentActivityName=".MainActivity">
         </activity>
         
         <service android:name=".ConnectionService">
