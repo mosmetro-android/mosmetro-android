@@ -12,7 +12,7 @@
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23" />
       
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
-        <activity android:name="MosMetro"
+        <activity android:name=".MainActivity"
                   android:label="@string/app_name"
                   android:theme="@style/AppBaseTheme">
             <intent-filter>

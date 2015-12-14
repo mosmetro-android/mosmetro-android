@@ -25,7 +25,7 @@ public class DebugActivity extends Activity {
     // Going back to main layout
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent main = new Intent(this, MosMetro.class);
+            Intent main = new Intent(this, MainActivity.class);
             startActivity(main);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             return true;
