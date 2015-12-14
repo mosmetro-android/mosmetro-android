@@ -20,6 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <service android:name=".ConnectionService">
+
+        </service>
 
         <receiver android:name=".NetworkReceiver">
             <intent-filter>
