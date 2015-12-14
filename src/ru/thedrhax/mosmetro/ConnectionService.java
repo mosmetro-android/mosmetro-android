@@ -2,10 +2,11 @@ package ru.thedrhax.mosmetro;
 
 import android.app.IntentService;
 import android.content.Intent;
-import java.io.FileWriter;
-import java.io.File;
-import java.io.IOException;
 import android.os.Environment;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class ConnectionService extends IntentService {
 	private static FileWriter log_writer;
@@ -16,7 +17,7 @@ public class ConnectionService extends IntentService {
 	
 	public void onCreate() {
 		super.onCreate();
-		
+
 		if (log_writer == null) {
             // Open log file
             try {
