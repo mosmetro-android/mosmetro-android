@@ -14,39 +14,6 @@ public class DebugActivity extends Activity {
     // UI Elements
     private TextView text_messages;
 
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.debug);
-
-        try {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ignored) {}
-
-        text_messages = (TextView)findViewById(R.id.text_messages);
-    }
-
-    // Going back to main layout on hardware back button press
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            goBack(); return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-    // ... or on menu back button press
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case android.R.id.home: goBack(); break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    public void goBack() {
-        Intent main = new Intent(this, MainActivity.class);
-        startActivity(main);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
-
     // Push received messages to the UI thread
     private final Handler handler = new Handler() {
         public void handleMessage(Message message) {
@@ -77,12 +44,41 @@ public class DebugActivity extends Activity {
         }
     };
 
-    // Handle connection button
-    public void connect (View view) {
-        // Start connection thread if not already running
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.debug);
+
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ignored) {}
+
+        text_messages = (TextView)findViewById(R.id.text_messages);
+
         if ((thread == null) || (!thread.isAlive())) {
             thread = new Thread(task);
             thread.start();
         }
+    }
+
+    // Going back to main layout on hardware back button press
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            goBack(); return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    // ... or on menu back button press
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home: goBack(); break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    public void goBack() {
+        Intent main = new Intent(this, MainActivity.class);
+        startActivity(main);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
