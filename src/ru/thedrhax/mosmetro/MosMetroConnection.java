@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class MosMetroConnection {
+public class MosMetroConnection {
     public void connect() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         log(">> " + dateFormat.format(new Date()));
@@ -143,5 +143,7 @@ public abstract class MosMetroConnection {
         log("<< " + dateFormat.format(new Date()));
     }
 
-    public abstract void log(String message);
+    public void log(String message) {
+        System.out.println(message);
+    }
 }
