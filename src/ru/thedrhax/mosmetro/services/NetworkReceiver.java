@@ -1,4 +1,4 @@
-package ru.thedrhax.mosmetro;
+package ru.thedrhax.mosmetro.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,19 +7,12 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 public class NetworkReceiver extends BroadcastReceiver {
-    private static boolean lock = false;
-
     public void onReceive(Context context, Intent intent) {
         WifiInfo info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
 
-        if (info == null) {
-            lock = false;
-            return;
-        }
+        if (info == null) return;
 
-        if (!lock && "\"MosMetro_Free\"".equals(info.getSSID())) {
-            lock = true;
+        if ("\"MosMetro_Free\"".equals(info.getSSID()))
             context.startService(new Intent(context, ConnectionService.class));
-        }
     }
 }

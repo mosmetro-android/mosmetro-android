@@ -1,8 +1,9 @@
-package ru.thedrhax.mosmetro;
+package ru.thedrhax.mosmetro.services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Environment;
+import ru.thedrhax.mosmetro.MosMetroConnection;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -43,8 +44,8 @@ public class ConnectionService extends IntentService {
 	};
 	
 	public void onHandleIntent(Intent intent) {
-		long time = Calendar.getInstance().getTimeInMillis();
-		if (time < lastSuccess + 5*60*1000) return;
-		if (connection.connect()) lastSuccess = time;
+		if (Calendar.getInstance().getTimeInMillis() < lastSuccess + 5*60*1000) return;
+
+		if (connection.connect()) lastSuccess = Calendar.getInstance().getTimeInMillis();
 	}
 }

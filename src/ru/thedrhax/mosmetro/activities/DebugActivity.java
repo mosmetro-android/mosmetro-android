@@ -1,4 +1,4 @@
-package ru.thedrhax.mosmetro;
+package ru.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.TextView;
+import ru.thedrhax.mosmetro.MosMetroConnection;
+import ru.thedrhax.mosmetro.R;
 
 public class DebugActivity extends Activity {
     // UI Elements

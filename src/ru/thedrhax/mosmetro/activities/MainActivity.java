@@ -1,9 +1,10 @@
-package ru.thedrhax.mosmetro;
+package ru.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import ru.thedrhax.mosmetro.R;
 
 public class MainActivity extends Activity {
     /** Called when the activity is first created. */

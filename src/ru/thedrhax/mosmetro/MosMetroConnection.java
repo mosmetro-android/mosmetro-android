@@ -1,6 +1,7 @@
 package ru.thedrhax.mosmetro;
 
 import ru.thedrhax.httpclient.HttpClient;
+import ru.thedrhax.util.HTMLFormParser;
 import ru.thedrhax.util.Util;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -35,7 +36,7 @@ public class MosMetroConnection {
                     .getContent();
         } catch (Exception ex) {
             log("<< Wrong network");
-            return true;
+            return false;
         }
 
         // Проверка соединения с интернетом
