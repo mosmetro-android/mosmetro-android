@@ -26,7 +26,7 @@ public class DebugActivity extends Activity {
     };
 
     // Connection sequence
-    final MosMetroConnection connection = new MosMetroConnection() {
+    private final MosMetroConnection connection = new MosMetroConnection() {
         // Send log messages to Handler
         public void log (String message) {
             Message msg = handler.obtainMessage();
@@ -77,7 +77,7 @@ public class DebugActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-    public void goBack() {
+    private void goBack() {
         Intent main = new Intent(this, MainActivity.class);
         startActivity(main);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
