@@ -7,9 +7,11 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
 
 public class ConnectionService extends IntentService {
 	private static FileWriter log_writer;
+	private static long lastSuccess = 0;
 	
 	public ConnectionService () {
 		super("ConnectionService");
@@ -41,6 +43,8 @@ public class ConnectionService extends IntentService {
 	};
 	
 	public void onHandleIntent(Intent intent) {
-		connection.connect();
+		long time = Calendar.getInstance().getTimeInMillis();
+		if (time < lastSuccess + 5*60*1000) return;
+		if (connection.connect()) lastSuccess = time;
 	}
 }

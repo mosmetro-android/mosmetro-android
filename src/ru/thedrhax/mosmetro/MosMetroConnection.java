@@ -13,7 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
-    public void connect() {
+	//  Returns true on success
+    public boolean connect() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         log(">> " + dateFormat.format(new Date()));
 
@@ -34,7 +35,7 @@ public class MosMetroConnection {
                     .getContent();
         } catch (Exception ex) {
             log("<< Wrong network");
-            return;
+            return true;
         }
 
         // Проверка соединения с интернетом
@@ -44,7 +45,7 @@ public class MosMetroConnection {
                     .navigate("https://google.ru")
                     .getContent();
             log("<< Already connected");
-            return;
+            return true;
         } catch (Exception ignored) {}
 
         log("<< All checks passed\n>> Connecting...");
@@ -60,10 +61,10 @@ public class MosMetroConnection {
                     .getContent();
         } catch (IOException ex) {
             log("<< Failed to get redirect page: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (Exception ex) {
             log("<< Unknown exception: " + Util.exToStr(ex));
-            return;
+            return false;
         }
 
         // Выделение ссылки на страницу авторизации
@@ -75,7 +76,7 @@ public class MosMetroConnection {
             link = mLinkRedirect.group(0);
         } else {
             log("<< Redirect link not found");
-            return;
+            return false;
         }
 
         // Получение страницы авторизации
@@ -86,16 +87,16 @@ public class MosMetroConnection {
                     .getContent();
         } catch (MalformedURLException ex) {
             log("<< Incorrect redirect URL: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (SSLHandshakeException ex) {
             log("<< SSL handshake failed: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (IOException ex) {
             log("<< Failed to get auth page: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (Exception ex) {
             log("<< Unknown exception: " + Util.exToStr(ex));
-            return;
+            return false;
         }
 
         // Парсинг формы авторизации
@@ -105,7 +106,7 @@ public class MosMetroConnection {
                 .toString();
         if (fields == null) {
             log("<< Failed to parse auth form");
-            return;
+            return false;
         }
 
         // Отправка запроса с данными формы
@@ -118,13 +119,13 @@ public class MosMetroConnection {
             log("Non critical error: " + Util.exToStr(ex));
         } catch (SSLHandshakeException ex) {
             log("<< SSL handshake failed: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (IOException ex) {
             log("<< Failed to submit auth form: " + Util.exToStr(ex));
-            return;
+            return false;
         } catch (Exception ex) {
             log("<< Unknown exception: " + Util.exToStr(ex));
-            return;
+            return false;
         }
 
         client.setIgnoreSSL(false);
@@ -138,9 +139,11 @@ public class MosMetroConnection {
             log("<< Connected successfully! :3");
         } catch (Exception ex) {
             log("<< Something wrong happened :C");
+            return false;
         }
 
         log("<< " + dateFormat.format(new Date()));
+        return true;
     }
 
     public void log(String message) {
