@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 public class DebugActivity extends Activity {
