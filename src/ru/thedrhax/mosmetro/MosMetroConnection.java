@@ -13,18 +13,13 @@ import java.util.regex.Pattern;
 public class MosMetroConnection {
 	//  Returns true on success
     public boolean connect() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        log("> " + dateFormat.format(new Date()));
-
-        // Блок объявлений
+        String page,fields,link;
+        HTMLFormParser parser = new HTMLFormParser();
         HttpClient client = new HttpClient();
         client.setTimeout(2000);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-        // Парсер HTML форм
-        HTMLFormParser parser = new HTMLFormParser();
-
-        String page,fields,link;
-
+        log("> " + dateFormat.format(new Date()));
         log(">> Проверка сети");
         try {
             client
