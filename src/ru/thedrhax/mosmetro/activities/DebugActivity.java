@@ -38,7 +38,7 @@ public class DebugActivity extends Activity {
     };
 
     // Run connection sequence in background thread
-    private Thread thread;
+    private static Thread thread;
     private final Runnable task = new Runnable() {
         public void run () {
             connection.connect();
