@@ -2,6 +2,7 @@ package ru.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import ru.thedrhax.mosmetro.MosMetroConnection;
 import ru.thedrhax.mosmetro.R;
+
+import java.util.Calendar;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -41,7 +44,14 @@ public class DebugActivity extends Activity {
     private static Thread thread;
     private final Runnable task = new Runnable() {
         public void run () {
-            connection.connect();
+            SharedPreferences settings = getSharedPreferences("MosMetro_Lock", 0);
+            SharedPreferences.Editor editor = settings.edit();
+
+            if (connection.connect()) {
+                Long time = Calendar.getInstance().getTimeInMillis();
+                editor.putLong("LastSuccess", time);
+                editor.apply();
+            }
         }
     };
 
