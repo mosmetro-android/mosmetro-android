@@ -24,8 +24,8 @@ public class MainActivity extends Activity {
         if (lastSuccess != 0)
             text_last_success.setText(
                     "Успешное подключение: " +
-                    Long.toString(((time-lastSuccess)/1000)) +
-                    " секунд назад"
+                    Long.toString(((time-lastSuccess)/(1000*60))) +
+                    " мин. назад"
             );
 	}
 
