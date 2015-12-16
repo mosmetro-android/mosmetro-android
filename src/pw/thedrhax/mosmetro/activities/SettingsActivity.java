@@ -1,4 +1,4 @@
-package ru.thedrhax.mosmetro.activities;
+package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import ru.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.R;
 
 public class SettingsActivity extends Activity {
 

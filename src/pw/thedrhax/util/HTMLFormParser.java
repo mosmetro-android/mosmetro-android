@@ -1,4 +1,4 @@
-package ru.thedrhax.util;
+package pw.thedrhax.util;
 
 import java.util.ArrayList;
 import java.util.List;

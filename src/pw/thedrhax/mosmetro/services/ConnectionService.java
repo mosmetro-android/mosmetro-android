@@ -1,9 +1,9 @@
-package ru.thedrhax.mosmetro.services;
+package pw.thedrhax.mosmetro.services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import ru.thedrhax.mosmetro.MosMetroConnection;
+import pw.thedrhax.mosmetro.MosMetroConnection;
 
 import java.util.Calendar;
 

@@ -1,4 +1,4 @@
-package ru.thedrhax.httpclient;
+package pw.thedrhax.httpclient;
 
 import javax.net.ssl.*;
 import java.io.*;

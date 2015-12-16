@@ -1,4 +1,4 @@
-package ru.thedrhax.util;
+package pw.thedrhax.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

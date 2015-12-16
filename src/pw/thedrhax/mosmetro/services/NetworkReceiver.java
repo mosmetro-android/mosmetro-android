@@ -1,4 +1,4 @@
-package ru.thedrhax.mosmetro.services;
+package pw.thedrhax.mosmetro.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

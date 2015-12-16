@@ -1,8 +1,8 @@
-package ru.thedrhax.mosmetro;
+package pw.thedrhax.mosmetro;
 
-import ru.thedrhax.httpclient.HttpClient;
-import ru.thedrhax.util.HTMLFormParser;
-import ru.thedrhax.util.Util;
+import pw.thedrhax.httpclient.HttpClient;
+import pw.thedrhax.util.HTMLFormParser;
+import pw.thedrhax.util.Util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

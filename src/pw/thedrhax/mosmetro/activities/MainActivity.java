@@ -1,4 +1,4 @@
-package ru.thedrhax.mosmetro.activities;
+package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import ru.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.R;
 
 import java.util.Calendar;
 
