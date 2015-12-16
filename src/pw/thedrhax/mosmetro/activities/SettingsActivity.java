@@ -30,22 +30,10 @@ public class SettingsActivity extends Activity {
                 .commit();
     }
 
-    // Going back to main layout on hardware back button press
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            goBack(); return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-    // ... or on menu back button press
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case android.R.id.home: goBack(); break;
+            case android.R.id.home: finish(); break;
         }
         return super.onOptionsItemSelected(item);
-    }
-    private void goBack() {
-        startActivity(new Intent(this, MainActivity.class));
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

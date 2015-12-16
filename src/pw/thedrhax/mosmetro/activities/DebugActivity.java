@@ -84,7 +84,7 @@ public class DebugActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
-                goBack();
+                finish();
                 return true;
 
             case R.id.action_share:
@@ -98,20 +98,5 @@ public class DebugActivity extends Activity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // Handle hardware back button
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            goBack(); return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    // Go back to the MainActivity
-    private void goBack() {
-        Intent main = new Intent(this, MainActivity.class);
-        startActivity(main);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
