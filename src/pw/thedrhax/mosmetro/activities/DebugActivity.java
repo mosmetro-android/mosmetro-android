@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.MosMetroConnection;
@@ -73,20 +75,40 @@ public class DebugActivity extends Activity {
         }
     }
 
-    // Going back to main layout on hardware back button press
+    // ActionBar Menu
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.debug, menu);
+        return true;
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                goBack();
+                return true;
+
+            case R.id.action_share:
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"mosmetro@thedrhax.pw"});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Отчет MosMetro");
+                intent.putExtra(Intent.EXTRA_TEXT, text_messages.getText().toString());
+
+                startActivity(Intent.createChooser(intent, "Отправить отчет"));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // Handle hardware back button
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             goBack(); return true;
         }
         return super.onKeyDown(keyCode, event);
     }
-    // ... or on menu back button press
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case android.R.id.home: goBack(); break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
+    // Go back to the MainActivity
     private void goBack() {
         Intent main = new Intent(this, MainActivity.class);
         startActivity(main);
