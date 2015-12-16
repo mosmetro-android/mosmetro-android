@@ -24,7 +24,7 @@ public class ConnectionService extends IntentService {
         Long time = Calendar.getInstance().getTimeInMillis();
         Long lastSuccess = settings.getLong("LastSuccess", 0);
 
-        if (time < lastSuccess + 5*60*1000) return;
+        if (time < lastSuccess + 60*1000) return;
 
         SharedPreferences.Editor editor = settings.edit();
 
