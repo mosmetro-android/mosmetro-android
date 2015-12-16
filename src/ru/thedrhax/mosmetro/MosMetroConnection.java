@@ -26,8 +26,8 @@ public class MosMetroConnection {
                     .navigate("http://1.1.1.1/login.html")
                     .getContent();
         } catch (Exception ex) {
-            log("<< Ошибка: неправильная сеть");
             log(Util.exToStr(ex));
+            log("<< Ошибка: неправильная сеть");
             return false;
         }
 
@@ -52,8 +52,8 @@ public class MosMetroConnection {
                     .navigate("http://vmet.ro")
                     .getContent();
         } catch (Exception ex) {
-            log("<<< Ошибка: перенаправление не получено");
             log(Util.exToStr(ex));
+            log("<<< Ошибка: перенаправление не получено");
             return false;
         }
 
@@ -73,8 +73,8 @@ public class MosMetroConnection {
                     .navigate(link)
                     .getContent();
         } catch (Exception ex) {
-            log("<<< Ошибка: страница авторизации не получена");
             log(Util.exToStr(ex));
+            log("<<< Ошибка: страница авторизации не получена");
             return false;
         }
 
@@ -93,8 +93,8 @@ public class MosMetroConnection {
                 .navigate(link, fields)
                 .getContent();
         } catch (Exception ex) {
-            log("<<< Ошибка: сервер не ответил или вернул ошибку");
             log(Util.exToStr(ex));
+            log("<<< Ошибка: сервер не ответил или вернул ошибку");
             return false;
         }
 
