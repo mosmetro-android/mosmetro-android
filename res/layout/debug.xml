@@ -5,14 +5,19 @@
                 android:layout_height="match_parent"
 >
 
-    <TextView
+    <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/text_messages"
-            android:enabled="true"
-            android:textIsSelectable="true"
-            android:layout_gravity="center_horizontal|top"
-            android:background="#cdcdcd" android:textSize="14sp" android:padding="5dp"
-            android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="false" android:layout_margin="10dp"/>
+            android:id="@+id/scrollView">
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/text_messages"
+                android:enabled="true"
+                android:textIsSelectable="true"
+                android:layout_gravity="center_horizontal|top"
+                android:textSize="14sp" android:padding="5dp"
+                android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="false" android:layout_margin="10dp"/>
+    </ScrollView>
 </RelativeLayout>
