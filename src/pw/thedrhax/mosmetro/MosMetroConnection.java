@@ -11,13 +11,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
-	//  Returns true on success
-    public boolean connect() {
+	//  Returns 0 on success, 1 if already connected and 2 if error
+    public int connect() {
         String page,fields,link;
         HTMLFormParser parser = new HTMLFormParser();
         HttpClient client = new HttpClient();
         client.setTimeout(2000);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         log("> " + dateFormat.format(new Date()));
         log(">> Проверка сети");
@@ -28,7 +28,7 @@ public class MosMetroConnection {
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<< Ошибка: неправильная сеть");
-            return false;
+            return 2;
         }
 
         log(">> Проверка доступа в интернет");
@@ -37,7 +37,7 @@ public class MosMetroConnection {
                     .navigate("https://google.ru")
                     .getContent();
             log("<< Уже подключено");
-            return true;
+            return 1;
         } catch (Exception ignored) {}
 
         log("<< Все проверки пройдены\n>> Подключаюсь...");
@@ -54,7 +54,7 @@ public class MosMetroConnection {
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: перенаправление не получено");
-            return false;
+            return 2;
         }
 
         Pattern pLink = Pattern.compile("https?:[^\"]*");
@@ -64,7 +64,7 @@ public class MosMetroConnection {
             link = mLinkRedirect.group(0);
         } else {
             log("<<< Ошибка: перенаправление не найдено");
-            return false;
+            return 2;
         }
 
         log(">>> Получение страницы авторизации");
@@ -75,7 +75,7 @@ public class MosMetroConnection {
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: страница авторизации не получена");
-            return false;
+            return 2;
         }
 
         fields = parser
@@ -83,7 +83,7 @@ public class MosMetroConnection {
                 .toString();
         if (fields == null) {
             log("<<< Ошибка: форма авторизации не найдена");
-            return false;
+            return 2;
         }
 
         // Отправка запроса с данными формы
@@ -95,7 +95,7 @@ public class MosMetroConnection {
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: сервер не ответил или вернул ошибку");
-            return false;
+            return 2;
         }
 
         client.setIgnoreSSL(false);
@@ -108,11 +108,11 @@ public class MosMetroConnection {
             log("<< Соединение успешно установлено :3");
         } catch (Exception ex) {
             log("<< Ошибка: доступ в интернет отсутствует");
-            return false;
+            return 2;
         }
 
         log("< " + dateFormat.format(new Date()));
-        return true;
+        return 0;
     }
 
     public void log(String message) {

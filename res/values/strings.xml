@@ -11,6 +11,11 @@
         Подключаться к интернету автоматически при соединении с сетью Wi-Fi MosMetro_Free
     </string>
 
+    <string name="pref_notify">Показывать уведомления</string>
+    <string name="pref_notify_summary">
+        Выводить уведомления об успешной авторизации
+    </string>
+
     <string name="text_description1">
         Данное приложение предназначено для авторизации при подключении к бесплатному Wi-Fi
         в московском метрополитене (название сети MosMetro_Free).

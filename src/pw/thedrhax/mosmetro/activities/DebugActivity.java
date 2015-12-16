@@ -49,7 +49,7 @@ public class DebugActivity extends Activity {
             SharedPreferences settings = getSharedPreferences("MosMetro_Lock", 0);
             SharedPreferences.Editor editor = settings.edit();
 
-            if (connection.connect()) {
+            if (connection.connect() < 2) {
                 Long time = Calendar.getInstance().getTimeInMillis();
                 editor.putLong("LastSuccess", time);
                 editor.apply();

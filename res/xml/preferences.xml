@@ -5,4 +5,10 @@
             android:title="@string/pref_autoconnect"
             android:summary="@string/pref_autoconnect_summary"
             android:defaultValue="true" />
+
+    <CheckBoxPreference
+            android:key="pref_notify"
+            android:title="@string/pref_notify"
+            android:summary="@string/pref_notify_summary"
+            android:defaultValue="true" />
 </PreferenceScreen>
