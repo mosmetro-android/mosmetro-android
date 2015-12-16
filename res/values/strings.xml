@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Wi-Fi в метро</string>
-    <string name="button_connect">Подключиться</string>
-    <string name="debug_activity_name">Ручное подключение</string>
+
+    <string name="manual_connection">Ручное подключение</string>
+    <string name="settings">Настройки</string>
+
+    <string name="pref_autoconnect">Автоматическая авторизация</string>
+    <string name="pref_autoconnect_summary">
+        Подключаться к интернету автоматически при соединении с сетью Wi-Fi MosMetro_Free
+    </string>
 
     <string name="text_description1">
         Данное приложение предназначено для авторизации при подключении к бесплатному Wi-Fi

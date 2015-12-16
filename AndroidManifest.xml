@@ -23,10 +23,15 @@
 
         <activity android:name=".activities.DebugActivity"
                   android:icon="@drawable/ic_launcher"
-                  android:label="@string/debug_activity_name"
+                  android:label="@string/manual_connection"
                   android:theme="@style/AppBaseTheme">
         </activity>
-        
+
+        <activity android:name=".activities.SettingsActivity"
+                  android:label="@string/settings"
+                  android:icon="@drawable/ic_settings"
+                  android:theme="@style/AppBaseTheme" />
+
         <service android:name=".services.ConnectionService">
 
         </service>

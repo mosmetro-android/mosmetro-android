@@ -28,7 +28,7 @@
     <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/debug_activity_name"
+            android:text="@string/manual_connection"
             android:id="@+id/button_debug" android:onClick="button_debug" android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true" android:layout_alignParentStart="true"/>
 </RelativeLayout>
