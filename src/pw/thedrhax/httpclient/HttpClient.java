@@ -47,7 +47,7 @@ public class HttpClient {
 	 * Methods
 	 */
 	
-	public HttpRequest navigate (URL url, String params) throws IOException {
+	private HttpRequest createRequest(URL url, String params) throws IOException {
 		HttpRequest request = new HttpRequest(url, params);
 		
 		if (cookies != null)	request.setCookies(cookies);
@@ -55,6 +55,12 @@ public class HttpClient {
 		if (userAgent != null)	request.setUserAgent(userAgent);
 		if (ignoreSSL)			request.setIgnoreSSL();
 		request.setTimeout(timeout);
+		
+		return request;
+	}
+	
+	public HttpRequest navigate (URL url, String params) throws IOException {
+		HttpRequest request = createRequest(url, params);
 		
 		for (int i = 0; i <= retries; i++) {
 			try {
@@ -64,7 +70,7 @@ public class HttpClient {
 				if (i == retries) {
 					throw(ex);
 				} else {
-					request = new HttpRequest(url, params);
+					request = createRequest(url, params);
 				}
 			}
 		}
