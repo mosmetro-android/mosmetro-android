@@ -5,6 +5,7 @@ import pw.thedrhax.util.HTMLFormParser;
 import pw.thedrhax.util.Util;
 
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,6 +54,10 @@ public class MosMetroConnection {
             page = client
                     .navigate("http://vmet.ro")
                     .getContent();
+        } catch (UnknownHostException ex) {
+            log("<<< Ошибка: DNS сервер не ответил");
+            log("<<< Похоже на временную неисправность");
+            return 2;
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: перенаправление не получено");
@@ -76,7 +81,7 @@ public class MosMetroConnection {
                     .getContent();
         } catch (SocketTimeoutException ex) {
             log("<<< Ошибка: сервер не отвечает");
-            log("<<< Похоже, что авторизация временно неисправна");
+            log("<<< Похоже на временную неисправность");
             return 2;
         } catch (Exception ex) {
             log(Util.exToStr(ex));
