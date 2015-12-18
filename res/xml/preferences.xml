@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-            android:key="pref_autoconnect"
-            android:title="@string/pref_autoconnect"
-            android:summary="@string/pref_autoconnect_summary"
-            android:defaultValue="true" />
+    <PreferenceCategory
+        android:title="Настройки подключения">
 
-    <CheckBoxPreference
-            android:key="pref_notify"
-            android:title="@string/pref_notify"
-            android:summary="@string/pref_notify_summary"
-            android:defaultValue="true" />
+        <CheckBoxPreference
+                android:key="pref_autoconnect"
+                android:title="@string/pref_autoconnect"
+                android:summary="@string/pref_autoconnect_summary"
+                android:defaultValue="true" />
+
+        <CheckBoxPreference
+                android:key="pref_notify"
+                android:title="@string/pref_notify"
+                android:summary="@string/pref_notify_summary"
+                android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="О программе">
+
+        <Preference
+            android:title="@string/app_name"
+            android:summary="Версия: " />
+
+        <Preference
+            android:title="Разработчик"
+            android:summary="Дмитрий Карих (mosmetro@thedrhax.pw)" />
+
+        <Preference
+            android:title="Сайт программы"
+            android:summary="http://thedrhax.pw" />
+
+    </PreferenceCategory>
 </PreferenceScreen>
