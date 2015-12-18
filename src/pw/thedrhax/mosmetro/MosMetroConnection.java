@@ -4,6 +4,7 @@ import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.HTMLFormParser;
 import pw.thedrhax.util.Util;
 
+import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 public class MosMetroConnection {
 	//  Returns 0 on success, 1 if already connected and 2 if error
     public int connect() {
-        String page,fields,link;
+        String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
         HttpClient client = new HttpClient();
         client.setTimeout(2000);
@@ -38,7 +39,8 @@ public class MosMetroConnection {
                     .getContent();
             log("<< Уже подключено");
             return 1;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         log("<< Все проверки пройдены\n>> Подключаюсь...");
 
@@ -72,6 +74,10 @@ public class MosMetroConnection {
             page = client
                     .navigate(link)
                     .getContent();
+        } catch (SocketTimeoutException ex) {
+            log("<<< Ошибка: сервер не отвечает");
+            log("<<< Похоже, что авторизация временно неисправна");
+            return 2;
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: страница авторизации не получена");
