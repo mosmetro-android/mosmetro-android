@@ -9,8 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import pw.thedrhax.mosmetro.R;
 
-import java.util.Calendar;
-
 public class MainActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
