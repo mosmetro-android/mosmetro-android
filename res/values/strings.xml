@@ -31,4 +31,9 @@
         отправьте результат работы программы на мой адрес e-mail (mosmetro@thedrhax.pw). Вы можете сделать это нажав
         кнопку в заголовке окна ручного подключения.
     </string>
+    <string name="developer">Разработчик</string>
+    <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
+    <string name="developer_site">Сайт разработчика</string>
+    <string name="developer_site_link">http://thedrhax.pw</string>
+    <string name="about">О программе</string>
 </resources>
