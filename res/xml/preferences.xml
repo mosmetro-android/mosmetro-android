@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Настройки подключения">
+        android:title="@string/pref_category_main">
 
         <CheckBoxPreference
                 android:key="pref_autoconnect"
@@ -9,10 +9,21 @@
                 android:summary="@string/pref_autoconnect_summary"
                 android:defaultValue="true" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/pref_category_notifications">
+
         <CheckBoxPreference
-                android:key="pref_notify"
-                android:title="@string/pref_notify"
-                android:summary="@string/pref_notify_summary"
+                android:key="pref_notify_success"
+                android:title="@string/pref_notify_success"
+                android:summary="@string/pref_notify_success_summary"
+                android:defaultValue="true" />
+
+        <CheckBoxPreference
+                android:key="pref_notify_fail"
+                android:title="@string/pref_notify_fail"
+                android:summary="@string/pref_notify_fail_summary"
                 android:defaultValue="true" />
 
     </PreferenceCategory>

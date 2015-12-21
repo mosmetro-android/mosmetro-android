@@ -23,26 +23,25 @@ public class ConnectionService extends IntentService {
     private static final MosMetroConnection connection = new MosMetroConnection();
 	
 	public void onHandleIntent(Intent intent) {
-        int result = connection.connect();
+        switch(connection.connect()) {
+            case 0:
+                if (settings.getBoolean("pref_notify_success", true))
+                    Util.notify(this,
+                            "Успешно подключено",
+                            "Вы можете отключить уведомления в настройках приложения"
+                    );
+                break;
 
-        if (settings.getBoolean("pref_notify", true))
-            switch(result) {
-				case 0:
-					Util.notify(this,
-          	   	   "Успешно подключено",
-             		   "Вы можете отключить уведомления в настройках приложения"
-          		  );
-       		   break;
-       
-       		case 1:
-       			break;
-       
-       		case 2:
-       			Util.notify(this,
-       				"Не удалось подключиться",
-       				"Попробуйте ручной режим или дождитесь повторной попытки"
-       			);
-       			break;
+            case 1:
+                break;
+
+            case 2:
+                if (settings.getBoolean("pref_notify_fail", true))
+                    Util.notify(this,
+                            "Не удалось подключиться",
+                            "Попробуйте ручной режим или дождитесь повторной попытки"
+                    );
+                break;
        	}
 	}
 }
