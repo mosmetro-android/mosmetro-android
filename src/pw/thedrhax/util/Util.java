@@ -25,6 +25,7 @@ public class Util {
         Notification.Builder builder = new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
+                .setContentText(message)
                 .setStyle(new Notification.BigTextStyle().bigText(message))
                 .setAutoCancel(true)
                 .setContentIntent(PendingIntent.getActivity(
