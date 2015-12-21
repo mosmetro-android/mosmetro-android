@@ -20,6 +20,7 @@ public class Util {
     }
 
     // Create notification
+    // TODO: Add field - target Activity class
     public static void notify (Context context, String title, String message) {
         Notification.Builder builder = new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)

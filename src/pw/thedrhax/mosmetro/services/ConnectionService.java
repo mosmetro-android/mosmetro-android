@@ -25,10 +25,24 @@ public class ConnectionService extends IntentService {
 	public void onHandleIntent(Intent intent) {
         int result = connection.connect();
 
-        if ((result == 0) && (settings.getBoolean("pref_notify", true)))
-            Util.notify(this,
-                "Успешно подключено",
-                "Вы можете отключить уведомления в настройках приложения"
-            );
+        if (settings.getBoolean("pref_notify", true))
+            switch(result) {
+				case 0:
+					Util.notify(this,
+          	   	   "Успешно подключено",
+             		   "Вы можете отключить уведомления в настройках приложения"
+          		  );
+       		   break;
+       
+       		case 1:
+       			break;
+       
+       		case 2:
+       			Util.notify(this,
+       				"Не удалось подключиться",
+       				"Попробуйте ручной режим или дождитесь повторной попытки"
+       			);
+       			break;
+       	}
 	}
 }
