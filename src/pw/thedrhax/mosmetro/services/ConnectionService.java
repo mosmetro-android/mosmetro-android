@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.MosMetroConnection;
+import pw.thedrhax.mosmetro.activities.DebugActivity;
+import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.util.Util;
 
 public class ConnectionService extends IntentService {
@@ -23,12 +25,14 @@ public class ConnectionService extends IntentService {
     private static final MosMetroConnection connection = new MosMetroConnection();
 	
 	public void onHandleIntent(Intent intent) {
-        switch(connection.connect()) {
+        //switch(connection.connect()) {
+        switch(0) {
             case 0:
                 if (settings.getBoolean("pref_notify_success", true))
                     Util.notify(this,
                             "Успешно подключено",
-                            "Вы можете отключить уведомления в настройках приложения"
+                            "Нажмите, чтобы открыть настройки уведомлений",
+                            new Intent(this, SettingsActivity.class)
                     );
                 break;
 
@@ -39,7 +43,8 @@ public class ConnectionService extends IntentService {
                 if (settings.getBoolean("pref_notify_fail", true))
                     Util.notify(this,
                             "Не удалось подключиться",
-                            "Попробуйте ручной режим или дождитесь повторной попытки"
+                            "Нажмите, чтобы подключиться вручную и увидеть сообщение об ошибке",
+                            new Intent(this, DebugActivity.class)
                     );
                 break;
        	}

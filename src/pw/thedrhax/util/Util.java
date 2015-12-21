@@ -20,8 +20,7 @@ public class Util {
     }
 
     // Create notification
-    // TODO: Add field - target Activity class
-    public static void notify (Context context, String title, String message) {
+    public static void notify (Context context, String title, String message, Intent intent) {
         Notification.Builder builder = new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
@@ -29,8 +28,7 @@ public class Util {
                 .setStyle(new Notification.BigTextStyle().bigText(message))
                 .setAutoCancel(true)
                 .setContentIntent(PendingIntent.getActivity(
-                            context, 0,
-                            new Intent(context, MainActivity.class),
+                            context, 0, intent,
                             PendingIntent.FLAG_UPDATE_CURRENT
                         )
                 );
@@ -39,5 +37,9 @@ public class Util {
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
         nm.notify(0, builder.build());
+    }
+
+    public static void notify (Context context, String title, String message) {
+        notify(context, title, message, new Intent(context, MainActivity.class));
     }
 }
