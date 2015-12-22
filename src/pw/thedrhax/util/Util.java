@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.MainActivity;
 
@@ -25,7 +26,6 @@ public class Util {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setStyle(new Notification.BigTextStyle().bigText(message))
                 .setAutoCancel(true)
                 .setContentIntent(PendingIntent.getActivity(
                             context, 0, intent,
@@ -36,7 +36,13 @@ public class Util {
         NotificationManager nm = (NotificationManager)context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
-        nm.notify(0, builder.build());
+        // Support APIs < 16
+        if (Build.VERSION.SDK_INT >= 16) {
+            builder = builder.setStyle(new Notification.BigTextStyle().bigText(message));
+            nm.notify(0, builder.build());
+        } else {
+            nm.notify(0, builder.getNotification());
+        }
     }
 
     public static void notify (Context context, String title, String message) {
