@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
 
 public class MosMetroConnection {
 	StringBuilder log = new StringBuilder();
+
+    // Comparing this key to the server answer we can determine internet connection status
+    final static String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
 	
 	// Returns 0 on success, 1 if already connected or wrong network and 2 if error
     public int connect() {
@@ -25,9 +28,7 @@ public class MosMetroConnection {
         log("> " + dateFormat.format(new Date()));
         log(">> Проверка сети");
         try {
-            client
-                    .navigate("http://1.1.1.1/login.html")
-                    .getContent();
+            client.navigate("http://1.1.1.1/login.html").getContent();
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<< Ошибка: неправильная сеть");
@@ -36,11 +37,11 @@ public class MosMetroConnection {
 
         log(">> Проверка доступа в интернет");
         try {
-            client
-                    .navigate("https://google.ru")
-                    .getContent();
-            log("<< Уже подключено");
-            return 1;
+            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
+            if (check.contains(INTERNET_CHECK_KEY)) {
+                log("<< Уже подключено");
+                return 1;
+            }
         } catch (Exception ignored) {}
 
         log("<< Все проверки пройдены\n>> Подключаюсь...");
@@ -50,9 +51,7 @@ public class MosMetroConnection {
 
         log(">>> Получение перенаправления");
         try {
-            page = client
-                    .navigate("http://vmet.ro")
-                    .getContent();
+            page = client.navigate("http://vmet.ro").getContent();
         } catch (UnknownHostException ex) {
             log("<<< Ошибка: DNS сервер не ответил");
             log("<<< Похоже на временную неисправность");
@@ -75,9 +74,7 @@ public class MosMetroConnection {
 
         log(">>> Получение страницы авторизации");
         try {
-            page = client
-                    .navigate(link)
-                    .getContent();
+            page = client.navigate(link).getContent();
         } catch (SocketTimeoutException ex) {
             log("<<< Ошибка: сервер не отвечает");
             log("<<< Похоже на временную неисправность");
@@ -88,9 +85,7 @@ public class MosMetroConnection {
             return 2;
         }
 
-        fields = parser
-                .parse(page)
-                .toString();
+        fields = parser.parse(page).toString();
         if (fields == null) {
             log("<<< Ошибка: форма авторизации не найдена");
             return 2;
@@ -99,9 +94,7 @@ public class MosMetroConnection {
         // Отправка запроса с данными формы
         log(">>> Отправка формы авторизации");
         try {
-            client
-                .navigate(link, fields)
-                .getContent();
+            client.navigate(link, fields).getContent();
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<<< Ошибка: сервер не ответил или вернул ошибку");
@@ -112,11 +105,14 @@ public class MosMetroConnection {
 
         log(">> Проверка доступа в интернет");
         try {
-            client
-                    .navigate("https://google.ru")
-                    .getContent();
-            log("<< Соединение успешно установлено :3");
+            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
+            if (check.contains(INTERNET_CHECK_KEY)) {
+                log("<< Соединение успешно установлено :3");
+            } else {
+                throw new Exception("Server returned wrong response: '" + check + "'");
+            }
         } catch (Exception ex) {
+            log(Util.exToStr(ex));
             log("<< Ошибка: доступ в интернет отсутствует");
             return 2;
         }
