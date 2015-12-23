@@ -67,10 +67,15 @@ public class DebugActivity extends Activity {
         } catch (NullPointerException ignored) {}
 
         text_messages = (TextView)findViewById(R.id.text_messages);
-
-        if ((thread == null) || (!thread.isAlive())) {
-            thread = new Thread(task);
-            thread.start();
+        
+        Bundle extra = getIntent().getExtras();
+        if (extra == null) {
+            if ((thread == null) || (!thread.isAlive())) {
+                thread = new Thread(task);
+                thread.start();
+            }
+        } else {
+            text_messages.setText(extra.getString("log"));
         }
     }
 

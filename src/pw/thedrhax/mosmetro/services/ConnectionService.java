@@ -39,12 +39,16 @@ public class ConnectionService extends IntentService {
                 break;
 
             case 2:
-                if (settings.getBoolean("pref_notify_fail", true))
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    Intent debug = new Intent(this, DebugActivity.class);
+                    debug.putExtra("log", connection.getLog());
+                    
                     Util.notify(this,
                             "Не удалось подключиться",
-                            "Нажмите, чтобы подключиться вручную и увидеть сообщение об ошибке",
-                            new Intent(this, DebugActivity.class)
+                            "Нажмите, чтобы увидеть лог",
+                            debug
                     );
+                }
                 break;
        	}
 	}

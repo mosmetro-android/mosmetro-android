@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
+	StringBuilder log = new StringBuilder();
+	
 	// Returns 0 on success, 1 if already connected or wrong network and 2 if error
     public int connect() {
         String page, fields, link;
@@ -124,6 +126,11 @@ public class MosMetroConnection {
     }
 
     public void log(String message) {
+        log.append(message);
+        log.append("\n");
+        
         System.out.println(message);
     }
+    
+    public String getLog() {return log.toString();}
 }
