@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
-	//  Returns 0 on success, 1 if already connected and 2 if error
+	// Returns 0 on success, 1 if already connected or wrong network and 2 if error
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
@@ -29,7 +29,7 @@ public class MosMetroConnection {
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<< Ошибка: неправильная сеть");
-            return 2;
+            return 1;
         }
 
         log(">> Проверка доступа в интернет");
@@ -39,14 +39,12 @@ public class MosMetroConnection {
                     .getContent();
             log("<< Уже подключено");
             return 1;
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
 
         log("<< Все проверки пройдены\n>> Подключаюсь...");
 
         client.setIgnoreSSL(true);
         client.setMaxRetries(3);
-
 
         log(">>> Получение перенаправления");
         try {
