@@ -25,8 +25,7 @@ public class ConnectionService extends IntentService {
     private static final MosMetroConnection connection = new MosMetroConnection();
 	
 	public void onHandleIntent(Intent intent) {
-        //switch(connection.connect()) {
-        switch(0) {
+        switch(connection.connect()) {
             case 0:
                 if (settings.getBoolean("pref_notify_success", true))
                     Util.notify(this,
