@@ -12,20 +12,36 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
-	StringBuilder log = new StringBuilder();
-
     // Comparing this key to the server answer we can determine internet connection status
-    final static String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
+    private static final String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
+
+	private StringBuilder log = new StringBuilder();
+    private HttpClient client;
+
+    public boolean isConnected() {
+        log(">> Проверка доступа в интернет");
+        try {
+            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
+            return check.contains(INTERNET_CHECK_KEY);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 	
 	// Returns 0 on success, 1 if already connected or wrong network and 2 if error
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
-        HttpClient client = new HttpClient();
-        client.setTimeout(2000);
+        client = new HttpClient().setTimeout(2000).setIgnoreSSL(true);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         log("> " + dateFormat.format(new Date()));
+
+        if (isConnected()) {
+            log("<< Уже подключено");
+            return 1;
+        }
+
         log(">> Проверка сети");
         try {
             client.navigate("http://1.1.1.1/login.html").getContent();
@@ -34,15 +50,6 @@ public class MosMetroConnection {
             log("<< Ошибка: неправильная сеть");
             return 1;
         }
-
-        log(">> Проверка доступа в интернет");
-        try {
-            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
-            if (check.contains(INTERNET_CHECK_KEY)) {
-                log("<< Уже подключено");
-                return 1;
-            }
-        } catch (Exception ignored) {}
 
         log("<< Все проверки пройдены\n>> Подключаюсь...");
 
@@ -101,18 +108,9 @@ public class MosMetroConnection {
             return 2;
         }
 
-        client.setIgnoreSSL(false);
-
-        log(">> Проверка доступа в интернет");
-        try {
-            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
-            if (check.contains(INTERNET_CHECK_KEY)) {
-                log("<< Соединение успешно установлено :3");
-            } else {
-                throw new Exception("Server returned wrong response: '" + check + "'");
-            }
-        } catch (Exception ex) {
-            log(Util.exToStr(ex));
+        if (isConnected()) {
+            log("<< Соединение успешно установлено :3");
+        } else {
             log("<< Ошибка: доступ в интернет отсутствует");
             return 2;
         }
