@@ -23,7 +23,7 @@ public class Util {
     // Create notification
     public static void notify (Context context, String title, String message, Intent intent) {
         Notification.Builder builder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
