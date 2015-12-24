@@ -1,4 +1,4 @@
-package pw.thedrhax.mosmetro;
+package pw.thedrhax.mosmetro.authenticator;
 
 import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.HTMLFormParser;
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MosMetroConnection {
+public class Authenticator {
 	private StringBuilder log = new StringBuilder();
 
     public boolean isConnected() {

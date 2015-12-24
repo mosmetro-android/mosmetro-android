@@ -4,7 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import pw.thedrhax.mosmetro.MosMetroConnection;
+import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.util.Util;
@@ -15,14 +16,15 @@ public class ConnectionService extends IntentService {
     public ConnectionService () {
 		super("ConnectionService");
 	}
+
+    private Authenticator connection;
 	
 	public void onCreate() {
 		super.onCreate();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+        connection = new AuthenticatorStat(this, true);
     }
-
-    private static final MosMetroConnection connection = new MosMetroConnection();
 	
 	public void onHandleIntent(Intent intent) {
         switch(connection.connect()) {

@@ -10,7 +10,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import pw.thedrhax.mosmetro.MosMetroConnection;
+import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
 import pw.thedrhax.mosmetro.R;
 
 import java.util.Calendar;
@@ -30,16 +31,7 @@ public class DebugActivity extends Activity {
     };
 
     // Connection sequence
-    private final MosMetroConnection connection = new MosMetroConnection() {
-        // Send log messages to Handler
-        public void log (String message) {
-            Message msg = handler.obtainMessage();
-            Bundle bundle = new Bundle();
-            bundle.putString("text", message + "\n");
-            msg.setData(bundle);
-            handler.sendMessage(msg);
-        }
-    };
+    private Authenticator connection;
 
     // Run connection sequence in background thread
     private static Thread thread;
@@ -66,8 +58,18 @@ public class DebugActivity extends Activity {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         } catch (NullPointerException ignored) {}
 
+        connection = new AuthenticatorStat(this, false) {
+            // Send log messages to Handler
+            public void log (String message) {
+                Message msg = handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("text", message + "\n");
+                msg.setData(bundle);
+                handler.sendMessage(msg);
+            }
+        };
+
         text_messages = (TextView)findViewById(R.id.text_messages);
-        
         Bundle extra = getIntent().getExtras();
         if (extra == null) {
             if ((thread == null) || (!thread.isAlive())) {
