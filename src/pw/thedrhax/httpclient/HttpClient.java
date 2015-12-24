@@ -8,7 +8,7 @@ public class HttpClient {
 	private String cookies;
 	private URL referer;
 	private String userAgent;
-	private int timeout = 5000;
+	private int timeout = 2000;
 	private boolean ignoreSSL = false;
 	private int retries = 0;
 	

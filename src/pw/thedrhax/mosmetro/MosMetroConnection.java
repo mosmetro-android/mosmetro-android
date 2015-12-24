@@ -32,7 +32,7 @@ public class MosMetroConnection {
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
-        client = new HttpClient().setTimeout(2000).setIgnoreSSL(true);
+        client = new HttpClient().setIgnoreSSL(true);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         log("> " + dateFormat.format(new Date()));
