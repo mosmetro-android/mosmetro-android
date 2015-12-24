@@ -32,18 +32,18 @@ public class Authenticator {
 
         log("> " + dateFormat.format(new Date()));
 
-        log(">> Проверка доступа в интернет");
-        if (isConnected()) {
-            log("<< Уже подключено");
-            return 1;
-        }
-
         log(">> Проверка сети");
         try {
             client.navigate("http://1.1.1.1/login.html").getContent();
         } catch (Exception ex) {
             log(Util.exToStr(ex));
             log("<< Ошибка: неправильная сеть");
+            return 1;
+        }
+
+        log(">> Проверка доступа в интернет");
+        if (isConnected()) {
+            log("<< Уже подключено");
             return 1;
         }
 
