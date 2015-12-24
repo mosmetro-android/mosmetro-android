@@ -12,17 +12,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MosMetroConnection {
-    // Comparing this key to the server answer we can determine internet connection status
-    private static final String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
-
 	private StringBuilder log = new StringBuilder();
-    private HttpClient client;
 
     public boolean isConnected() {
-        log(">> Проверка доступа в интернет");
         try {
-            String check = client.navigate("http://thedrhax.pw/mosmetro/check.php").getContent();
-            return check.contains(INTERNET_CHECK_KEY);
+            new HttpClient().navigate("https://google.com");
+            return true;
         } catch (Exception ex) {
             return false;
         }
@@ -32,11 +27,12 @@ public class MosMetroConnection {
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
-        client = new HttpClient().setIgnoreSSL(true);
+        HttpClient client = new HttpClient().setIgnoreSSL(true);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         log("> " + dateFormat.format(new Date()));
 
+        log(">> Проверка доступа в интернет");
         if (isConnected()) {
             log("<< Уже подключено");
             return 1;
@@ -108,6 +104,7 @@ public class MosMetroConnection {
             return 2;
         }
 
+        log(">> Проверка доступа в интернет");
         if (isConnected()) {
             log("<< Соединение успешно установлено :3");
         } else {
