@@ -6,20 +6,9 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/text_description1" android:layout_gravity="center_horizontal"
-            android:text="@string/text_description1" android:layout_marginBottom="5dp"
+            android:id="@+id/text_description" android:layout_gravity="center_horizontal"
+            android:text="@string/text_description" android:layout_marginBottom="5dp"
             android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:layout_marginRight="10dp"/>
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:id="@+id/text_description2" android:layout_gravity="center_horizontal"
-              android:text="@string/text_description2"
-              android:layout_below="@+id/text_description1" android:layout_alignParentLeft="true"
-              android:layout_alignParentStart="true" android:layout_marginLeft="10dp" android:layout_marginTop="5dp"
-              android:layout_marginRight="10dp" android:layout_marginBottom="5dp"/>
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/text_description3"
-              android:layout_gravity="center_horizontal" android:text="@string/text_description3"
-              android:layout_below="@+id/text_description2" android:layout_centerHorizontal="true"
-              android:layout_marginLeft="10dp" android:layout_marginTop="5dp" android:layout_marginRight="10dp"
-              android:layout_marginBottom="5dp"/>
     <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
