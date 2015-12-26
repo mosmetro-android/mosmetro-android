@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
 
         // This is here because menu is needed to run setDebug
         Bundle extra = getIntent().getExtras();
-        if (extra != null) {
+        if ((extra != null) && (extra.getString("log") != null)) {
             setDebug(true);
             text_description.setText(extra.getString("log"));
         }
