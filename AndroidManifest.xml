@@ -20,12 +20,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="pw.thedrhax.mosmetro.activities.DebugActivity"
-                  android:icon="@drawable/ic_launcher"
-                  android:label="@string/manual_connection"
-                  android:theme="@style/AppBaseTheme">
-        </activity>
-
         <activity android:name="pw.thedrhax.mosmetro.activities.SettingsActivity"
                   android:label="@string/settings"
                   android:icon="@drawable/ic_settings"

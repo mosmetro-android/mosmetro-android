@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">Wi-Fi в метро</string>
 
-    <string name="manual_connection">Ручное подключение</string>
+    <string name="button_debug">Ручное подключение</string>
+    <string name="button_debug_retry">Повторить попытку</string>
     <string name="settings">Настройки</string>
     <string name="share">Поделиться</string>
 

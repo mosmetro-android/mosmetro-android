@@ -7,4 +7,12 @@
             android:title="@string/settings"
             android:showAsAction="ifRoom" />
 
+    <group android:id="@+id/menu_debug" android:visible="false">
+        <item
+                android:id="@+id/action_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/share"
+                android:showAsAction="ifRoom" />
+    </group>
+
 </menu>
