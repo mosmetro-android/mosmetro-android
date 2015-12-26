@@ -41,14 +41,7 @@ public class MainActivity extends Activity {
     private static Thread thread;
     private final Runnable task = new Runnable() {
         public void run () {
-            SharedPreferences settings = getSharedPreferences("MosMetro_Lock", 0);
-            SharedPreferences.Editor editor = settings.edit();
-
-            if (connection.connect() < 2) {
-                Long time = Calendar.getInstance().getTimeInMillis();
-                editor.putLong("LastSuccess", time);
-                editor.apply();
-            }
+            connection.connect();
         }
     };
 
