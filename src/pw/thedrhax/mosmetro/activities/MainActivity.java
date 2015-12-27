@@ -1,8 +1,9 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,12 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
-
-import java.util.Calendar;
 
 public class MainActivity extends Activity {
     // UI Elements
@@ -25,7 +24,7 @@ public class MainActivity extends Activity {
     private Menu menu;
 
     // Connection sequence
-    private Authenticator connection;
+    private AuthenticatorStat connection;
 
     // Push received messages to the UI thread
     private final Handler handler = new Handler() {
@@ -89,13 +88,32 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_share:
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"mosmetro@thedrhax.pw"});
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Отчет MosMetro");
-                intent.putExtra(Intent.EXTRA_TEXT, text_description.getText().toString());
+                final AlertDialog.Builder alert_thanks = new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.thanks))
+                        .setMessage(getString(R.string.thanks_info))
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {}
+                        });
 
-                startActivity(Intent.createChooser(intent, "Отправить отчет"));
+                final EditText input = new EditText(this);
+                final AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.share))
+                        .setMessage(getString(R.string.share_info))
+                        .setView(input)
+                        .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                connection.report(
+                                        text_description.getText().toString(),
+                                        input.getText().toString());
+                                alert_thanks.show();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {}
+                        });
+
+                alert.show();
+
                 return true;
 
             case android.R.id.home:
