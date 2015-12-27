@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.activities.MainActivity;
+import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
-import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.util.Util;
 
 public class ConnectionService extends IntentService {
