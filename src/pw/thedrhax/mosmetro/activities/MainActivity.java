@@ -147,16 +147,14 @@ public class MainActivity extends Activity {
             button_debug.setText(getString(R.string.button_debug_retry));
             text_description.setText("");
             menu.setGroupVisible(R.id.menu_debug, true);
-            try {
+            if (getActionBar() != null)
                 getActionBar().setDisplayHomeAsUpEnabled(true);
-            } catch (NullPointerException ignored) {}
         } else {
             button_debug.setText(getString(R.string.button_debug));
             text_description.setText(getString(R.string.text_description));
             menu.setGroupVisible(R.id.menu_debug, false);
-            try {
+            if (getActionBar() != null)
                 getActionBar().setDisplayHomeAsUpEnabled(false);
-            } catch (NullPointerException ignored) {}
         }
     }
 }
