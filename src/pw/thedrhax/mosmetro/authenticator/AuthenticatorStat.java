@@ -11,6 +11,7 @@ import java.io.IOException;
 public class AuthenticatorStat extends Authenticator {
     private static final String INTERNET_CHECK_URL = "http://thedrhax.pw/mosmetro/check.php";
     private static final String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
+    private static final String REPORT_URL = "http://thedrhax.pw/mosmetro/report.php";
 
     private Context context;
     private boolean isAutomatic;
@@ -54,10 +55,7 @@ public class AuthenticatorStat extends Authenticator {
                 params.append("version=").append(getVersion());
 
                 try {
-                    new HttpClient().navigate(
-                            "http://thedrhax.pw/mosmetro/report.php",
-                            params.toString()
-                    );
+                    new HttpClient().navigate(REPORT_URL, params.toString());
                 } catch (IOException ignored) {}
             }
         }).start();
