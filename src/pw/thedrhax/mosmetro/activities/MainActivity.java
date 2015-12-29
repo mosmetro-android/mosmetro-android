@@ -25,6 +25,9 @@ public class MainActivity extends Activity {
 
     // Connection sequence
     private AuthenticatorStat connection;
+    
+    // Log from intent
+    private String debug_log;
 
     // Push received messages to the UI thread
     private final Handler handler = new Handler() {
@@ -53,6 +56,7 @@ public class MainActivity extends Activity {
         connection = new AuthenticatorStat(this, false) {
             // Send log messages to Handler
             public void log (String message) {
+                super.log(message);
                 Message msg = handler.obtainMessage();
                 Bundle bundle = new Bundle();
                 bundle.putString("text", message + "\n");
@@ -76,6 +80,7 @@ public class MainActivity extends Activity {
         if ((extra != null) && (extra.getString("log") != null)) {
             setDebug(true);
             text_description.setText(extra.getString("log"));
+            debug_log = extra.getString("debug");
         }
 
         return true;
@@ -96,15 +101,14 @@ public class MainActivity extends Activity {
                         });
 
                 final EditText input = new EditText(this);
+                final String debug = ((debug_log != null) ? debug_log : connection.getDebug());
                 final AlertDialog.Builder alert = new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.share))
                         .setMessage(getString(R.string.share_info))
                         .setView(input)
                         .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                connection.report(
-                                        text_description.getText().toString(),
-                                        input.getText().toString());
+                                connection.report(debug, input.getText().toString());
                                 alert_thanks.show();
                             }
                         })

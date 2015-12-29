@@ -44,6 +44,7 @@ public class ConnectionService extends IntentService {
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     Intent debug = new Intent(this, MainActivity.class);
                     debug.putExtra("log", connection.getLog());
+                    debug.putExtra("debug", connection.getDebug());
                     
                     Util.notify(this,
                             "Не удалось подключиться",

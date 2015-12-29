@@ -13,12 +13,14 @@ import java.util.regex.Pattern;
 
 public class Authenticator {
 	private StringBuilder log = new StringBuilder();
+	private StringBuilder debug = new StringBuilder();
 
     public boolean isConnected() {
         try {
             new HttpClient().navigate("https://google.com");
             return true;
         } catch (Exception ex) {
+            debug(ex);
             return false;
         }
     }
@@ -34,9 +36,10 @@ public class Authenticator {
 
         log(">> Проверка сети");
         try {
-            client.navigate("http://1.1.1.1/login.html");
+            debug(client.navigate("http://1.1.1.1/login.html").getContent());
         } catch (Exception ex) {
             log(ex.toString());
+            debug(ex);
             log("<< Ошибка: неправильная сеть (вы не в метро?)");
             return 1;
         }
@@ -55,11 +58,14 @@ public class Authenticator {
         log(">>> Получение перенаправления");
         try {
             page = client.navigate("http://vmet.ro").getContent();
+            debug(page);
         } catch (UnknownHostException ex) {
+            debug(ex);
             log("<<< Ошибка: DNS сервер не ответил (временная неисправность)");
             return 2;
         } catch (Exception ex) {
-            log(Util.exToStr(ex));
+            log(ex.toString());
+            debug(ex);
             log("<<< Ошибка: перенаправление не получено");
             return 2;
         }
@@ -77,11 +83,14 @@ public class Authenticator {
         log(">>> Получение страницы авторизации");
         try {
             page = client.navigate(link).getContent();
+            debug(page);
         } catch (SocketTimeoutException ex) {
             log("<<< Ошибка: сервер не отвечает (временная неисправность)");
+            debug(ex);
             return 2;
         } catch (Exception ex) {
-            log(Util.exToStr(ex));
+            log(ex.toString());
+            debug(ex);
             log("<<< Ошибка: страница авторизации не получена");
             return 2;
         }
@@ -95,9 +104,10 @@ public class Authenticator {
         // Отправка запроса с данными формы
         log(">>> Отправка формы авторизации");
         try {
-            client.navigate(link, fields).getContent();
+            debug(client.navigate(link, fields).getContent());
         } catch (Exception ex) {
-            log(Util.exToStr(ex));
+            log(ex.toString());
+            debug(ex);
             log("<<< Ошибка: сервер не ответил или вернул ошибку");
             return 2;
         }
@@ -115,11 +125,19 @@ public class Authenticator {
     }
 
     public void log(String message) {
-        log.append(message);
-        log.append("\n");
-        
+        log.append(message).append("\n");
+        debug(message);
         System.out.println(message);
     }
     
+    public void debug(Exception ex) {
+        debug(Util.exToStr(ex));
+    }
+    
+    public void debug(String message) {
+        debug.append(message).append("\n");
+    }
+    
     public String getLog() {return log.toString();}
+    public String getDebug() {return debug.toString();}
 }

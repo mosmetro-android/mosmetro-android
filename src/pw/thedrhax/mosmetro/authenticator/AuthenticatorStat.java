@@ -42,6 +42,7 @@ public class AuthenticatorStat extends Authenticator {
                     .navigate(INTERNET_CHECK_URL, params.toString())
                     .getContent().contains(INTERNET_CHECK_KEY);
         } catch (Exception ex) {
+            debug(ex);
             return false;
         }
     }
