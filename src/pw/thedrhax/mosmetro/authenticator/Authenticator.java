@@ -34,10 +34,10 @@ public class Authenticator {
 
         log(">> Проверка сети");
         try {
-            client.navigate("http://1.1.1.1/login.html").getContent();
+            client.navigate("http://1.1.1.1/login.html");
         } catch (Exception ex) {
-            log(Util.exToStr(ex));
-            log("<< Ошибка: неправильная сеть");
+            log(ex.toString());
+            log("<< Ошибка: неправильная сеть (вы не в метро?)");
             return 1;
         }
 
@@ -56,8 +56,7 @@ public class Authenticator {
         try {
             page = client.navigate("http://vmet.ro").getContent();
         } catch (UnknownHostException ex) {
-            log("<<< Ошибка: DNS сервер не ответил");
-            log("<<< Похоже на временную неисправность");
+            log("<<< Ошибка: DNS сервер не ответил (временная неисправность)");
             return 2;
         } catch (Exception ex) {
             log(Util.exToStr(ex));
@@ -79,8 +78,7 @@ public class Authenticator {
         try {
             page = client.navigate(link).getContent();
         } catch (SocketTimeoutException ex) {
-            log("<<< Ошибка: сервер не отвечает");
-            log("<<< Похоже на временную неисправность");
+            log("<<< Ошибка: сервер не отвечает (временная неисправность)");
             return 2;
         } catch (Exception ex) {
             log(Util.exToStr(ex));
