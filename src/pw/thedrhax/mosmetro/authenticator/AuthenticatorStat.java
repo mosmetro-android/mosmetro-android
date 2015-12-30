@@ -14,12 +14,12 @@ public class AuthenticatorStat extends Authenticator {
     private static final String REPORT_URL = "http://thedrhax.pw/mosmetro/report.php";
 
     private Context context;
-    private boolean isAutomatic;
+    private boolean automatic;
 
-    public AuthenticatorStat(Context context, boolean isAutomatic) {
+    public AuthenticatorStat(Context context, boolean automatic) {
         super();
         this.context = context;
-        this.isAutomatic = isAutomatic;
+        this.automatic = automatic;
     }
 
     private String getVersion() {
@@ -36,7 +36,7 @@ public class AuthenticatorStat extends Authenticator {
         StringBuilder params = new StringBuilder();
 
         params.append("version=").append(getVersion()).append("&");
-        params.append("isAutomatic=").append(isAutomatic ? "TRUE" : "FALSE");
+        params.append("automatic=").append(automatic ? "TRUE" : "FALSE");
         try {
             return new HttpClient()
                     .navigate(INTERNET_CHECK_URL, params.toString())
