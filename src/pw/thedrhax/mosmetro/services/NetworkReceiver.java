@@ -23,7 +23,6 @@ public class NetworkReceiver extends BroadcastReceiver {
                 settings_editor.putBoolean("locked", true);
                 settings_editor.apply();
                 context.startService(new Intent(context, ConnectionService.class));
-                System.out.println("Service started");
             }
         } else {
             settings_editor.putBoolean("locked", false);
