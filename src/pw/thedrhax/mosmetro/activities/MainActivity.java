@@ -79,9 +79,12 @@ public class MainActivity extends Activity {
         // This is here because menu is needed to run setDebug()
         try {
             intent_bundle = getIntent().getExtras();
-            setDebug(true);
-            text_description.setText(intent_bundle.getString("log"));
-            show_service_log = true;
+            String log = intent_bundle.getString("log");
+            if (log != null) {
+                setDebug(true);
+                text_description.setText(log);
+                show_service_log = true;
+            }
         } catch (NullPointerException ignored) {}
 
         return true;
