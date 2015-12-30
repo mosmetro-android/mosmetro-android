@@ -10,14 +10,24 @@ import android.preference.PreferenceManager;
 
 public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!preferences.getBoolean("pref_autoconnect", true)) return;
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!settings.getBoolean("pref_autoconnect", true)) return;
 
-        WifiInfo info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+        SharedPreferences.Editor settings_editor = settings.edit();
 
-        if (info == null) return;
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-        if ("\"MosMetro_Free\"".equals(info.getSSID()))
-            context.startService(new Intent(context, ConnectionService.class));
+        if ("\"MosMetro_Free\"".equals(wifiInfo.getSSID())) {
+            if (!settings.getBoolean("locked", false)) {
+                settings_editor.putBoolean("locked", true);
+                settings_editor.apply();
+                context.startService(new Intent(context, ConnectionService.class));
+                System.out.println("Service started");
+            }
+        } else {
+            settings_editor.putBoolean("locked", false);
+            settings_editor.apply();
+        }
     }
 }
