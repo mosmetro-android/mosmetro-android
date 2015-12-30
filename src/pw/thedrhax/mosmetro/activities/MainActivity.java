@@ -2,6 +2,7 @@ package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,14 +28,14 @@ public class MainActivity extends Activity {
     private AuthenticatorStat connection;
     
     // Log from intent
-    private String debug_log;
+    private Bundle intent_bundle;
+    private boolean show_service_log = false; // Activity is started to show log from service
 
     // Push received messages to the UI thread
     private final Handler handler = new Handler() {
         public void handleMessage(Message message) {
             String text = message.getData().getString("text");
             if (text == null) return;
-
             text_description.append(text);
         }
     };
@@ -75,13 +76,13 @@ public class MainActivity extends Activity {
         inflater.inflate(R.menu.main, menu);
         this.menu = menu;
 
-        // This is here because menu is needed to run setDebug
-        Bundle extra = getIntent().getExtras();
-        if ((extra != null) && (extra.getString("log") != null)) {
+        // This is here because menu is needed to run setDebug()
+        try {
+            intent_bundle = getIntent().getExtras();
             setDebug(true);
-            text_description.setText(extra.getString("log"));
-            debug_log = extra.getString("debug");
-        }
+            text_description.setText(intent_bundle.getString("log"));
+            show_service_log = true;
+        } catch (NullPointerException ignored) {}
 
         return true;
     }
@@ -93,30 +94,37 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_share:
-                final AlertDialog.Builder alert_thanks = new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.thanks))
-                        .setMessage(getString(R.string.thanks_info))
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {}
-                        });
+                final Context context = this;
 
+                // Guess what to send in report
+                final String debug = ((show_service_log) ? intent_bundle.getString("debug") : connection.getDebug());
+
+                // Text field for user's message
                 final EditText input = new EditText(this);
-                final String debug = ((debug_log != null) ? debug_log : connection.getDebug());
-                final AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.share))
-                        .setMessage(getString(R.string.share_info))
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                        .setTitle(R.string.share)
+                        .setMessage(R.string.share_info)
                         .setView(input)
                         .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                AlertDialog.Builder message = new AlertDialog.Builder(context)
+                                        .setTitle(R.string.share_ok)
+                                        .setMessage(R.string.share_ok_info)
+                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {}
+                                        });
+
                                 connection.report(debug, input.getText().toString());
-                                alert_thanks.show();
+
+                                message.show();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {}
                         });
 
-                alert.show();
+                dialog.show();
 
                 return true;
 
@@ -130,6 +138,7 @@ public class MainActivity extends Activity {
     }
 
     public void button_debug (View view) {
+        show_service_log = false;
         if ((thread == null) || (!thread.isAlive())) {
             setDebug(true);
 
@@ -139,6 +148,7 @@ public class MainActivity extends Activity {
     }
 
     public void onBackPressed() {
+        show_service_log = false;
         if (button_debug.getText().equals(getString(R.string.button_debug_retry))) {
             setDebug(false);
         } else {
