@@ -25,7 +25,7 @@ public class Authenticator {
         }
     }
 	
-	// Returns 0 on success, 1 if already connected or wrong network and 2 if error
+	// Returns 0 on success, 1 if already connected, 2 if wrong network and 3 if error
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
@@ -41,7 +41,7 @@ public class Authenticator {
             log(ex.toString());
             debug(ex);
             log("<< Ошибка: неправильная сеть (вы не в метро?)");
-            return 1;
+            return 2;
         }
 
         log(">> Проверка доступа в интернет");
@@ -62,12 +62,12 @@ public class Authenticator {
         } catch (UnknownHostException ex) {
             debug(ex);
             log("<<< Ошибка: DNS сервер не ответил (временная неисправность)");
-            return 2;
+            return 3;
         } catch (Exception ex) {
             log(ex.toString());
             debug(ex);
             log("<<< Ошибка: перенаправление не получено");
-            return 2;
+            return 3;
         }
 
         Pattern pLink = Pattern.compile("https?:[^\"]*");
@@ -77,7 +77,7 @@ public class Authenticator {
             link = mLinkRedirect.group(0);
         } else {
             log("<<< Ошибка: перенаправление не найдено");
-            return 2;
+            return 3;
         }
 
         log(">>> Получение страницы авторизации");
@@ -87,18 +87,18 @@ public class Authenticator {
         } catch (SocketTimeoutException ex) {
             log("<<< Ошибка: сервер не отвечает (временная неисправность)");
             debug(ex);
-            return 2;
+            return 3;
         } catch (Exception ex) {
             log(ex.toString());
             debug(ex);
             log("<<< Ошибка: страница авторизации не получена");
-            return 2;
+            return 3;
         }
 
         fields = parser.parse(page).toString();
         if (fields == null) {
             log("<<< Ошибка: форма авторизации не найдена");
-            return 2;
+            return 3;
         }
 
         // Отправка запроса с данными формы
@@ -109,7 +109,7 @@ public class Authenticator {
             log(ex.toString());
             debug(ex);
             log("<<< Ошибка: сервер не ответил или вернул ошибку");
-            return 2;
+            return 3;
         }
 
         log(">> Проверка доступа в интернет");
@@ -117,7 +117,7 @@ public class Authenticator {
             log("<< Соединение успешно установлено :3");
         } else {
             log("<< Ошибка: доступ в интернет отсутствует");
-            return 2;
+            return 3;
         }
 
         log("< " + dateFormat.format(new Date()));

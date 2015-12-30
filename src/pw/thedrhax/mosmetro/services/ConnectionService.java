@@ -28,6 +28,7 @@ public class ConnectionService extends IntentService {
 	
 	public void onHandleIntent(Intent intent) {
         switch(connection.connect()) {
+            // Successful connection
             case 0:
                 if (settings.getBoolean("pref_notify_success", true))
                     Util.notify(this,
@@ -36,11 +37,14 @@ public class ConnectionService extends IntentService {
                             new Intent(this, SettingsActivity.class)
                     );
                 break;
-
+            // Already connected: ok too
             case 1:
                 break;
-
+            // Wrong network
             case 2:
+                break;
+            // Error
+            case 3:
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     Intent debug = new Intent(this, MainActivity.class);
                     debug.putExtra("log", connection.getLog());
