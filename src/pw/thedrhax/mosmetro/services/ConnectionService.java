@@ -3,6 +3,7 @@ package pw.thedrhax.mosmetro.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.activities.MainActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
@@ -32,7 +33,9 @@ public class ConnectionService extends IntentService {
                 .setText("Пожалуйта, подождите...")
                 .setContinuous();
 
-        boolean pref_notify_progress = settings.getBoolean("pref_notify_progress", true);
+        boolean pref_notify_progress = (
+                settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14)
+        );
         int pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
         int pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
