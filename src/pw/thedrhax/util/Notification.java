@@ -53,6 +53,12 @@ public class Notification {
         return this;
     }
 
+    public Notification setProgress (int progress) {
+        if (Build.VERSION.SDK_INT >= 14)
+            builder = builder.setProgress(100, progress, false);
+        return this;
+    }
+
     public void show() {
         if (Build.VERSION.SDK_INT >= 16) {
             nm.notify(id, builder.build());

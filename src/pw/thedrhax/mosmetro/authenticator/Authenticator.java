@@ -34,6 +34,8 @@ public class Authenticator {
 
         log("> " + dateFormat.format(new Date()));
 
+        onChangeProgress(0);
+
         log(">> Проверка сети");
         try {
             debug(client.navigate("http://1.1.1.1/login.html").getContent());
@@ -43,6 +45,8 @@ public class Authenticator {
             log("<< Ошибка: неправильная сеть (вы не в метро?)");
             return 2;
         }
+
+        onChangeProgress(16);
 
         log(">> Проверка доступа в интернет");
         if (isConnected()) {
@@ -54,6 +58,8 @@ public class Authenticator {
 
         client.setIgnoreSSL(true);
         client.setMaxRetries(3);
+
+        onChangeProgress(32);
 
         log(">>> Получение перенаправления");
         try {
@@ -80,6 +86,8 @@ public class Authenticator {
             return 3;
         }
 
+        onChangeProgress(48);
+
         log(">>> Получение страницы авторизации");
         try {
             page = client.navigate(link).getContent();
@@ -101,6 +109,8 @@ public class Authenticator {
             return 3;
         }
 
+        onChangeProgress(64);
+
         // Отправка запроса с данными формы
         log(">>> Отправка формы авторизации");
         try {
@@ -112,6 +122,8 @@ public class Authenticator {
             return 3;
         }
 
+        onChangeProgress(80);
+
         log(">> Проверка доступа в интернет");
         if (isConnected()) {
             log("<< Соединение успешно установлено :3");
@@ -120,9 +132,13 @@ public class Authenticator {
             return 3;
         }
 
+        onChangeProgress(100);
+
         log("< " + dateFormat.format(new Date()));
         return 0;
     }
+
+    public void onChangeProgress (int progress) {}
 
     public void log(String message) {
         log.append(message).append("\n");

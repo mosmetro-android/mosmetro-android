@@ -17,48 +17,47 @@ public class ConnectionService extends IntentService {
     public ConnectionService () {
 		super("ConnectionService");
 	}
-
-    private Authenticator connection;
 	
 	public void onCreate() {
 		super.onCreate();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        connection = new AuthenticatorStat(this, true);
     }
 	
 	public void onHandleIntent(Intent intent) {
-        Notification progress = new Notification(this)
-                .setTitle("Подключение...")
-                .setText("Пожалуйта, подождите...")
-                .setContinuous();
-
-        boolean pref_notify_progress = (
+        final boolean pref_notify_progress = (
                 settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14)
         );
         int pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
         int pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
+        final Notification notify_progress = new Notification(this)
+                .setTitle("Подключение к MosMetro_Free");
+
+        Authenticator connection = new AuthenticatorStat(this, true) {
+            public void onChangeProgress(int progress) {
+                if (pref_notify_progress) {
+                    notify_progress.setProgress(progress);
+                    notify_progress.show();
+                }
+            }
+        };
+
         int result, count = 0;
 
-        if (pref_notify_progress) progress.show();
+        if (pref_notify_progress) notify_progress.show();
         do {
-            // Wait 1 minute
             if (count > 0) {
-                if (count < pref_retry_count)
-                    connection.log(
-                            "Повторная попытка (" + (count+1) +
-                            " из " + pref_retry_count + ") через "
-                            + pref_retry_delay + " секунд\n"
-                    );
+                if (pref_notify_progress)
+                    notify_progress.setText("Ожидание...").setContinuous().show();
 
                 try {
                     Thread.sleep(pref_retry_delay * 1000);
                 } catch (InterruptedException ignored) {}
-
-                if (pref_notify_progress)
-                    progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
             }
+
+            if (pref_notify_progress)
+                notify_progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
 
             result = connection.connect();
 
@@ -85,9 +84,10 @@ public class ConnectionService extends IntentService {
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
+                return;
             // Already connected
             case 1:
-                if (pref_notify_progress) progress.hide();
+                if (pref_notify_progress) notify_progress.hide();
                 return;
             // Wrong network
             case 2:
