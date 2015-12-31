@@ -98,7 +98,7 @@ public class ConnectionService extends IntentService {
 
                     notification
                             .setTitle("Не удалось подключиться")
-                            .setText("Нажмите, чтобы увидеть лог")
+                            .setText("Нажмите, чтобы узнать подробности или попробовать снова")
                             .setIntent(debug)
                             .show();
                 }
