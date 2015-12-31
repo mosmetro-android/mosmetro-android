@@ -26,6 +26,12 @@
                 android:summary="@string/pref_notify_fail_summary"
                 android:defaultValue="true" />
 
+        <CheckBoxPreference
+                android:key="pref_notify_progress"
+                android:title="@string/pref_notify_progress"
+                android:summary="@string/pref_notify_progress_summary"
+                android:defaultValue="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

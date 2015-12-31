@@ -47,11 +47,21 @@ public class Notification {
         return this;
     }
 
+    public Notification setContinuous () {
+        if (Build.VERSION.SDK_INT >= 14)
+            builder = builder.setProgress(0, 0, true);
+        return this;
+    }
+
     public void show() {
         if (Build.VERSION.SDK_INT >= 16) {
             nm.notify(id, builder.build());
         } else { // support older devices
             nm.notify(id, builder.getNotification());
         }
+    }
+
+    public void hide() {
+        nm.cancel(id);
     }
 }

@@ -27,9 +27,16 @@ public class ConnectionService extends IntentService {
     }
 	
 	public void onHandleIntent(Intent intent) {
+        Notification progress = new Notification(this)
+                .setTitle("Подключение...")
+                .setText("Пожалуйта, подождите...")
+                .setContinuous();
+        boolean pref_notify_progress = settings.getBoolean("pref_notify_progress", true);
+
         int result, count = 0;
 
         // Retry 5 times, wait 1 minute after each retry
+        if (pref_notify_progress) progress.show();
         do {
             // Wait 1 minute
             if (count > 0) {
@@ -37,6 +44,7 @@ public class ConnectionService extends IntentService {
                 try {
                     Thread.sleep(60 * 1000);
                 } catch (InterruptedException ignored) {}
+                if (pref_notify_progress) progress.setText("Попытка " + (count+1) + " из 5").show();
             }
 
             result = connection.connect();
@@ -66,6 +74,7 @@ public class ConnectionService extends IntentService {
                             .show();
             // Already connected
             case 1:
+                if (pref_notify_progress) progress.hide();
                 return;
             // Wrong network
             case 2:
