@@ -8,7 +8,7 @@ import pw.thedrhax.mosmetro.activities.MainActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
-import pw.thedrhax.util.Util;
+import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
     private SharedPreferences settings;
@@ -53,15 +53,17 @@ public class ConnectionService extends IntentService {
          * Notify user about result
          */
 
+        Notification notification = new Notification(this);
+
         switch (result) {
             // Successful connection
             case 0:
                 if (settings.getBoolean("pref_notify_success", true))
-                    Util.notify(this,
-                            "Успешно подключено",
-                            "Нажмите, чтобы открыть настройки уведомлений",
-                            new Intent(this, SettingsActivity.class)
-                    );
+                    notification
+                            .setTitle("Успешно подключено")
+                            .setText("Нажмите, чтобы открыть настройки уведомлений")
+                            .setIntent(new Intent(this, SettingsActivity.class))
+                            .show();
             // Already connected
             case 1:
                 return;
@@ -74,11 +76,11 @@ public class ConnectionService extends IntentService {
                     debug.putExtra("log", connection.getLog());
                     debug.putExtra("debug", connection.getDebug());
 
-                    Util.notify(this,
-                            "Не удалось подключиться",
-                            "Нажмите, чтобы увидеть лог",
-                            debug
-                    );
+                    notification
+                            .setTitle("Не удалось подключиться")
+                            .setText("Нажмите, чтобы увидеть лог")
+                            .setIntent(debug)
+                            .show();
                 }
         }
 	}
