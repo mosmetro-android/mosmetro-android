@@ -31,20 +31,22 @@ public class ConnectionService extends IntentService {
 
         // Retry 5 times, wait 1 minute after each retry
         do {
-            result = connection.connect();
-
             // Wait 1 minute
-            if (count++ < 5) {
-                connection.log("Повторная попытка (" + (count+1) + " из 5) через 60 секунд");
+            if (count > 0) {
+                if (count < 5) connection.log("Повторная попытка (" + (count+1) + " из 5) через 60 секунд");
                 try {
                     Thread.sleep(60 * 1000);
                 } catch (InterruptedException ignored) {}
             }
 
+            result = connection.connect();
+
             if (!settings.getBoolean("locked", false)) {
                 connection.log("Ошибка: соединение с сетью прервалось (поезд уехал?)");
                 break;
             }
+
+            count++;
         } while (count < 5 && result > 1); // Repeat until internet is available or 5 tries are made
 
         /*
