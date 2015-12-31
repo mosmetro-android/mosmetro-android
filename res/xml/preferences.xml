@@ -9,6 +9,20 @@
                 android:summary="@string/pref_autoconnect_summary"
                 android:defaultValue="true" />
 
+        <EditTextPreference
+                android:key="pref_retry_count"
+                android:inputType="number"
+                android:title="@string/pref_retry_count"
+                android:summary="@string/pref_retry_count_summary"
+                android:defaultValue="5" />
+
+        <EditTextPreference
+                android:key="pref_retry_delay"
+                android:inputType="number"
+                android:title="@string/pref_retry_delay"
+                android:summary="@string/pref_retry_delay_summary"
+                android:defaultValue="10" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

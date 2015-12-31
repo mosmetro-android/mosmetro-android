@@ -31,20 +31,30 @@ public class ConnectionService extends IntentService {
                 .setTitle("Подключение...")
                 .setText("Пожалуйта, подождите...")
                 .setContinuous();
+
         boolean pref_notify_progress = settings.getBoolean("pref_notify_progress", true);
+        int pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
+        int pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
         int result, count = 0;
 
-        // Retry 5 times, wait 1 minute after each retry
         if (pref_notify_progress) progress.show();
         do {
             // Wait 1 minute
             if (count > 0) {
-                if (count < 5) connection.log("Повторная попытка (" + (count+1) + " из 5) через 60 секунд");
+                if (count < pref_retry_count)
+                    connection.log(
+                            "Повторная попытка (" + (count+1) +
+                            " из " + pref_retry_count + ") через "
+                            + pref_retry_delay + " секунд\n"
+                    );
+
                 try {
-                    Thread.sleep(60 * 1000);
+                    Thread.sleep(pref_retry_delay * 1000);
                 } catch (InterruptedException ignored) {}
-                if (pref_notify_progress) progress.setText("Попытка " + (count+1) + " из 5").show();
+
+                if (pref_notify_progress)
+                    progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
             }
 
             result = connection.connect();
@@ -55,7 +65,7 @@ public class ConnectionService extends IntentService {
             }
 
             count++;
-        } while (count < 5 && result > 1); // Repeat until internet is available or 5 tries are made
+        } while (count < pref_retry_count && result > 1);
 
         /*
          * Notify user about result

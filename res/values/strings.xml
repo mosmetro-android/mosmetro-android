@@ -20,7 +20,7 @@
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
     <string name="pref_autoconnect_summary">
-        Подключаться к интернету автоматически при соединении с сетью Wi-Fi MosMetro_Free
+        Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free
     </string>
 
     <string name="pref_notify_success">Успешное подключение</string>
@@ -54,4 +54,9 @@
     <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_notifications">Уведомления</string>
+    <string name="pref_retry_delay">Задержка между попытками</string>
+    <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 10)
+    </string>
+    <string name="pref_retry_count">Количество попыток</string>
+    <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 5)</string>
 </resources>
