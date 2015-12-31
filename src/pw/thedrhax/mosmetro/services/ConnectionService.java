@@ -27,52 +27,57 @@ public class ConnectionService extends IntentService {
     }
 	
 	public void onHandleIntent(Intent intent) {
-        int result = 0, count = 0;
+        int result, count = 0;
 
-        // Retry 5 times, wait 1 minute after each retry, stop on error
-        while (settings.getBoolean("locked", false) && count < 5 && result < 3) {
+        // Retry 5 times, wait 1 minute after each retry
+        do {
             result = connection.connect();
-            count++;
-
-            switch (result) {
-                // Successful connection
-                case 0:
-                    if (settings.getBoolean("pref_notify_success", true))
-                        Util.notify(this,
-                                "Успешно подключено",
-                                "Нажмите, чтобы открыть настройки уведомлений",
-                                new Intent(this, SettingsActivity.class)
-                        );
-                    break;
-                // Already connected: ok too
-                case 1:
-                    break;
-                // Wrong network
-                case 2:
-                    break;
-                // Error
-                case 3:
-                    if (settings.getBoolean("pref_notify_fail", true)) {
-                        Intent debug = new Intent(this, MainActivity.class);
-                        debug.putExtra("log", connection.getLog());
-                        debug.putExtra("debug", connection.getDebug());
-
-                        Util.notify(this,
-                                "Не удалось подключиться",
-                                "Нажмите, чтобы увидеть лог",
-                                debug
-                        );
-                    }
-                    break;
-            }
 
             // Wait 1 minute
-            if (count < 5) {
+            if (count++ < 5) {
                 connection.log("Повторная попытка (" + (count+1) + " из 5) через 60 секунд");
                 try {
                     Thread.sleep(60 * 1000);
                 } catch (InterruptedException ignored) {}
             }
+
+            if (!settings.getBoolean("locked", false)) {
+                connection.log("Ошибка: соединение с сетью прервалось (поезд уехал?)");
+                break;
+            }
+        } while (count < 5 && result > 1); // Repeat until internet is available or 5 tries are made
+
+        /*
+         * Notify user about result
+         */
+
+        switch (result) {
+            // Successful connection
+            case 0:
+                if (settings.getBoolean("pref_notify_success", true))
+                    Util.notify(this,
+                            "Успешно подключено",
+                            "Нажмите, чтобы открыть настройки уведомлений",
+                            new Intent(this, SettingsActivity.class)
+                    );
+            // Already connected
+            case 1:
+                return;
+            // Wrong network
+            case 2:
+            // Error
+            case 3:
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    Intent debug = new Intent(this, MainActivity.class);
+                    debug.putExtra("log", connection.getLog());
+                    debug.putExtra("debug", connection.getDebug());
+
+                    Util.notify(this,
+                            "Не удалось подключиться",
+                            "Нажмите, чтобы увидеть лог",
+                            debug
+                    );
+                }
         }
 	}
 }
