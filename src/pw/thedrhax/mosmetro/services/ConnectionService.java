@@ -45,7 +45,6 @@ public class ConnectionService extends IntentService {
 
         int result, count = 0;
 
-        if (pref_notify_progress) notify_progress.show();
         do {
             if (count > 0) {
                 if (pref_notify_progress)
@@ -73,6 +72,7 @@ public class ConnectionService extends IntentService {
          * Notify user about result
          */
 
+        if (pref_notify_progress) notify_progress.hide();
         Notification notification = new Notification(this);
 
         switch (result) {
@@ -84,10 +84,8 @@ public class ConnectionService extends IntentService {
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
-                return;
             // Already connected
             case 1:
-                if (pref_notify_progress) notify_progress.hide();
                 return;
             // Wrong network
             case 2:
