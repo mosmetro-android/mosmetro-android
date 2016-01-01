@@ -16,6 +16,8 @@ public class AuthenticatorStat extends Authenticator {
     private Context context;
     private boolean automatic;
 
+    private boolean first_check;
+
     public AuthenticatorStat(Context context, boolean automatic) {
         super();
         this.context = context;
@@ -28,15 +30,22 @@ public class AuthenticatorStat extends Authenticator {
             pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName + "-" + pInfo.versionCode;
         } catch (PackageManager.NameNotFoundException ex) {
-            return "unknown";
+            return "";
         }
+    }
+
+    public int connect() {
+        first_check = true;
+        return super.connect();
     }
 
     public boolean isConnected() {
         StringBuilder params = new StringBuilder();
 
         params.append("version=").append(getVersion()).append("&");
-        params.append("automatic=").append(automatic ? "TRUE" : "FALSE");
+        params.append("automatic=").append(automatic ? "1" : "0").append("&");
+        params.append("connected=").append(first_check ? "0" : "1");
+        first_check = false;
         try {
             return new HttpClient()
                     .navigate(INTERNET_CHECK_URL, params.toString())
