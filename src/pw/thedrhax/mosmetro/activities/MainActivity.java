@@ -1,8 +1,6 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,10 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.mosmetro.tasks.SendReportTask;
 
 public class MainActivity extends Activity {
     // UI Elements
@@ -64,36 +62,7 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_share:
-                // Guess what to send in report
-                final String debug = connection_debug;
-
-                // Text field for user's message
-                final EditText input = new EditText(this);
-
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this)
-                        .setTitle(R.string.share)
-                        .setMessage(R.string.share_info)
-                        .setView(input)
-                        .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                AlertDialog.Builder message = new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle(R.string.share_ok)
-                                        .setMessage(R.string.share_ok_info)
-                                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {}
-                                        });
-
-                                new AuthenticatorStat(MainActivity.this, false).report(debug, input.getText().toString());
-
-                                message.show();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {}
-                        });
-
-                dialog.show();
-
+                new SendReportTask(this, connection_debug).execute();
                 return true;
 
             case android.R.id.home:

@@ -7,10 +7,7 @@
     <string name="settings">Настройки</string>
 
     <string name="share">Отправить отчет</string>
-    <string name="share_info">
-        Перед отправкой отчета убедитесь, что интернет доступен, иначе сообщение не дойдет.
-        \n\nЕсли вы хотите сообщить дополнительную информацию, запишите её в это поле:
-    </string>
+    <string name="share_info">Если вы хотите сообщить дополнительную информацию, запишите её в это поле:</string>
     <string name="share_ok">Спасибо!</string>
     <string name="share_ok_info">Ваше сообщение поможет сделать это приложение лучше :3</string>
 
@@ -59,4 +56,6 @@
     </string>
     <string name="pref_retry_count">Количество попыток</string>
     <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 5)</string>
+    <string name="share_fail">Интернет недоступен</string>
+    <string name="share_fail_info">Убедитесь, что вы подключены к интернету, чтобы отправить отчет</string>
 </resources>
