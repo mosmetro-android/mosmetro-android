@@ -18,7 +18,8 @@ public class ConnectionService extends IntentService {
 		super("ConnectionService");
 	}
 	
-	public void onCreate() {
+	@Override
+    public void onCreate() {
 		super.onCreate();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);

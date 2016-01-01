@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
 
     // Push received messages to the UI thread
     private final Handler handler = new Handler() {
+        @Override
         public void handleMessage(Message message) {
             String text = message.getData().getString("text");
             if (text == null) return;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity {
 
         connection = new AuthenticatorStat(this, false) {
             // Send log messages to Handler
+            @Override
             public void log (String message) {
                 super.log(message);
                 Message msg = handler.obtainMessage();
@@ -71,6 +73,7 @@ public class MainActivity extends Activity {
 	}
 
     // ActionBar Menu
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -89,6 +92,7 @@ public class MainActivity extends Activity {
 
         return true;
     }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:

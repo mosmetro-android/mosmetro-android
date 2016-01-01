@@ -12,12 +12,14 @@ import pw.thedrhax.mosmetro.R;
 public class SettingsActivity extends Activity {
 
     public static class SettingsFragment extends PreferenceFragment {
+        @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
         }
     }
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -43,6 +45,7 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
@@ -53,6 +56,7 @@ public class SettingsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

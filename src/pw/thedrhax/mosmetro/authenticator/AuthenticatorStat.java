@@ -34,11 +34,13 @@ public class AuthenticatorStat extends Authenticator {
         }
     }
 
+    @Override
     public int connect() {
         first_check = true;
         return super.connect();
     }
 
+    @Override
     public boolean isConnected() {
         StringBuilder params = new StringBuilder();
 
