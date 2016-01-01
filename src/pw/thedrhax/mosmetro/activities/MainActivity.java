@@ -2,12 +2,10 @@ package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,50 +21,15 @@ public class MainActivity extends Activity {
     private TextView text_description;
     private Button button_debug;
     private Menu menu;
-
-    // Connection sequence
-    private AuthenticatorStat connection;
     
-    // Log from intent
-    private Bundle intent_bundle;
-    private boolean show_service_log = false; // Activity is started to show log from service
-
-    // Push received messages to the UI thread
-    private final Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message message) {
-            String text = message.getData().getString("text");
-            if (text == null) return;
-            text_description.append(text);
-        }
-    };
-
-    // Run connection sequence in background thread
-    private static Thread thread;
-    private final Runnable task = new Runnable() {
-        public void run () {
-            connection.connect();
-        }
-    };
+    // Connection and logs
+    private String connection_debug;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-        connection = new AuthenticatorStat(this, false) {
-            // Send log messages to Handler
-            @Override
-            public void log (String message) {
-                super.log(message);
-                Message msg = handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("text", message + "\n");
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-            }
-        };
 
         text_description = (TextView)findViewById(R.id.text_description);
         button_debug = (Button)findViewById(R.id.button_debug);
@@ -81,12 +44,12 @@ public class MainActivity extends Activity {
 
         // This is here because menu is needed to run setDebug()
         try {
-            intent_bundle = getIntent().getExtras();
-            String log = intent_bundle.getString("log");
-            if (log != null) {
+            Bundle intent_bundle = getIntent().getExtras();
+            String connection_log = intent_bundle.getString("log");
+            connection_debug = intent_bundle.getString("debug");
+            if (connection_log != null) {
                 setDebug(true);
-                text_description.setText(log);
-                show_service_log = true;
+                text_description.setText(connection_log);
             }
         } catch (NullPointerException ignored) {}
 
@@ -101,10 +64,8 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_share:
-                final Context context = this;
-
                 // Guess what to send in report
-                final String debug = ((show_service_log) ? intent_bundle.getString("debug") : connection.getDebug());
+                final String debug = connection_debug;
 
                 // Text field for user's message
                 final EditText input = new EditText(this);
@@ -115,14 +76,14 @@ public class MainActivity extends Activity {
                         .setView(input)
                         .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                AlertDialog.Builder message = new AlertDialog.Builder(context)
+                                AlertDialog.Builder message = new AlertDialog.Builder(MainActivity.this)
                                         .setTitle(R.string.share_ok)
                                         .setMessage(R.string.share_ok_info)
                                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {}
                                         });
 
-                                connection.report(debug, input.getText().toString());
+                                new AuthenticatorStat(MainActivity.this, false).report(debug, input.getText().toString());
 
                                 message.show();
                             }
@@ -144,18 +105,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void button_debug (View view) {
-        show_service_log = false;
-        if ((thread == null) || (!thread.isAlive())) {
-            setDebug(true);
-
-            thread = new Thread(task);
-            thread.start();
-        }
-    }
-
     public void onBackPressed() {
-        show_service_log = false;
         if (button_debug.getText().equals(getString(R.string.button_debug_retry))) {
             setDebug(false);
         } else {
@@ -176,6 +126,56 @@ public class MainActivity extends Activity {
             menu.setGroupVisible(R.id.menu_debug, false);
             if (getActionBar() != null)
                 getActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+    }
+
+    /*
+     * Run manual connection in background thread
+     */
+
+    private class AuthTask extends AsyncTask<Void, String, Void> {
+        private AuthenticatorStat connection;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            connection = new AuthenticatorStat(MainActivity.this, false) {
+                // Send log messages as progress
+                @Override
+                public void log(String message) {
+                    super.log(message);
+                    publishProgress(message + "\n");
+                }
+            };
+            connection.connect();
+            return null;
+        }
+
+        // Show log messages in the UI thread
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            text_description.append(values[0]);
+        }
+
+        // Extract debug log after finish
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            connection_debug = connection.getDebug();
+        }
+    }
+
+    // Current instance of AuthTask is stored here
+    private AuthTask task;
+
+    // Handle manual connection button
+    public void button_debug (View view) {
+        if ((task == null) || (AsyncTask.Status.FINISHED == task.getStatus()))
+            task = new AuthTask();
+
+        if (task.getStatus() != AsyncTask.Status.RUNNING) {
+            setDebug(true);
+            task.execute();
         }
     }
 }
