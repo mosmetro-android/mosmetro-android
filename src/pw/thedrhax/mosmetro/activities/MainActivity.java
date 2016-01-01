@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
-import pw.thedrhax.mosmetro.tasks.SendReportTask;
+import pw.thedrhax.mosmetro.authenticator.SendReportTask;
 
 public class MainActivity extends Activity {
     // UI Elements

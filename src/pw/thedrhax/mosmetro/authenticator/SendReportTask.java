@@ -1,4 +1,4 @@
-package pw.thedrhax.mosmetro.tasks;
+package pw.thedrhax.mosmetro.authenticator;
 
 import android.app.AlertDialog;
 import android.content.Context;
