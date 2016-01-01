@@ -16,7 +16,7 @@ public class AuthenticatorStat extends Authenticator {
     private Context context;
     private boolean automatic;
 
-    private boolean first_check;
+    private boolean first_check = true;
 
     public AuthenticatorStat(Context context, boolean automatic) {
         super();
