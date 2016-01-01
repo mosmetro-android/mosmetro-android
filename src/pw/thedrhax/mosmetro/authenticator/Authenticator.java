@@ -1,7 +1,7 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import pw.thedrhax.httpclient.HttpClient;
-import pw.thedrhax.util.HTMLFormParser;
+import pw.thedrhax.httpclient.HTMLFormParser;
 import pw.thedrhax.util.Util;
 
 import java.net.SocketTimeoutException;

@@ -1,4 +1,4 @@
-package pw.thedrhax.util;
+package pw.thedrhax.httpclient;
 
 import java.util.ArrayList;
 import java.util.List;
