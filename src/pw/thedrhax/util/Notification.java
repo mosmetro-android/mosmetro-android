@@ -19,7 +19,7 @@ public class Notification {
         this.builder = new android.app.Notification.Builder(context);
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        builder = builder.setSmallIcon(R.drawable.ic_launcher); // default icon
+        builder = builder.setSmallIcon(R.drawable.ic_notification); // default icon
         builder = builder.setAutoCancel(true); // delete notification on press
     }
 
