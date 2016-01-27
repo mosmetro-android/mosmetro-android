@@ -33,7 +33,7 @@ public class ConnectionService extends IntentService {
         int pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
         final Notification notify_progress = new Notification(this)
-                .setTitle("Подключение к MosMetro_Free");
+                .setTitle("Подключение к MosMetro_Free").setId(1);
 
         Authenticator connection = new AuthenticatorStat(this, true) {
             public void onChangeProgress(int progress) {
