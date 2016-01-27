@@ -115,7 +115,7 @@ public class ConnectionService extends IntentService {
             count++;
         } while (count < pref_retry_count && result > 1);
 
-        if (pref_notify_progress) notify_progress.hide();
+        notify_progress.hide();
 
         return result;
     }
