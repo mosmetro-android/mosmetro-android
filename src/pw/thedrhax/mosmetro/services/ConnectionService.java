@@ -95,7 +95,9 @@ public class ConnectionService extends IntentService {
         do {
             if (count > 0) {
                 if (pref_notify_progress)
-                    notify_progress.setText("Ожидание...").setContinuous().show();
+                    notify_progress.setText(
+                            "Ожидание... (попытка " + (count+1) + " из " + pref_retry_count + ")"
+                    ).setContinuous().show();
 
                 try {
                     Thread.sleep(pref_retry_delay * 1000);
@@ -103,7 +105,9 @@ public class ConnectionService extends IntentService {
             }
 
             if (pref_notify_progress)
-                notify_progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
+                notify_progress.setText(
+                        "Подключаюсь... (попытка " + (count+1) + " из " + pref_retry_count + ")"
+                ).show();
 
             result = connection.connect();
 
