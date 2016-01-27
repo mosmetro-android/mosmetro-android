@@ -74,19 +74,21 @@ public class ConnectionService extends IntentService {
          */
 
         if (pref_notify_progress) notify_progress.hide();
+
         Notification notification = new Notification(this);
 
         switch (result) {
             // Successful connection
             case 0:
+            // Already connected
+            case 1:
                 if (settings.getBoolean("pref_notify_success", true))
                     notification
                             .setTitle("Успешно подключено")
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
+                            .setCancellable(false)
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
-            // Already connected
-            case 1:
                 return;
             // Wrong network
             case 2:

@@ -13,6 +13,7 @@ public class Notification {
     private NotificationManager nm;
 
     private int id = 0;
+    private boolean cancellable;
 
     public Notification (Context context) {
         this.context = context;
@@ -20,7 +21,7 @@ public class Notification {
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         builder = builder.setSmallIcon(R.drawable.ic_notification); // default icon
-        builder = builder.setAutoCancel(true); // delete notification on press
+        setCancellable(true);
     }
 
     public Notification setTitle (String title) {
@@ -47,6 +48,12 @@ public class Notification {
         return this;
     }
 
+    public Notification setCancellable (boolean cancellable) {
+        this.cancellable = cancellable;
+        builder = builder.setAutoCancel(cancellable); // delete notification on press if true
+        return this;
+    }
+
     public Notification setContinuous () {
         if (Build.VERSION.SDK_INT >= 14)
             builder = builder.setProgress(0, 0, true);
@@ -60,11 +67,14 @@ public class Notification {
     }
 
     public void show() {
+        android.app.Notification notification;
         if (Build.VERSION.SDK_INT >= 16) {
-            nm.notify(id, builder.build());
+            notification = builder.build();
         } else { // support older devices
-            nm.notify(id, builder.getNotification());
+            notification = builder.getNotification();
         }
+        if (!cancellable) notification.flags |= android.app.Notification.FLAG_NO_CLEAR;
+        nm.notify(id, notification);
     }
 
     public void hide() {
