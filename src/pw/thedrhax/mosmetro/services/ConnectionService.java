@@ -14,6 +14,18 @@ import pw.thedrhax.util.Notification;
 public class ConnectionService extends IntentService {
     private SharedPreferences settings;
 
+    // Preferences
+    private boolean pref_notify_progress;
+    private int pref_retry_count;
+    private int pref_retry_delay;
+
+    // Authenticator
+    private Authenticator connection;
+
+    // Notifications
+    private Notification notify_progress;
+    private Notification notification;
+
     public ConnectionService () {
 		super("ConnectionService");
 	}
@@ -23,19 +35,12 @@ public class ConnectionService extends IntentService {
 		super.onCreate();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-    }
-	
-	public void onHandleIntent(Intent intent) {
-        final boolean pref_notify_progress = (
-                settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14)
-        );
-        int pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
-        int pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
-        final Notification notify_progress = new Notification(this)
-                .setTitle("Подключение к MosMetro_Free").setId(1);
+        pref_notify_progress = settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14);
+        pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
+        pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
-        Authenticator connection = new AuthenticatorStat(this, true) {
+        connection = new AuthenticatorStat(this, true) {
             public void onChangeProgress(int progress) {
                 if (pref_notify_progress) {
                     notify_progress.setProgress(progress);
@@ -44,39 +49,15 @@ public class ConnectionService extends IntentService {
             }
         };
 
-        int result, count = 0;
+        notify_progress = new Notification(this)
+                .setTitle("Подключение к MosMetro_Free")
+                .setId(1);
 
-        do {
-            if (count > 0) {
-                if (pref_notify_progress)
-                    notify_progress.setText("Ожидание...").setContinuous().show();
+        notification = new Notification(this)
+                .setId(0);
+    }
 
-                try {
-                    Thread.sleep(pref_retry_delay * 1000);
-                } catch (InterruptedException ignored) {}
-            }
-
-            if (pref_notify_progress)
-                notify_progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
-
-            result = connection.connect();
-
-            if (!settings.getBoolean("locked", false)) {
-                connection.log("Ошибка: соединение с сетью прервалось (поезд уехал?)");
-                break;
-            }
-
-            count++;
-        } while (count < pref_retry_count && result > 1);
-
-        /*
-         * Notify user about result
-         */
-
-        if (pref_notify_progress) notify_progress.hide();
-
-        Notification notification = new Notification(this);
-
+    private void notify (int result) {
         switch (result) {
             // Successful connection
             case 0:
@@ -106,5 +87,41 @@ public class ConnectionService extends IntentService {
                             .show();
                 }
         }
+    }
+
+    private int connect() {
+        int result, count = 0;
+
+        do {
+            if (count > 0) {
+                if (pref_notify_progress)
+                    notify_progress.setText("Ожидание...").setContinuous().show();
+
+                try {
+                    Thread.sleep(pref_retry_delay * 1000);
+                } catch (InterruptedException ignored) {}
+            }
+
+            if (pref_notify_progress)
+                notify_progress.setText("Попытка " + (count+1) + " из " + pref_retry_count + "...").show();
+
+            result = connection.connect();
+
+            if (!settings.getBoolean("locked", false)) {
+                connection.log("Ошибка: соединение с сетью прервалось (поезд уехал?)");
+                break;
+            }
+
+            count++;
+        } while (count < pref_retry_count && result > 1);
+
+        if (pref_notify_progress) notify_progress.hide();
+
+        return result;
+    }
+	
+	public void onHandleIntent(Intent intent) {
+        int result = connect();
+        notify(result);
 	}
 }
