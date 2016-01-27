@@ -122,6 +122,9 @@ public class ConnectionService extends IntentService {
 	
 	public void onHandleIntent(Intent intent) {
         int result = connect();
-        notify(result);
+
+        // Show notification only if locked (connected to Wi-Fi)
+        if (settings.getBoolean("locked", false))
+            notify(result);
 	}
 }

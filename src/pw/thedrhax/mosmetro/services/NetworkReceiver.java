@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
+import pw.thedrhax.util.Notification;
 
 public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
@@ -27,6 +28,7 @@ public class NetworkReceiver extends BroadcastReceiver {
         } else {
             settings_editor.putBoolean("locked", false);
             settings_editor.apply();
+            new Notification(context).setId(0).hide(); // Hide result notification on disconnect
         }
     }
 }
