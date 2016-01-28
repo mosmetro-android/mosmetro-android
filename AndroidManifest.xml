@@ -25,14 +25,21 @@
                   android:icon="@drawable/ic_settings"
                   android:theme="@style/AppBaseTheme" />
 
-        <service android:name="pw.thedrhax.mosmetro.services.ConnectionService">
-
-        </service>
+        <service android:name="pw.thedrhax.mosmetro.services.ConnectionService" />
 
         <receiver android:name="pw.thedrhax.mosmetro.services.NetworkReceiver">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
+        </receiver>
+
+        <receiver android:name=".widgets.ToggleWidget"
+                  android:label="Автоподключение">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/toggle_widget" />
         </receiver>
     </application>
 </manifest>
