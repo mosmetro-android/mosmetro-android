@@ -20,7 +20,7 @@ public class Notification {
         this.builder = new android.app.Notification.Builder(context);
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        builder = builder.setSmallIcon(R.drawable.ic_notification); // default icon
+        setIcon(R.drawable.ic_notification); // default icon
         setCancellable(true);
     }
 
@@ -45,6 +45,11 @@ public class Notification {
 
     public Notification setId (int id) {
         this.id = id;
+        return this;
+    }
+
+    public Notification setIcon (int icon) {
+        builder = builder.setSmallIcon(icon);
         return this;
     }
 

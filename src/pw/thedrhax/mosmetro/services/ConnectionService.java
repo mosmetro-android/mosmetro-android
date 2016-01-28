@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.MainActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
@@ -51,6 +52,7 @@ public class ConnectionService extends IntentService {
 
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
+                .setIcon(R.drawable.ic_notification_connecting)
                 .setId(1);
 
         notification = new Notification(this)
@@ -83,6 +85,7 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Не удалось подключиться")
                             .setText("Нажмите, чтобы узнать подробности или попробовать снова")
+                            .setIcon(R.drawable.ic_notification_error)
                             .setIntent(debug)
                             .show();
                 }
