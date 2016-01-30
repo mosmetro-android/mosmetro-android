@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 public class Authenticator {
 	protected Logger logger;
-    private boolean ignoreWrongNetwork = false;
 
     public Authenticator () {
         logger = new Logger();
@@ -27,7 +26,7 @@ public class Authenticator {
         }
     }
 	
-	// Returns 0 on success, 1 if already connected, 2 if wrong network and 3 if error
+	// Returns 0 on success, 1 if already connected and 2 if error
     public int connect() {
         String page, fields, link;
         HTMLFormParser parser = new HTMLFormParser();
@@ -37,25 +36,6 @@ public class Authenticator {
         logger.log_debug("> " + dateFormat.format(new Date()));
 
         onChangeProgress(0);
-
-        if (!ignoreWrongNetwork) {
-            logger.log_debug(">> Проверка сети");
-            try {
-                logger.debug(client.navigate("http://1.1.1.1/login.html").getContent());
-            } catch (Exception ex) {
-                logger.debug(ex);
-                logger.log_debug("<< Ошибка: не удалось подтвердить правильность сети");
-
-                logger.log("\nВозможные причины:");
-                logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
-                logger.log(" * Вы находитесь не в метро");
-                logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-                logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-                return 2;
-            }
-        }
-
-        onChangeProgress(16);
 
         logger.log_debug(">> Проверка доступа в интернет");
         if (isConnected()) {
@@ -68,7 +48,7 @@ public class Authenticator {
         client.setIgnoreSSL(true);
         client.setMaxRetries(3);
 
-        onChangeProgress(32);
+        onChangeProgress(20);
 
         logger.log_debug(">>> Получение перенаправления на страницу авторизации");
         try {
@@ -85,7 +65,7 @@ public class Authenticator {
 
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
-            return 3;
+            return 2;
         }
 
         Pattern pLink = Pattern.compile("https?:[^\"]*");
@@ -99,10 +79,10 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 3;
+            return 2;
         }
 
-        onChangeProgress(48);
+        onChangeProgress(40);
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
@@ -118,7 +98,7 @@ public class Authenticator {
 
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
-            return 3;
+            return 2;
         }
 
         fields = parser.parse(page).toString();
@@ -131,10 +111,10 @@ public class Authenticator {
 
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
-            return 3;
+            return 2;
         }
 
-        onChangeProgress(64);
+        onChangeProgress(60);
 
         // Отправка запроса с данными формы
         logger.log_debug(">>> Отправка формы авторизации");
@@ -150,7 +130,7 @@ public class Authenticator {
 
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
-            return 3;
+            return 2;
         }
 
         onChangeProgress(80);
@@ -167,18 +147,13 @@ public class Authenticator {
 
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
-            return 3;
+            return 2;
         }
 
         onChangeProgress(100);
 
         logger.log_debug("< " + dateFormat.format(new Date()));
         return 0;
-    }
-
-    public Authenticator setIgnoreWrongNetwork (boolean ignoreWrongNetwork) {
-        this.ignoreWrongNetwork = ignoreWrongNetwork;
-        return this;
     }
 
     public void onChangeProgress (int progress) {}

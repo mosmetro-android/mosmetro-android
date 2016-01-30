@@ -59,9 +59,6 @@ public class ConnectionService extends IntentService {
         // Set logger
         connection.setLogger(logger);
 
-        // Ignore this error because service starts only when connected to Wi-Fi
-        connection.setIgnoreWrongNetwork(true);
-
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
                 .setIcon(R.drawable.ic_notification_connecting)
@@ -85,10 +82,8 @@ public class ConnectionService extends IntentService {
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
                 return;
-            // Wrong network
-            case 2:
             // Error
-            case 3:
+            case 2:
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     Intent debug = new Intent(this, MainActivity.class);
                     debug.putExtra("log", logger.getLog());
