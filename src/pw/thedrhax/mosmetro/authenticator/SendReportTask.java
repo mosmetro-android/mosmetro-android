@@ -6,18 +6,18 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.EditText;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.util.Logger;
 
 public class SendReportTask extends AsyncTask<Void, Void, Void> {
     private Context context;
-    private String report;
+    private Logger report;
 
     private boolean isConnected;
 
     private AuthenticatorStat connection;
     private AlertDialog.Builder result_dialog;
 
-    public SendReportTask (Context context, String report) {
+    public SendReportTask (Context context, Logger report) {
         this.context = context;
         this.report = report;
 

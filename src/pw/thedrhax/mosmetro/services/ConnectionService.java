@@ -10,6 +10,7 @@ import pw.thedrhax.mosmetro.activities.MainActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
@@ -19,6 +20,9 @@ public class ConnectionService extends IntentService {
     private boolean pref_notify_progress;
     private int pref_retry_count;
     private int pref_retry_delay;
+
+    // Logger
+    private Logger logger;
 
     // Authenticator
     private Authenticator connection;
@@ -41,6 +45,8 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
 
+        logger = new Logger();
+
         connection = new AuthenticatorStat(this, true) {
             public void onChangeProgress(int progress) {
                 if (pref_notify_progress) {
@@ -49,6 +55,10 @@ public class ConnectionService extends IntentService {
                 }
             }
         };
+
+        // Set logger
+        connection.setLogger(logger);
+
         // Ignore this error because service starts only when connected to Wi-Fi
         connection.setIgnoreWrongNetwork(true);
 
@@ -81,8 +91,9 @@ public class ConnectionService extends IntentService {
             case 3:
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     Intent debug = new Intent(this, MainActivity.class);
-                    debug.putExtra("log", connection.getLog());
-                    debug.putExtra("debug", connection.getDebug());
+                    debug.putExtra("log", logger.getLog());
+                    debug.putExtra("debug", logger.getDebug());
+                    debug.putExtra("ConnectionService", true);
 
                     notification
                             .setTitle("Не удалось подключиться")
@@ -117,7 +128,12 @@ public class ConnectionService extends IntentService {
             result = connection.connect();
 
             if (!settings.getBoolean("locked", false)) {
-                connection.log("Ошибка: соединение с сетью прервалось (поезд уехал?)");
+                logger.log_debug("Ошибка: соединение с сетью прервалось");
+
+                logger.log("\nВозможные причины:");
+                logger.log(" * Вы отключились от сети MosMetro_Free");
+                logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
+                logger.log(" * Точка доступа в поезде отключилась");
                 break;
             }
 

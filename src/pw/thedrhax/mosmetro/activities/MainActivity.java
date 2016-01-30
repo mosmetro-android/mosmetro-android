@@ -13,6 +13,7 @@ import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
 import pw.thedrhax.mosmetro.authenticator.SendReportTask;
+import pw.thedrhax.util.Logger;
 
 public class MainActivity extends Activity {
     // UI Elements
@@ -20,8 +21,8 @@ public class MainActivity extends Activity {
     private Button button_debug;
     private Menu menu;
     
-    // Connection and logs
-    private String connection_debug;
+    // Logger
+    private Logger logger;
 
     /** Called when the activity is first created. */
     @Override
@@ -31,6 +32,16 @@ public class MainActivity extends Activity {
 
         text_description = (TextView)findViewById(R.id.text_description);
         button_debug = (Button)findViewById(R.id.button_debug);
+
+        logger = new Logger() {
+            @Override
+            public void log(String message) {
+                super.log(message);
+
+                if (button_debug.getText().equals(getString(R.string.button_debug_retry)))
+                    text_description.append(message + "\n");
+            }
+        };
 	}
 
     // ActionBar Menu
@@ -43,12 +54,10 @@ public class MainActivity extends Activity {
         // This is here because menu is needed to run setDebug()
         try {
             Bundle intent_bundle = getIntent().getExtras();
-            String connection_log = intent_bundle.getString("log");
-            connection_debug = intent_bundle.getString("debug");
-            if (connection_log != null) {
+            if (intent_bundle.getBoolean("ConnectionService", false))
                 setDebug(true);
-                text_description.setText(connection_log);
-            }
+            logger.log(intent_bundle.getString("log"));
+            logger.debug(intent_bundle.getString("debug"));
         } catch (NullPointerException ignored) {}
 
         return true;
@@ -62,7 +71,7 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_share:
-                new SendReportTask(this, connection_debug).execute();
+                new SendReportTask(this, logger).execute();
                 return true;
 
             case android.R.id.home:
@@ -107,14 +116,14 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            connection = new AuthenticatorStat(MainActivity.this, false) {
-                // Send log messages as progress
+            connection = new AuthenticatorStat(MainActivity.this, false);
+            connection.setLogger(new Logger() {
                 @Override
                 public void log(String message) {
                     super.log(message);
                     publishProgress(message + "\n");
                 }
-            };
+            });
             connection.connect();
             return null;
         }
@@ -130,7 +139,7 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            connection_debug = connection.getDebug();
+            logger.debug(connection.getLogger().getDebug());
         }
     }
 

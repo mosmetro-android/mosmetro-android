@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import pw.thedrhax.httpclient.HttpClient;
+import pw.thedrhax.util.Logger;
 
 import java.io.IOException;
 
@@ -53,16 +54,16 @@ public class AuthenticatorStat extends Authenticator {
                     .navigate(INTERNET_CHECK_URL, params.toString())
                     .getContent().contains(INTERNET_CHECK_KEY);
         } catch (Exception ex) {
-            debug(ex);
+            logger.debug(ex);
             return false;
         }
     }
 
-    public void report(final String log, final String message) {
+    public void report(final Logger log, final String message) {
         new Thread(new Runnable() {
             public void run() {
                 StringBuilder params = new StringBuilder();
-                params.append("log=").append(Uri.encode(log)).append("&");
+                params.append("log=").append(Uri.encode(log.getDebug())).append("&");
                 params.append("message=").append(Uri.encode(message)).append("&");
                 params.append("version=").append(getVersion());
 

@@ -2,27 +2,27 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.httpclient.HTMLFormParser;
-import pw.thedrhax.util.Util;
+import pw.thedrhax.util.Logger;
 
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Authenticator {
-	private StringBuilder log = new StringBuilder();
-	private StringBuilder debug = new StringBuilder();
-
+	protected Logger logger;
     private boolean ignoreWrongNetwork = false;
+
+    public Authenticator () {
+        logger = new Logger();
+    }
 
     public boolean isConnected() {
         try {
             new HttpClient().navigate("https://google.com");
             return true;
         } catch (Exception ex) {
-            debug(ex);
+            logger.debug(ex);
             return false;
         }
     }
@@ -34,57 +34,57 @@ public class Authenticator {
         HttpClient client = new HttpClient().setIgnoreSSL(true);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
-        log("> " + dateFormat.format(new Date()));
+        logger.log_debug("> " + dateFormat.format(new Date()));
 
         onChangeProgress(0);
 
         if (!ignoreWrongNetwork) {
-            log(">> Проверка сети");
+            logger.log_debug(">> Проверка сети");
             try {
-                debug(client.navigate("http://1.1.1.1/login.html").getContent());
+                logger.debug(client.navigate("http://1.1.1.1/login.html").getContent());
             } catch (Exception ex) {
-                debug(ex);
-                log("<< Ошибка: не удалось подтвердить правильность сети");
+                logger.debug(ex);
+                logger.log_debug("<< Ошибка: не удалось подтвердить правильность сети");
 
-                log("\nВозможные причины:");
-                log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
-                log(" * Вы находитесь не в метро");
-                log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-                log(" * Структура сети изменилась: потребуется обновление алгоритма");
+                logger.log("\nВозможные причины:");
+                logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
+                logger.log(" * Вы находитесь не в метро");
+                logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+                logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
                 return 2;
             }
         }
 
         onChangeProgress(16);
 
-        log(">> Проверка доступа в интернет");
+        logger.log_debug(">> Проверка доступа в интернет");
         if (isConnected()) {
-            log("<< Уже подключено");
+            logger.log_debug("<< Уже подключено");
             return 1;
         }
 
-        log("<< Все проверки пройдены\n>> Подключаюсь...");
+        logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
 
         client.setIgnoreSSL(true);
         client.setMaxRetries(3);
 
         onChangeProgress(32);
 
-        log(">>> Получение перенаправления на страницу авторизации");
+        logger.log_debug(">>> Получение перенаправления на страницу авторизации");
         try {
             page = client.navigate("http://vmet.ro").getContent();
-            debug(page);
+            logger.debug(page);
         } catch (Exception ex) {
-            debug(ex);
-            log("<<< Ошибка: перенаправление не получено");
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: перенаправление не получено");
 
-            log("\nВозможные причины:");
-            log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
 
-            log("\nОтчетов по этой ошибке еще не приходило.");
-            log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 3;
         }
 
@@ -94,85 +94,85 @@ public class Authenticator {
         if (mLinkRedirect.find()) {
             link = mLinkRedirect.group(0);
         } else {
-            log("<<< Ошибка: перенаправление не найдено");
+            logger.log_debug("<<< Ошибка: перенаправление не найдено");
 
-            log("\nВозможные причины:");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
             return 3;
         }
 
         onChangeProgress(48);
 
-        log(">>> Получение страницы авторизации");
+        logger.log_debug(">>> Получение страницы авторизации");
         try {
             page = client.navigate(link).getContent();
-            debug(page);
+            logger.debug(page);
         } catch (Exception ex) {
-            debug(ex);
-            log("<<< Ошибка: страница авторизации не получена");
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: страница авторизации не получена");
 
-            log("\nВозможные причины:");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
 
-            log("\nОтчетов по этой ошибке еще не приходило.");
-            log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 3;
         }
 
         fields = parser.parse(page).toString();
         if (fields == null) {
-            log("<<< Ошибка: форма авторизации не найдена");
+            logger.log_debug("<<< Ошибка: форма авторизации не найдена");
 
-            log("\nВозможные причины:");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
 
-            log("\nОтчетов по этой ошибке еще не приходило.");
-            log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 3;
         }
 
         onChangeProgress(64);
 
         // Отправка запроса с данными формы
-        log(">>> Отправка формы авторизации");
+        logger.log_debug(">>> Отправка формы авторизации");
         try {
-            debug(client.navigate(link, fields).getContent());
+            logger.debug(client.navigate(link, fields).getContent());
         } catch (Exception ex) {
-            debug(ex);
-            log("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
 
-            log("\nВозможные причины:");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
 
-            log("\nОтчетов по этой ошибке еще не приходило.");
-            log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 3;
         }
 
         onChangeProgress(80);
 
-        log(">> Проверка доступа в интернет");
+        logger.log_debug(">> Проверка доступа в интернет");
         if (isConnected()) {
-            log("<< Соединение успешно установлено :3");
+            logger.log_debug("<< Соединение успешно установлено :3");
         } else {
-            log("<< Ошибка: доступ в интернет отсутствует");
+            logger.log_debug("<< Ошибка: доступ в интернет отсутствует");
 
-            log("\nВозможные причины:");
-            log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
 
-            log("\nОтчетов по этой ошибке еще не приходило.");
-            log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 3;
         }
 
         onChangeProgress(100);
 
-        log("< " + dateFormat.format(new Date()));
+        logger.log_debug("< " + dateFormat.format(new Date()));
         return 0;
     }
 
@@ -183,20 +183,10 @@ public class Authenticator {
 
     public void onChangeProgress (int progress) {}
 
-    public void log (String message) {
-        log.append(message).append("\n");
-        debug(message);
-        System.out.println(message);
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
-    
-    public void debug (Exception ex) {
-        debug(Util.exToStr(ex));
+    public Logger getLogger() {
+        return logger;
     }
-    
-    public void debug (String message) {
-        debug.append(message).append("\n");
-    }
-    
-    public String getLog() {return log.toString();}
-    public String getDebug() {return debug.toString();}
 }
