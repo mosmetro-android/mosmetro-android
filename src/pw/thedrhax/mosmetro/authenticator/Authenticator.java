@@ -15,6 +15,8 @@ public class Authenticator {
 	private StringBuilder log = new StringBuilder();
 	private StringBuilder debug = new StringBuilder();
 
+    private boolean ignoreWrongNetwork = false;
+
     public boolean isConnected() {
         try {
             new HttpClient().navigate("https://google.com");
@@ -36,14 +38,15 @@ public class Authenticator {
 
         onChangeProgress(0);
 
-        log(">> Проверка сети");
-        try {
-            debug(client.navigate("http://1.1.1.1/login.html").getContent());
-        } catch (Exception ex) {
-            log(ex.toString());
-            debug(ex);
-            log("<< Ошибка: неправильная сеть (вы не в метро?)");
-            return 2;
+        if (!ignoreWrongNetwork) {
+            log(">> Проверка сети");
+            try {
+                debug(client.navigate("http://1.1.1.1/login.html").getContent());
+            } catch (Exception ex) {
+                debug(ex);
+                log("<< Ошибка: неправильная сеть (вы не в метро?)");
+                return 2;
+            }
         }
 
         onChangeProgress(16);
@@ -136,6 +139,11 @@ public class Authenticator {
 
         log("< " + dateFormat.format(new Date()));
         return 0;
+    }
+
+    public Authenticator setIgnoreWrongNetwork (boolean ignoreWrongNetwork) {
+        this.ignoreWrongNetwork = ignoreWrongNetwork;
+        return this;
     }
 
     public void onChangeProgress (int progress) {}

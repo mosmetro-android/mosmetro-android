@@ -49,6 +49,8 @@ public class ConnectionService extends IntentService {
                 }
             }
         };
+        // Ignore this error because service starts only when connected to Wi-Fi
+        connection.setIgnoreWrongNetwork(true);
 
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
