@@ -94,7 +94,7 @@ public class MainActivity extends Activity {
     public void setDebug (boolean debug) {
         if (debug) {
             button_debug.setText(getString(R.string.button_debug_retry));
-            text_description.setText("");
+            text_description.setText(logger.getLog());
             menu.setGroupVisible(R.id.menu_debug, true);
             if (getActionBar() != null)
                 getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void log(String message) {
                     super.log(message);
-                    publishProgress(message + "\n");
+                    publishProgress(message);
                 }
             });
             connection.connect();
@@ -132,7 +132,7 @@ public class MainActivity extends Activity {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            text_description.append(values[0]);
+            logger.log(values[0]);
         }
 
         // Extract debug log after finish
