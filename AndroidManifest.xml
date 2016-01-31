@@ -30,6 +30,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:icon="@drawable/ic_launcher"
+                  android:label="@string/shortcut_connect"
+                  android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service android:name="pw.thedrhax.mosmetro.services.ConnectionService" />
 
         <receiver android:name="pw.thedrhax.mosmetro.services.NetworkReceiver">
