@@ -17,6 +17,12 @@
                       android:textColor="@android:color/black"/>
         </FrameLayout>
     </ScrollView>
+    <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_debug_log"
+            android:id="@+id/show_debug_log" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
+            android:onClick="show_debug_log"/>
     <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/button_connect"
             android:id="@+id/button_connect" android:onClick="button_connect" />
 </LinearLayout>

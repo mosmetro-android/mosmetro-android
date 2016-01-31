@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
@@ -17,10 +18,10 @@ import pw.thedrhax.util.Logger;
 public class DebugActivity extends Activity {
     // UI Elements
     private TextView text_messages;
-    private Button button_debug;
     
     // Logger
     private Logger logger;
+    private boolean show_debug = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -29,13 +30,18 @@ public class DebugActivity extends Activity {
 		setContentView(R.layout.debug_activity);
 
         text_messages = (TextView)findViewById(R.id.text_messages);
-        button_debug = (Button)findViewById(R.id.button_connect);
 
         logger = new Logger() {
             @Override
             public void log(String message) {
                 super.log(message);
-                text_messages.append(message + "\n");
+                if (!show_debug) text_messages.append(message + "\n");
+            }
+
+            @Override
+            public void debug(String message) {
+                super.debug(message);
+                if (show_debug) text_messages.append(message + "\n");
             }
         };
 
@@ -127,5 +133,11 @@ public class DebugActivity extends Activity {
 
         if (task.getStatus() != AsyncTask.Status.RUNNING)
             task.execute();
+    }
+
+    // Handle debug log checkbox
+    public void show_debug_log (View view) {
+        show_debug = ((CheckBox)view).isChecked();
+        text_messages.setText(show_debug ? logger.getDebug() : logger.getLog());
     }
 }

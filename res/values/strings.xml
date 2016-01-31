@@ -43,4 +43,5 @@
     <string name="manual_connection">Ручное подключение</string>
     <string name="manual_connection_summary">Воспользуйтесь ручным подключением, если автоматическое не сработало
     </string>
+    <string name="show_debug_log">Показать подробные сообщения</string>
 </resources>
