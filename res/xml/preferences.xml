@@ -52,6 +52,17 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/debug">
+
+        <PreferenceScreen
+                android:title="@string/manual_connection"
+                android:summary="@string/manual_connection_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/about">
 
         <Preference

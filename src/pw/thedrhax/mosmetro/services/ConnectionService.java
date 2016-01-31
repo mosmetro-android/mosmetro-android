@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.MainActivity;
+import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
@@ -85,7 +85,7 @@ public class ConnectionService extends IntentService {
             // Error
             case 2:
                 if (settings.getBoolean("pref_notify_fail", true)) {
-                    Intent debug = new Intent(this, MainActivity.class);
+                    Intent debug = new Intent(this, DebugActivity.class);
                     debug.putExtra("log", logger.getLog());
                     debug.putExtra("debug", logger.getDebug());
                     debug.putExtra("ConnectionService", true);
