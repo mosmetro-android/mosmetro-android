@@ -1,5 +1,5 @@
 bin
 gen
-*.class
-.idea
+.idea/workspace.xml
+.idea/tasks.xml
 proguard_logs
