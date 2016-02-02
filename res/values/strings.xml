@@ -45,4 +45,7 @@
     </string>
     <string name="show_debug_log">Показать подробные сообщения</string>
     <string name="shortcut_connect">Подключиться</string>
+    <string name="github_repo">Репозиторий GitHub</string>
+    <string name="github_repo_summary">TheDrHax/mosmetro-android</string>
+    <string name="github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
 </resources>

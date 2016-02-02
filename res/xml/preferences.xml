@@ -80,6 +80,16 @@
         </PreferenceScreen>
 
         <PreferenceScreen
+            android:title="@string/github_repo"
+            android:summary="@string/github_repo_summary">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/github_repo_link" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
                 android:title="@string/developer_site"
                 android:summary="@string/developer_site_link">
 
