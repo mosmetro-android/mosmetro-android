@@ -48,4 +48,7 @@
     <string name="github_repo">Репозиторий GitHub</string>
     <string name="github_repo_summary">TheDrHax/mosmetro-android</string>
     <string name="github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
+    <string name="vkontakte">Сообщество ВКонтакте</string>
+    <string name="vkontakte_summary">vk.com/wifi_v_metro</string>
+    <string name="vkontakte_link">https://vk.com/wifi_v_metro</string>
 </resources>
