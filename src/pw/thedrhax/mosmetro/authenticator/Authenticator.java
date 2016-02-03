@@ -72,7 +72,7 @@ public class Authenticator {
         Matcher mLinkRedirect = pLink.matcher(page);
 
         if (mLinkRedirect.find()) {
-            link = mLinkRedirect.group(0);
+            link = mLinkRedirect.group(0).replace("http:", "https:");
             logger.debug(link);
         } else {
             logger.log_debug("<<< Ошибка: перенаправление не найдено");
