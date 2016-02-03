@@ -12,7 +12,6 @@ import pw.thedrhax.util.Notification;
 public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!settings.getBoolean("pref_autoconnect", true)) return;
 
         SharedPreferences.Editor settings_editor = settings.edit();
 
@@ -20,7 +19,7 @@ public class NetworkReceiver extends BroadcastReceiver {
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
         if ("\"MosMetro_Free\"".equals(wifiInfo.getSSID())) {
-            if (!settings.getBoolean("locked", false)) {
+            if (!settings.getBoolean("locked", false) && settings.getBoolean("pref_autoconnect", true)) {
                 settings_editor.putBoolean("locked", true);
                 settings_editor.apply();
                 context.startService(new Intent(context, ConnectionService.class));
