@@ -73,6 +73,7 @@ public class Authenticator {
 
         if (mLinkRedirect.find()) {
             link = mLinkRedirect.group(0);
+            logger.debug(link);
         } else {
             logger.log_debug("<<< Ошибка: перенаправление не найдено");
 
