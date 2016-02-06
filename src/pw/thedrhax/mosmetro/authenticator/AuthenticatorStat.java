@@ -3,16 +3,11 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import pw.thedrhax.httpclient.HttpClient;
-import pw.thedrhax.util.Logger;
-
-import java.io.IOException;
 
 public class AuthenticatorStat extends Authenticator {
     private static final String INTERNET_CHECK_URL = "http://thedrhax.pw/mosmetro/check.php";
     private static final String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
-    private static final String REPORT_URL = "http://thedrhax.pw/mosmetro/report.php";
 
     private Context context;
     private boolean automatic;
@@ -38,6 +33,7 @@ public class AuthenticatorStat extends Authenticator {
     @Override
     public int connect() {
         first_check = true;
+        logger.debug("Версия приложения: " + getVersion());
         return super.connect();
     }
 
@@ -57,20 +53,5 @@ public class AuthenticatorStat extends Authenticator {
             logger.debug(ex);
             return false;
         }
-    }
-
-    public void report(final Logger log, final String message) {
-        new Thread(new Runnable() {
-            public void run() {
-                StringBuilder params = new StringBuilder();
-                params.append("log=").append(Uri.encode(log.getDebug())).append("&");
-                params.append("message=").append(Uri.encode(message)).append("&");
-                params.append("version=").append(getVersion());
-
-                try {
-                    new HttpClient().navigate(REPORT_URL, params.toString());
-                } catch (IOException ignored) {}
-            }
-        }).start();
     }
 }

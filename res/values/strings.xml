@@ -5,13 +5,14 @@
     <string name="button_connect">Повторить попытку</string>
 
     <string name="share">Отправить отчет</string>
-    <string name="share_info">Если вы хотите сообщить дополнительную информацию, запишите её в это поле:</string>
-    <string name="share_ok">Спасибо!</string>
-    <string name="share_ok_info">Ваше сообщение поможет сделать это приложение лучше :3</string>
+    <string name="share_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
+    <string name="share_email">mosmetro@thedrhax.pw</string>
+    <string name="share_subject">Отчет об ошибке</string>
 
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
     <string name="pref_autoconnect_summary">

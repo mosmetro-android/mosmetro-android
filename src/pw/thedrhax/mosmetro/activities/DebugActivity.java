@@ -1,18 +1,17 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
-import pw.thedrhax.mosmetro.authenticator.SendReportTask;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
@@ -75,7 +74,14 @@ public class DebugActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                new SendReportTask(this, logger).execute();
+                Intent send_email = new Intent(Intent.ACTION_SEND);
+
+                send_email.setType("text/plain");
+                send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.share_email)});
+                send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject));
+                send_email.putExtra(Intent.EXTRA_TEXT, logger.getDebug());
+
+                startActivity(Intent.createChooser(send_email, getString(R.string.share)));
                 return true;
 
             case android.R.id.home:
