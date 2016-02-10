@@ -7,10 +7,11 @@ for icon in *.svg; do
     echo "Processing $icon..."
 
     for dpi in ldpi mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-    
-        res_path="./res/drawable-$dpi"
-        mkdir -p "$res_path"
         
+        res_path="../res/drawable-$dpi"
+            
+        mkdir -p "$res_path"
+            
         case "$dpi" in
             ldpi)    size=32  ;;
             mdpi)    size=48  ;;

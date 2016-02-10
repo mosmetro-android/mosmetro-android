@@ -37,21 +37,21 @@
                     android:key="pref_notify_success"
                     android:title="@string/pref_notify_success"
                     android:summary="@string/pref_notify_success_summary"
-                    android:icon="@drawable/ic_notification"
+                    android:icon="@drawable/ic_notification_success_colored"
                     android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_notify_fail"
                     android:title="@string/pref_notify_fail"
                     android:summary="@string/pref_notify_fail_summary"
-                    android:icon="@drawable/ic_notification_error"
+                    android:icon="@drawable/ic_notification_error_colored"
                     android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_notify_progress"
                     android:title="@string/pref_notify_progress"
                     android:summary="@string/pref_notify_progress_summary"
-                    android:icon="@drawable/ic_notification_connecting"
+                    android:icon="@drawable/ic_notification_connecting_colored"
                     android:defaultValue="true" />
 
         </PreferenceScreen>

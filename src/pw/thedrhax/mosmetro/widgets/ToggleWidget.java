@@ -28,7 +28,8 @@ public class ToggleWidget extends AppWidgetProvider {
                 .getDefaultSharedPreferences(context)
                 .getBoolean("pref_autoconnect", true);
         views.setImageViewResource(R.id.imageButton, pref_autoconnect ?
-                        R.drawable.ic_notification : R.drawable.ic_notification_error);
+                        R.drawable.ic_notification_success_colored :
+                        R.drawable.ic_notification_error_colored);
 
         for (int appWidgetId : appWidgetIds) { // For all widgets
             appWidgetManager.updateAppWidget(appWidgetId, views);

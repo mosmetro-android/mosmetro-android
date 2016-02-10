@@ -61,7 +61,9 @@ public class ConnectionService extends IntentService {
 
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
-                .setIcon(R.drawable.ic_notification_connecting)
+                .setIcon(Build.VERSION.SDK_INT >= 21 ?
+                        R.drawable.ic_notification_connecting :
+                        R.drawable.ic_notification_connecting_colored)
                 .setId(1)
                 .setCancellable(false);
 
@@ -79,6 +81,9 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Успешно подключено")
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
+                            .setIcon(Build.VERSION.SDK_INT >= 21 ?
+                                    R.drawable.ic_notification_success :
+                                    R.drawable.ic_notification_success_colored)
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
                 return;
@@ -93,7 +98,9 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Не удалось подключиться")
                             .setText("Нажмите, чтобы узнать подробности или попробовать снова")
-                            .setIcon(R.drawable.ic_notification_error)
+                            .setIcon(Build.VERSION.SDK_INT >= 21 ?
+                                    R.drawable.ic_notification_error :
+                                    R.drawable.ic_notification_error_colored)
                             .setIntent(debug)
                             .show();
                 }

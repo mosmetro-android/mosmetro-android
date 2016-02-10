@@ -35,8 +35,8 @@
      id="namedview4"
      showgrid="false"
      inkscape:zoom="23.280131"
-     inkscape:cx="8.8726871"
-     inkscape:cy="11.535158"
+     inkscape:cx="10.055606"
+     inkscape:cy="8.5467491"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -137,7 +137,7 @@
      inkscape:label="base"
      id="layer2"
      inkscape:groupmode="layer"><circle
-       r="10"
+       r="12"
        cy="78"
        cx="12"
        id="path5888"
@@ -159,7 +159,7 @@
        id="path4268"
        d="M 35.100142,35.839189 Z"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /><g
-       transform="matrix(0.27692324,0,0,0.27692324,-0.3692419,-0.36923553)"
+       transform="matrix(0.33230789,0,0,0.33230789,-2.3630904,-2.3630827)"
        id="g4422"
        style="fill:#d40000;fill-opacity:1"><path
          inkscape:connector-curvature="0"

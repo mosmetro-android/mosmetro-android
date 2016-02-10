@@ -20,7 +20,6 @@ public class Notification {
         this.builder = new android.app.Notification.Builder(context);
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        setIcon(R.drawable.ic_notification); // default icon
         setCancellable(true);
     }
 
