@@ -1,6 +1,8 @@
 #!/bin/bash
 
-for icon in *.svg; do
+[ "$#" -gt 0 ] && icons="$@" || icons="*.svg"
+
+for icon in $icons; do
 
     icon=$(echo "$icon" | sed 's|\.svg||g')
 
