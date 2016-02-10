@@ -7,7 +7,9 @@
     <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageButton" android:layout_gravity="center_vertical" android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            android:id="@+id/imageButton" android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:src="@drawable/ic_widget_toggle_off"
+            android:layout_centerVertical="true" android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

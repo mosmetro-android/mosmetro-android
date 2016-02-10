@@ -3,7 +3,7 @@
                     android:minWidth="40dp"
                     android:minHeight="40dp"
                     android:updatePeriodMillis="86400000"
-                    android:previewImage="@drawable/ic_notification_success"
+                    android:previewImage="@drawable/ic_widget_toggle_off"
                     android:initialLayout="@layout/toggle_widget"
                     android:resizeMode="horizontal|vertical"
                     android:widgetCategory="home_screen">
