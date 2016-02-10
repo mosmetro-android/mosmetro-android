@@ -62,7 +62,8 @@ public class ConnectionService extends IntentService {
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
                 .setIcon(R.drawable.ic_notification_connecting)
-                .setId(1);
+                .setId(1)
+                .setCancellable(false);
 
         notification = new Notification(this)
                 .setId(0);
@@ -78,7 +79,6 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Успешно подключено")
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
-                            .setCancellable(false)
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
                 return;
