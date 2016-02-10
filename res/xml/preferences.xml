@@ -9,45 +9,52 @@
                 android:summary="@string/pref_autoconnect_summary"
                 android:defaultValue="true" />
 
-        <EditTextPreference
-                android:key="pref_retry_count"
-                android:inputType="number"
-                android:title="@string/pref_retry_count"
-                android:summary="@string/pref_retry_count_summary"
-                android:defaultValue="5" />
+        <PreferenceScreen
+            android:title="@string/pref_category_connection"
+            android:summary="@string/pref_category_connection_summary">
 
-        <EditTextPreference
-                android:key="pref_retry_delay"
-                android:inputType="number"
-                android:title="@string/pref_retry_delay"
-                android:summary="@string/pref_retry_delay_summary"
-                android:defaultValue="10" />
+            <EditTextPreference
+                    android:key="pref_retry_count"
+                    android:inputType="number"
+                    android:title="@string/pref_retry_count"
+                    android:summary="@string/pref_retry_count_summary"
+                    android:defaultValue="5" />
 
-    </PreferenceCategory>
+            <EditTextPreference
+                    android:key="pref_retry_delay"
+                    android:inputType="number"
+                    android:title="@string/pref_retry_delay"
+                    android:summary="@string/pref_retry_delay_summary"
+                    android:defaultValue="10" />
 
-    <PreferenceCategory
-            android:title="@string/pref_category_notifications">
+        </PreferenceScreen>
 
-        <CheckBoxPreference
-                android:key="pref_notify_success"
-                android:title="@string/pref_notify_success"
-                android:summary="@string/pref_notify_success_summary"
-                android:icon="@drawable/ic_notification"
-                android:defaultValue="true" />
+        <PreferenceScreen
+                android:title="@string/pref_category_notifications"
+                android:summary="@string/pref_category_notifications_summary">
 
-        <CheckBoxPreference
-                android:key="pref_notify_fail"
-                android:title="@string/pref_notify_fail"
-                android:summary="@string/pref_notify_fail_summary"
-                android:icon="@drawable/ic_notification_error"
-                android:defaultValue="true" />
+            <CheckBoxPreference
+                    android:key="pref_notify_success"
+                    android:title="@string/pref_notify_success"
+                    android:summary="@string/pref_notify_success_summary"
+                    android:icon="@drawable/ic_notification"
+                    android:defaultValue="true" />
 
-        <CheckBoxPreference
-                android:key="pref_notify_progress"
-                android:title="@string/pref_notify_progress"
-                android:summary="@string/pref_notify_progress_summary"
-                android:icon="@drawable/ic_notification_connecting"
-                android:defaultValue="true" />
+            <CheckBoxPreference
+                    android:key="pref_notify_fail"
+                    android:title="@string/pref_notify_fail"
+                    android:summary="@string/pref_notify_fail_summary"
+                    android:icon="@drawable/ic_notification_error"
+                    android:defaultValue="true" />
+
+            <CheckBoxPreference
+                    android:key="pref_notify_progress"
+                    android:title="@string/pref_notify_progress"
+                    android:summary="@string/pref_notify_progress_summary"
+                    android:icon="@drawable/ic_notification_connecting"
+                    android:defaultValue="true" />
+
+        </PreferenceScreen>
 
     </PreferenceCategory>
 

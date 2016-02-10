@@ -29,10 +29,14 @@
     <string name="developer_site_link">http://thedrhax.pw</string>
     <string name="about">О программе</string>
     <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
-    <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
+    <string name="pref_notify_fail_summary">
+        Уведомлять при возникновении ошибки
+        \n\nВы можете нажать на это уведомление и увидеть/отправить лог подключения
+    </string>
     <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_notifications">Уведомления</string>
+    <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
     <string name="pref_retry_delay">Задержка между попытками</string>
     <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 10)
     </string>
@@ -52,4 +56,8 @@
     <string name="vkontakte">Сообщество ВКонтакте</string>
     <string name="vkontakte_summary">vk.com/wifi_v_metro</string>
     <string name="vkontakte_link">https://vk.com/wifi_v_metro</string>
+    <string name="pref_category_connection">Параметры подключения</string>
+    <string name="pref_category_connection_summary">В случае проблем попробуйте увеличить значение одного из этих
+        параметров
+    </string>
 </resources>
