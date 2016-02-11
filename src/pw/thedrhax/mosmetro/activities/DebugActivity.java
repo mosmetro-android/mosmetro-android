@@ -81,7 +81,7 @@ public class DebugActivity extends Activity {
                 send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject));
                 send_email.putExtra(Intent.EXTRA_TEXT, logger.getDebug());
 
-                startActivity(Intent.createChooser(send_email, getString(R.string.share)));
+                startActivity(Intent.createChooser(send_email, getString(R.string.share_client)));
                 return true;
 
             case android.R.id.home:

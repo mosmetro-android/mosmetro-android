@@ -8,6 +8,7 @@
     <string name="share_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
     <string name="share_email">mosmetro@thedrhax.pw</string>
     <string name="share_subject">Отчет об ошибке</string>
+    <string name="share_client">Выберите E-mail клиент…</string>
 
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
