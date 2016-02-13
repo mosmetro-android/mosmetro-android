@@ -54,6 +54,12 @@
                     android:icon="@drawable/ic_notification_connecting_colored"
                     android:defaultValue="true" />
 
+            <CheckBoxPreference
+                    android:key="pref_notify_alternative"
+                    android:title="@string/pref_notify_alternative"
+                    android:summary="@string/pref_notify_alternative_summary"
+                    android:defaultValue="false" />
+
         </PreferenceScreen>
 
     </PreferenceCategory>

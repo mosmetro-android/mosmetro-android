@@ -30,6 +30,7 @@ public class ConnectionService extends IntentService {
     // Notifications
     private Notification notify_progress;
     private Notification notification;
+    boolean colored_icons;
 
     public ConnectionService () {
 		super("ConnectionService");
@@ -59,11 +60,13 @@ public class ConnectionService extends IntentService {
         // Set logger
         connection.setLogger(logger);
 
+        colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
+
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
-                .setIcon(Build.VERSION.SDK_INT >= 21 ?
-                        R.drawable.ic_notification_connecting :
-                        R.drawable.ic_notification_connecting_colored)
+                .setIcon(colored_icons ?
+                        R.drawable.ic_notification_connecting_colored :
+                        R.drawable.ic_notification_connecting)
                 .setId(1)
                 .setCancellable(false);
 
@@ -81,9 +84,9 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Успешно подключено")
                             .setText("Нажмите, чтобы открыть настройки уведомлений")
-                            .setIcon(Build.VERSION.SDK_INT >= 21 ?
-                                    R.drawable.ic_notification_success :
-                                    R.drawable.ic_notification_success_colored)
+                            .setIcon(colored_icons ?
+                                    R.drawable.ic_notification_success_colored :
+                                    R.drawable.ic_notification_success)
                             .setIntent(new Intent(this, SettingsActivity.class))
                             .show();
                 return;
@@ -98,9 +101,9 @@ public class ConnectionService extends IntentService {
                     notification
                             .setTitle("Не удалось подключиться")
                             .setText("Нажмите, чтобы узнать подробности или попробовать снова")
-                            .setIcon(Build.VERSION.SDK_INT >= 21 ?
-                                    R.drawable.ic_notification_error :
-                                    R.drawable.ic_notification_error_colored)
+                            .setIcon(colored_icons ?
+                                    R.drawable.ic_notification_error_colored :
+                                    R.drawable.ic_notification_error)
                             .setIntent(debug)
                             .show();
                 }
