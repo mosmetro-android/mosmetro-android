@@ -1,7 +1,7 @@
 package pw.thedrhax.mosmetro.authenticator;
 
-import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.httpclient.HTMLFormParser;
+import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.Logger;
 
 import java.text.DateFormat;
@@ -53,7 +53,11 @@ public class Authenticator {
         logger.log_debug(">>> Получение перенаправления на страницу авторизации");
         try {
             page = client.navigate("http://vmet.ro").getContent();
-            logger.debug(page);
+            if (page.isEmpty()) {
+                throw new Exception("Страница перенаправления не получена");
+            } else {
+                logger.debug(page);
+            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: перенаправление не получено");
@@ -88,7 +92,11 @@ public class Authenticator {
         logger.log_debug(">>> Получение страницы авторизации");
         try {
             page = client.navigate(link).getContent();
-            logger.debug(page);
+            if (page.isEmpty()) {
+                throw new Exception("Страница авторизации не получена");
+            } else {
+                logger.debug(page);
+            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
@@ -120,7 +128,12 @@ public class Authenticator {
         // Отправка запроса с данными формы
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            logger.debug(client.navigate(link, fields).getContent());
+            page = client.navigate(link, fields).getContent();
+            if (page.isEmpty()) {
+                throw new Exception("Ответ сервера не не получен");
+            } else {
+                logger.debug(page);
+            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
