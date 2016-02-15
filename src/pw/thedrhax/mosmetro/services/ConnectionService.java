@@ -43,8 +43,8 @@ public class ConnectionService extends IntentService {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         pref_notify_progress = settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14);
-        pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "5"));
-        pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "10"));
+        pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
+        pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
 
         logger = new Logger();
 
