@@ -48,7 +48,7 @@ public class Authenticator {
         client.setIgnoreSSL(true);
         client.setMaxRetries(3);
 
-        onChangeProgress(20);
+        onChangeProgress(16);
 
         logger.log_debug(">>> Получение перенаправления на страницу авторизации");
         try {
@@ -87,7 +87,7 @@ public class Authenticator {
             return 2;
         }
 
-        onChangeProgress(40);
+        onChangeProgress(32);
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
@@ -123,7 +123,7 @@ public class Authenticator {
             return 2;
         }
 
-        onChangeProgress(60);
+        onChangeProgress(48);
 
         // Отправка запроса с данными формы
         logger.log_debug(">>> Отправка формы авторизации");
@@ -145,6 +145,41 @@ public class Authenticator {
             logger.log("\nОтчетов по этой ошибке еще не приходило.");
             logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
             return 2;
+        }
+
+        fields = parser.parse(page).toString();
+        if (fields == null) {
+            logger.log_debug("<<< Ошибка: вторая форма авторизации не найдена");
+
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
+        }
+
+        onChangeProgress(64);
+
+        // Отправка запроса с данными второй формы
+        logger.log_debug(">>> Отправка второй формы авторизации");
+        try {
+            page = client.navigate(link, fields).getContent();
+            if (page.isEmpty()) {
+                throw new Exception("Ответ сервера не не получен");
+            } else {
+                logger.debug(page);
+            }
+        } catch (Exception ex) {
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+
+            logger.log("\nОтчетов по этой ошибке еще не приходило.");
+            logger.log("Пожалуйста, отправьте отчет при помощи кнопки \"Поделиться\"");
         }
 
         onChangeProgress(80);
