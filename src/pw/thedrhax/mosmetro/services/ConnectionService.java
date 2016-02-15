@@ -73,6 +73,14 @@ public class ConnectionService extends IntentService {
         notification = new Notification(this)
                 .setId(0);
     }
+    
+    private Intent debugIntent (Logger logger) {
+        Intent debug = new Intent(this, DebugActivity.class);
+        debug.putExtra("log", logger.getLog());
+        debug.putExtra("debug", logger.getDebug());
+        debug.putExtra("ConnectionService", true);
+        return debug;
+    }
 
     private void notify (int result) {
         switch (result) {
@@ -80,33 +88,36 @@ public class ConnectionService extends IntentService {
             case 0:
             // Already connected
             case 1:
-                if (settings.getBoolean("pref_notify_success", true))
+                if (settings.getBoolean("pref_notify_success", true)) {
                     notification
                             .setTitle("Успешно подключено")
-                            .setText("Нажмите, чтобы открыть настройки уведомлений")
                             .setIcon(colored_icons ?
                                     R.drawable.ic_notification_success_colored :
-                                    R.drawable.ic_notification_success)
-                            .setIntent(new Intent(this, SettingsActivity.class))
-                            .show();
+                                    R.drawable.ic_notification_success);
+                            
+                    if (settings.getBoolean("pref_notify_success_log", false)) {
+                        notification
+                                .setText("Нажмите, чтобы узнать подробности")
+                                .setIntent(debugIntent(logger));
+                    } else {
+                        notification
+                                .setText("Нажмите, чтобы открыть настройки уведомлений")
+                                .setIntent(new Intent(this, SettingsActivity.class));
+                    }
+                    notification.show();
+                }
                 return;
             // Error
             case 2:
-                if (settings.getBoolean("pref_notify_fail", true)) {
-                    Intent debug = new Intent(this, DebugActivity.class);
-                    debug.putExtra("log", logger.getLog());
-                    debug.putExtra("debug", logger.getDebug());
-                    debug.putExtra("ConnectionService", true);
-
+                if (settings.getBoolean("pref_notify_fail", true))
                     notification
                             .setTitle("Не удалось подключиться")
                             .setText("Нажмите, чтобы узнать подробности или попробовать снова")
                             .setIcon(colored_icons ?
                                     R.drawable.ic_notification_error_colored :
                                     R.drawable.ic_notification_error)
-                            .setIntent(debug)
+                            .setIntent(debugIntent(logger))
                             .show();
-                }
         }
     }
 
