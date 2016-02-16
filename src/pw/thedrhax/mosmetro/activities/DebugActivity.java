@@ -21,6 +21,9 @@ public class DebugActivity extends Activity {
     // Logger
     private Logger logger;
     private boolean show_debug = false;
+    
+    // Preferences
+    boolean close_when_connected = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -44,14 +47,21 @@ public class DebugActivity extends Activity {
             }
         };
 
-        // Check for log from ConnectionService
+        // Check for external intents
         try {
             Bundle intent_bundle = getIntent().getExtras();
+            // Intent from the ConnectionService
             if (intent_bundle.getBoolean("ConnectionService", false)) {
                 logger.log(intent_bundle.getString("log"));
                 logger.debug(intent_bundle.getString("debug"));
                 return;
             }
+        } catch (NullPointerException ignored) {}
+        
+        try {
+            // Browser intent (from Captive Portal check)
+            if (getIntent().getAction().equals(Intent.ACTION_VIEW))
+                close_when_connected = true;
         } catch (NullPointerException ignored) {}
 
         button_connect(null);
@@ -99,6 +109,7 @@ public class DebugActivity extends Activity {
 
     private class AuthTask extends AsyncTask<Void, String, Void> {
         private AuthenticatorStat connection;
+        private int result = 2;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -110,7 +121,7 @@ public class DebugActivity extends Activity {
                     publishProgress(message);
                 }
             });
-            connection.connect();
+            result = connection.connect();
             return null;
         }
 
@@ -126,6 +137,7 @@ public class DebugActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             logger.debug(connection.getLogger().getDebug());
+            if (close_when_connected && result < 2) DebugActivity.this.finish();
         }
     }
 

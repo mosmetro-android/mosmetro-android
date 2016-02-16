@@ -19,6 +19,15 @@
                 <action android:name="pw.thedrhax.mosmetro.activities.DebugActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="*" />
+                <data android:path="/generate_204" />
+            </intent-filter>
         </activity>
 
         <activity android:name="pw.thedrhax.mosmetro.activities.SettingsActivity"
