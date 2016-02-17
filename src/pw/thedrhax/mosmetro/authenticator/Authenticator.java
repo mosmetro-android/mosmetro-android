@@ -45,7 +45,6 @@ public class Authenticator {
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
 
-        client.setIgnoreSSL(true);
         client.setMaxRetries(3);
 
         onChangeProgress(16);
