@@ -1,19 +1,21 @@
 package pw.thedrhax.mosmetro.authenticator;
 
-import pw.thedrhax.httpclient.HTMLFormParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.Logger;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Authenticator {
 	protected Logger logger;
+    private HttpClient client;
 
     public Authenticator () {
         logger = new Logger();
+        client = new HttpClient().setIgnoreSSL(true);
     }
 
     public boolean isConnected() {
@@ -25,12 +27,68 @@ public class Authenticator {
             return false;
         }
     }
-	
+
+    private static String parseMetaRedirect (String content) throws Exception {
+        String link = null;
+
+        for (Element element : Jsoup.parse(content).getElementsByTag("meta")) {
+            if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
+                link = element.attr("content").split("URL=")[1];
+            }
+        }
+
+        if (link == null || link.isEmpty())
+            throw new Exception ("Перенаправление не найдено");
+
+        return link;
+    }
+
+    private String getPageContent (String link) throws Exception {
+        String content = client.navigate(link).getContent();
+
+        if (content == null || content.isEmpty()) {
+            throw new Exception("Страница не получена");
+        }
+
+        return content;
+    }
+
+    private String getPageContent (String link, String params) throws Exception {
+        String content = client.navigate(link, params).getContent();
+
+        if (content == null || content.isEmpty()) {
+            throw new Exception("Страница не получена");
+        }
+
+        return content;
+    }
+
+    private static String parseForm (String content) throws Exception {
+        String request;
+
+        Elements inputs = Jsoup.parse(content)
+                .getElementsByTag("form").first()
+                .getElementsByTag("input");
+
+        StringBuilder params = new StringBuilder();
+        for (Element input : inputs) {
+            if (params.length() != 0) params.append("&");
+            params.append(input.attr("name"))
+                    .append("=")
+                    .append(input.attr("value"));
+        }
+        request = params.toString();
+
+        if (request == null || request.isEmpty()) {
+            throw new Exception("Форма не найдена");
+        }
+
+        return request;
+    }
+
 	// Returns 0 on success, 1 if already connected and 2 if error
     public int connect() {
         String page, fields, link;
-        HTMLFormParser parser = new HTMLFormParser();
-        HttpClient client = new HttpClient().setIgnoreSSL(true);
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         logger.log_debug("> " + dateFormat.format(new Date()));
@@ -49,14 +107,10 @@ public class Authenticator {
 
         onChangeProgress(16);
 
-        logger.log_debug(">>> Получение перенаправления на страницу авторизации");
+        logger.log_debug(">>> Получение начального перенаправления");
         try {
-            page = client.navigate("http://vmet.ro").getContent();
-            if (page.isEmpty()) {
-                throw new Exception("Страница перенаправления не получена");
-            } else {
-                logger.debug(page);
-            }
+            page = getPageContent("http://vmet.ro");
+            logger.debug(page);
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: перенаправление не получено");
@@ -68,13 +122,11 @@ public class Authenticator {
             return 2;
         }
 
-        Pattern pLink = Pattern.compile("https?:[^\"]*");
-        Matcher mLinkRedirect = pLink.matcher(page);
-
-        if (mLinkRedirect.find()) {
-            link = mLinkRedirect.group(0).replace("http:", "https:");
+        try {
+            link = parseMetaRedirect(page);
             logger.debug(link);
-        } else {
+        } catch (Exception ex) {
+            logger.debug(ex);
             logger.log_debug("<<< Ошибка: перенаправление не найдено");
 
             logger.log("\nВозможные причины:");
@@ -85,14 +137,39 @@ public class Authenticator {
 
         onChangeProgress(32);
 
+        logger.log_debug(">>> Получение начальной страницы");
+        try {
+            page = getPageContent(link);
+            logger.debug(page);
+        } catch (Exception ex) {
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: начальная страница не получена");
+
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            return 2;
+        }
+
+        try {
+            fields = parseForm(page);
+            logger.debug(fields);
+        } catch (Exception ex) {
+            logger.debug(ex);
+            logger.log_debug("<<< Ошибка: форма перенаправления не найдена");
+
+            logger.log("\nВозможные причины:");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            return 2;
+        }
+
+        onChangeProgress(48);
+
         logger.log_debug(">>> Получение страницы авторизации");
         try {
-            page = client.navigate(link).getContent();
-            if (page.isEmpty()) {
-                throw new Exception("Страница авторизации не получена");
-            } else {
-                logger.debug(page);
-            }
+            page = getPageContent(link, fields);
+            logger.debug(page);
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
@@ -103,8 +180,10 @@ public class Authenticator {
             return 2;
         }
 
-        fields = parser.parse(page).toString();
-        if (fields == null || fields.isEmpty()) {
+        try {
+            fields = parseForm(page);
+            logger.debug(fields);
+        } catch (Exception ex) {
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
 
             logger.log("\nВозможные причины:");
@@ -113,17 +192,12 @@ public class Authenticator {
             return 2;
         }
 
-        onChangeProgress(48);
+        onChangeProgress(64);
 
-        // Отправка запроса с данными формы
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            page = client.navigate(link, fields).getContent();
-            if (page.isEmpty()) {
-                throw new Exception("Ответ сервера не не получен");
-            } else {
-                logger.debug(page);
-            }
+            page = getPageContent(link, fields);
+            logger.debug(page);
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
@@ -132,35 +206,6 @@ public class Authenticator {
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
             return 2;
-        }
-
-        fields = parser.parse(page).toString();
-        if (fields == null) {
-            logger.log_debug("<<< Ошибка: вторая форма авторизации не найдена");
-
-            logger.log("\nВозможные причины:");
-            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-        }
-
-        onChangeProgress(64);
-
-        // Отправка запроса с данными второй формы
-        logger.log_debug(">>> Отправка второй формы авторизации");
-        try {
-            page = client.navigate(link, fields).getContent();
-            if (page.isEmpty()) {
-                throw new Exception("Ответ сервера не не получен");
-            } else {
-                logger.debug(page);
-            }
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
-
-            logger.log("\nВозможные причины:");
-            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
         }
 
         onChangeProgress(80);
