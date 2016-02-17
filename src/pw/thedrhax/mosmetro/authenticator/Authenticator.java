@@ -110,7 +110,7 @@ public class Authenticator {
         }
 
         fields = parser.parse(page).toString();
-        if (fields == null) {
+        if (fields == null || fields.isEmpty()) {
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
 
             logger.log("\nВозможные причины:");
