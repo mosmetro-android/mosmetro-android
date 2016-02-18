@@ -44,16 +44,6 @@ public class Authenticator {
         return link;
     }
 
-    private Document getPageContent (String link) throws Exception {
-        String content = client.navigate(link).getContent();
-
-        if (content == null || content.isEmpty()) {
-            throw new Exception("Страница не получена");
-        }
-
-        return Jsoup.parse(content);
-    }
-
     private Document getPageContent (String link, String params) throws Exception {
         String content = client.navigate(link, params).getContent();
 
@@ -111,7 +101,7 @@ public class Authenticator {
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
-            page = getPageContent("http://vmet.ro");
+            page = getPageContent("http://vmet.ro", null);
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -141,7 +131,7 @@ public class Authenticator {
 
         logger.log_debug(">>> Получение начальной страницы");
         try {
-            page = getPageContent(link);
+            page = getPageContent(link, null);
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
