@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -21,17 +19,10 @@ public class NetworkReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor settings_editor = settings.edit();
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-        if (networkInfo != null && // network info exists
-            networkInfo.isConnected() && // network is connected
-            NETWORK_SSID.equals(wifiInfo.getSSID())) { // wi-fi SSID is "MosMetro_Free"
-
-            // if not locked, then lock and start the ConnectionService
+        if (NETWORK_SSID.equals(wifiInfo.getSSID())) {
             if (!settings.getBoolean("locked", false) && settings.getBoolean("pref_autoconnect", true)) {
                 settings_editor.putBoolean("locked", true);
                 settings_editor.apply();
