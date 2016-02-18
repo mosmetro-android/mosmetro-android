@@ -45,13 +45,20 @@ public class Authenticator {
     }
 
     private Document getPageContent (String link, String params) throws Exception {
-        String content = client.navigate(link, params).getContent();
+        Document document;
 
+        // Get and parse the page
+        String content = client.navigate(link, params).getContent();
         if (content == null || content.isEmpty()) {
             throw new Exception("Страница не получена");
         }
+        document = Jsoup.parse(content);
 
-        return Jsoup.parse(content);
+        // Clean-up useless tags: <script>, <style>
+        document.getElementsByTag("script").remove();
+        document.getElementsByTag("style").remove();
+
+        return document;
     }
 
     private static String parseForm (Document document) throws Exception {
