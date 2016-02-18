@@ -1,6 +1,7 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pw.thedrhax.httpclient.HttpClient;
@@ -28,10 +29,10 @@ public class Authenticator {
         }
     }
 
-    private static String parseMetaRedirect (String content) throws Exception {
+    private static String parseMetaRedirect (Document document) throws Exception {
         String link = null;
 
-        for (Element element : Jsoup.parse(content).getElementsByTag("meta")) {
+        for (Element element : document.getElementsByTag("meta")) {
             if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
                 link = element.attr("content").split("URL=")[1];
             }
@@ -43,30 +44,30 @@ public class Authenticator {
         return link;
     }
 
-    private String getPageContent (String link) throws Exception {
+    private Document getPageContent (String link) throws Exception {
         String content = client.navigate(link).getContent();
 
         if (content == null || content.isEmpty()) {
             throw new Exception("Страница не получена");
         }
 
-        return content;
+        return Jsoup.parse(content);
     }
 
-    private String getPageContent (String link, String params) throws Exception {
+    private Document getPageContent (String link, String params) throws Exception {
         String content = client.navigate(link, params).getContent();
 
         if (content == null || content.isEmpty()) {
             throw new Exception("Страница не получена");
         }
 
-        return content;
+        return Jsoup.parse(content);
     }
 
-    private static String parseForm (String content) throws Exception {
+    private static String parseForm (Document document) throws Exception {
         String request;
 
-        Elements inputs = Jsoup.parse(content)
+        Elements inputs = document
                 .getElementsByTag("form").first()
                 .getElementsByTag("input");
 
@@ -88,7 +89,8 @@ public class Authenticator {
 
 	// Returns 0 on success, 1 if already connected and 2 if error
     public int connect() {
-        String page, fields, link;
+        Document page;
+        String fields, link;
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
 
         logger.log_debug("> " + dateFormat.format(new Date()));
@@ -110,7 +112,7 @@ public class Authenticator {
         logger.log_debug(">>> Получение начального перенаправления");
         try {
             page = getPageContent("http://vmet.ro");
-            logger.debug(page);
+            logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: перенаправление не получено");
@@ -140,7 +142,7 @@ public class Authenticator {
         logger.log_debug(">>> Получение начальной страницы");
         try {
             page = getPageContent(link);
-            logger.debug(page);
+            logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: начальная страница не получена");
@@ -169,7 +171,7 @@ public class Authenticator {
         logger.log_debug(">>> Получение страницы авторизации");
         try {
             page = getPageContent(link, fields);
-            logger.debug(page);
+            logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
@@ -197,7 +199,7 @@ public class Authenticator {
         logger.log_debug(">>> Отправка формы авторизации");
         try {
             page = getPageContent(link, fields);
-            logger.debug(page);
+            logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
