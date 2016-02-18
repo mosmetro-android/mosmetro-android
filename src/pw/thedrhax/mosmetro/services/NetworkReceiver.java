@@ -43,12 +43,13 @@ public class NetworkReceiver extends BroadcastReceiver {
                 settings.getBoolean("locked", false)) {
 
                 List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-                for (WifiConfiguration network : list) {
-                    if (network.SSID.equals(NETWORK_SSID)) {
-                        wifiManager.enableNetwork(network.networkId, true);
-                        wifiManager.reconnect();
+                if (list != null)
+                    for (WifiConfiguration network : list) {
+                        if (network.SSID.equals(NETWORK_SSID)) {
+                            wifiManager.enableNetwork(network.networkId, true);
+                            wifiManager.reconnect();
+                        }
                     }
-                }
             }
 
             settings_editor.putBoolean("locked", false);
