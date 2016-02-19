@@ -3,3 +3,4 @@ gen
 .idea/workspace.xml
 .idea/tasks.xml
 proguard_logs
+local.properties
