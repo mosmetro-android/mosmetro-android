@@ -1,10 +1,8 @@
-# Wi-Fi в метро
+# Wi-Fi в метро [![Build Status](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/badge/icon)](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/) [![Google Play](img/google-play.png)](https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro) [![ВКонтакте](img/vk-box.png)](https://vk.com/wifi_v_metro)
 
 Приложение для Android, предназначенное для автоматической авторизации в сети MosMetro_Free в московском метрополитене.
 
 Данный репозиторий содержит проект, который можно импортировать в среду разработки IntelliJ IDEA или совместимые (изначально проект разрабатывался в AIDE, поэтому он не использует Gradle). Для сборки проекта потребуется Android SDK.
-
-<a href="https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img alt="Get it on Google Play" width="150px" src="https://play.google.com/intl/en_us/badges/images/apps/ru-play-badge-border.png" /></a> [Официальный сайт](http://thedrhax.pw/?p=1817)
 
 ## Процесс разработки
 
