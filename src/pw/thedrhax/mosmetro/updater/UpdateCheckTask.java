@@ -1,15 +1,20 @@
 package pw.thedrhax.mosmetro.updater;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pw.thedrhax.httpclient.HttpClient;
+import pw.thedrhax.mosmetro.R;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +98,33 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         result(hasUpdate(), current_branch);
+    }
+
+    public void showDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+
+        if (hasUpdate()) {
+            dialog = dialog
+                    .setTitle(context.getString(R.string.updater_available))
+                    .setMessage(current_branch.message)
+                    .setNegativeButton(context.getString(R.string.cancel), null)
+                    .setPositiveButton(R.string.install,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse(current_branch.getDownloadUrl()));
+                                    context.startActivity(intent);
+                                }
+                            });
+        } else {
+            dialog = dialog
+                    .setTitle(context.getString(R.string.updater_not_available))
+                    .setMessage(context.getString(R.string.updater_not_available_message))
+                    .setNegativeButton(context.getString(R.string.ok), null);
+        }
+
+        dialog.show();
     }
 
     abstract public void result (boolean hasUpdate, Branch current_branch);
