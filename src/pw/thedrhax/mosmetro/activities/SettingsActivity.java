@@ -1,13 +1,17 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.view.MenuItem;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 
 public class SettingsActivity extends Activity {
 
@@ -39,5 +43,42 @@ public class SettingsActivity extends Activity {
         } catch (PackageManager.NameNotFoundException ex) {
             app_name.setSummary("");
         }
+
+        // Update checker
+        Preference pref_updater_check = settings.findPreference("pref_updater_check");
+        pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new UpdateCheckTask(SettingsActivity.this) {
+                    @Override
+                    public void result(boolean hasUpdate, final Branch current_branch) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(SettingsActivity.this)
+                                .setTitle(hasUpdate ?
+                                        getString(R.string.updater_available) :
+                                        getString(R.string.updater_not_available))
+                                .setMessage(hasUpdate ?
+                                        current_branch.message :
+                                        getString(R.string.updater_not_available_message))
+                                .setNegativeButton(hasUpdate ?
+                                        getString(R.string.cancel) :
+                                        getString(R.string.ok), null);
+
+                        if (hasUpdate)
+                            dialog = dialog.setPositiveButton(R.string.install,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(current_branch.getDownloadUrl()));
+                                            startActivity(intent);
+                                        }
+                                    });
+
+                        dialog.show();
+                    }
+                }.execute();
+                return false;
+            }
+        });
     }
 }

@@ -71,4 +71,13 @@
     <string name="pref_wifi_reconnect_summary">Пытаться восстановить соединение с сетью MosMetro_Free автоматически при
         потере сигнала или сбросе соединения
     </string>
+    <string name="pref_updater_check">Проверить наличие обновлений</string>
+    <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
+    <string name="pref_category_updater">Обновления</string>
+    <string name="updater_available">Доступно обновление</string>
+    <string name="updater_not_available">Нет доступных обновлений</string>
+    <string name="updater_not_available_message">Обновления появятся здесь при выходе новых версий и/или появлении
+        проблем с Google Play
+    </string>
+    <string name="install">Установить</string>
 </resources>

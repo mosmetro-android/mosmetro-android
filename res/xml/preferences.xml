@@ -88,6 +88,16 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pref_category_updater">
+
+        <Preference
+            android:key="pref_updater_check"
+            android:title="@string/pref_updater_check"
+            android:summary="@string/pref_updater_check_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/about">
 
         <Preference
