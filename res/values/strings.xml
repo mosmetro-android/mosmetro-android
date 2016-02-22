@@ -80,4 +80,6 @@
         проблем с Google Play
     </string>
     <string name="install">Установить</string>
+    <string name="pref_updater_branch">Ветки обновлений</string>
+    <string name="pref_updater_branch_summary">Выбор ветки, из которой приложение будет получать обновления</string>
 </resources>

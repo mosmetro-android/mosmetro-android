@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="branches_entries">
+        <item>Стабильная (play)</item>
+        <item>Бета (play-beta)</item>
+    </string-array>
+    <string-array name="branches_values">
+        <item>play</item>
+        <item>beta</item>
+    </string-array>
+</resources>
