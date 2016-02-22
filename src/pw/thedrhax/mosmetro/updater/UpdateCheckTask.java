@@ -16,9 +16,6 @@ import org.jsoup.nodes.Element;
 import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.mosmetro.R;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     private static final String UPDATE_BASE_URL = "http://thedrhax.pw/mosmetro/";
     private static final String UPDATE_INFO_URL = UPDATE_BASE_URL + "update.php";
@@ -28,7 +25,6 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     private final SharedPreferences settings;
 
     // Info from the server
-    private List<Branch> branches;
     private Branch current_branch;
 
     // Updater state
@@ -73,20 +69,12 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
         // Parse server answer
         Document document = Jsoup.parse(content);
-        branches = new LinkedList<Branch>();
-        for (Element branch : document.getElementsByTag("branch")) {
-            branches.add(new Branch(branch));
-        }
-
-        if (branches.isEmpty()) {
-            update_failed = true;
-            return null;
-        }
-
-        // Search for current branch in parsed info
-        for (Branch branch : branches) {
-            if (branch.name.equals(settings.getString("pref_updater_branch", "play")))
+        for (Element element : document.getElementsByTag("branch")) {
+            Branch branch = new Branch(element);
+            if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
                 current_branch = branch;
+                break;
+            }
         }
 
         if (current_branch == null) {
