@@ -58,7 +58,7 @@ public class SettingsActivity extends Activity {
                     public void result(boolean hasUpdate, final Branch current_branch) {
                         showDialog();
                     }
-                }.execute();
+                }.setIgnore(0).execute();
                 return false;
             }
         });

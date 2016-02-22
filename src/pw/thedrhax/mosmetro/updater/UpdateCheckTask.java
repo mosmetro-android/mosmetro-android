@@ -51,7 +51,9 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     }
 
     private boolean hasUpdate() {
-        return !update_failed && getVersionCode() < current_branch.version;
+        return !update_failed &&
+                getVersionCode() < current_branch.version &&
+                settings.getInt("pref_updater_ignore", 0) < current_branch.version;
     }
 
     @Override
@@ -107,7 +109,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
             dialog = dialog
                     .setTitle(context.getString(R.string.updater_available))
                     .setMessage(current_branch.message)
-                    .setNegativeButton(context.getString(R.string.cancel), null)
+                    .setNegativeButton(R.string.updater_ignore, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            setIgnore(current_branch.version);
+                        }
+                    })
+                    .setNeutralButton(R.string.updater_later, null)
                     .setPositiveButton(R.string.install,
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -125,6 +133,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         }
 
         dialog.show();
+    }
+
+    public UpdateCheckTask setIgnore (int version) {
+        settings.edit()
+                .putInt("pref_updater_ignore", version)
+                .apply();
+        return this;
     }
 
     abstract public void result (boolean hasUpdate, Branch current_branch);
