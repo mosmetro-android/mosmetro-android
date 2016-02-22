@@ -84,4 +84,6 @@
     <string name="pref_updater_branch_summary">Выбор ветки, из которой приложение будет получать обновления</string>
     <string name="updater_ignore">Игнор.</string>
     <string name="updater_later">Позже</string>
+    <string name="pref_updater_enabled">Проверять автоматически</string>
+    <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
 </resources>

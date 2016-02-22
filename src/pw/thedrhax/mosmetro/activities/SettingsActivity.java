@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 
@@ -41,12 +42,13 @@ public class SettingsActivity extends Activity {
         }
 
         // Check for updates on start
-        new UpdateCheckTask(this) {
-            @Override
-            public void result(boolean hasUpdate, Branch current_branch) {
-                if (hasUpdate) showDialog();
-            }
-        }.execute();
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true))
+            new UpdateCheckTask(this) {
+                @Override
+                public void result(boolean hasUpdate, Branch current_branch) {
+                    if (hasUpdate) showDialog();
+                }
+            }.execute();
 
         // Update checker
         Preference pref_updater_check = settings.findPreference("pref_updater_check");
