@@ -103,6 +103,9 @@ public class ConnectionService extends IntentService {
                                 .setText("Нажмите, чтобы открыть настройки уведомлений")
                                 .setIntent(new Intent(this, SettingsActivity.class));
                     }
+
+                    notification.setCancellable(!settings.getBoolean("pref_notify_success_lock", false));
+
                     notification.show();
                 }
                 return;

@@ -86,4 +86,8 @@
     <string name="updater_later">Позже</string>
     <string name="pref_updater_enabled">Проверять автоматически</string>
     <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
+    <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
+    <string name="pref_notify_success_lock_summary">Сделать уведомление об успехе неудаляемым (уведомление будет
+        отображаться, пока подключена сеть Wi-Fi
+    </string>
 </resources>
