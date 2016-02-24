@@ -5,14 +5,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import pw.thedrhax.httpclient.HttpClient;
 
+import java.io.IOException;
+
 public class AuthenticatorStat extends Authenticator {
-    private static final String INTERNET_CHECK_URL = "http://thedrhax.pw/mosmetro/check.php";
-    private static final String INTERNET_CHECK_KEY = "2fv3bYW6x92V3Y7gM5FfT7Wmh";
+    private static final String STATISTICS_URL = "http://thedrhax.pw/mosmetro/check.php";
 
     private Context context;
     private boolean automatic;
-
-    private boolean first_check = true;
 
     public AuthenticatorStat(Context context, boolean automatic) {
         super();
@@ -32,26 +31,24 @@ public class AuthenticatorStat extends Authenticator {
 
     @Override
     public int connect() {
-        first_check = true;
         logger.debug("Версия приложения: " + getVersion());
-        return super.connect();
+        int result = super.connect();
+
+        if (result <= STATUS_ALREADY_CONNECTED)
+            submit_info(result);
+
+        return result;
     }
 
-    @Override
-    public boolean isConnected() {
+    private void submit_info (int result) {
         StringBuilder params = new StringBuilder();
 
         params.append("version=").append(getVersion()).append("&");
         params.append("automatic=").append(automatic ? "1" : "0").append("&");
-        params.append("connected=").append(first_check ? "0" : "1");
-        first_check = false;
+        params.append("connected=").append(result == STATUS_CONNECTED ? "1" : "0");
+
         try {
-            return new HttpClient()
-                    .navigate(INTERNET_CHECK_URL, params.toString())
-                    .getContent().contains(INTERNET_CHECK_KEY);
-        } catch (Exception ex) {
-            logger.debug(ex);
-            return false;
-        }
+            new HttpClient().navigate(STATISTICS_URL, params.toString());
+        } catch (IOException ignored) {}
     }
 }

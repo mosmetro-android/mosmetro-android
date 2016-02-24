@@ -11,10 +11,16 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class Authenticator {
+    // Result state
     public static final int STATUS_CONNECTED = 0;
     public static final int STATUS_ALREADY_CONNECTED = 1;
     public static final int STATUS_NOT_REGISTERED = 2;
     public static final int STATUS_ERROR = 3;
+
+    // Network check state
+    public static final int CHECK_CONNECTED = 0;
+    public static final int CHECK_WRONG_NETWORK = 1;
+    public static final int CHECK_NOT_CONNECTED = 2;
     
 	protected Logger logger;
     private HttpClient client;
@@ -24,14 +30,29 @@ public class Authenticator {
         client = new HttpClient().setIgnoreSSL(true);
     }
 
-    public boolean isConnected() {
+    public int isConnected() {
+        HttpClient client = new HttpClient();
+
+        String content;
         try {
-            new HttpClient().navigate("https://google.com");
-            return true;
+            content = client.navigate("http://vmet.ro").getContent();
+            if (content == null || content.isEmpty())
+                throw new Exception("Empty response");
         } catch (Exception ex) {
-            logger.debug(ex);
-            return false;
+            // Server not responding => wrong network
+            return CHECK_WRONG_NETWORK;
         }
+
+        try {
+            Document doc = Jsoup.parse(content);
+            parseMetaRedirect(doc);
+        } catch (Exception ex) {
+            // Redirect not found => connected
+            return CHECK_CONNECTED;
+        }
+
+        // Redirect found => not connected
+        return CHECK_NOT_CONNECTED;
     }
 
     private static String parseMetaRedirect (Document document) throws Exception {
@@ -97,9 +118,19 @@ public class Authenticator {
         onChangeProgress(0);
 
         logger.log_debug(">> Проверка доступа в интернет");
-        if (isConnected()) {
+        int connected = isConnected();
+        if (connected == CHECK_CONNECTED) {
             logger.log_debug("<< Уже подключено");
             return STATUS_ALREADY_CONNECTED;
+        } else if (connected == CHECK_WRONG_NETWORK) {
+            logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
+
+            logger.log("\nВозможные причины ошибки:");
+            logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
+            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+
+            return STATUS_ERROR;
         }
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
@@ -223,7 +254,7 @@ public class Authenticator {
         onChangeProgress(80);
 
         logger.log_debug(">> Проверка доступа в интернет");
-        if (isConnected()) {
+        if (isConnected() == CHECK_CONNECTED) {
             logger.log_debug("<< Соединение успешно установлено :3");
         } else {
             logger.log_debug("<< Ошибка: доступ в интернет отсутствует");
