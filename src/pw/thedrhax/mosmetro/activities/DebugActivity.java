@@ -109,7 +109,7 @@ public class DebugActivity extends Activity {
 
     private class AuthTask extends AsyncTask<Void, String, Void> {
         private AuthenticatorStat connection;
-        private int result = 2;
+        private int result = AuthenticatorStat.STATUS_ERROR;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -137,7 +137,8 @@ public class DebugActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             logger.debug(connection.getLogger().getDebug());
-            if (close_when_connected && result < 2) DebugActivity.this.finish();
+            if (close_when_connected && result <= AuthenticatorStat.STATUS_ALREADY_CONNECTED)
+                DebugActivity.this.finish();
         }
     }
 

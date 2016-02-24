@@ -11,6 +11,10 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class Authenticator {
+    public static final int STATUS_CONNECTED = 0;
+    public static final int STATUS_ALREADY_CONNECTED = 1;
+    public static final int STATUS_ERROR = 2;
+    
 	protected Logger logger;
     private HttpClient client;
 
@@ -97,7 +101,7 @@ public class Authenticator {
         logger.log_debug(">> Проверка доступа в интернет");
         if (isConnected()) {
             logger.log_debug("<< Уже подключено");
-            return 1;
+            return STATUS_ALREADY_CONNECTED;
         }
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
@@ -118,7 +122,7 @@ public class Authenticator {
             logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         try {
@@ -131,7 +135,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         onChangeProgress(32);
@@ -147,7 +151,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         try {
@@ -160,7 +164,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         onChangeProgress(48);
@@ -176,7 +180,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         try {
@@ -188,7 +192,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         onChangeProgress(64);
@@ -204,7 +208,7 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         onChangeProgress(80);
@@ -218,13 +222,13 @@ public class Authenticator {
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return 2;
+            return STATUS_ERROR;
         }
 
         onChangeProgress(100);
 
         logger.log_debug("< " + dateFormat.format(new Date()));
-        return 0;
+        return STATUS_CONNECTED;
     }
 
     public void onChangeProgress (int progress) {}

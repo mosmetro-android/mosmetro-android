@@ -84,10 +84,8 @@ public class ConnectionService extends IntentService {
 
     private void notify (int result) {
         switch (result) {
-            // Successful connection
-            case 0:
-            // Already connected
-            case 1:
+            case Authenticator.STATUS_CONNECTED:
+            case Authenticator.STATUS_ALREADY_CONNECTED:
                 if (settings.getBoolean("pref_notify_success", true)) {
                     notification
                             .setTitle("Успешно подключено")
@@ -107,8 +105,7 @@ public class ConnectionService extends IntentService {
                     notification.show();
                 }
                 return;
-            // Error
-            case 2:
+            case Authenticator.STATUS_ERROR:
                 if (settings.getBoolean("pref_notify_fail", true))
                     notification
                             .setTitle("Не удалось подключиться")
@@ -154,7 +151,7 @@ public class ConnectionService extends IntentService {
             }
 
             count++;
-        } while (count < pref_retry_count && result > 1);
+        } while (count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
 
         notify_progress.hide();
 
