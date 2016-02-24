@@ -60,8 +60,23 @@ public class SettingsActivity extends Activity {
                     public void result(boolean hasUpdate, final Branch current_branch) {
                         showDialog();
                     }
-                }.setIgnore(0).execute();
+                }.setIgnore(false).execute();
                 return false;
+            }
+        });
+
+        // Reset all updater preferences when changing branch
+        Preference pref_updater_branch = settings.findPreference("pref_updater_branch");
+        pref_updater_branch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                PreferenceManager
+                        .getDefaultSharedPreferences(SettingsActivity.this)
+                        .edit()
+                        .putInt("pref_updater_build", 0)
+                        .putInt("pref_updater_ignore", 0)
+                        .apply();
+                return true;
             }
         });
     }

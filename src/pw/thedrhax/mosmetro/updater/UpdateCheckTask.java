@@ -29,27 +29,15 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     // Updater state
     private boolean update_failed = false;
+    private boolean check_ignored = false;
 
     public UpdateCheckTask (Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    private int getVersionCode() {
-        try {
-            PackageInfo pInfo = context
-                    .getPackageManager().getPackageInfo(context.getPackageName(), 0);
-
-            return pInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException ex) {
-            return Integer.MAX_VALUE;
-        }
-    }
-
     private boolean hasUpdate() {
-        return !update_failed &&
-                getVersionCode() < current_branch.version &&
-                settings.getInt("pref_updater_ignore", 0) < current_branch.version;
+        return !update_failed && current_branch.hasUpdate();
     }
 
     @Override
@@ -100,19 +88,16 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                     .setNegativeButton(R.string.updater_ignore, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            setIgnore(current_branch.version);
+                            current_branch.ignore(true);
                         }
                     })
                     .setNeutralButton(R.string.updater_later, null)
-                    .setPositiveButton(R.string.install,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse(current_branch.url));
-                                    context.startActivity(intent);
-                                }
-                            });
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            current_branch.download();
+                        }
+                    });
         } else {
             dialog = dialog
                     .setTitle(context.getString(R.string.updater_not_available))
@@ -123,24 +108,24 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         dialog.show();
     }
 
-    public UpdateCheckTask setIgnore (int version) {
-        settings.edit()
-                .putInt("pref_updater_ignore", version)
-                .apply();
-        return this;
+    public UpdateCheckTask setIgnore (boolean ignore) {
+        check_ignored = !ignore; return this;
     }
 
     abstract public void result (boolean hasUpdate, Branch current_branch);
 
     public class Branch {
         public String name;
-        public int version;
-        public int build;
-        public String url;
         public String message;
+
+        private int version;
+        private String url;
+        private boolean by_build = false; // Check by build number instead of version code
 
         public Branch (Element element) {
             name = element.attr("id");
+
+            int version = 0, build = 0;
 
             for (Element key : element.getElementsByTag("key")) {
                 if (key.attr("id").equals("version"))
@@ -149,12 +134,56 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                 if (key.attr("id").equals("build"))
                     build = Integer.parseInt(key.html());
 
+                if (key.attr("id").equals("by_build") &&
+                        key.html().equals("1"))
+                    by_build = true;
+
                 if (key.attr("id").equals("url"))
                     url = key.html();
 
                 if (key.attr("id").equals("message"))
                     message = key.html().replace("<br>", "");
             }
+
+            this.version = by_build ? build : version;
+        }
+
+        private int getVersion() {
+            if (by_build) {
+                return settings.getInt("pref_updater_build", 0);
+            } else {
+                try {
+                    PackageInfo pInfo = context
+                            .getPackageManager().getPackageInfo(context.getPackageName(), 0);
+
+                    return pInfo.versionCode;
+                } catch (PackageManager.NameNotFoundException ex) {
+                    return Integer.MAX_VALUE;
+                }
+            }
+        }
+
+        public boolean hasUpdate() {
+            if (settings.getInt("pref_updater_ignore", 0) < version || check_ignored)
+                if (getVersion() < version) return true;
+
+            return false;
+        }
+
+        public void ignore(boolean ignore) {
+            settings.edit()
+                    .putInt("pref_updater_ignore", ignore ? version : 0)
+                    .apply();
+        }
+
+        public void download() {
+            settings.edit()
+                    .putInt("pref_updater_build", version)
+                    .apply();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            context.startActivity(intent);
         }
     }
 }

@@ -3,9 +3,11 @@
     <string-array name="branches_entries">
         <item>Стабильная (play)</item>
         <item>Бета (play-beta)</item>
+        <item>Основная (master)</item>
     </string-array>
     <string-array name="branches_values">
         <item>play</item>
         <item>beta</item>
+        <item>master</item>
     </string-array>
 </resources>
