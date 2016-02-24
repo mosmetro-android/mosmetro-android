@@ -109,7 +109,7 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse(current_branch.getDownloadUrl()));
+                                    intent.setData(Uri.parse(current_branch.url));
                                     context.startActivity(intent);
                                 }
                             });
@@ -136,6 +136,7 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         public String name;
         public int version;
         public int build;
+        public String url;
         public String message;
 
         public Branch (Element element) {
@@ -148,13 +149,12 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                 if (key.attr("id").equals("build"))
                     build = Integer.parseInt(key.html());
 
+                if (key.attr("id").equals("url"))
+                    url = key.html();
+
                 if (key.attr("id").equals("message"))
                     message = key.html().replace("<br>", "");
             }
-        }
-
-        public String getDownloadUrl () {
-            return UPDATE_BASE_URL + "releases/MosMetro-" + name + "-v" + version + "-b" + build + ".apk";
         }
     }
 }
