@@ -3,6 +3,7 @@ package pw.thedrhax.mosmetro.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
@@ -103,6 +104,21 @@ public class ConnectionService extends IntentService {
                                 .setIntent(new Intent(this, SettingsActivity.class));
                     }
                     notification.show();
+                }
+                return;
+            case Authenticator.STATUS_NOT_REGISTERED:
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("http://vmet.ro"));
+
+                    notification
+                            .setTitle("Устройство не зарегистрировано")
+                            .setText("Нажмите, чтобы перейти к регистрации")
+                            .setIcon(colored_icons ?
+                                    R.drawable.ic_notification_register_colored :
+                                    R.drawable.ic_notification_register)
+                            .setIntent(intent)
+                            .show();
                 }
                 return;
             case Authenticator.STATUS_ERROR:

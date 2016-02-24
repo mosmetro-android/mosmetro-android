@@ -13,7 +13,8 @@ import java.util.Date;
 public class Authenticator {
     public static final int STATUS_CONNECTED = 0;
     public static final int STATUS_ALREADY_CONNECTED = 1;
-    public static final int STATUS_ERROR = 2;
+    public static final int STATUS_NOT_REGISTERED = 2;
+    public static final int STATUS_ERROR = 3;
     
 	protected Logger logger;
     private HttpClient client;
@@ -65,12 +66,9 @@ public class Authenticator {
         return document;
     }
 
-    private static String parseForm (Document document) throws Exception {
+    private static String parseForm (Element form) throws Exception {
         String request;
-
-        Elements inputs = document
-                .getElementsByTag("form").first()
-                .getElementsByTag("input");
+        Elements inputs = form.getElementsByTag("input");
 
         StringBuilder params = new StringBuilder();
         for (Element input : inputs) {
@@ -155,7 +153,7 @@ public class Authenticator {
         }
 
         try {
-            fields = parseForm(page);
+            fields = parseForm(page.getElementsByTag("form").first());
             logger.debug(fields);
         } catch (Exception ex) {
             logger.debug(ex);
@@ -184,7 +182,18 @@ public class Authenticator {
         }
 
         try {
-            fields = parseForm(page);
+            Elements forms = page.getElementsByTag("form");
+            if (forms.size() > 1 && forms.last().attr("id").equals("sms-form")) {
+                logger.log_debug("<<< Ошибка: устройство не зарегистрировано в сети");
+
+                logger.log("\nВозможные причины:");
+                logger.log(" * Ваше устройство подключено к сети в первый раз (вы не проходили регистрацию через СМС)");
+                logger.log("   Попробуйте подключиться через браузер и, если потребуется, пройдите регистрацию через СМС.");
+                logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+
+                return STATUS_NOT_REGISTERED;
+            }
+            fields = parseForm(forms.first());
             logger.debug(fields);
         } catch (Exception ex) {
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
