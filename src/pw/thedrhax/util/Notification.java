@@ -1,11 +1,10 @@
 package pw.thedrhax.util;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.app.PendingIntent;
 import android.os.Build;
-import pw.thedrhax.mosmetro.R;
 
 public class Notification {
     private Context context;
@@ -14,6 +13,7 @@ public class Notification {
 
     private int id = 0;
     private boolean cancellable;
+    private boolean enabled = true;
 
     public Notification (Context context) {
         this.context = context;
@@ -70,7 +70,13 @@ public class Notification {
         return this;
     }
 
+    public Notification setEnabled (boolean enabled) {
+        this.enabled = enabled; return this;
+    }
+
     public void show() {
+        if (!enabled) return;
+
         android.app.Notification notification;
         if (Build.VERSION.SDK_INT >= 16) {
             notification = builder.build();

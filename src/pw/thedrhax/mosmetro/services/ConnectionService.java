@@ -15,23 +15,19 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
-    private SharedPreferences settings;
-
     // Preferences
-    private boolean pref_notify_progress;
+    private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_retry_delay;
-
-    // Logger
-    private Logger logger;
-
-    // Authenticator
-    private Authenticator connection;
+    private boolean pref_colored_icons;
 
     // Notifications
     private Notification notify_progress;
     private Notification notification;
-    boolean colored_icons;
+
+    // Authenticator
+    private Logger logger;
+    private Authenticator connection;
 
     public ConnectionService () {
 		super("ConnectionService");
@@ -42,90 +38,83 @@ public class ConnectionService extends IntentService {
 		super.onCreate();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-
-        pref_notify_progress = settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14);
         pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
-
-        logger = new Logger();
-
-        connection = new AuthenticatorStat(this, true) {
-            public void onChangeProgress(int progress) {
-                if (pref_notify_progress) {
-                    notify_progress.setProgress(progress);
-                    notify_progress.show();
-                }
-            }
-        };
-
-        // Set logger
-        connection.setLogger(logger);
-
-        colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
+        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
 
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
-                .setIcon(colored_icons ?
+                .setIcon(pref_colored_icons ?
                         R.drawable.ic_notification_connecting_colored :
                         R.drawable.ic_notification_connecting)
                 .setId(1)
-                .setCancellable(false);
+                .setCancellable(false)
+                .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14));
 
         notification = new Notification(this)
                 .setId(0);
+
+        logger = new Logger();
+        connection = new AuthenticatorStat(this, true) {
+            public void onChangeProgress(int progress) {
+                notify_progress
+                        .setProgress(progress)
+                        .show();
+            }
+        };
+        connection.setLogger(logger);
     }
 
     private void notify (int result) {
         switch (result) {
             case Authenticator.STATUS_CONNECTED:
             case Authenticator.STATUS_ALREADY_CONNECTED:
-                if (settings.getBoolean("pref_notify_success", true)) {
+                notification
+                        .setTitle("Успешно подключено")
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_success_colored :
+                                R.drawable.ic_notification_success);
+
+                if (settings.getBoolean("pref_notify_success_log", false)) {
                     notification
-                            .setTitle("Успешно подключено")
-                            .setIcon(colored_icons ?
-                                    R.drawable.ic_notification_success_colored :
-                                    R.drawable.ic_notification_success);
-                            
-                    if (settings.getBoolean("pref_notify_success_log", false)) {
-                        notification
-                                .setText("Нажмите, чтобы узнать подробности")
-                                .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
-                    } else {
-                        notification
-                                .setText("Нажмите, чтобы открыть настройки уведомлений")
-                                .setIntent(new Intent(this, SettingsActivity.class));
-                    }
-
-                    notification.setCancellable(!settings.getBoolean("pref_notify_success_lock", false));
-
-                    notification.show();
+                            .setText("Нажмите, чтобы узнать подробности")
+                            .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
+                } else {
+                    notification
+                            .setText("Нажмите, чтобы открыть настройки уведомлений")
+                            .setIntent(new Intent(this, SettingsActivity.class));
                 }
+
+                notification
+                        .setCancellable(!settings.getBoolean("pref_notify_success_lock", false))
+                        .setEnabled(settings.getBoolean("pref_notify_success", true))
+                        .show();
+
                 return;
+
             case Authenticator.STATUS_NOT_REGISTERED:
-                if (settings.getBoolean("pref_notify_fail", true)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("http://vmet.ro"));
+                notification
+                        .setTitle("Устройство не зарегистрировано")
+                        .setText("Нажмите, чтобы перейти к регистрации")
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
+                        .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://vmet.ro")))
+                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
+                        .show();
 
-                    notification
-                            .setTitle("Устройство не зарегистрировано")
-                            .setText("Нажмите, чтобы перейти к регистрации")
-                            .setIcon(colored_icons ?
-                                    R.drawable.ic_notification_register_colored :
-                                    R.drawable.ic_notification_register)
-                            .setIntent(intent)
-                            .show();
-                }
                 return;
+
             case Authenticator.STATUS_ERROR:
-                if (settings.getBoolean("pref_notify_fail", true))
-                    notification
-                            .setTitle("Не удалось подключиться")
-                            .setText("Нажмите, чтобы узнать подробности или попробовать снова")
-                            .setIcon(colored_icons ?
-                                    R.drawable.ic_notification_error_colored :
-                                    R.drawable.ic_notification_error)
-                            .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
-                            .show();
+                notification
+                        .setTitle("Не удалось подключиться")
+                        .setText("Нажмите, чтобы узнать подробности или попробовать снова")
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_error_colored :
+                                R.drawable.ic_notification_error)
+                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
+                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
+                        .show();
         }
     }
 
@@ -134,25 +123,24 @@ public class ConnectionService extends IntentService {
 
         do {
             if (count > 0) {
-                if (pref_notify_progress)
-                    notify_progress.setText(
-                            "Ожидание... (попытка " + (count+1) + " из " + pref_retry_count + ")"
-                    ).setContinuous().show();
+                notify_progress
+                        .setText("Ожидание... (попытка " + (count+1) + " из " + pref_retry_count + ")")
+                        .setContinuous()
+                        .show();
 
                 try {
                     Thread.sleep(pref_retry_delay * 1000);
                 } catch (InterruptedException ignored) {}
             }
 
-            if (pref_notify_progress)
-                notify_progress.setText(
-                        "Подключаюсь... (попытка " + (count+1) + " из " + pref_retry_count + ")"
-                ).show();
+            notify_progress
+                    .setText("Подключаюсь... (попытка " + (count+1) + " из " + pref_retry_count + ")")
+                    .show();
 
             result = connection.connect();
 
             if (!settings.getBoolean("locked", false)) {
-                logger.log_debug("Ошибка: соединение с сетью прервалось");
+                logger.log_debug("< Ошибка: Соединение с сетью прервалось");
 
                 logger.log("\nВозможные причины:");
                 logger.log(" * Вы отключились от сети MosMetro_Free");
@@ -160,17 +148,16 @@ public class ConnectionService extends IntentService {
                 logger.log(" * Точка доступа в поезде отключилась");
                 break;
             }
-
-            count++;
-        } while (count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
-
-        notify_progress.hide();
+        } while (count++ < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
 
         return result;
     }
 	
 	public void onHandleIntent(Intent intent) {
         int result = connect();
+
+        // Remove progress notification
+        notify_progress.hide();
 
         // Show notification only if locked (connected to Wi-Fi)
         if (settings.getBoolean("locked", false))
