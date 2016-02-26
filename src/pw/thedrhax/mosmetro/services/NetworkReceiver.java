@@ -10,22 +10,20 @@ import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import pw.thedrhax.util.Notification;
 
-import java.util.List;
-
 public class NetworkReceiver extends BroadcastReceiver {
     private static final String NETWORK_SSID = "\"MosMetro_Free\"";
 
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor settings_editor = settings.edit();
 
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = manager.getConnectionInfo();
 
-        if (NETWORK_SSID.equals(wifiInfo.getSSID())) {
-            if (!settings.getBoolean("locked", false) && settings.getBoolean("pref_autoconnect", true)) {
-                settings_editor.putBoolean("locked", true);
-                settings_editor.apply();
+        if (NETWORK_SSID.equals(info.getSSID())) {
+            if (!settings.getBoolean("locked", false) &&
+                settings.getBoolean("pref_autoconnect", true)) {
+
+                settings.edit().putBoolean("locked", true).apply();
                 context.startService(new Intent(context, ConnectionService.class));
             }
         } else {
@@ -33,18 +31,17 @@ public class NetworkReceiver extends BroadcastReceiver {
             if (settings.getBoolean("pref_wifi_reconnect", false) &&
                 settings.getBoolean("locked", false)) {
 
-                List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-                if (list != null)
-                    for (WifiConfiguration network : list) {
+                try {
+                    for (WifiConfiguration network : manager.getConfiguredNetworks()) {
                         if (network.SSID.equals(NETWORK_SSID)) {
-                            wifiManager.enableNetwork(network.networkId, true);
-                            wifiManager.reconnect();
+                            manager.enableNetwork(network.networkId, true);
+                            manager.reconnect();
                         }
                     }
+                } catch (NullPointerException ignored) {}
             }
 
-            settings_editor.putBoolean("locked", false);
-            settings_editor.apply();
+            settings.edit().putBoolean("locked", false).apply();
             new Notification(context).setId(0).hide(); // Hide result notification on disconnect
         }
     }
