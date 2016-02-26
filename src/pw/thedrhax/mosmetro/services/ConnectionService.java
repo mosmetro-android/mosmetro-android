@@ -74,14 +74,6 @@ public class ConnectionService extends IntentService {
         notification = new Notification(this)
                 .setId(0);
     }
-    
-    private Intent debugIntent (Logger logger) {
-        Intent debug = new Intent(this, DebugActivity.class);
-        debug.putExtra("log", logger.getLog());
-        debug.putExtra("debug", logger.getDebug());
-        debug.putExtra("ConnectionService", true);
-        return debug;
-    }
 
     private void notify (int result) {
         switch (result) {
@@ -97,7 +89,7 @@ public class ConnectionService extends IntentService {
                     if (settings.getBoolean("pref_notify_success_log", false)) {
                         notification
                                 .setText("Нажмите, чтобы узнать подробности")
-                                .setIntent(debugIntent(logger));
+                                .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
                     } else {
                         notification
                                 .setText("Нажмите, чтобы открыть настройки уведомлений")
@@ -132,7 +124,7 @@ public class ConnectionService extends IntentService {
                             .setIcon(colored_icons ?
                                     R.drawable.ic_notification_error_colored :
                                     R.drawable.ic_notification_error)
-                            .setIntent(debugIntent(logger))
+                            .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                             .show();
         }
     }

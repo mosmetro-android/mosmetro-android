@@ -49,13 +49,10 @@ public class DebugActivity extends Activity {
 
         // Check for external intents
         try {
-            Bundle intent_bundle = getIntent().getExtras();
             // Intent from the ConnectionService
-            if (intent_bundle.getBoolean("ConnectionService", false)) {
-                logger.log(intent_bundle.getString("log"));
-                logger.debug(intent_bundle.getString("debug"));
-                return;
-            }
+            Bundle bundle = getIntent().getExtras();
+            logger.merge((Logger)bundle.getParcelable("logger"));
+            return;
         } catch (NullPointerException ignored) {}
         
         try {
