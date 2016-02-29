@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import pw.thedrhax.util.Notification;
@@ -17,9 +16,8 @@ public class NetworkReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo info = manager.getConnectionInfo();
 
-        if (NETWORK_SSID.equals(info.getSSID())) {
+        if (NETWORK_SSID.equals(manager.getConnectionInfo().getSSID())) {
             if (!settings.getBoolean("locked", false) &&
                 settings.getBoolean("pref_autoconnect", true)) {
 
