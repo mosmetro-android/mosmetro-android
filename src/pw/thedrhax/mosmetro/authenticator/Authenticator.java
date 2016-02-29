@@ -221,20 +221,22 @@ public class Authenticator {
             fields = parseForm(forms.first());
             logger.debug(fields);
         } catch (Exception ex) {
+            fields = null;
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
 
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return STATUS_ERROR;
         }
 
         onChangeProgress(64);
 
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            page = getPageContent(link, fields);
-            logger.debug(page.outerHtml());
+            if (fields != null) {
+                page = getPageContent(link, fields);
+                logger.debug(page.outerHtml());
+            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
