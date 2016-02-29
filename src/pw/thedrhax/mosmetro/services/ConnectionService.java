@@ -21,6 +21,7 @@ public class ConnectionService extends IntentService {
     private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_retry_delay;
+    private int pref_ip_wait;
     private boolean pref_colored_icons;
 
     // Notifications
@@ -42,6 +43,7 @@ public class ConnectionService extends IntentService {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
+        pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "0"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
 
         notify_progress = new Notification(this)
@@ -145,13 +147,13 @@ public class ConnectionService extends IntentService {
                     .show();
         while (manager.getConnectionInfo().getIpAddress() == 0) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
 
             if (!isLocked()) return Authenticator.STATUS_ERROR;
 
-            if (count++ == 60) {
-                logger.log_debug("<< Ошибка: IP адрес не получен в течение 30 секунд");
+            if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
+                logger.log_debug("<< Ошибка: IP адрес не был получен в течение " + pref_ip_wait + " секунд");
 
                 logger.log("\nВозможные причины:");
                 logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");

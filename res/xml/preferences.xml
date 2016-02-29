@@ -32,6 +32,13 @@
                     android:title="@string/pref_retry_delay"
                     android:summary="@string/pref_retry_delay_summary"
                     android:defaultValue="5" />
+                    
+            <EditTextPreference
+                    android:key="pref_ip_wait"
+                    android:inputType="number"
+                    android:title="@string/pref_ip_wait"
+                    android:summary="@string/pref_ip_wait_summary"
+                    android:defaultValue="0" />
 
         </PreferenceScreen>
 
