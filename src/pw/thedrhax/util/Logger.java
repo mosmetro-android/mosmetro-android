@@ -3,6 +3,9 @@ package pw.thedrhax.util;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class Logger implements Parcelable {
     private StringBuilder log, debug;
 
@@ -35,6 +38,11 @@ public class Logger implements Parcelable {
     public void merge (Logger logger) {
         log(logger.getLog());
         debug(logger.getDebug());
+    }
+
+    public void date (String prefix, String postfix) {
+        DateFormat dateFormat = DateFormat.getDateTimeInstance();
+        log_debug(prefix + dateFormat.format(new Date()) + postfix);
     }
 
     /*

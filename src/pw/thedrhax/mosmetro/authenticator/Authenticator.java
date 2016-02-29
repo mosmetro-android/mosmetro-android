@@ -7,9 +7,6 @@ import org.jsoup.select.Elements;
 import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.Logger;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 public class Authenticator {
     // Result state
     public static final int STATUS_CONNECTED = 0;
@@ -111,9 +108,6 @@ public class Authenticator {
     public int connect() {
         Document page;
         String fields, link;
-        DateFormat dateFormat = DateFormat.getDateTimeInstance();
-
-        logger.log_debug("> " + dateFormat.format(new Date()));
 
         onChangeProgress(0);
 
@@ -267,7 +261,6 @@ public class Authenticator {
 
         onChangeProgress(100);
 
-        logger.log_debug("< " + dateFormat.format(new Date()));
         return STATUS_CONNECTED;
     }
 

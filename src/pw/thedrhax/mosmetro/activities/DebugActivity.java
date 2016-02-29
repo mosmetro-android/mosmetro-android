@@ -118,7 +118,9 @@ public class DebugActivity extends Activity {
                     publishProgress(message);
                 }
             });
+            connection.getLogger().date("> ", "");
             result = connection.connect();
+            connection.getLogger().date("< ", "\n");
             return null;
         }
 

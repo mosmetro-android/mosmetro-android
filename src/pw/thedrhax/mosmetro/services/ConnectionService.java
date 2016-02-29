@@ -1,9 +1,11 @@
 package pw.thedrhax.mosmetro.services;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
@@ -118,9 +120,49 @@ public class ConnectionService extends IntentService {
         }
     }
 
+    private boolean isLocked() {
+        if (settings.getBoolean("locked", false)) return true;
+
+        logger.log_debug("< Ошибка: Соединение с сетью прервалось");
+
+        logger.log("\nВозможные причины:");
+        logger.log(" * Вы отключились от сети MosMetro_Free");
+        logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
+        logger.log(" * Точка доступа в поезде отключилась");
+
+        return false;
+    }
+
     private int connect() {
+        WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
         int result, count = 0;
 
+        logger.log_debug(">> Ожидание получения IP адреса...");
+        notify_progress
+                    .setText("Ожидание получения IP адреса...")
+                    .setContinuous()
+                    .show();
+        while (manager.getConnectionInfo().getIpAddress() == 0) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
+
+            if (!isLocked()) return Authenticator.STATUS_ERROR;
+
+            if (count++ == 60) {
+                logger.log_debug("<< Ошибка: IP адрес не получен в течение 30 секунд");
+
+                logger.log("\nВозможные причины:");
+                logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
+                logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
+
+                return Authenticator.STATUS_ERROR;
+            }
+        }
+        logger.log_debug("<< IP адрес получен в течение " + count/2 + " секунд");
+
+        count = 0;
         do {
             if (count > 0) {
                 notify_progress
@@ -139,22 +181,16 @@ public class ConnectionService extends IntentService {
 
             result = connection.connect();
 
-            if (!settings.getBoolean("locked", false)) {
-                logger.log_debug("< Ошибка: Соединение с сетью прервалось");
-
-                logger.log("\nВозможные причины:");
-                logger.log(" * Вы отключились от сети MosMetro_Free");
-                logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
-                logger.log(" * Точка доступа в поезде отключилась");
-                break;
-            }
+            if (!isLocked()) return Authenticator.STATUS_ERROR;
         } while (count++ < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
 
         return result;
     }
 	
 	public void onHandleIntent(Intent intent) {
+        logger.date("> ", "");
         int result = connect();
+        logger.date("< ", "\n");
 
         // Remove progress notification
         notify_progress.hide();
