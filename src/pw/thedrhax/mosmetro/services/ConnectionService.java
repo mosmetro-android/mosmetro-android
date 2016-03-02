@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -128,7 +130,10 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean isWifiConnected() {
-        return NETWORK_SSID.equals(manager.getConnectionInfo().getSSID());
+        WifiInfo info = manager.getConnectionInfo();
+
+        return NETWORK_SSID.equals(info.getSSID()) &&
+               info.getSupplicantState().equals(SupplicantState.COMPLETED);
     }
 
     private int connect() {
