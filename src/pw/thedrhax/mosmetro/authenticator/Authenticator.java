@@ -164,7 +164,7 @@ public class Authenticator {
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
 
-        onChangeProgress(16);
+        onChangeProgress(20);
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
@@ -194,40 +194,11 @@ public class Authenticator {
             return STATUS_ERROR;
         }
 
-        onChangeProgress(32);
-
-        logger.log_debug(">>> Получение начальной страницы");
-        try {
-            page = getPageContent(link, null);
-            logger.debug(page.outerHtml());
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug("<<< Ошибка: начальная страница не получена");
-
-            logger.log("\nВозможные причины:");
-            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return STATUS_ERROR;
-        }
-
-        try {
-            fields = parseForm(page.getElementsByTag("form").first());
-            logger.debug(fields);
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug("<<< Ошибка: форма перенаправления не найдена");
-
-            logger.log("\nВозможные причины:");
-            logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-            logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
-            return STATUS_ERROR;
-        }
-
-        onChangeProgress(48);
+        onChangeProgress(40);
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
-            page = getPageContent(link, fields);
+            page = getPageContent(link, null);
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -253,22 +224,20 @@ public class Authenticator {
             }
             fields = parseForm(forms.first());
         } catch (Exception ex) {
-            fields = null;
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
 
             logger.log("\nВозможные причины:");
             logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
             logger.log(" * Структура сети изменилась: потребуется обновление алгоритма");
+            return STATUS_ERROR;
         }
 
-        onChangeProgress(64);
+        onChangeProgress(60);
 
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            if (fields != null) {
-                page = getPageContent(link, fields);
-                logger.debug(page.outerHtml());
-            }
+            page = getPageContent(link, fields);
+            logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
