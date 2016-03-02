@@ -21,9 +21,6 @@ public class DebugActivity extends Activity {
     // Logger
     private Logger logger;
     private boolean show_debug = false;
-    
-    // Preferences
-    boolean close_when_connected = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -47,18 +44,12 @@ public class DebugActivity extends Activity {
             }
         };
 
-        // Check for external intents
+        // Check for log from ConnectionService
         try {
             // Intent from the ConnectionService
             Bundle bundle = getIntent().getExtras();
             logger.merge((Logger)bundle.getParcelable("logger"));
             return;
-        } catch (NullPointerException ignored) {}
-        
-        try {
-            // Browser intent (from Captive Portal check)
-            if (getIntent().getAction().equals(Intent.ACTION_VIEW))
-                close_when_connected = true;
         } catch (NullPointerException ignored) {}
 
         button_connect(null);
@@ -106,7 +97,6 @@ public class DebugActivity extends Activity {
 
     private class AuthTask extends AsyncTask<Void, String, Void> {
         private AuthenticatorStat connection;
-        private int result = AuthenticatorStat.STATUS_ERROR;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -119,7 +109,7 @@ public class DebugActivity extends Activity {
                 }
             });
             connection.getLogger().date("> ", "");
-            result = connection.connect();
+            connection.connect();
             connection.getLogger().date("< ", "\n");
             return null;
         }
@@ -136,8 +126,6 @@ public class DebugActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             logger.debug(connection.getLogger().getDebug());
-            if (close_when_connected && result <= AuthenticatorStat.STATUS_ALREADY_CONNECTED)
-                DebugActivity.this.finish();
         }
     }
 
