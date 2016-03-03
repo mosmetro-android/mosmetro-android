@@ -3,7 +3,10 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import pw.thedrhax.httpclient.HttpClient;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import java.io.IOException;
 
@@ -41,14 +44,16 @@ public class AuthenticatorStat extends Authenticator {
     }
 
     private void submit_info (int result) {
-        StringBuilder params = new StringBuilder();
-
-        params.append("version=").append(getVersion()).append("&");
-        params.append("automatic=").append(automatic ? "1" : "0").append("&");
-        params.append("connected=").append(result == STATUS_CONNECTED ? "1" : "0");
+        RequestBody body = new FormBody.Builder()
+                    .add("version", getVersion())
+                    .add("automatic", automatic ? "1" : "0")
+                    .add("connected", result == STATUS_CONNECTED ? "1" : "0")
+                    .build();
 
         try {
-            new HttpClient().navigate(STATISTICS_URL, params.toString());
+            new OkHttpClient().newCall(new Request.Builder()
+                    .url(STATISTICS_URL).post(body).build()
+            ).execute();
         } catch (IOException ignored) {}
     }
 }

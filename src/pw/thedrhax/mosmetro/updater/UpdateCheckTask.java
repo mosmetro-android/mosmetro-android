@@ -10,10 +10,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.mosmetro.R;
 
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
@@ -42,12 +43,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground (Void... params) {
-        HttpClient client = new HttpClient().setMaxRetries(3);
-
         // Retrieve info from server
         String content;
         try {
-            content = client.navigate(UPDATE_INFO_URL).getContent();
+            content = new OkHttpClient().newCall(new Request.Builder()
+                    .url(UPDATE_INFO_URL).get().build()
+            ).execute().body().string();
+
             if (content == null || content.isEmpty())
                 throw new Exception ("Failed to receive info from the update server");
         } catch (Exception ex) {

@@ -1,11 +1,17 @@
 package pw.thedrhax.mosmetro.authenticator;
 
+import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import pw.thedrhax.httpclient.HttpClient;
 import pw.thedrhax.util.Logger;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Authenticator {
     // Result state
@@ -20,19 +26,44 @@ public class Authenticator {
     public static final int CHECK_NOT_CONNECTED = 2;
     
 	protected Logger logger;
-    private HttpClient client;
+    private OkHttpClient client;
+    private String referer = "http://curlmyip.org";
 
     public Authenticator () {
         logger = new Logger();
-        client = new HttpClient().setIgnoreSSL(true);
+        client = new OkHttpClient.Builder()
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                })
+                .cookieJar(new CookieJar() {
+                    private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<HttpUrl, List<Cookie>>();
+
+                    @Override
+                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+                        this.cookies.put(url, cookies);
+                    }
+
+                    @Override
+                    public List<Cookie> loadForRequest(HttpUrl url) {
+                        List<Cookie> url_cookies = cookies.get(url);
+                        return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
+                    }
+                })
+                .build();
     }
 
     public int isConnected() {
-        HttpClient client = new HttpClient();
-
         String content;
         try {
-            content = client.navigate("http://vmet.ro").getContent();
+            content = client.newCall(new Request.Builder()
+                    .url("http://vmet.ro").get().build()
+            ).execute().body().string();
+
             if (content == null || content.isEmpty())
                 throw new Exception("Empty response");
         } catch (Exception ex) {
@@ -67,11 +98,24 @@ public class Authenticator {
         return link;
     }
 
-    private Document getPageContent (String link, String params) throws Exception {
+    private Document getPageContent (String link, RequestBody params) throws Exception {
         Document document;
 
         // Get and parse the page
-        String content = client.navigate(link, params).getContent();
+        Request.Builder request = new Request.Builder()
+                .url(link).addHeader("Referer", referer);
+
+        if (params == null) {
+            request = request.get();
+        } else {
+            request = request.post(params);
+        }
+
+        String content = client.newCall(request.build())
+                .execute().body().string();
+
+        referer = link;
+
         if (content == null || content.isEmpty()) {
             throw new Exception("Страница не получена");
         }
@@ -84,30 +128,21 @@ public class Authenticator {
         return document;
     }
 
-    private static String parseForm (Element form) throws Exception {
-        String request;
+    private static RequestBody parseForm (Element form) throws Exception {
         Elements inputs = form.getElementsByTag("input");
+        FormBody.Builder result = new FormBody.Builder();
+        
+        for (Element input : inputs)
+             result.add(input.attr("name"), input.attr("value"));
 
-        StringBuilder params = new StringBuilder();
-        for (Element input : inputs) {
-            if (params.length() != 0) params.append("&");
-            params.append(input.attr("name"))
-                    .append("=")
-                    .append(input.attr("value"));
-        }
-        request = params.toString();
-
-        if (request == null || request.isEmpty()) {
-            throw new Exception("Форма не найдена");
-        }
-
-        return request;
+        return result.build();
     }
 
 	// Returns 0 on success, 1 if already connected and 2 if error
     public int connect() {
         Document page;
-        String fields, link;
+        RequestBody fields;
+        String link;
 
         onChangeProgress(0);
 
@@ -128,8 +163,6 @@ public class Authenticator {
         }
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
-
-        client.setMaxRetries(3);
 
         onChangeProgress(16);
 
@@ -219,7 +252,6 @@ public class Authenticator {
                 return STATUS_NOT_REGISTERED;
             }
             fields = parseForm(forms.first());
-            logger.debug(fields);
         } catch (Exception ex) {
             fields = null;
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
