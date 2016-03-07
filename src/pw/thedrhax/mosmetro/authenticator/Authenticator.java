@@ -60,9 +60,11 @@ public class Authenticator {
     public int isConnected() {
         String content;
         try {
-            content = client.newCall(new Request.Builder()
+            ResponseBody body = client.newCall(new Request.Builder()
                     .url("http://vmet.ro").get().build()
-            ).execute().body().string();
+            ).execute().body();
+            content = body.string();
+            body.close();
 
             if (content == null || content.isEmpty())
                 throw new Exception("Empty response");
@@ -111,8 +113,10 @@ public class Authenticator {
             request = request.post(params);
         }
 
-        String content = client.newCall(request.build())
-                .execute().body().string();
+        ResponseBody body = client.newCall(request.build())
+                .execute().body();
+        String content = body.string();
+        body.close();
 
         referer = link;
 

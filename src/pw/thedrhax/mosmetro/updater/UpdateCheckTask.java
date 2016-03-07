@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -46,9 +47,11 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         // Retrieve info from server
         String content;
         try {
-            content = new OkHttpClient().newCall(new Request.Builder()
+            ResponseBody body = new OkHttpClient().newCall(new Request.Builder()
                     .url(UPDATE_INFO_URL).get().build()
-            ).execute().body().string();
+            ).execute().body();
+            content = body.string();
+            body.close();
 
             if (content == null || content.isEmpty())
                 throw new Exception ("Failed to receive info from the update server");
