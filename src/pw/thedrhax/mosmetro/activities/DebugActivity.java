@@ -105,7 +105,13 @@ public class DebugActivity extends Activity {
                 @Override
                 public void log(String message) {
                     super.log(message);
-                    publishProgress(message);
+                    publishProgress("log", message);
+                }
+
+                @Override
+                public void debug(String message) {
+                    super.debug(message);
+                    publishProgress("debug", message);
                 }
             });
             connection.getLogger().date("> ", "");
@@ -117,15 +123,11 @@ public class DebugActivity extends Activity {
         // Show log messages in the UI thread
         @Override
         protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            logger.log(values[0]);
-        }
-
-        // Extract debug log after finish
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            logger.debug(connection.getLogger().getDebug());
+            if (values[0].equals("log")) {
+                logger.log(values[1]);
+            } else {
+                logger.debug(values[1]);
+            }
         }
     }
 
