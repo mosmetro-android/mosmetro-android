@@ -110,7 +110,9 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                     .setNegativeButton(context.getString(R.string.ok), null);
         }
 
-        dialog.show();
+        try {
+            dialog.show();
+        } catch (Exception ignored) {}
     }
 
     public UpdateCheckTask setIgnore (boolean ignore) {
