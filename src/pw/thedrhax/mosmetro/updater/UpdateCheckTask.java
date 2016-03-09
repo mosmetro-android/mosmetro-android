@@ -17,6 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.httpclient.BetterDns;
 
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     private static final String UPDATE_BASE_URL = "http://thedrhax.pw/mosmetro/";
@@ -47,8 +48,8 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         // Retrieve info from server
         String content;
         try {
-            ResponseBody body = new OkHttpClient().newCall(new Request.Builder()
-                    .url(UPDATE_INFO_URL).get().build()
+            ResponseBody body = new OkHttpClient.Builder().dns(new BetterDns()).build().newCall(
+                    new Request.Builder().url(UPDATE_INFO_URL).get().build()
             ).execute().body();
             content = body.string();
             body.close();

@@ -7,6 +7,7 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import pw.thedrhax.mosmetro.httpclient.BetterDns;
 
 import java.io.IOException;
 
@@ -51,8 +52,8 @@ public class AuthenticatorStat extends Authenticator {
                     .build();
 
         try {
-            new OkHttpClient().newCall(new Request.Builder()
-                    .url(STATISTICS_URL).post(body).build()
+            new OkHttpClient.Builder().dns(new BetterDns()).build().newCall(
+                    new Request.Builder().url(STATISTICS_URL).post(body).build()
             ).execute();
         } catch (IOException ignored) {}
     }
