@@ -10,7 +10,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (settings.getBoolean("pref_autoconnect", true))
+        if (settings.getBoolean("pref_autoconnect", true) && !ConnectionService.isRunning())
             context.startService(new Intent(context, ConnectionService.class));
     }
 }

@@ -21,6 +21,7 @@ import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
     private static final String NETWORK_SSID = "\"MosMetro_Free\"";
+    private static boolean running = false;
 
     // Preferences
     private WifiManager manager;
@@ -126,16 +127,15 @@ public class ConnectionService extends IntentService {
                info.getSupplicantState().equals(SupplicantState.COMPLETED);
     }
 
-    private int connect() {
-        WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        int result, count = 0;
+    private boolean waitForIP() {
+        int count = 0;
 
         logger.log_debug(">> Ожидание получения IP адреса...");
         notify_progress
-                    .setText("Ожидание получения IP адреса...")
-                    .setContinuous()
-                    .show();
+                .setText("Ожидание получения IP адреса...")
+                .setContinuous()
+                .show();
+
         while (manager.getConnectionInfo().getIpAddress() == 0) {
             try {
                 Thread.sleep(1000);
@@ -149,7 +149,7 @@ public class ConnectionService extends IntentService {
                 logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
                 logger.log(" * Точка доступа в поезде отключилась");
 
-                return Authenticator.STATUS_ERROR;
+                return false;
             }
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
@@ -159,12 +159,17 @@ public class ConnectionService extends IntentService {
                 logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
                 logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
 
-                return Authenticator.STATUS_ERROR;
+                return false;
             }
         }
-        logger.log_debug("<< IP адрес получен в течение " + count/2 + " секунд");
 
-        count = 0;
+        logger.log_debug("<< IP адрес получен в течение " + count/2 + " секунд");
+        return true;
+    }
+
+    private int connect() {
+        int result, count = 0;
+
         do {
             if (count > 0) {
                 notify_progress
@@ -191,42 +196,64 @@ public class ConnectionService extends IntentService {
                 logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
                 logger.log(" * Точка доступа в поезде отключилась");
 
-                return Authenticator.STATUS_ERROR;
+                result = Authenticator.STATUS_ERROR; break;
             }
-        } while (count++ < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
+        } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
+
+        // Remove progress notification
+        notify_progress.hide();
 
         return result;
     }
 	
 	public void onHandleIntent(Intent intent) {
-        if (isWifiConnected()) {
-            if (!settings.getBoolean("locked", false)) {
-                logger.date("> ", "");
-                int result = connect();
-                logger.date("< ", "\n");
-                settings.edit().putBoolean("locked", true).apply();
+        // Check if Wi-Fi is connected
+        if (!isWifiConnected()) return;
 
-                // Remove progress notification
-                notify_progress.hide();
+        // Disable calls from the NetworkReceiver
+        running = true;
 
-                // Show notification only if locked (connected to Wi-Fi)
-                if (isWifiConnected()) notify(result);
-            }
-        } else {
-            // Try to reconnect the Wi-Fi network
-            if (settings.getBoolean("pref_wifi_reconnect", false) &&
-                settings.getBoolean("locked", false)) {
-                try {
-                    for (WifiConfiguration network : manager.getConfiguredNetworks()) {
-                        if (network.SSID.equals(NETWORK_SSID)) {
-                            manager.enableNetwork(network.networkId, true);
-                            manager.reconnect();
-                        }
-                    }
-                } catch (NullPointerException ignored) {}
-            }
-            settings.edit().putBoolean("locked", false).apply();
-            notification.hide();
+        // Try to connect
+        int result = Authenticator.STATUS_ERROR;
+        logger.date("> ", "");
+        if (waitForIP()) result = connect();
+        logger.date("< ", "\n");
+
+        // Notify user if still connected to Wi-Fi
+        if (isWifiConnected()) notify(result);
+
+        // Wait until Wi-Fi is disconnected
+        while (isWifiConnected()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {}
         }
+
+        notification.hide();
+
+        // Try to reconnect the Wi-Fi network
+        if (settings.getBoolean("pref_wifi_reconnect", false)) {
+            try {
+                for (WifiConfiguration network : manager.getConfiguredNetworks()) {
+                    if (network.SSID.equals(NETWORK_SSID)) {
+                        manager.enableNetwork(network.networkId, true);
+                        manager.reconnect();
+                    }
+                }
+            } catch (NullPointerException ignored) {}
+        }
+
+        running = false;
 	}
+	
+	@Override
+    public void onDestroy() {
+        running = false;
+        notification.hide();
+        notify_progress.hide();
+    }
+
+    public static boolean isRunning() {
+        return running;
+    }
 }
