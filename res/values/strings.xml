@@ -63,10 +63,6 @@
     <string name="pref_category_connection_summary">В случае проблем попробуйте увеличить значение одного из этих
         параметров
     </string>
-    <string name="pref_notify_alternative">Альтернативные иконки</string>
-    <string name="pref_notify_alternative_summary">Использовать цветные иконки уведомлений на Android 5.0+
-        (поддерживается не всегда)
-    </string>
     <string name="pref_notify_success_log">Лог успешного подключения</string>
     <string name="pref_notify_success_log_summary">Показывать лог успешного подключения при нажатии на соответствующее уведомление</string>
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
