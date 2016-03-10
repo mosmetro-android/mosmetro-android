@@ -29,6 +29,7 @@ public class ConnectionService extends IntentService {
     private int pref_retry_count;
     private int pref_retry_delay;
     private int pref_ip_wait;
+    private boolean pref_colored_icons;
 
     // Notifications
     private Notification notify_progress;
@@ -51,10 +52,13 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
         pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "0"));
+        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
 
         notify_progress = new Notification(this)
                 .setTitle("Подключение к MosMetro_Free")
-                .setIcon(R.drawable.ic_notification_connecting)
+                .setIcon(pref_colored_icons ?
+                        R.drawable.ic_notification_connecting_colored :
+                        R.drawable.ic_notification_connecting)
                 .setId(1)
                 .setCancellable(false)
                 .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14));
@@ -79,7 +83,9 @@ public class ConnectionService extends IntentService {
             case Authenticator.STATUS_ALREADY_CONNECTED:
                 notification
                         .setTitle("Успешно подключено")
-                        .setIcon(R.drawable.ic_notification_success);
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_success_colored :
+                                R.drawable.ic_notification_success);
 
                 if (settings.getBoolean("pref_notify_success_log", false)) {
                     notification
@@ -102,7 +108,9 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle("Устройство не зарегистрировано")
                         .setText("Нажмите, чтобы перейти к регистрации")
-                        .setIcon(R.drawable.ic_notification_register)
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
                         .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://vmet.ro")))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
@@ -113,7 +121,9 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle("Не удалось подключиться")
                         .setText("Нажмите, чтобы узнать подробности или попробовать снова")
-                        .setIcon(R.drawable.ic_notification_error)
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_error_colored :
+                                R.drawable.ic_notification_error)
                         .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
