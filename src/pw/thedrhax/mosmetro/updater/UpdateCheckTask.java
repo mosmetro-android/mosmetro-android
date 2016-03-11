@@ -20,6 +20,8 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.BetterDns;
 
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
+    private String UPDATE_INFO_URL;
+
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
@@ -42,7 +44,7 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground (Void... params) {
-        final String UPDATE_INFO_URL = new BaseUrlRetriever(context).getBaseUrl() + "/update.php";
+        UPDATE_INFO_URL = new BaseUrlRetriever(context).getBaseUrl() + "/update.php";
 
         // Retrieve info from server
         String content;
@@ -126,7 +128,6 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         public String message;
 
         private int version;
-        private String url;
         private boolean by_build = false; // Check by build number instead of version code
 
         public Branch (Element element) {
@@ -144,9 +145,6 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                 if (key.attr("id").equals("by_build") &&
                         key.html().equals("1"))
                     by_build = true;
-
-                if (key.attr("id").equals("url"))
-                    url = key.html();
 
                 if (key.attr("id").equals("message"))
                     message = key.html().replace("<br>", "");
@@ -189,7 +187,7 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
                     .apply();
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
+            intent.setData(Uri.parse(UPDATE_INFO_URL + "?download=" + name));
             context.startActivity(intent);
         }
     }
