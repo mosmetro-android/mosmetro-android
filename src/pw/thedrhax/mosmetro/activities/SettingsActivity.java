@@ -11,6 +11,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 
 public class SettingsActivity extends Activity {
+    private UpdateCheckTask updater;
 
     public static class SettingsFragment extends PreferenceFragment {
         @Override
@@ -42,26 +43,29 @@ public class SettingsActivity extends Activity {
         }
 
         // Check for updates on start
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true))
-            new UpdateCheckTask(this) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true)) {
+            updater = new UpdateCheckTask(this) {
                 @Override
                 public void result(boolean hasUpdate, Branch current_branch) {
                     if (hasUpdate) showDialog();
                 }
-            }.execute();
+            };
+            updater.execute();
+        }
 
         // Update checker
         Preference pref_updater_check = settings.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new UpdateCheckTask(SettingsActivity.this) {
+                updater = new UpdateCheckTask(SettingsActivity.this) {
                     @Override
                     public void result(boolean hasUpdate, final Branch current_branch) {
                         showDialog();
                     }
-                }.setIgnore(false).execute();
-                return false;
+                }.setIgnore(false);
+
+                updater.execute(); return false;
             }
         });
 
@@ -79,5 +83,11 @@ public class SettingsActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        if (updater != null && updater.getStatus() == UpdateCheckTask.Status.RUNNING) updater.cancel(true);
+        super.onStop();
     }
 }
