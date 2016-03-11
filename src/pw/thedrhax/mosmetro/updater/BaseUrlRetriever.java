@@ -23,7 +23,7 @@ public class BaseUrlRetriever {
             try {
                 String base_url = new OkHttpClient().newCall(
                         new Request.Builder().url(BASE_URL_SOURCE).get().build()
-                ).execute().body().string();
+                ).execute().body().string().trim();
 
                 settings
                         .edit()
