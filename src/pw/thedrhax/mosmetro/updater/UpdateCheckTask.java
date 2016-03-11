@@ -20,9 +20,6 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.BetterDns;
 
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
-    private static final String UPDATE_BASE_URL = "http://thedrhax.pw/mosmetro/";
-    private static final String UPDATE_INFO_URL = UPDATE_BASE_URL + "update.php";
-
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
@@ -45,6 +42,8 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground (Void... params) {
+        final String UPDATE_INFO_URL = new BaseUrlRetriever(context).getBaseUrl() + "/update.php";
+
         // Retrieve info from server
         String content;
         try {

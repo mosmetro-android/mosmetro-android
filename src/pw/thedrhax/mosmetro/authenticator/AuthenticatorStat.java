@@ -8,12 +8,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import pw.thedrhax.mosmetro.httpclient.BetterDns;
+import pw.thedrhax.mosmetro.updater.BaseUrlRetriever;
 
 import java.io.IOException;
 
 public class AuthenticatorStat extends Authenticator {
-    private static final String STATISTICS_URL = "http://thedrhax.pw/mosmetro/check.php";
-
     private Context context;
     private boolean automatic;
 
@@ -45,6 +44,8 @@ public class AuthenticatorStat extends Authenticator {
     }
 
     private void submit_info (int result) {
+        final String STATISTICS_URL = new BaseUrlRetriever(context).getBaseUrl() + "/check.php";
+
         RequestBody body = new FormBody.Builder()
                     .add("version", getVersion())
                     .add("automatic", automatic ? "1" : "0")
