@@ -233,10 +233,17 @@ public class ConnectionService extends IntentService {
         if (isWifiConnected()) notify(result);
 
         // Wait until Wi-Fi is disconnected
+        int count = 0;
         while (isWifiConnected()) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ignored) {}
+
+            // Check internet connection each 5 seconds
+            if (++count == 5*2 && connection.isConnected() != Authenticator.CHECK_CONNECTED) {
+                startService(new Intent(this, ConnectionService.class)); // Restart this service
+                break;
+            }
         }
 
         notification.hide();
