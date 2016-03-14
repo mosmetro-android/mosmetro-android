@@ -19,7 +19,7 @@ public class BaseUrlRetriever {
 
     public String getBaseUrl() {
         if (settings.getString("base_url_cache", "").isEmpty() ||
-            settings.getLong("base_url_timestamp", 0) + 60*60 < System.currentTimeMillis() / 1000) {
+            settings.getLong("base_url_timestamp", 0) + 24*60*60 < System.currentTimeMillis() / 1000L) {
             try {
                 String base_url = new OkHttpClient().newCall(
                         new Request.Builder().url(BASE_URL_SOURCE).get().build()
@@ -28,6 +28,7 @@ public class BaseUrlRetriever {
                 settings
                         .edit()
                         .putLong("base_url_timestamp", System.currentTimeMillis() / 1000L)
+                        .putString("base_url_cache", base_url)
                         .apply();
 
                 return base_url;
