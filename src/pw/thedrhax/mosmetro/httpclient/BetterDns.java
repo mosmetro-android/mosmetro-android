@@ -1,13 +1,12 @@
 package pw.thedrhax.mosmetro.httpclient;
 
+import android.content.Context;
 import okhttp3.Dns;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
@@ -18,17 +17,20 @@ import java.util.List;
  */
 
 public class BetterDns implements Dns {
+    private Context context;
+
+    public BetterDns (Context context) {
+        this.context = context;
+    }
+
     @Override
     public List<InetAddress> lookup(String s) throws UnknownHostException {
         List<InetAddress> result = new LinkedList<InetAddress>();
 
         // Retrieve DNS records from dns-api.org
-        String json = null;
-        try {
-            json = new OkHttpClient().newCall(
-                    new Request.Builder().url("https://dns-api.org/A/" + s).get().build()
-            ).execute().body().string();
-        } catch (IOException ignored) {}
+        String json = new CachedRetriever(context)
+                .setClient(new OkHttpClient()) // Override client to avoid stack overflow
+                .get("https://dns-api.org/A/" + s);
 
         // Parse JSON answer
         if (json != null) {

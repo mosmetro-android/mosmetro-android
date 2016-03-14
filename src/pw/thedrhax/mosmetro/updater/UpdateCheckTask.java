@@ -10,14 +10,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.BetterDns;
+import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 
 public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     private String UPDATE_INFO_URL;
@@ -44,16 +41,12 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground (Void... params) {
-        UPDATE_INFO_URL = new BaseUrlRetriever(context).getBaseUrl() + "/update.php";
+        UPDATE_INFO_URL = new CachedRetriever(context).get(CachedRetriever.BASE_URL_SOURCE)  + "/update.php";
 
         // Retrieve info from server
         String content;
         try {
-            ResponseBody body = new OkHttpClient.Builder().dns(new BetterDns()).build().newCall(
-                    new Request.Builder().url(UPDATE_INFO_URL).get().build()
-            ).execute().body();
-            content = body.string();
-            body.close();
+            content = new CachedRetriever(UpdateCheckTask.this.context).get(UPDATE_INFO_URL, 60*60);
 
             if (content == null || content.isEmpty())
                 throw new Exception ("Failed to receive info from the update server");

@@ -3,13 +3,9 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import pw.thedrhax.mosmetro.httpclient.BetterDns;
-import pw.thedrhax.mosmetro.updater.BaseUrlRetriever;
-
+import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import java.io.IOException;
 
 public class AuthenticatorStat extends Authenticator {
@@ -44,7 +40,7 @@ public class AuthenticatorStat extends Authenticator {
     }
 
     private void submit_info (int result) {
-        final String STATISTICS_URL = new BaseUrlRetriever(context).getBaseUrl() + "/check.php";
+        final String STATISTICS_URL = new CachedRetriever(context).get(CachedRetriever.BASE_URL_SOURCE) + "/check.php";
 
         RequestBody body = new FormBody.Builder()
                     .add("version", getVersion())
@@ -53,7 +49,7 @@ public class AuthenticatorStat extends Authenticator {
                     .build();
 
         try {
-            new OkHttpClient.Builder().dns(new BetterDns()).build().newCall(
+            new OkHttpClient.Builder().dns(new BetterDns(context)).build().newCall(
                     new Request.Builder().url(STATISTICS_URL).post(body).build()
             ).execute();
         } catch (IOException ignored) {}
