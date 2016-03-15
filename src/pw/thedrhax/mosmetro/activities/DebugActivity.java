@@ -1,7 +1,9 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,7 +13,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
@@ -96,11 +99,20 @@ public class DebugActivity extends Activity {
      */
 
     private class AuthTask extends AsyncTask<Void, String, Void> {
-        private AuthenticatorStat connection;
 
         @Override
         protected Void doInBackground(Void... params) {
-            connection = new AuthenticatorStat(DebugActivity.this, false);
+            Authenticator connection;
+
+            String SSID = ((WifiManager)DebugActivity.this
+                    .getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID();
+            if (MosMetro.SSID.equals(SSID)) {
+                connection = new MosMetro(DebugActivity.this, true);
+            } else {
+                publishProgress("log", "Вы не подключены ни к одной из поддерживаемых сетей");
+                return null;
+            }
+
             connection.setLogger(new Logger() {
                 @Override
                 public void log(String message) {
@@ -114,9 +126,11 @@ public class DebugActivity extends Activity {
                     publishProgress("debug", message);
                 }
             });
+
             connection.getLogger().date("> ", "");
-            connection.connect();
+            connection.start();
             connection.getLogger().date("< ", "\n");
+
             return null;
         }
 

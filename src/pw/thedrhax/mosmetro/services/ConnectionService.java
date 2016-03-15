@@ -15,12 +15,11 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
-import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
-    private static final String NETWORK_SSID = "\"MosMetro_Free\"";
     private static boolean running = false;
 
     // Preferences
@@ -67,14 +66,6 @@ public class ConnectionService extends IntentService {
                 .setId(0);
 
         logger = new Logger();
-        connection = new AuthenticatorStat(this, true) {
-            public void onChangeProgress(int progress) {
-                notify_progress
-                        .setProgress(progress)
-                        .show();
-            }
-        };
-        connection.setLogger(logger);
     }
 
     private void notify (int result) {
@@ -138,7 +129,11 @@ public class ConnectionService extends IntentService {
             if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
                 return false;
 
-        return NETWORK_SSID.equals(info.getSSID());
+        for (String SSID : Authenticator.SUPPORTED_NETWORKS) {
+            if (info.getSSID().equals(SSID)) return true;
+        }
+
+        return false;
     }
 
     private boolean waitForIP() {
@@ -200,7 +195,7 @@ public class ConnectionService extends IntentService {
                     .setText("Подключаюсь... (попытка " + (count+1) + " из " + pref_retry_count + ")")
                     .show();
 
-            result = connection.connect();
+            result = connection.start();
 
             if (!isWifiConnected()) {
                 logger.log_debug("< Ошибка: Соединение с сетью прервалось");
@@ -226,6 +221,20 @@ public class ConnectionService extends IntentService {
 
         // Disable calls from the NetworkReceiver
         running = true;
+
+        String SSID = manager.getConnectionInfo().getSSID();
+        if (MosMetro.SSID.equals(SSID)) {
+            connection = new MosMetro(this, true) {
+                public void onChangeProgress(int progress) {
+                    notify_progress
+                            .setProgress(progress)
+                            .show();
+                }
+            };
+        } else {
+            return;
+        }
+        connection.setLogger(logger);
 
         // Try to connect
         int result = Authenticator.STATUS_ERROR;
@@ -256,7 +265,7 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) {
             try {
                 for (WifiConfiguration network : manager.getConfiguredNetworks()) {
-                    if (network.SSID.equals(NETWORK_SSID)) {
+                    if (network.SSID.equals(SSID)) {
                         manager.enableNetwork(network.networkId, true);
                         manager.reconnect();
                     }
