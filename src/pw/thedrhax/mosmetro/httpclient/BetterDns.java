@@ -30,7 +30,7 @@ public class BetterDns implements Dns {
         // Retrieve DNS records from dns-api.org
         String json = new CachedRetriever(context)
                 .setClient(new OkHttpClient()) // Override client to avoid stack overflow
-                .get("https://dns-api.org/A/" + s);
+                .get("https://dns-api.org/A/" + s, null);
 
         // Parse JSON answer
         if (json != null) {

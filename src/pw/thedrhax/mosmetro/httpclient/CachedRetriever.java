@@ -18,13 +18,11 @@ import java.util.LinkedList;
 public class CachedRetriever {
     public static final String BASE_URL_SOURCE = "https://thedrhax.github.io/mosmetro-android/base-url";
 
-    private Context context;
     private SharedPreferences settings;
     private JSONArray cache_storage;
     private OkHttpClient client;
 
     public CachedRetriever (Context context) {
-        this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         try {
@@ -79,9 +77,9 @@ public class CachedRetriever {
                 .apply();
     }
 
-    public String get (String url, int ttl) {
+    public String get (String url, int ttl, String default_value) {
         JSONObject cached_url = findCachedUrl(url);
-        String result;
+        String result = null;
 
         // Get content from cache if it isn't expired
         if (cached_url != null) {
@@ -102,13 +100,14 @@ public class CachedRetriever {
             writeCachedUrl(url, result);
         } catch (IOException ex) {
             // Get expired cache if can't retrieve content
-            result = cached_url.get("content").toString();
+            if (cached_url != null)
+                result = cached_url.get("content").toString();
         }
 
-        return result;
+        return result != null ? result : default_value;
     }
 
-    public String get (String url) {
-        return get(url, 24*60*60);
+    public String get (String url, String default_value) {
+        return get(url, 24*60*60, default_value);
     }
 }

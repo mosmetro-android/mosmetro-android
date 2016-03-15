@@ -41,12 +41,15 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground (Void... params) {
-        UPDATE_INFO_URL = new CachedRetriever(context).get(CachedRetriever.BASE_URL_SOURCE)  + "/update.php";
+        CachedRetriever retriever = new CachedRetriever(context);
+
+        UPDATE_INFO_URL = retriever
+                .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com")  + "/update.php";
 
         // Retrieve info from server
         String content;
         try {
-            content = new CachedRetriever(UpdateCheckTask.this.context).get(UPDATE_INFO_URL, 60*60);
+            content = retriever.get(UPDATE_INFO_URL, 60*60, "");
 
             if (content == null || content.isEmpty())
                 throw new Exception ("Failed to receive info from the update server");

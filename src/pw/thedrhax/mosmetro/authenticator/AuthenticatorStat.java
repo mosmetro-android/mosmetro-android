@@ -40,7 +40,8 @@ public class AuthenticatorStat extends Authenticator {
     }
 
     private void submit_info (int result) {
-        final String STATISTICS_URL = new CachedRetriever(context).get(CachedRetriever.BASE_URL_SOURCE) + "/check.php";
+        final String STATISTICS_URL = new CachedRetriever(context)
+                .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/check.php";
 
         RequestBody body = new FormBody.Builder()
                     .add("version", getVersion())
