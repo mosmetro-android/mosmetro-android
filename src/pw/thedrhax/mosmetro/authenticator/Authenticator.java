@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
+import pw.thedrhax.mosmetro.authenticator.networks.MosGorTrans;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public abstract class Authenticator {
     public static final Class<? extends Authenticator>[] SUPPORTED_NETWORKS =
-            new Class[] {MosMetro.class, AURA.class};
+            new Class[] {MosMetro.class, AURA.class, MosGorTrans.class};
 
     // Result state
     public static final int STATUS_CONNECTED = 0;

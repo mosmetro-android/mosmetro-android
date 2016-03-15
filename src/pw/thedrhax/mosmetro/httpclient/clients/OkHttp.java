@@ -7,6 +7,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +15,6 @@ import java.util.Map;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
-
-    private String referer = "http://curlmyip.org";
 
     public OkHttp() {
         client = new OkHttpClient.Builder()
@@ -39,6 +38,19 @@ public class OkHttp extends Client {
                     public List<Cookie> loadForRequest(HttpUrl url) {
                         List<Cookie> url_cookies = cookies.get(url);
                         return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
+                    }
+                })
+                // Update referer for each request
+                .addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request().newBuilder()
+                                .addHeader("Referer", referer)
+                                .build();
+
+                        referer = request.url().toString();
+
+                        return chain.proceed(request);
                     }
                 })
                 .build();

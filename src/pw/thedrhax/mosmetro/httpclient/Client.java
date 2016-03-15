@@ -8,6 +8,7 @@ import java.util.Map;
 
 public abstract class Client {
     protected Document document;
+    protected String referer = "http://curlmyip.org";
 
     protected Client() {}
 
@@ -21,6 +22,10 @@ public abstract class Client {
     // Parse methods
     public Document getPageContent() throws Exception {
         return document;
+    }
+
+    public String getReferer() {
+        return referer;
     }
 
     public String parseLinkRedirect() throws Exception {

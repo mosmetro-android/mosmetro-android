@@ -126,6 +126,15 @@
         </Preference>
 
         <Preference
+                android:title="@string/manual_connection_mosgortrans"
+                android:summary="@string/manual_connection_mosgortrans_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+                <extra android:name="SSID" android:value="MosGorTrans_Free" />
+            </intent>
+        </Preference>
+
+        <Preference
                 android:title="@string/manual_connection_shortcut"
                 android:summary="@string/manual_connection_shortcut_summary">
             <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
