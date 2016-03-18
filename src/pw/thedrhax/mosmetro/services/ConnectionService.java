@@ -133,8 +133,12 @@ public class ConnectionService extends IntentService {
     private boolean isWifiConnected() {
         WifiInfo info = manager.getConnectionInfo();
 
-        return NETWORK_SSID.equals(info.getSSID()) &&
-               info.getSupplicantState().equals(SupplicantState.COMPLETED);
+        // Strict check by supplicant state
+        if (settings.getBoolean("pref_autoconnect_strict", false))
+            if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
+                return false;
+
+        return NETWORK_SSID.equals(info.getSSID());
     }
 
     private boolean waitForIP() {

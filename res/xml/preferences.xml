@@ -40,6 +40,12 @@
                     android:summary="@string/pref_ip_wait_summary"
                     android:defaultValue="0" />
 
+            <CheckBoxPreference
+                    android:key="pref_autoconnect_strict"
+                    android:title="@string/pref_autoconnect_strict"
+                    android:summary="@string/pref_autoconnect_strict_summary"
+                    android:defaultValue="false" />
+
         </PreferenceScreen>
 
         <PreferenceScreen

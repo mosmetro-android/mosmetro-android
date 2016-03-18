@@ -92,4 +92,8 @@
     <string name="pref_notify_success_lock_summary">Сделать уведомление об успехе неудаляемым (уведомление будет
         отображаться, пока подключена сеть Wi-Fi
     </string>
+    <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
+    <string name="pref_autoconnect_strict_summary">Включите строгую проверку, если приложение срабатывает на другие
+        сети
+    </string>
 </resources>
