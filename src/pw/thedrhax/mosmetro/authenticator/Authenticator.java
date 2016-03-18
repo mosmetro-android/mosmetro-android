@@ -58,26 +58,20 @@ public class Authenticator {
     }
 
     public int isConnected() {
-        String content;
+        Document content;
         try {
-            ResponseBody body = client.newCall(new Request.Builder()
-                    .url("http://vmet.ro").get().build()
-            ).execute().body();
-            content = body.string();
-            body.close();
-
-            if (content == null || content.isEmpty())
-                throw new Exception("Empty response");
+            content = getPageContent("http://vmet.ro", null);
         } catch (Exception ex) {
             // Server not responding => wrong network
+            logger.debug(ex);
             return CHECK_WRONG_NETWORK;
         }
 
         try {
-            Document doc = Jsoup.parse(content);
-            parseMetaRedirect(doc);
+            parseMetaRedirect(content);
         } catch (Exception ex) {
             // Redirect not found => connected
+            logger.debug(ex);
             return CHECK_CONNECTED;
         }
 
