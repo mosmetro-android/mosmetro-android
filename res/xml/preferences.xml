@@ -56,6 +56,22 @@
 
             </PreferenceCategory>
 
+            <PreferenceCategory
+                    android:title="@string/pref_category_enforta">
+
+                <EditTextPreference
+                        android:key="pref_enforta_username"
+                        android:title="@string/pref_enforta_username"
+                        android:summary="@string/pref_enforta_username_summary"
+                        android:defaultValue="" />
+
+                <EditTextPreference
+                        android:key="pref_enforta_password"
+                        android:title="@string/pref_enforta_password"
+                        android:summary="@string/pref_enforta_password_summary"
+                        android:defaultValue="" />
+            </PreferenceCategory>
+
         </PreferenceScreen>
 
         <PreferenceScreen

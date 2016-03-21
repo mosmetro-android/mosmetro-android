@@ -20,7 +20,7 @@ public abstract class Client {
     public abstract Client post(String link, Map<String,String> params) throws Exception;
 
     // Parse methods
-    public Document getPageContent() throws Exception {
+    public Document getPageContent() {
         return document;
     }
 

@@ -31,6 +31,7 @@
     <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
     <string name="pref_category_updater">Обновления</string>
     <string name="pref_category_about">О программе</string>
+    <string name="pref_category_enforta">MosGorTrans_Free Enforta</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
     <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
@@ -86,6 +87,11 @@
     <string name="pref_updater_branch_summary">
         Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
     </string>
+
+    <string name="pref_enforta_username">Логин</string>
+    <string name="pref_enforta_username_summary">Ваш номер телефона, использованный при регистрации в Enforta</string>
+    <string name="pref_enforta_password">Пароль</string>
+    <string name="pref_enforta_password_summary">Пароль, полученный по СМС при регистрации в Enforta</string>
 
     <string name="update_available">Доступно обновление</string>
     <string name="update_not_available">Нет доступных обновлений</string>
@@ -153,5 +159,4 @@
     <string name="chooser_ssid">Определение названия сети</string>
     <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
     <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
-
 </resources>
