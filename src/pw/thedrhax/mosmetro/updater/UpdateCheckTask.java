@@ -132,11 +132,15 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
             int version = 0, build = 0;
 
             for (Element key : element.getElementsByTag("key")) {
-                if (key.attr("id").equals("version"))
-                    version = Integer.parseInt(key.html());
+                try {
+                    if (key.attr("id").equals("version"))
+                        version = Integer.parseInt(key.html());
+                } catch (NumberFormatException ignored) {}
 
-                if (key.attr("id").equals("build"))
-                    build = Integer.parseInt(key.html());
+                try {
+                    if (key.attr("id").equals("build"))
+                        build = Integer.parseInt(key.html());
+                } catch (NumberFormatException ignored) {}
 
                 if (key.attr("id").equals("by_build") &&
                         key.html().equals("1"))
