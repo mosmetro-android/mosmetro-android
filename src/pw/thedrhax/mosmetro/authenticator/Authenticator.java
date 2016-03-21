@@ -84,12 +84,17 @@ public class Authenticator {
 
         for (Element element : document.getElementsByTag("meta")) {
             if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
-                link = element.attr("content").split("URL=")[1];
+                String attr = element.attr("content");
+                link = attr.substring(attr.indexOf("=") + 1);
             }
         }
 
         if (link == null || link.isEmpty())
             throw new Exception ("Перенаправление не найдено");
+
+        // Check protocol of the URL
+        if (!(link.contains("http://") || link.contains("https://")))
+            link = "http://" + link;
 
         return link;
     }
