@@ -2,6 +2,7 @@ package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
@@ -62,8 +63,22 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
-            page = getPageContent(getPage(link, null));
+            Response temp = getPage(link, null);
+            page = getPageContent(temp);
             logger.debug(page.outerHtml());
+
+            // 301 redirect may be returned
+            String redirect = null;
+            try {
+                 redirect = get300Redirect(temp);
+            } catch (Exception ignored) {}
+
+            if (redirect != null) {
+                logger.debug("Получено перенаправление: " + redirect);
+                link = redirect;
+                page = getPageContent(getPage(link, null));
+                logger.debug(page.outerHtml());
+            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
