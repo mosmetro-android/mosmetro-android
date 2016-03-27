@@ -154,22 +154,11 @@ public class ConnectionService extends IntentService {
 
             if (!isWifiConnected()) {
                 logger.log_debug("< Ошибка: Соединение с сетью прервалось");
-
-                logger.log("\nВозможные причины:");
-                logger.log(" * Вы отключились от сети MosMetro_Free");
-                logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
-                logger.log(" * Точка доступа в поезде отключилась");
-
                 return false;
             }
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
                 logger.log_debug("<< Ошибка: IP адрес не был получен в течение " + pref_ip_wait + " секунд");
-
-                logger.log("\nВозможные причины:");
-                logger.log(" * Устройство не полностью подключилось к сети: убедитесь, что статус сети \"Подключено\"");
-                logger.log(" * Сеть временно неисправна или перегружена: попробуйте снова или пересядьте в другой поезд");
-
                 return false;
             }
         }
@@ -201,12 +190,6 @@ public class ConnectionService extends IntentService {
 
             if (!isWifiConnected()) {
                 logger.log_debug("< Ошибка: Соединение с сетью прервалось");
-
-                logger.log("\nВозможные причины:");
-                logger.log(" * Вы отключились от сети MosMetro_Free");
-                logger.log(" * Поезд, с которым устанавливалось соединение, уехал");
-                logger.log(" * Точка доступа в поезде отключилась");
-
                 result = Authenticator.STATUS_ERROR; break;
             }
         } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
