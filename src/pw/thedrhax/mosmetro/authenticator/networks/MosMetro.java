@@ -114,6 +114,7 @@ public class MosMetro extends Authenticator {
         Document content;
         try {
             content = getPageContent("http://vmet.ro", null);
+            logger.debug(content.outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network
             logger.debug(ex);
