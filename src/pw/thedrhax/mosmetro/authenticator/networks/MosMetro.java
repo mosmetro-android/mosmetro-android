@@ -7,7 +7,7 @@ import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 
 public class MosMetro extends Authenticator {
-    public static String SSID = "\"MosMetro_Free\"";
+    public static final String SSID = "\"MosMetro_Free\"";
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
@@ -41,7 +41,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
-            page = getPageContent("http://vmet.ro", null);
+            page = getPageContent(getPage("http://vmet.ro", null));
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -62,7 +62,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
-            page = getPageContent(link, null);
+            page = getPageContent(getPage(link, null));
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -86,7 +86,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            page = getPageContent(link, fields);
+            page = getPageContent(getPage(link, fields));
             logger.debug(page.outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -113,7 +113,7 @@ public class MosMetro extends Authenticator {
     public int isConnected() {
         Document content;
         try {
-            content = getPageContent("http://vmet.ro", null);
+            content = getPageContent(getPage("http://vmet.ro", null));
             logger.debug(content.outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network

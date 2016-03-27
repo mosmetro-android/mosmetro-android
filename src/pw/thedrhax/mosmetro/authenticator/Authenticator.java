@@ -160,12 +160,21 @@ public abstract class Authenticator {
         return link;
     }
 
-    protected Document getPageContent (String link, RequestBody params) throws Exception {
-        Document document;
+    protected String parseLinkRedirect (Document document) throws Exception {
+        String link = document.getElementsByTag("a").first().attr("href");
 
+        if (link == null || link.isEmpty())
+            throw new Exception ("Перенаправление не найдено");
+
+        return link;
+    }
+
+    protected Response getPage (String link, RequestBody params) throws Exception {
         // Get and parse the page
         Request.Builder request = new Request.Builder()
                 .url(link).addHeader("Referer", referer);
+
+        referer = link;
 
         if (params == null) {
             request = request.get();
@@ -173,17 +182,26 @@ public abstract class Authenticator {
             request = request.post(params);
         }
 
-        ResponseBody body = client.newCall(request.build())
-                .execute().body();
-        String content = body.string();
-        body.close();
+        return client.newCall(request.build()).execute();
+    }
 
-        referer = link;
+    protected String get300Redirect (Response response) throws Exception {
+        String link = response.header("Location");
+
+        if (link == null || link.isEmpty())
+            throw new Exception ("Перенаправление не найдено");
+
+        return link;
+    }
+
+    protected Document getPageContent (Response response) throws Exception {
+        ResponseBody body = response.body();
+        String content = body.string(); body.close();
 
         if (content == null || content.isEmpty()) {
             throw new Exception("Страница не получена");
         }
-        document = Jsoup.parse(content);
+        Document document = Jsoup.parse(content);
 
         // Clean-up useless tags: <script>, <style>
         document.getElementsByTag("script").remove();
@@ -195,7 +213,7 @@ public abstract class Authenticator {
     protected RequestBody parseForm (Element form) throws Exception {
         Elements inputs = form.getElementsByTag("input");
         FormBody.Builder result = new FormBody.Builder();
-        
+
         logger.debug(">>> Парсинг формы");
         for (Element input : inputs) {
              result.add(input.attr("name"), input.attr("value"));
