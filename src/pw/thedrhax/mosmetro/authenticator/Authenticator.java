@@ -135,7 +135,7 @@ public abstract class Authenticator {
      * Response parsing
      */
 
-    protected static String parseMetaRedirect (Document document) throws Exception {
+    protected String parseMetaRedirect (Document document) throws Exception {
         String link = null;
 
         for (Element element : document.getElementsByTag("meta")) {
@@ -187,12 +187,16 @@ public abstract class Authenticator {
         return document;
     }
 
-    protected static RequestBody parseForm (Element form) throws Exception {
+    protected RequestBody parseForm (Element form) throws Exception {
         Elements inputs = form.getElementsByTag("input");
         FormBody.Builder result = new FormBody.Builder();
         
-        for (Element input : inputs)
+        logger.debug(">>> Парсинг формы");
+        for (Element input : inputs) {
              result.add(input.attr("name"), input.attr("value"));
+             logger.debug(input.attr("name") + "=" + input.attr("value"));
+        }
+        logger.debug("<<< Парсинг завершен");
 
         return result.build();
     }
