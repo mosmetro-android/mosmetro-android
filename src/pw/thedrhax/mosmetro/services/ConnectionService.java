@@ -15,7 +15,6 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
-import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
@@ -129,8 +128,11 @@ public class ConnectionService extends IntentService {
             if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
                 return false;
 
-        for (String SSID : Authenticator.SUPPORTED_NETWORKS) {
-            if (info.getSSID().equals(SSID)) return true;
+        for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
+            try {
+                if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
+                    return true;
+            } catch (Exception ignored) {}
         }
 
         return false;
@@ -222,12 +224,9 @@ public class ConnectionService extends IntentService {
         // Disable calls from the NetworkReceiver
         running = true;
 
-        String SSID = manager.getConnectionInfo().getSSID();
-        if (MosMetro.SSID.equals(SSID)) {
-            connection = new MosMetro(this, true);
-        } else {
-            return;
-        }
+        connection = Authenticator.choose(this, true);
+        if (connection == null) return;
+
         connection.setLogger(logger);
         connection.setProgressListener(new Authenticator.ProgressListener() {
             @Override
@@ -267,7 +266,7 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) {
             try {
                 for (WifiConfiguration network : manager.getConfiguredNetworks()) {
-                    if (network.SSID.equals(SSID)) {
+                    if (network.SSID.equals(connection.getSSID())) {
                         manager.enableNetwork(network.networkId, true);
                         manager.reconnect();
                     }

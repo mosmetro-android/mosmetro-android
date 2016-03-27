@@ -3,6 +3,7 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
 import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class Authenticator {
-    public static final String SSID = "";
-    public static final String[] SUPPORTED_NETWORKS = new String[] {MosMetro.SSID};
+    public static final Class<? extends Authenticator>[] SUPPORTED_NETWORKS
+            = new Class[] {MosMetro.class};
 
     // Result state
     public static final int STATUS_CONNECTED = 0;
@@ -74,6 +75,39 @@ public abstract class Authenticator {
         this.context = context;
         this.automatic = automatic;
     }
+
+    public static Authenticator choose (Context context, boolean automatic) {
+        // Get SSID from WifiManager
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        String SSID = manager.getConnectionInfo().getSSID();
+
+        // Trying to match one of Authenticators for this SSID
+        Class<? extends Authenticator> result_class = null;
+        for (Class<? extends Authenticator> network : SUPPORTED_NETWORKS) {
+            try {
+                String class_ssid = (String) network.getField("SSID").get(network);
+                if ((SSID.equals(class_ssid))) {
+                    result_class = network; break;
+                }
+            } catch (Exception ignored) {}
+        }
+        if (result_class == null) return null;
+
+        // Make instance of matched Authenticator
+        Authenticator result;
+        try {
+            result = result_class
+                    .getConstructor(Context.class, boolean.class)
+                    .newInstance(context, automatic);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        return result;
+    }
+
+    public abstract String getSSID();
 
     public int start() {
         logger.debug("Версия приложения: " + getVersion());

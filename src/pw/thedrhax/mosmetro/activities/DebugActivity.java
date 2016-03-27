@@ -1,9 +1,7 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,7 +12,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
-import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
@@ -102,18 +99,14 @@ public class DebugActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            Authenticator connection;
+            Authenticator connection = Authenticator.choose(DebugActivity.this, false);
 
-            String SSID = ((WifiManager)DebugActivity.this
-                    .getSystemService(Context.WIFI_SERVICE)).getConnectionInfo().getSSID();
-            if (MosMetro.SSID.equals(SSID)) {
-                connection = new MosMetro(DebugActivity.this, true);
-            } else {
+            if (connection == null) {
                 publishProgress("log", "Вы не подключены ни к одной из поддерживаемых сетей");
                 return null;
             }
 
-            connection.setLogger(new Logger() {
+            Logger local_logger = new Logger() {
                 @Override
                 public void log(String message) {
                     super.log(message);
@@ -125,11 +118,12 @@ public class DebugActivity extends Activity {
                     super.debug(message);
                     publishProgress("debug", message);
                 }
-            });
+            };
+            connection.setLogger(local_logger);
 
-            connection.getLogger().date("> ", "");
+            local_logger.date("> ", "");
             connection.start();
-            connection.getLogger().date("< ", "\n");
+            local_logger.date("< ", "\n");
 
             return null;
         }

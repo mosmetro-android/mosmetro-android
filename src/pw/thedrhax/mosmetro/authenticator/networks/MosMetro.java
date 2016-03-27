@@ -14,6 +14,11 @@ public class MosMetro extends Authenticator {
     }
 
     @Override
+    public String getSSID() {
+        return SSID;
+    }
+
+    @Override
     public int connect() {
         Document page;
         RequestBody fields;
