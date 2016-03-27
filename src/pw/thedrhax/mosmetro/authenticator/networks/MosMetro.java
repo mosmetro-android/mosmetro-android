@@ -4,9 +4,9 @@ import android.content.Context;
 import okhttp3.RequestBody;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import pw.thedrhax.mosmetro.authenticator.AuthenticatorStat;
+import pw.thedrhax.mosmetro.authenticator.Authenticator;
 
-public class MosMetro extends AuthenticatorStat {
+public class MosMetro extends Authenticator {
     public static String SSID = "\"MosMetro_Free\"";
 
     public MosMetro (Context context, boolean automatic) {

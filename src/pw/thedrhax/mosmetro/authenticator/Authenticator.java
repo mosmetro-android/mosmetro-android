@@ -1,15 +1,21 @@
 package pw.thedrhax.mosmetro.authenticator;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
+import pw.thedrhax.mosmetro.httpclient.BetterDns;
+import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,11 +39,16 @@ public abstract class Authenticator {
     protected OkHttpClient client;
     protected String referer = "http://curlmyip.org";
 
-    public Authenticator () {
+    // Device info
+    private Context context;
+    private boolean automatic;
+
+    public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
         client = new OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
+                .dns(new BetterDns(context))
                 .hostnameVerifier(new HostnameVerifier() {
                     @Override
                     public boolean verify(String hostname, SSLSession session) {
@@ -59,14 +70,19 @@ public abstract class Authenticator {
                     }
                 })
                 .build();
+
+        this.context = context;
+        this.automatic = automatic;
     }
 
     public int start() {
-        return connect();
-    }
+        logger.debug("Версия приложения: " + getVersion());
+        int result = connect();
 
-    public String getSSID() {
-        return SSID;
+        if (result <= STATUS_ALREADY_CONNECTED)
+            submit_info(result);
+
+        return result;
     }
 
     /*
@@ -172,5 +188,36 @@ public abstract class Authenticator {
 
     public interface ProgressListener {
         void onProgressUpdate(int progress);
+    }
+
+    /*
+     * System info
+     */
+
+    private String getVersion() {
+        PackageInfo pInfo;
+        try {
+            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName + "-" + pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException ex) {
+            return "";
+        }
+    }
+
+    private void submit_info (int result) {
+        String STATISTICS_URL = new CachedRetriever(context)
+                .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/check.php";
+
+        RequestBody body = new FormBody.Builder()
+                .add("version", getVersion())
+                .add("automatic", automatic ? "1" : "0")
+                .add("connected", result == STATUS_CONNECTED ? "1" : "0")
+                .build();
+
+        try {
+            new OkHttpClient.Builder().dns(new BetterDns(context)).build().newCall(
+                    new Request.Builder().url(STATISTICS_URL).post(body).build()
+            ).execute();
+        } catch (IOException ignored) {}
     }
 }
