@@ -28,7 +28,7 @@ public abstract class Authenticator {
     public static final int CHECK_CONNECTED = 0;
     public static final int CHECK_WRONG_NETWORK = 1;
     public static final int CHECK_NOT_CONNECTED = 2;
-    
+
 	protected Logger logger;
     protected OkHttpClient client;
     protected String referer = "http://curlmyip.org";
@@ -159,5 +159,18 @@ public abstract class Authenticator {
      * Progress reporting
      */
 
-    public void onChangeProgress (int progress) {}
+    protected ProgressListener progressListener = new ProgressListener() {
+        @Override
+        public void onProgressUpdate(int progress) {
+
+        }
+    };
+
+    public void setProgressListener (ProgressListener listener) {
+        progressListener = listener;
+    }
+
+    public interface ProgressListener {
+        void onProgressUpdate(int progress);
+    }
 }

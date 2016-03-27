@@ -224,17 +224,19 @@ public class ConnectionService extends IntentService {
 
         String SSID = manager.getConnectionInfo().getSSID();
         if (MosMetro.SSID.equals(SSID)) {
-            connection = new MosMetro(this, true) {
-                public void onChangeProgress(int progress) {
-                    notify_progress
-                            .setProgress(progress)
-                            .show();
-                }
-            };
+            connection = new MosMetro(this, true);
         } else {
             return;
         }
         connection.setLogger(logger);
+        connection.setProgressListener(new Authenticator.ProgressListener() {
+            @Override
+            public void onProgressUpdate(int progress) {
+                notify_progress
+                        .setProgress(progress)
+                        .show();
+            }
+        });
 
         // Try to connect
         int result = Authenticator.STATUS_ERROR;

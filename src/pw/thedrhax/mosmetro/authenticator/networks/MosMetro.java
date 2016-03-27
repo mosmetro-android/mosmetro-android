@@ -19,7 +19,7 @@ public class MosMetro extends AuthenticatorStat {
         RequestBody fields;
         String link;
 
-        onChangeProgress(0);
+        progressListener.onProgressUpdate(0);
 
         logger.log_debug("Подключение к сети " + SSID);
         logger.log_debug(">> Проверка доступа в интернет");
@@ -40,7 +40,7 @@ public class MosMetro extends AuthenticatorStat {
 
         logger.log_debug("<< Все проверки пройдены\n>> Подключаюсь...");
 
-        onChangeProgress(20);
+        progressListener.onProgressUpdate(20);
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
@@ -70,7 +70,7 @@ public class MosMetro extends AuthenticatorStat {
             return STATUS_ERROR;
         }
 
-        onChangeProgress(40);
+        progressListener.onProgressUpdate(40);
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
@@ -108,7 +108,7 @@ public class MosMetro extends AuthenticatorStat {
             return STATUS_ERROR;
         }
 
-        onChangeProgress(60);
+        progressListener.onProgressUpdate(60);
 
         logger.log_debug(">>> Отправка формы авторизации");
         try {
@@ -124,7 +124,7 @@ public class MosMetro extends AuthenticatorStat {
             return STATUS_ERROR;
         }
 
-        onChangeProgress(80);
+        progressListener.onProgressUpdate(80);
 
         logger.log_debug(">> Проверка доступа в интернет");
         if (isConnected() == CHECK_CONNECTED) {
@@ -138,7 +138,7 @@ public class MosMetro extends AuthenticatorStat {
             return STATUS_ERROR;
         }
 
-        onChangeProgress(100);
+        progressListener.onProgressUpdate(100);
 
         return STATUS_CONNECTED;
     }
