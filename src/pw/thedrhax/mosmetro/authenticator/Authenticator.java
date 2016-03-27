@@ -255,6 +255,7 @@ public abstract class Authenticator {
                 .add("version", getVersion())
                 .add("automatic", automatic ? "1" : "0")
                 .add("connected", result == STATUS_CONNECTED ? "1" : "0")
+                .add("ssid", getSSID().replace("\"", ""))
                 .build();
 
         try {
