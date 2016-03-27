@@ -22,6 +22,9 @@ public class DebugActivity extends Activity {
     private Logger logger;
     private boolean show_debug = false;
 
+    // Settings
+    private String SSID = null;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,14 @@ public class DebugActivity extends Activity {
             Bundle bundle = getIntent().getExtras();
             logger.merge((Logger)bundle.getParcelable("logger"));
             return;
+        } catch (NullPointerException ignored) {}
+
+        try {
+            // Intent from the SettingsActivity
+            String SSID = getIntent().getStringExtra("SSID");
+
+            if (SSID != null && !SSID.isEmpty())
+                this.SSID = "\"" + SSID + "\"";
         } catch (NullPointerException ignored) {}
 
         button_connect(null);
@@ -95,15 +106,20 @@ public class DebugActivity extends Activity {
      * Run manual connection in background thread
      */
 
-    private class AuthTask extends AsyncTask<Void, String, Void> {
+    private class AuthTask extends AsyncTask<String, String, Void> {
 
         @Override
-        protected Void doInBackground(Void... params) {
-            Authenticator connection = Authenticator.choose(DebugActivity.this, false);
+        protected Void doInBackground(String... params) {
+            Authenticator connection;
+            if (params[0] == null) {
+                connection = Authenticator.choose(DebugActivity.this, false);
 
-            if (connection == null) {
-                publishProgress("log", "Вы не подключены ни к одной из поддерживаемых сетей");
-                return null;
+                if (connection == null) {
+                    publishProgress("log", "Вы не подключены ни к одной из поддерживаемых сетей");
+                    return null;
+                }
+            } else {
+                connection = Authenticator.choose(DebugActivity.this, false, params[0]);
             }
 
             Logger local_logger = new Logger() {
@@ -148,7 +164,7 @@ public class DebugActivity extends Activity {
             task = new AuthTask();
 
         if (task.getStatus() != AsyncTask.Status.RUNNING)
-            task.execute();
+            task.execute(SSID);
     }
 
     // Handle debug log checkbox

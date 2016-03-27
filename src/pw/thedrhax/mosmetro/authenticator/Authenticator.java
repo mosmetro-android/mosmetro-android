@@ -9,8 +9,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
+import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.mosmetro.httpclient.BetterDns;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
@@ -77,11 +77,7 @@ public abstract class Authenticator {
         this.automatic = automatic;
     }
 
-    public static Authenticator choose (Context context, boolean automatic) {
-        // Get SSID from WifiManager
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String SSID = manager.getConnectionInfo().getSSID();
-
+    public static Authenticator choose (Context context, boolean automatic, String SSID) {
         // Trying to match one of Authenticators for this SSID
         Class<? extends Authenticator> result_class = null;
         for (Class<? extends Authenticator> network : SUPPORTED_NETWORKS) {
@@ -106,6 +102,14 @@ public abstract class Authenticator {
         }
 
         return result;
+    }
+
+    public static Authenticator choose (Context context, boolean automatic) {
+        // Get SSID from WifiManager
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        String SSID = manager.getConnectionInfo().getSSID();
+
+        return choose(context, automatic, SSID);
     }
 
     public abstract String getSSID();

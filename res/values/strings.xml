@@ -47,10 +47,7 @@
     <string name="pref_ip_wait_summary">Количество секунд, в течение которых приложение ожидает получение IP адреса. Если установлен 0, то приложение будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию: 0)</string>
     <string name="share_fail">Интернет недоступен</string>
     <string name="share_fail_info">Убедитесь, что вы подключены к интернету, чтобы отправить отчет</string>
-    <string name="debug">Отладка</string>
     <string name="manual_connection">Ручное подключение</string>
-    <string name="manual_connection_summary">Воспользуйтесь ручным подключением, если автоматическое не сработало
-    </string>
     <string name="show_debug_log">Показать подробные сообщения</string>
     <string name="shortcut_connect">Подключиться</string>
     <string name="github_repo">Репозиторий GitHub</string>
@@ -96,4 +93,8 @@
     <string name="pref_autoconnect_strict_summary">Включите строгую проверку, если приложение срабатывает на другие
         сети
     </string>
+    <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
+    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям московского метрополитена</string>
+    <string name="manual_connection_default">По умолчанию</string>
+    <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
 </resources>

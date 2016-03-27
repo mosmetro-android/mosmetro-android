@@ -96,14 +96,23 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/debug">
+        android:title="@string/manual_connection">
 
-        <PreferenceScreen
-                android:title="@string/manual_connection"
-                android:summary="@string/manual_connection_summary">
+        <Preference
+                android:title="@string/manual_connection_default"
+                android:summary="@string/manual_connection_default_summary">
 
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity" />
-        </PreferenceScreen>
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
+        </Preference>
+
+        <Preference
+                android:title="@string/manual_connection_mosmetro"
+                android:summary="@string/manual_connection_mosmetro_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+                <extra android:name="SSID" android:value="MosMetro_Free" />
+            </intent>
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
