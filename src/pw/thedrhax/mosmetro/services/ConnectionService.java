@@ -128,11 +128,16 @@ public class ConnectionService extends IntentService {
             if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
                 return false;
 
-        for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
-            try {
-                if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
-                    return true;
-            } catch (Exception ignored) {}
+        if (connection == null) {
+            for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
+                try {
+                    if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
+                        return true;
+                } catch (Exception ignored) {}
+            }
+        } else {
+            if (info.getSSID().equals(connection.getSSID()))
+                return true;
         }
 
         return false;
