@@ -36,7 +36,6 @@ public class ConnectionService extends IntentService {
     // Authenticator
     private Logger logger;
     private Authenticator connection;
-    private String SSID = null;
 
     public ConnectionService () {
 		super("ConnectionService");
@@ -129,16 +128,11 @@ public class ConnectionService extends IntentService {
             if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
                 return false;
 
-        if (SSID != null && SSID.equals(info.getSSID())) {
-            return true;
-        } else {
-            for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
-                try {
-                    if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
-                        return true;
-                } catch (Exception ignored) {
-                }
-            }
+        for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
+            try {
+                if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
+                    return true;
+            } catch (Exception ignored) {}
         }
 
         return false;
@@ -214,11 +208,7 @@ public class ConnectionService extends IntentService {
         running = true;
 
         connection = Authenticator.choose(this, true);
-        if (connection == null) {
-            return;
-        } else {
-            SSID = connection.getSSID();
-        }
+        if (connection == null) return;
 
         connection.setLogger(logger);
         connection.setProgressListener(new Authenticator.ProgressListener() {
