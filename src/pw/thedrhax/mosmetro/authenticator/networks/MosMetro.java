@@ -1,11 +1,14 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
+
+import java.net.ProtocolException;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "\"MosMetro_Free\"";
@@ -66,19 +69,6 @@ public class MosMetro extends Authenticator {
             Response temp = getPage(link, null);
             page = getPageContent(temp);
             logger.debug(page.outerHtml());
-
-            // 301 redirect may be returned
-            String redirect = null;
-            try {
-                 redirect = get300Redirect(temp);
-            } catch (Exception ignored) {}
-
-            if (redirect != null) {
-                logger.debug("Получено перенаправление: " + redirect);
-                link = redirect;
-                page = getPageContent(getPage(link, null));
-                logger.debug(page.outerHtml());
-            }
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
@@ -103,6 +93,7 @@ public class MosMetro extends Authenticator {
         try {
             page = getPageContent(getPage(link, fields));
             logger.debug(page.outerHtml());
+        } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
@@ -128,7 +119,17 @@ public class MosMetro extends Authenticator {
     public int isConnected() {
         Document content;
         try {
-            content = getPageContent(getPage("http://vmet.ro", null));
+            Response response = client.newBuilder()
+                    .followSslRedirects(false)
+                    .followRedirects(false)
+                    .build()
+                    .newCall(new Request.Builder()
+                            .get()
+                            .url("http://vmet.ro")
+                            .build()
+                    )
+                    .execute();
+            content = getPageContent(response);
             logger.debug(content.outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network

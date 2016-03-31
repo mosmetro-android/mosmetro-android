@@ -48,9 +48,6 @@ public abstract class Authenticator {
     public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
         client = new OkHttpClient.Builder()
-                .followRedirects(false)
-                .followSslRedirects(false)
-                .dns(new BetterDns(context))
                 .hostnameVerifier(new HostnameVerifier() {
                     @Override
                     public boolean verify(String hostname, SSLSession session) {
@@ -183,15 +180,6 @@ public abstract class Authenticator {
         }
 
         return client.newCall(request.build()).execute();
-    }
-
-    protected String get300Redirect (Response response) throws Exception {
-        String link = response.header("Location");
-
-        if (link == null || link.isEmpty())
-            throw new Exception ("Перенаправление не найдено");
-
-        return link;
     }
 
     protected Document getPageContent (Response response) throws Exception {
