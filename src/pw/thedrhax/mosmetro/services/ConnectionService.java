@@ -53,7 +53,6 @@ public class ConnectionService extends IntentService {
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
 
         notify_progress = new Notification(this)
-                .setTitle("Подключение к MosMetro_Free")
                 .setIcon(pref_colored_icons ?
                         R.drawable.ic_notification_connecting_colored :
                         R.drawable.ic_notification_connecting)
@@ -224,6 +223,8 @@ public class ConnectionService extends IntentService {
                         .show();
             }
         });
+
+        notify_progress.setTitle("Подключение к " + connection.getSSID());
 
         // Try to connect
         int result = Authenticator.STATUS_ERROR;
