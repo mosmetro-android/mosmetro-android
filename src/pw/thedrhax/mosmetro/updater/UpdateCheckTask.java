@@ -43,8 +43,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     protected Void doInBackground (Void... params) {
         CachedRetriever retriever = new CachedRetriever(context);
 
-        UPDATE_INFO_URL = retriever
-                .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com")  + "/update.php";
+        try {
+            UPDATE_INFO_URL = retriever
+                    .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/update.php";
+        } catch (NullPointerException ex) {
+            update_failed = true;
+            return null;
+        }
 
         // Retrieve info from server
         String content;
