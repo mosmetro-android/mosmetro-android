@@ -3,15 +3,12 @@ package pw.thedrhax.mosmetro.httpclient;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -20,7 +17,7 @@ public class CachedRetriever {
 
     private SharedPreferences settings;
     private JSONArray cache_storage;
-    private OkHttpClient client;
+    private Client client;
 
     public CachedRetriever (Context context) {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -31,10 +28,10 @@ public class CachedRetriever {
             cache_storage = new JSONArray();
         }
 
-        client = new OkHttpClient.Builder().dns(new BetterDns(context)).build();
+        client = new OkHttp();
     }
 
-    public CachedRetriever setClient (OkHttpClient client) {
+    public CachedRetriever setClient (Client client) {
         this.client = client; return this;
     }
 
@@ -90,15 +87,11 @@ public class CachedRetriever {
 
         // Try to retrieve content from server
         try {
-            ResponseBody body = client.newCall(
-                    new Request.Builder().url(url).get().build()
-            ).execute().body();
-            result = body.string().trim();
-            body.close();
+            client.get(url, null);
 
             // Write new content to cache
-            writeCachedUrl(url, result);
-        } catch (IOException ex) {
+            writeCachedUrl(url, client.getPageContent().outerHtml().trim());
+        } catch (Exception ex) {
             // Get expired cache if can't retrieve content
             if (cached_url != null)
                 result = cached_url.get("content").toString();

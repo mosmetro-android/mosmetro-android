@@ -1,14 +1,13 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 
 import java.net.ProtocolException;
+import java.util.Map;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "\"MosMetro_Free\"";
@@ -24,9 +23,8 @@ public class MosMetro extends Authenticator {
 
     @Override
     public int connect() {
-        Document page;
-        RequestBody fields;
         String link;
+        Map<String,String> fields;
 
         progressListener.onProgressUpdate(0);
 
@@ -45,8 +43,8 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
-            page = getPageContent(getPage("http://vmet.ro", null));
-            logger.debug(page.outerHtml());
+            client.get("http://vmet.ro", null);
+            logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: перенаправление не получено");
@@ -54,7 +52,7 @@ public class MosMetro extends Authenticator {
         }
 
         try {
-            link = parseMetaRedirect(page);
+            link = client.parseMetaRedirect();
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
@@ -66,9 +64,8 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение страницы авторизации");
         try {
-            Response temp = getPage(link, null);
-            page = getPageContent(temp);
-            logger.debug(page.outerHtml());
+            client.get(link, null);
+            logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug("<<< Ошибка: страница авторизации не получена");
@@ -76,12 +73,12 @@ public class MosMetro extends Authenticator {
         }
 
         try {
-            Elements forms = page.getElementsByTag("form");
+            Elements forms = client.getPageContent().getElementsByTag("form");
             if (forms.size() > 1 && forms.last().attr("id").equals("sms-form")) {
                 logger.log_debug("<<< Ошибка: устройство не зарегистрировано в сети");
                 return STATUS_NOT_REGISTERED;
             }
-            fields = parseForm(forms.first());
+            fields = Client.parseForm(forms.first());
         } catch (Exception ex) {
             logger.log_debug("<<< Ошибка: форма авторизации не найдена");
             return STATUS_ERROR;
@@ -91,8 +88,8 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Отправка формы авторизации");
         try {
-            page = getPageContent(getPage(link, fields));
-            logger.debug(page.outerHtml());
+            client.post(link, fields);
+            logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
             logger.debug(ex);
@@ -117,20 +114,13 @@ public class MosMetro extends Authenticator {
     
     @Override
     public int isConnected() {
-        Document content;
+        Client client;
         try {
-            Response response = client.newBuilder()
-                    .followSslRedirects(false)
+            client = new OkHttp()
                     .followRedirects(false)
-                    .build()
-                    .newCall(new Request.Builder()
-                            .get()
-                            .url("http://vmet.ro")
-                            .build()
-                    )
-                    .execute();
-            content = getPageContent(response);
-            logger.debug(content.outerHtml());
+                    .get("http://vmet.ro", null);
+
+            logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network
             logger.debug(ex);
@@ -138,7 +128,7 @@ public class MosMetro extends Authenticator {
         }
 
         try {
-            parseMetaRedirect(content);
+            client.parseMetaRedirect();
         } catch (Exception ex) {
             // Redirect not found => connected
             logger.debug(ex);

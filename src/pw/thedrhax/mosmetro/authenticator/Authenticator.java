@@ -4,23 +4,15 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
-import okhttp3.*;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
-import pw.thedrhax.mosmetro.httpclient.BetterDns;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
+import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 public abstract class Authenticator {
     public static final Class<? extends Authenticator>[] SUPPORTED_NETWORKS =
@@ -38,8 +30,7 @@ public abstract class Authenticator {
     public static final int CHECK_NOT_CONNECTED = 2;
 
 	protected Logger logger;
-    protected OkHttpClient client;
-    protected String referer = "http://curlmyip.org";
+    protected Client client;
 
     // Device info
     private Context context;
@@ -47,28 +38,7 @@ public abstract class Authenticator {
 
     public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
-        client = new OkHttpClient.Builder()
-                .hostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                })
-                .cookieJar(new CookieJar() {
-                    private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<HttpUrl, List<Cookie>>();
-
-                    @Override
-                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                        this.cookies.put(url, cookies);
-                    }
-
-                    @Override
-                    public List<Cookie> loadForRequest(HttpUrl url) {
-                        List<Cookie> url_cookies = cookies.get(url);
-                        return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
-                    }
-                })
-                .build();
+        client = new OkHttp();
 
         this.context = context;
         this.automatic = automatic;
@@ -129,89 +99,6 @@ public abstract class Authenticator {
         this.logger = logger;
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
-
-    /*
-     * Response parsing
-     */
-
-    protected String parseMetaRedirect (Document document) throws Exception {
-        String link = null;
-
-        for (Element element : document.getElementsByTag("meta")) {
-            if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
-                String attr = element.attr("content");
-                link = attr.substring(attr.indexOf("=") + 1);
-            }
-        }
-
-        if (link == null || link.isEmpty())
-            throw new Exception ("Перенаправление не найдено");
-
-        // Check protocol of the URL
-        if (!(link.contains("http://") || link.contains("https://")))
-            link = "http://" + link;
-
-        return link;
-    }
-
-    protected String parseLinkRedirect (Document document) throws Exception {
-        String link = document.getElementsByTag("a").first().attr("href");
-
-        if (link == null || link.isEmpty())
-            throw new Exception ("Перенаправление не найдено");
-
-        return link;
-    }
-
-    protected Response getPage (String link, RequestBody params) throws Exception {
-        // Get and parse the page
-        Request.Builder request = new Request.Builder()
-                .url(link).addHeader("Referer", referer);
-
-        referer = link;
-
-        if (params == null) {
-            request = request.get();
-        } else {
-            request = request.post(params);
-        }
-
-        return client.newCall(request.build()).execute();
-    }
-
-    protected Document getPageContent (Response response) throws Exception {
-        ResponseBody body = response.body();
-        String content = body.string(); body.close();
-
-        if (content == null || content.isEmpty()) {
-            throw new Exception("Страница не получена");
-        }
-        Document document = Jsoup.parse(content);
-
-        // Clean-up useless tags: <script>, <style>
-        document.getElementsByTag("script").remove();
-        document.getElementsByTag("style").remove();
-
-        return document;
-    }
-
-    protected RequestBody parseForm (Element form) throws Exception {
-        Elements inputs = form.getElementsByTag("input");
-        FormBody.Builder result = new FormBody.Builder();
-
-        logger.debug(">>> Парсинг формы");
-        for (Element input : inputs) {
-             result.add(input.attr("name"), input.attr("value"));
-             logger.debug(input.attr("name") + "=" + input.attr("value"));
-        }
-        logger.debug("<<< Парсинг завершен");
-
-        return result.build();
-    }
-
     /*
      * Connection sequence
      */
@@ -257,17 +144,14 @@ public abstract class Authenticator {
         String STATISTICS_URL = new CachedRetriever(context)
                 .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/check.php";
 
-        RequestBody body = new FormBody.Builder()
-                .add("version", getVersion())
-                .add("automatic", automatic ? "1" : "0")
-                .add("connected", result == STATUS_CONNECTED ? "1" : "0")
-                .add("ssid", getSSID().replace("\"", ""))
-                .build();
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("version", getVersion());
+        params.put("automatic", automatic ? "1" : "0");
+        params.put("connected", result == STATUS_CONNECTED ? "1" : "0");
+        params.put("ssid", getSSID().replace("\"", ""));
 
         try {
-            new OkHttpClient.Builder().dns(new BetterDns(context)).build().newCall(
-                    new Request.Builder().url(STATISTICS_URL).post(body).build()
-            ).execute();
-        } catch (IOException ignored) {}
+            new OkHttp().post(STATISTICS_URL, params);
+        } catch (Exception ignored) {}
     }
 }
