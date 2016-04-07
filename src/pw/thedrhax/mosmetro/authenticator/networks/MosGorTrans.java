@@ -9,7 +9,7 @@ import org.mozilla.javascript.Scriptable;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.httpclient.clients.JsoupClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +26,7 @@ public class MosGorTrans extends Authenticator {
 
     public MosGorTrans (Context context, boolean automatic) {
         super(context, automatic);
+        client = new JsoupClient();
     }
 
     @Override
@@ -470,7 +471,7 @@ public class MosGorTrans extends Authenticator {
 
     @Override
     public int isConnected() {
-        Client client = new OkHttp().followRedirects(false);
+        Client client = new JsoupClient().followRedirects(false);
         try {
             client.get("http://mosgortrans.ru", null);
             logger.debug(client.getPageContent().outerHtml());
