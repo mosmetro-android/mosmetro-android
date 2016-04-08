@@ -107,22 +107,10 @@ public class DebugActivity extends Activity {
      */
 
     private class AuthTask extends AsyncTask<String, String, Void> {
+        private Logger local_logger;
 
-        @Override
-        protected Void doInBackground(String... params) {
-            Authenticator connection;
-            if (params[0] == null) {
-                connection = Authenticator.choose(DebugActivity.this, false);
-
-                if (connection == null) {
-                    publishProgress("log", "Вы не подключены ни к одной из поддерживаемых сетей");
-                    return null;
-                }
-            } else {
-                connection = Authenticator.choose(DebugActivity.this, false, params[0]);
-            }
-
-            Logger local_logger = new Logger() {
+        public AuthTask() {
+            local_logger = new Logger() {
                 @Override
                 public void log(String message) {
                     super.log(message);
@@ -135,10 +123,28 @@ public class DebugActivity extends Activity {
                     publishProgress("debug", message);
                 }
             };
-            connection.setLogger(local_logger);
+        }
 
+        @Override
+        protected Void doInBackground(String... params) {
             local_logger.date("> ", "");
+
+            Authenticator connection;
+            if (params[0] == null) {
+                local_logger.log_debug(">> Определение названия сети");
+                connection = Authenticator.choose(DebugActivity.this, false);
+
+                if (connection == null) {
+                    local_logger.log_debug("<< Ошибка: Вы не подключены ни к одной из поддерживаемых сетей");
+                    return null;
+                }
+            } else {
+                connection = Authenticator.choose(DebugActivity.this, false, params[0]);
+            }
+
+            connection.setLogger(local_logger);
             connection.start();
+
             local_logger.date("< ", "\n");
 
             return null;

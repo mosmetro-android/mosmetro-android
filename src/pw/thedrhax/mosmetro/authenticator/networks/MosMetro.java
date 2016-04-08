@@ -36,6 +36,8 @@ public class MosMetro extends Authenticator {
             return STATUS_ALREADY_CONNECTED;
         } else if (connected == CHECK_WRONG_NETWORK) {
             logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
+
+            logger.log("\nПопробуйте перезапустить (выключить и включить) Wi-Fi в настройках устройства.");
             return STATUS_ERROR;
         }
 
@@ -76,6 +78,13 @@ public class MosMetro extends Authenticator {
             Elements forms = client.getPageContent().getElementsByTag("form");
             if (forms.size() > 1 && forms.last().attr("id").equals("sms-form")) {
                 logger.log_debug("<<< Ошибка: устройство не зарегистрировано в сети");
+
+                logger.log("\nПожалуйста, зайдите на сайт http://wi-fi.ru и пройдите регистрацию, " +
+                        "введя свой номер телефона в появившуюся форму для получения СМС с дальнейшими инструкциями. " +
+                        "Это необходимо сделать только один раз, после чего приложение начнет нормально работать.");
+
+                logger.log("\nПримечание: Разработчик этого приложения не имеет никакого отношения к регистрации. " +
+                        "Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).");
                 return STATUS_NOT_REGISTERED;
             }
             fields = Client.parseForm(forms.first());
