@@ -50,6 +50,7 @@ public class SettingsActivity extends Activity {
                     if (hasUpdate) showDialog();
                 }
             };
+
             updater.execute();
         }
 
@@ -79,7 +80,17 @@ public class SettingsActivity extends Activity {
                         .edit()
                         .putInt("pref_updater_build", 0)
                         .putInt("pref_updater_ignore", 0)
+                        .putString("pref_updater_branch", (String)newValue)
                         .apply();
+
+                updater = new UpdateCheckTask(SettingsActivity.this) {
+                    @Override
+                    public void result(boolean hasUpdate, Branch current_branch) {
+                        if (hasUpdate) showDialog();
+                    }
+                };
+
+                updater.execute();
                 return true;
             }
         });
