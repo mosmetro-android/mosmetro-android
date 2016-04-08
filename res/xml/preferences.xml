@@ -3,48 +3,52 @@
     <PreferenceCategory
         android:title="@string/pref_category_main">
 
-        <CheckBoxPreference
-                android:key="pref_autoconnect"
-                android:title="@string/pref_autoconnect"
-                android:summary="@string/pref_autoconnect_summary"
-                android:defaultValue="true" />
-
-        <CheckBoxPreference
-                android:key="pref_wifi_reconnect"
-                android:title="@string/pref_wifi_reconnect"
-                android:summary="@string/pref_wifi_reconnect_summary"
-                android:defaultValue="false" />
-
         <PreferenceScreen
             android:title="@string/pref_category_connection"
             android:summary="@string/pref_category_connection_summary">
 
-            <EditTextPreference
-                    android:key="pref_retry_count"
-                    android:inputType="number"
-                    android:title="@string/pref_retry_count"
-                    android:summary="@string/pref_retry_count_summary"
-                    android:defaultValue="3" />
-
-            <EditTextPreference
-                    android:key="pref_retry_delay"
-                    android:inputType="number"
-                    android:title="@string/pref_retry_delay"
-                    android:summary="@string/pref_retry_delay_summary"
-                    android:defaultValue="5" />
-                    
-            <EditTextPreference
-                    android:key="pref_ip_wait"
-                    android:inputType="number"
-                    android:title="@string/pref_ip_wait"
-                    android:summary="@string/pref_ip_wait_summary"
-                    android:defaultValue="0" />
+            <CheckBoxPreference
+                    android:key="pref_autoconnect"
+                    android:title="@string/pref_autoconnect"
+                    android:summary="@string/pref_autoconnect_summary"
+                    android:defaultValue="true" />
 
             <CheckBoxPreference
-                    android:key="pref_autoconnect_strict"
-                    android:title="@string/pref_autoconnect_strict"
-                    android:summary="@string/pref_autoconnect_strict_summary"
+                    android:key="pref_wifi_reconnect"
+                    android:title="@string/pref_wifi_reconnect"
+                    android:summary="@string/pref_wifi_reconnect_summary"
                     android:defaultValue="false" />
+
+            <PreferenceCategory android:title="Параметры подключения">
+
+                <EditTextPreference
+                        android:key="pref_retry_count"
+                        android:inputType="number"
+                        android:title="@string/pref_retry_count"
+                        android:summary="@string/pref_retry_count_summary"
+                        android:defaultValue="3" />
+
+                <EditTextPreference
+                        android:key="pref_retry_delay"
+                        android:inputType="number"
+                        android:title="@string/pref_retry_delay"
+                        android:summary="@string/pref_retry_delay_summary"
+                        android:defaultValue="5" />
+
+                <EditTextPreference
+                        android:key="pref_ip_wait"
+                        android:inputType="number"
+                        android:title="@string/pref_ip_wait"
+                        android:summary="@string/pref_ip_wait_summary"
+                        android:defaultValue="0" />
+
+                <CheckBoxPreference
+                        android:key="pref_autoconnect_strict"
+                        android:title="@string/pref_autoconnect_strict"
+                        android:summary="@string/pref_autoconnect_strict_summary"
+                        android:defaultValue="false" />
+
+            </PreferenceCategory>
 
         </PreferenceScreen>
 

@@ -27,13 +27,10 @@
     <string name="developer">Разработчик</string>
     <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Сайт разработчика</string>
-    <string name="developer_site_link">http://thedrhax.pw</string>
+    <string name="developer_site_link">https://thedrhax.pw</string>
     <string name="about">О программе</string>
     <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
-    <string name="pref_notify_fail_summary">
-        Уведомлять при возникновении ошибки
-        \n\nВы можете нажать на это уведомление и увидеть/отправить лог подключения
-    </string>
+    <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
     <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_notifications">Уведомления</string>
@@ -44,7 +41,10 @@
     <string name="pref_retry_count">Количество попыток</string>
     <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 3)</string>
     <string name="pref_ip_wait">Ожидание IP адреса</string>
-    <string name="pref_ip_wait_summary">Количество секунд, в течение которых приложение ожидает получение IP адреса. Если установлен 0, то приложение будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию: 0)</string>
+    <string name="pref_ip_wait_summary">Количество секунд, в течение которых приложение ожидает получение IP адреса.
+        Если установлен 0, то приложение будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию:
+        0)
+    </string>
     <string name="share_fail">Интернет недоступен</string>
     <string name="share_fail_info">Убедитесь, что вы подключены к интернету, чтобы отправить отчет</string>
     <string name="manual_connection">Ручное подключение</string>
@@ -56,18 +56,18 @@
     <string name="vkontakte">Сообщество ВКонтакте</string>
     <string name="vkontakte_summary">vk.com/wifi_v_metro</string>
     <string name="vkontakte_link">https://vk.com/wifi_v_metro</string>
-    <string name="pref_category_connection">Параметры подключения</string>
-    <string name="pref_category_connection_summary">В случае проблем попробуйте увеличить значение одного из этих
-        параметров
-    </string>
+    <string name="pref_category_connection">Настройки подключения</string>
+    <string name="pref_category_connection_summary">Основные настройки автоматического фонового подключения</string>
     <string name="pref_notify_alternative">Альтернативные иконки</string>
     <string name="pref_notify_alternative_summary">Использовать цветные иконки уведомлений на Android 5.0+
         (поддерживается не всегда)
     </string>
     <string name="pref_notify_success_log">Лог успешного подключения</string>
-    <string name="pref_notify_success_log_summary">Показывать лог успешного подключения при нажатии на соответствующее уведомление</string>
+    <string name="pref_notify_success_log_summary">Показывать лог успешного подключения при нажатии на соответствующее
+        уведомление
+    </string>
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
-    <string name="pref_wifi_reconnect_summary">Пытаться восстановить соединение с сетью MosMetro_Free автоматически при
+    <string name="pref_wifi_reconnect_summary">Пытаться восстановить соединение с сетью Wi-Fi автоматически при
         потере сигнала или сбросе соединения
     </string>
     <string name="pref_updater_check">Проверить наличие обновлений</string>
@@ -79,7 +79,7 @@
         проблем с Google Play
     </string>
     <string name="install">Установить</string>
-    <string name="pref_updater_branch">Ветки обновлений</string>
+    <string name="pref_updater_branch">Ветка обновления</string>
     <string name="pref_updater_branch_summary">Выбор ветки, из которой приложение будет получать обновления</string>
     <string name="updater_ignore">Игнор.</string>
     <string name="updater_later">Позже</string>
@@ -87,11 +87,11 @@
     <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
     <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
     <string name="pref_notify_success_lock_summary">Сделать уведомление об успехе неудаляемым (уведомление будет
-        отображаться, пока подключена сеть Wi-Fi
+        отображаться, пока подключена сеть Wi-Fi)
     </string>
     <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
-    <string name="pref_autoconnect_strict_summary">Включите строгую проверку, если приложение срабатывает на другие
-        сети
+    <string name="pref_autoconnect_strict_summary">Включите строгую проверку названия сети, если приложение
+        срабатывает на другие сети
     </string>
     <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
     <string name="manual_connection_mosmetro_summary">Подключение к основным сетям московского метрополитена</string>
