@@ -15,7 +15,7 @@ import java.util.Map;
 public class OkHttp extends Client {
     private OkHttpClient client;
 
-    private String referer = "http://example.com";
+    private String referer = "http://curlmyip.org";
 
     public OkHttp() {
         client = new OkHttpClient.Builder()
