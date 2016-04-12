@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
@@ -129,18 +130,15 @@ public class DebugActivity extends Activity {
         protected Void doInBackground(String... params) {
             local_logger.date("> ", "");
 
+            Chooser chooser = new Chooser(DebugActivity.this, false, local_logger);
+
             Authenticator connection;
             if (params[0] == null) {
-                local_logger.log_debug(">> Определение названия сети");
-                connection = Authenticator.choose(DebugActivity.this, false);
-
-                if (connection == null) {
-                    local_logger.log_debug("<< Ошибка: Вы не подключены ни к одной из поддерживаемых сетей");
-                    return null;
-                }
+                connection = chooser.choose();
             } else {
-                connection = Authenticator.choose(DebugActivity.this, false, params[0]);
+                connection = chooser.choose(params[0]);
             }
+            if (connection == null) return null;
 
             connection.setLogger(local_logger);
             connection.start();

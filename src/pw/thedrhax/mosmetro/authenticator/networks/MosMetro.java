@@ -28,7 +28,7 @@ public class MosMetro extends Authenticator {
 
         progressListener.onProgressUpdate(0);
 
-        logger.log_debug("Подключение к сети " + getSSID());
+        logger.log_debug("> Подключение к сети " + getSSID());
         logger.log_debug(">> Проверка доступа в интернет");
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {

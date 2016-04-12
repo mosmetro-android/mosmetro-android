@@ -15,6 +15,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
+import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
@@ -205,13 +206,15 @@ public class ConnectionService extends IntentService {
     }
 	
 	public void onHandleIntent(Intent intent) {
+        logger.date("> ", "");
+
         // Check if Wi-Fi is connected
         if (!isWifiConnected()) return;
 
         // Disable calls from the NetworkReceiver
         running = true;
 
-        connection = Authenticator.choose(this, true);
+        connection = new Chooser(this, true, logger).choose();
         if (connection == null) return;
 
         connection.setLogger(logger);
@@ -228,8 +231,8 @@ public class ConnectionService extends IntentService {
 
         // Try to connect
         int result = Authenticator.STATUS_ERROR;
-        logger.date("> ", "");
         if (waitForIP()) result = connect();
+
         logger.date("< ", "\n");
 
         // Notify user if still connected to Wi-Fi
