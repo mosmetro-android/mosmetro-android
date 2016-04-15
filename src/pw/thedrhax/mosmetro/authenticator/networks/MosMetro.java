@@ -45,7 +45,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(">>> Получение начального перенаправления");
         try {
-            client.get("http://vmet.ro", null);
+            client.get("http://wi-fi.ru", null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -127,7 +127,7 @@ public class MosMetro extends Authenticator {
         try {
             client = new OkHttp()
                     .followRedirects(false)
-                    .get("http://vmet.ro", null);
+                    .get("http://wi-fi.ru", null);
 
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {

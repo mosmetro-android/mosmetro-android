@@ -101,7 +101,7 @@ public class ConnectionService extends IntentService {
                         .setIcon(pref_colored_icons ?
                                 R.drawable.ic_notification_register_colored :
                                 R.drawable.ic_notification_register)
-                        .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://vmet.ro")))
+                        .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://wi-fi.ru")))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
 
