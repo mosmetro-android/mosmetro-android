@@ -44,8 +44,9 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         CachedRetriever retriever = new CachedRetriever(context);
 
         try {
-            UPDATE_INFO_URL = retriever
-                    .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/update.php";
+            UPDATE_INFO_URL = Jsoup.parse(
+                    retriever.get(CachedRetriever.BASE_URL_SOURCE, "")
+            ).getElementsByTag("body").html() + "/update.php";
         } catch (NullPointerException ex) {
             update_failed = true;
             return null;
