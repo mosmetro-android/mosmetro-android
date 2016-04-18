@@ -1,6 +1,9 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -29,6 +32,7 @@ public class MosMetro extends Authenticator {
         progressListener.onProgressUpdate(0);
 
         logger.log_debug("> Подключение к сети " + getSSID());
+
         logger.log_debug(">> Проверка доступа в интернет");
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {
@@ -37,7 +41,14 @@ public class MosMetro extends Authenticator {
         } else if (connected == CHECK_WRONG_NETWORK) {
             logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
 
-            logger.log("\nПопробуйте перезапустить (выключить и включить) Wi-Fi в настройках устройства.");
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+            if (settings.getBoolean("pref_wifi_restart", false)) {
+                logger.log_debug(">> Перезапуск Wi-Fi...");
+
+                WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                manager.reassociate();
+            }
+
             return STATUS_ERROR;
         }
 

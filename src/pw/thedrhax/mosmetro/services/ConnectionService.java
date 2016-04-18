@@ -176,6 +176,8 @@ public class ConnectionService extends IntentService {
         int result, count = 0;
 
         do {
+            if (!waitForIP()) return Authenticator.STATUS_ERROR;
+
             if (count > 0) {
                 notify_progress
                         .setText("Ожидание... (попытка " + (count+1) + " из " + pref_retry_count + ")")
@@ -230,8 +232,7 @@ public class ConnectionService extends IntentService {
         notify_progress.setTitle("Подключение к " + connection.getSSID());
 
         // Try to connect
-        int result = Authenticator.STATUS_ERROR;
-        if (waitForIP()) result = connect();
+        int result = connect();
 
         logger.date("< ", "\n");
 

@@ -32,8 +32,8 @@ public abstract class Authenticator {
     protected Client client;
 
     // Device info
-    private Context context;
-    private boolean automatic;
+    protected Context context;
+    protected boolean automatic;
 
     public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
