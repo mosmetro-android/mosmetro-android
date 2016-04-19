@@ -70,8 +70,7 @@ public class DebugActivity extends Activity {
                 finish();
             }
 
-            if (SSID != null && !SSID.isEmpty())
-                this.SSID = "\"" + SSID + "\"";
+            if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
         } catch (NullPointerException ignored) {}
 
         button_connect(null);

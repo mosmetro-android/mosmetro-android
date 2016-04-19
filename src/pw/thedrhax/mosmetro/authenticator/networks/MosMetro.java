@@ -13,7 +13,7 @@ import java.net.ProtocolException;
 import java.util.Map;
 
 public class MosMetro extends Authenticator {
-    public static final String SSID = "\"MosMetro_Free\"";
+    public static final String SSID = "MosMetro_Free";
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
@@ -21,7 +21,7 @@ public class MosMetro extends Authenticator {
 
     @Override
     public String getSSID() {
-        return "\"MosMetro_Free\"";
+        return "MosMetro_Free";
     }
 
     @Override

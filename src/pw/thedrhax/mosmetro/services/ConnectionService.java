@@ -136,12 +136,12 @@ public class ConnectionService extends IntentService {
         if (connection == null) {
             for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
                 try {
-                    if (info.getSSID().equals(authenticator.getField("SSID").get(authenticator)))
+                    if (info.getSSID().replace("\"", "").equals(authenticator.getField("SSID").get(authenticator)))
                         return true;
                 } catch (Exception ignored) {}
             }
         } else {
-            if (info.getSSID().equals(connection.getSSID()))
+            if (info.getSSID().replace("\"", "").equals(connection.getSSID()))
                 return true;
         }
 
@@ -230,8 +230,7 @@ public class ConnectionService extends IntentService {
         running = true;
 
         if (from_shortcut) {
-            connection = new Chooser(this, true, logger)
-                    .choose("\"" + intent.getStringExtra("SSID") + "\"");
+            connection = new Chooser(this, true, logger).choose(intent.getStringExtra("SSID"));
         } else {
             connection = new Chooser(this, true, logger).choose();
         }
@@ -279,7 +278,7 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) {
             try {
                 for (WifiConfiguration network : manager.getConfiguredNetworks()) {
-                    if (network.SSID.equals(connection.getSSID())) {
+                    if (network.SSID.replace("\"", "").equals(connection.getSSID())) {
                         manager.enableNetwork(network.networkId, true);
                         manager.reconnect();
                     }

@@ -112,7 +112,7 @@ public abstract class Authenticator {
         params.put("version", getVersion());
         params.put("automatic", automatic ? "1" : "0");
         params.put("connected", result == STATUS_CONNECTED ? "1" : "0");
-        params.put("ssid", getSSID().replace("\"", ""));
+        params.put("ssid", getSSID());
 
         try {
             new OkHttp().post(STATISTICS_URL, params);

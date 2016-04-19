@@ -52,7 +52,7 @@ public class Chooser {
         // Get SSID from WifiManager
         logger.log_debug(">> Определение названия сети");
         WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String SSID = manager.getConnectionInfo().getSSID();
+        String SSID = manager.getConnectionInfo().getSSID().replace("\"", "");
 
         return choose(SSID);
     }
