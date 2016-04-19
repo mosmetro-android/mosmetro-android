@@ -33,7 +33,8 @@
 
         <activity android:icon="@drawable/ic_launcher"
                   android:label="@string/shortcut_connect"
-                  android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity">
+                  android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"
+                  android:theme="@style/AppBaseTheme">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_weight="1">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Выберите режим подключения"
+                android:id="@+id/textView" android:layout_gravity="center_horizontal" android:layout_margin="10dp"
+        />
+
+        <RadioGroup android:layout_width="fill_parent" android:layout_height="fill_parent"
+        >
+
+            <RadioButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Автоматическое определение названия сети"
+                    android:id="@+id/radio_auto" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
+                    android:textSize="18dp" android:layout_marginBottom="5dp"
+                    android:checked="true" android:onClick="network_selected"/>
+
+            <RadioButton android:layout_width="fill_parent" android:layout_height="wrap_content"
+                         android:text="MosMetro_Free / AURA" android:id="@+id/radio_mosmetro"
+                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18dp"
+                         android:layout_marginBottom="5dp" android:onClick="network_selected"/>
+
+        </RadioGroup>
+    </LinearLayout>
+    <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Подключаться в фоне"
+            android:id="@+id/check_background" android:layout_weight="0" android:textSize="18dp" android:layout_margin="5dp"
+    />
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_weight="0">
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:id="@+id/button_cancel" android:layout_weight="1" android:nestedScrollingEnabled="false"
+                android:onClick="button_cancel"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:id="@+id/button_save" android:layout_weight="1" android:onClick="button_save"/>
+    </LinearLayout>
+</LinearLayout>

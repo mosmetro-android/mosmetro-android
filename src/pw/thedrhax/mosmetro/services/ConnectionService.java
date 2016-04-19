@@ -21,6 +21,7 @@ import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
     private static boolean running = false;
+    private boolean from_shortcut = false;
 
     // Preferences
     private WifiManager manager;
@@ -29,6 +30,7 @@ public class ConnectionService extends IntentService {
     private int pref_retry_delay;
     private int pref_ip_wait;
     private boolean pref_colored_icons;
+    private boolean pref_notify_success_lock;
 
     // Notifications
     private Notification notify_progress;
@@ -52,6 +54,7 @@ public class ConnectionService extends IntentService {
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
         pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "0"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
+        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", false);
 
         notify_progress = new Notification(this)
                 .setIcon(pref_colored_icons ?
@@ -88,7 +91,7 @@ public class ConnectionService extends IntentService {
                 }
 
                 notification
-                        .setCancellable(!settings.getBoolean("pref_notify_success_lock", false))
+                        .setCancellable(!pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
 
@@ -121,6 +124,8 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean isWifiConnected() {
+        if (from_shortcut) return true;
+
         WifiInfo info = manager.getConnectionInfo();
 
         // Strict check by supplicant state
@@ -144,6 +149,8 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean waitForIP() {
+        if (from_shortcut) return true;
+
         int count = 0;
 
         logger.log_debug(">> Ожидание получения IP адреса...");
@@ -208,6 +215,12 @@ public class ConnectionService extends IntentService {
     }
 	
 	public void onHandleIntent(Intent intent) {
+        // Check if started from one of the shortcuts
+        if (intent.getStringExtra("SSID") != null) {
+            pref_notify_success_lock = false;
+            from_shortcut = true;
+        }
+
         logger.date("> ", "");
 
         // Check if Wi-Fi is connected
@@ -216,7 +229,12 @@ public class ConnectionService extends IntentService {
         // Disable calls from the NetworkReceiver
         running = true;
 
-        connection = new Chooser(this, true, logger).choose();
+        if (from_shortcut) {
+            connection = new Chooser(this, true, logger)
+                    .choose("\"" + intent.getStringExtra("SSID") + "\"");
+        } else {
+            connection = new Chooser(this, true, logger).choose();
+        }
         if (connection == null) return;
 
         connection.setLogger(logger);
@@ -238,6 +256,8 @@ public class ConnectionService extends IntentService {
 
         // Notify user if still connected to Wi-Fi
         if (isWifiConnected()) notify(result);
+
+        if (from_shortcut) return;
 
         // Wait until Wi-Fi is disconnected
         int count = 0;
@@ -273,7 +293,7 @@ public class ConnectionService extends IntentService {
 	@Override
     public void onDestroy() {
         running = false;
-        notification.hide();
+        if (!from_shortcut) notification.hide();
         notify_progress.hide();
     }
 

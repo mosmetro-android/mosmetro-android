@@ -13,6 +13,7 @@ import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.Chooser;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
@@ -57,8 +58,17 @@ public class DebugActivity extends Activity {
         } catch (NullPointerException ignored) {}
 
         try {
-            // Intent from the SettingsActivity
-            String SSID = getIntent().getStringExtra("SSID");
+            // Intent from the SettingsActivity or from shortcuts
+            Intent intent = getIntent();
+            String SSID = intent.getStringExtra("SSID");
+
+            if (intent.getBooleanExtra("background", false)) {
+                Intent service = new Intent(this, ConnectionService.class);
+                if (!SSID.isEmpty()) service.putExtra("SSID", SSID);
+
+                startService(service);
+                finish();
+            }
 
             if (SSID != null && !SSID.isEmpty())
                 this.SSID = "\"" + SSID + "\"";
