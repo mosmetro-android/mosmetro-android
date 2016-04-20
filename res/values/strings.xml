@@ -100,7 +100,7 @@
     <string name="manual_connection_default">По умолчанию</string>
     <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
     <string name="pref_wifi_restart">Перезапуск Wi-Fi</string>
-    <string name="pref_wifi_restart_summary">Переподключаться к Wi-Fi при проблемах с соединением с сетью (исправляет
-        ошибку "Сеть недоступна или не отвечает")
+    <string name="pref_wifi_restart_summary">Переподключаться к Wi-Fi при проблемах с соединением (исправляет
+        ошибку \"Сеть недоступна или не отвечает\")
     </string>
 </resources>
