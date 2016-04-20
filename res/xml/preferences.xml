@@ -46,7 +46,7 @@
                         android:inputType="number"
                         android:title="@string/pref_ip_wait"
                         android:summary="@string/pref_ip_wait_summary"
-                        android:defaultValue="0" />
+                        android:defaultValue="30" />
 
                 <CheckBoxPreference
                         android:key="pref_autoconnect_strict"

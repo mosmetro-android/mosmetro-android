@@ -52,7 +52,7 @@ public class ConnectionService extends IntentService {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
-        pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "0"));
+        pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "30"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", false);
 
