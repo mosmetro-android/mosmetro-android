@@ -16,7 +16,10 @@ import org.jsoup.nodes.Element;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 
-public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
+import java.util.LinkedList;
+import java.util.List;
+
+public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     private String UPDATE_INFO_URL;
 
     // Info from the app
@@ -24,11 +27,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     private final SharedPreferences settings;
 
     // Info from the server
+    private List<Branch> branches;
     private Branch current_branch;
 
     // Updater state
     private boolean update_failed = false;
     private boolean check_ignored = false;
+    private boolean force_check = false;
 
     public UpdateCheckTask (Context context) {
         this.context = context;
@@ -40,8 +45,10 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     }
 
     @Override
-    protected Void doInBackground (Void... params) {
+    protected Void doInBackground (Boolean... force) {
         CachedRetriever retriever = new CachedRetriever(context);
+
+        force_check = force[0];
 
         try {
             UPDATE_INFO_URL = Jsoup.parse(
@@ -66,12 +73,13 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
 
         // Parse server answer
         Document document = Jsoup.parse(content);
+        branches = new LinkedList<Branch>();
         for (Element element : document.getElementsByTag("branch")) {
             Branch branch = new Branch(element);
             if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
                 current_branch = branch;
-                break;
             }
+            branches.add(branch);
         }
 
         if (current_branch == null) {
@@ -85,6 +93,7 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         result(hasUpdate(), current_branch);
+        result(branches);
     }
 
     public void showDialog() {
@@ -123,7 +132,11 @@ public abstract class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         check_ignored = !ignore; return this;
     }
 
-    abstract public void result (boolean hasUpdate, Branch current_branch);
+    public void result(boolean hasUpdate, Branch current_branch) {
+        if (hasUpdate || force_check) showDialog();
+    }
+
+    public void result(List<Branch> branches) {}
 
     public class Branch {
         public String name;

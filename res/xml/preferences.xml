@@ -144,8 +144,7 @@
             android:title="@string/pref_updater_branch"
             android:summary="@string/pref_updater_branch_summary"
             android:defaultValue="play"
-            android:entries="@array/branches_entries"
-            android:entryValues="@array/branches_values" />
+            android:enabled="false" />
 
     </PreferenceCategory>
 

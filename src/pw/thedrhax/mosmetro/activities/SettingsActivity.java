@@ -4,15 +4,16 @@ import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 
-public class SettingsActivity extends Activity {
-    private UpdateCheckTask updater;
+import java.util.List;
 
+public class SettingsActivity extends Activity {
     public static class SettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -26,7 +27,7 @@ public class SettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Populate preferences
-        SettingsFragment settings = new SettingsFragment();
+        final SettingsFragment settings = new SettingsFragment();
         getFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, settings)
@@ -42,36 +43,11 @@ public class SettingsActivity extends Activity {
             app_name.setSummary("");
         }
 
-        // Check for updates on start
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true)) {
-            updater = new UpdateCheckTask(this) {
-                @Override
-                public void result(boolean hasUpdate, Branch current_branch) {
-                    if (hasUpdate) showDialog();
-                }
-            };
+        /*
+            Update checking
+         */
 
-            updater.execute();
-        }
-
-        // Update checker
-        Preference pref_updater_check = settings.findPreference("pref_updater_check");
-        pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                updater = new UpdateCheckTask(SettingsActivity.this) {
-                    @Override
-                    public void result(boolean hasUpdate, final Branch current_branch) {
-                        showDialog();
-                    }
-                }.setIgnore(false);
-
-                updater.execute(); return false;
-            }
-        });
-
-        // Reset all updater preferences when changing branch
-        Preference pref_updater_branch = settings.findPreference("pref_updater_branch");
+        final ListPreference pref_updater_branch = (ListPreference)settings.findPreference("pref_updater_branch");
         pref_updater_branch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -83,22 +59,49 @@ public class SettingsActivity extends Activity {
                         .putString("pref_updater_branch", (String)newValue)
                         .apply();
 
-                updater = new UpdateCheckTask(SettingsActivity.this) {
-                    @Override
-                    public void result(boolean hasUpdate, Branch current_branch) {
-                        if (hasUpdate) showDialog();
-                    }
-                };
-
-                updater.execute();
+                new UpdateCheckTask(SettingsActivity.this).execute(false);
                 return true;
             }
         });
-    }
 
-    @Override
-    protected void onStop() {
-        if (updater != null && updater.getStatus() == UpdateCheckTask.Status.RUNNING) updater.cancel(true);
-        super.onStop();
+        // Check for updates on start
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true))
+            new UpdateCheckTask(this) {
+                @Override
+                public void result(List<Branch> branches) {
+                    if (branches == null) return;
+
+                    String[] branch_names = new String[branches.size()];
+                    for (int i = 0; i < branch_names.length; i++) {
+                        branch_names[i] = branches.get(i).name;
+                    }
+                    pref_updater_branch.setEntries(branch_names);
+                    pref_updater_branch.setEntryValues(branch_names);
+                    pref_updater_branch.setEnabled(true);
+                }
+            }.execute(false);
+
+        // Force check
+        Preference pref_updater_check = settings.findPreference("pref_updater_check");
+        pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new UpdateCheckTask(SettingsActivity.this) {
+                    @Override
+                    public void result(List<Branch> branches) {
+                        if (branches == null) return;
+
+                        String[] branch_names = new String[branches.size()];
+                        for (int i = 0; i < branch_names.length; i++) {
+                            branch_names[i] = branches.get(i).name;
+                        }
+                        pref_updater_branch.setEntries(branch_names);
+                        pref_updater_branch.setEntryValues(branch_names);
+                        pref_updater_branch.setEnabled(true);
+                    }
+                }.setIgnore(false).execute(true);
+                return false;
+            }
+        });
     }
 }
