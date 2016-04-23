@@ -23,6 +23,9 @@ public class ShortcutActivity extends Activity {
 
             case R.id.radio_mosmetro:
                 SSID = "MosMetro_Free"; break;
+
+            case R.id.radio_mosgortrans:
+                SSID = "MosGorTrans_Free"; break;
         }
     }
 

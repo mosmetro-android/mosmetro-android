@@ -30,6 +30,10 @@
                          android:text="MosMetro_Free / AURA" android:id="@+id/radio_mosmetro"
                          android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18dp"
                          android:layout_marginBottom="5dp" android:onClick="network_selected"/>
+            <RadioButton android:layout_width="fill_parent" android:layout_height="wrap_content"
+                         android:text="MosGorTrans_Free" android:id="@+id/radio_mosgortrans"
+                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18dp"
+                         android:layout_marginBottom="5dp" android:onClick="network_selected"/>
 
         </RadioGroup>
     </LinearLayout>
