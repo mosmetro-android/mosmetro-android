@@ -107,13 +107,14 @@
 
     <PreferenceCategory
         android:title="@string/manual_connection">
-
+        <!-- TODO: Uncomment this then another networks will be available
         <Preference
                 android:title="@string/manual_connection_default"
                 android:summary="@string/manual_connection_default_summary">
 
             <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
         </Preference>
+        -->
 
         <Preference
                 android:title="@string/manual_connection_mosmetro"
