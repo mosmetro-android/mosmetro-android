@@ -42,7 +42,7 @@ public class MosMetro extends Authenticator {
             logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-            if (settings.getBoolean("pref_wifi_restart", false)) {
+            if (settings.getBoolean("pref_wifi_restart", true)) {
                 logger.log_debug(">> Перезапуск Wi-Fi...");
 
                 WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);

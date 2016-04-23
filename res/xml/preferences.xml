@@ -23,7 +23,7 @@
                     android:key="pref_wifi_restart"
                     android:title="@string/pref_wifi_restart"
                     android:summary="@string/pref_wifi_restart_summary"
-                    android:defaultValue="false" />
+                    android:defaultValue="true" />
 
             <PreferenceCategory android:title="Параметры подключения">
 
