@@ -22,6 +22,7 @@ public abstract class Authenticator {
     public static final int STATUS_ALREADY_CONNECTED = 1;
     public static final int STATUS_NOT_REGISTERED = 2;
     public static final int STATUS_ERROR = 3;
+    public static final int STATUS_INTERRUPTED = 4;
 
     // Network check state
     public static final int CHECK_CONNECTED = 0;
@@ -30,6 +31,7 @@ public abstract class Authenticator {
 
 	protected Logger logger;
     protected Client client;
+    protected boolean stopped;
 
     // Device info
     protected Context context;
@@ -46,13 +48,21 @@ public abstract class Authenticator {
     public abstract String getSSID();
 
     public int start() {
+        stopped = false;
+
         logger.debug("Версия приложения: " + getVersion());
         int result = connect();
+
+        if (stopped) return result;
 
         if (result <= STATUS_ALREADY_CONNECTED)
             submit_info(result);
 
         return result;
+    }
+
+    public void stop() {
+        stopped = true;
     }
 
     /*

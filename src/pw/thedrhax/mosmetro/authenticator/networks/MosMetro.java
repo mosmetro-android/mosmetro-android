@@ -29,6 +29,7 @@ public class MosMetro extends Authenticator {
         String link;
         Map<String,String> fields;
 
+        if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
         logger.log_debug("> Подключение к сети " + getSSID());
@@ -52,6 +53,7 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
+        if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(20);
 
         logger.log_debug(">>> Получение начального перенаправления");
@@ -73,6 +75,7 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
+        if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(40);
 
         logger.log_debug(">>> Получение страницы авторизации");
@@ -104,6 +107,7 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
+        if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(60);
 
         logger.log_debug(">>> Отправка формы авторизации");
@@ -117,6 +121,7 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
+        if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(80);
 
         logger.log_debug(">> Проверка доступа в интернет");
