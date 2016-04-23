@@ -64,23 +64,6 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        // Check for updates on start
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_updater_enabled", true))
-            new UpdateCheckTask(this) {
-                @Override
-                public void result(List<Branch> branches) {
-                    if (branches == null) return;
-
-                    String[] branch_names = new String[branches.size()];
-                    for (int i = 0; i < branch_names.length; i++) {
-                        branch_names[i] = branches.get(i).name;
-                    }
-                    pref_updater_branch.setEntries(branch_names);
-                    pref_updater_branch.setEntryValues(branch_names);
-                    pref_updater_branch.setEnabled(true);
-                }
-            }.execute(false);
-
         // Force check
         Preference pref_updater_check = settings.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -95,13 +78,22 @@ public class SettingsActivity extends Activity {
                         for (int i = 0; i < branch_names.length; i++) {
                             branch_names[i] = branches.get(i).name;
                         }
+
                         pref_updater_branch.setEntries(branch_names);
                         pref_updater_branch.setEntryValues(branch_names);
                         pref_updater_branch.setEnabled(true);
                     }
-                }.setIgnore(false).execute(true);
+                }.setIgnore(preference == null).execute(preference != null);
                 return false;
             }
         });
+
+        // Check for updates on start if enabled
+        if (PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getBoolean("pref_updater_enabled", true))
+            pref_updater_check
+                    .getOnPreferenceClickListener()
+                    .onPreferenceClick(null);
     }
 }
