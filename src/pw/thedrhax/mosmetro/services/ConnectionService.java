@@ -1,6 +1,7 @@
 package pw.thedrhax.mosmetro.services;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -61,8 +62,12 @@ public class ConnectionService extends IntentService {
                         R.drawable.ic_notification_connecting_colored :
                         R.drawable.ic_notification_connecting)
                 .setId(1)
-                .setCancellable(false)
-                .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14));
+                .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14))
+                .setDeleteIntent(PendingIntent.getService(
+                        this, 0,
+                        new Intent(this, ConnectionService.class).setAction("STOP"),
+                        PendingIntent.FLAG_UPDATE_CURRENT)
+                );
 
         notification = new Notification(this)
                 .setId(0);
@@ -71,6 +76,8 @@ public class ConnectionService extends IntentService {
     }
 
     private void notify (int result) {
+        if (!running) return;
+
         switch (result) {
             case Authenticator.STATUS_CONNECTED:
             case Authenticator.STATUS_ALREADY_CONNECTED:
@@ -159,7 +166,7 @@ public class ConnectionService extends IntentService {
                 .setContinuous()
                 .show();
 
-        while (manager.getConnectionInfo().getIpAddress() == 0) {
+        while (manager.getConnectionInfo().getIpAddress() == 0 && running) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
@@ -206,15 +213,27 @@ public class ConnectionService extends IntentService {
                 logger.log_debug("< Ошибка: Соединение с сетью прервалось");
                 result = Authenticator.STATUS_ERROR; break;
             }
-        } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED);
+        } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED && running);
 
         // Remove progress notification
         notify_progress.hide();
 
         return result;
     }
-	
-	public void onHandleIntent(Intent intent) {
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if ("STOP".equals(intent.getAction())) { // Stop by intent
+            stopSelf();
+        } else if (!running) { // Start if not already running
+            onStart(intent, startId);
+        }
+        return START_NOT_STICKY;
+    }
+
+    public void onHandleIntent(Intent intent) {
+        running = true;
+
         // Check if started from one of the shortcuts
         if (intent.getStringExtra("SSID") != null) {
             pref_notify_success_lock = false;
@@ -292,11 +311,8 @@ public class ConnectionService extends IntentService {
 	@Override
     public void onDestroy() {
         running = false;
+        if (connection != null) connection.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
-    }
-
-    public static boolean isRunning() {
-        return running;
     }
 }

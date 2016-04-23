@@ -42,6 +42,11 @@ public class Notification {
         return this;
     }
 
+    public Notification setDeleteIntent (PendingIntent intent) {
+        builder = builder.setDeleteIntent(intent);
+        return this;
+    }
+
     public Notification setId (int id) {
         this.id = id;
         return this;
