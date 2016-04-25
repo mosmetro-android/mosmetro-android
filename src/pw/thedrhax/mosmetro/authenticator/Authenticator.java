@@ -3,6 +3,7 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import org.jsoup.Jsoup;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
@@ -115,8 +116,10 @@ public abstract class Authenticator {
     }
 
     private void submit_info (int result) {
-        String STATISTICS_URL = new CachedRetriever(context)
-                .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com") + "/check.php";
+        String STATISTICS_URL = Jsoup.parse(
+                new CachedRetriever(context)
+                        .get(CachedRetriever.BASE_URL_SOURCE, "http://wi-fi.metro-it.com")
+        ).getElementsByTag("body").html() + "/check.php";
 
         Map<String,String> params = new HashMap<String, String>();
         params.put("version", getVersion());
