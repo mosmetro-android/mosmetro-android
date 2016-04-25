@@ -132,6 +132,10 @@ public class ConnectionService extends IntentService {
 
     private boolean isWifiConnected() {
         if (from_shortcut) return true;
+        
+        // Check if Wi-Fi is not enabled
+        if (!manager.isWifiEnabled())
+            return false;
 
         WifiInfo info = manager.getConnectionInfo();
 
