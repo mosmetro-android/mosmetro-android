@@ -79,9 +79,11 @@ public class SettingsActivity extends Activity {
                             branch_names[i] = branches.get(i).name;
                         }
 
-                        pref_updater_branch.setEntries(branch_names);
-                        pref_updater_branch.setEntryValues(branch_names);
-                        pref_updater_branch.setEnabled(true);
+                        if (branch_names.length > 0) {
+                            pref_updater_branch.setEntries(branch_names);
+                            pref_updater_branch.setEntryValues(branch_names);
+                            pref_updater_branch.setEnabled(true);
+                        }
                     }
                 }.setIgnore(preference == null).execute(preference != null);
                 return false;
