@@ -233,7 +233,11 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         running = true;
-
+        main(intent);
+        running = false;
+    }
+    
+    public void main(Intent intent) {
         // Check if started from one of the shortcuts
         if (intent.getStringExtra("SSID") != null) {
             pref_notify_success_lock = false;
@@ -244,9 +248,6 @@ public class ConnectionService extends IntentService {
 
         // Check if Wi-Fi is connected
         if (!isWifiConnected()) return;
-
-        // Disable calls from the NetworkReceiver
-        running = true;
 
         if (from_shortcut) {
             connection = new Chooser(this, true, logger).choose(intent.getStringExtra("SSID"));
@@ -304,13 +305,10 @@ public class ConnectionService extends IntentService {
                 }
             } catch (NullPointerException ignored) {}
         }
-
-        running = false;
 	}
 	
 	@Override
     public void onDestroy() {
-        running = false;
         if (connection != null) connection.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
