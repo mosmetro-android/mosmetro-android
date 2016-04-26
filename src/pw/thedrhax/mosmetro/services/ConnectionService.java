@@ -113,7 +113,10 @@ public class ConnectionService extends IntentService {
                                 R.drawable.ic_notification_register)
                         .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://wi-fi.ru")))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
+                        .setId(2)
                         .show();
+
+                notification.setId(0); // Reset ID to default
 
                 return;
 
@@ -217,6 +220,8 @@ public class ConnectionService extends IntentService {
                 logger.log_debug("< Ошибка: Соединение с сетью прервалось");
                 result = Authenticator.STATUS_ERROR; break;
             }
+
+            if (result == Authenticator.STATUS_NOT_REGISTERED) break;
         } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED && running);
 
         // Remove progress notification
@@ -280,7 +285,7 @@ public class ConnectionService extends IntentService {
         // Notify user if still connected to Wi-Fi
         if (isWifiConnected()) notify(result);
 
-        if (from_shortcut) return;
+        if (from_shortcut || result > Authenticator.STATUS_ALREADY_CONNECTED) return;
 
         // Wait until Wi-Fi is disconnected
         int count = 0;
