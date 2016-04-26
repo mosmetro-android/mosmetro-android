@@ -42,7 +42,13 @@ public class ShortcutActivity extends Activity {
                 Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)
         );
 
-        setResult(RESULT_OK, result);
+        if (getIntent().getAction().equals("android.intent.action.CREATE_SHORTCUT")) {
+            setResult(RESULT_OK, result);
+        } else {
+            result.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+            sendBroadcast(result);
+        }
+
         finish();
     }
 

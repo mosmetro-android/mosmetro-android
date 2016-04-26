@@ -101,4 +101,8 @@
     <string name="pref_wifi_restart_summary">Переподключаться к Wi-Fi при проблемах с соединением (исправляет
         ошибку \"Сеть недоступна или не отвечает\")
     </string>
+    <string name="manual_connection_shortcut">Создать ярлык</string>
+    <string name="manual_connection_shortcut_summary">Добавить иконку быстрого доступа к ручному подключению на домашний
+        экран (настраивается).
+    </string>
 </resources>

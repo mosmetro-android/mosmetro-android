@@ -124,6 +124,12 @@
                 <extra android:name="SSID" android:value="MosMetro_Free" />
             </intent>
         </Preference>
+
+        <Preference
+                android:title="@string/manual_connection_shortcut"
+                android:summary="@string/manual_connection_shortcut_summary">
+            <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
