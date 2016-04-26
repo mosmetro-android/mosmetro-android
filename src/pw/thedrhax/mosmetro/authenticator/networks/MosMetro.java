@@ -90,7 +90,7 @@ public class MosMetro extends Authenticator {
 
         try {
             Elements forms = client.getPageContent().getElementsByTag("form");
-            if (forms.size() > 1 && forms.last().attr("id").equals("sms-form")) {
+            if (forms.size() > 1) {
                 logger.log_debug("<<< Ошибка: устройство не зарегистрировано в сети");
 
                 logger.log("\nПожалуйста, зайдите на сайт http://wi-fi.ru и пройдите регистрацию, " +
