@@ -56,7 +56,10 @@ public abstract class Client {
         Map<String,String> result = new HashMap<String,String>();
 
         for (Element input : form.getElementsByTag("input")) {
-            result.put(input.attr("name"), input.attr("value"));
+            String value = input.attr("value");
+
+            if (value != null && !value.isEmpty())
+                result.put(input.attr("name"), value);
         }
 
         return result;
