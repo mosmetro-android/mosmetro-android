@@ -155,7 +155,7 @@ public class ConnectionService extends IntentService {
                 } catch (Exception ignored) {}
             }
         } else {
-            if (info.getSSID().replace("\"", "").equals(connection.getSSID()))
+            if (connection.getSSID().equals(info.getSSID().replace("\"", "")))
                 return true;
         }
 
