@@ -4,7 +4,7 @@
     <item
             android:id="@+id/action_share"
             android:icon="@drawable/ic_mail_outline"
-            android:title="@string/share"
+            android:title="@string/report"
             android:showAsAction="ifRoom" />
 
 </menu>

@@ -2,107 +2,109 @@
 <resources>
     <string name="app_name">Wi-Fi в метро</string>
 
-    <string name="button_connect">Повторить попытку</string>
+    <string name="report">Отправить отчет</string>
+    <string name="report_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
+    <string name="report_email_address">mosmetro@thedrhax.pw</string>
+    <string name="report_email_subject">Отчет об ошибке</string>
+    <string name="report_choose_client">Выберите E-mail клиент…</string>
 
-    <string name="share">Отправить отчет</string>
-    <string name="share_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
-    <string name="share_email">mosmetro@thedrhax.pw</string>
-    <string name="share_subject">Отчет об ошибке</string>
-    <string name="share_client">Выберите E-mail клиент…</string>
-
+    <string name="retry">Попробовать снова</string>
+    <string name="connect">Подключиться</string>
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
+    <string name="install">Установить</string>
+    <string name="manual_connection">Ручное подключение</string>
+    <string name="ignore">Игнор.</string>
+    <string name="later">Позже</string>
+    <string name="show_debug_log">Показать подробные сообщения</string>
+
+    <string name="pref_category_main">Основные настройки</string>
+    <string name="pref_category_connection">Настройки подключения</string>
+    <string name="pref_category_connection_summary">Основные настройки автоматического фонового подключения</string>
+    <string name="pref_category_notifications">Уведомления</string>
+    <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
+    <string name="pref_category_updater">Обновления</string>
+    <string name="pref_category_about">О программе</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
-    <string name="pref_autoconnect_summary">
-        Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free
+    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
+    <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
+    <string name="pref_autoconnect_strict_summary">
+        Включите строгую проверку названия сети, если приложение срабатывает на другие сети
+    </string>
+
+    <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
+    <string name="pref_wifi_reconnect_summary">
+        Пытаться восстановить соединение с сетью Wi-Fi автоматически при потере сигнала или сбросе соединения
+    </string>
+    <string name="pref_wifi_restart">Перезапуск Wi-Fi</string>
+    <string name="pref_wifi_restart_summary">
+        Переподключаться к Wi-Fi при проблемах с соединением (исправляет ошибку \"Сеть недоступна или не отвечает\")
     </string>
 
     <string name="pref_notify_success">Успешное подключение</string>
     <string name="pref_notify_fail">Неудачное подключение</string>
     <string name="pref_notify_progress">Процесс подключения</string>
+    <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
+    <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
+    <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
+    <string name="pref_notify_alternative">Альтернативные иконки</string>
+    <string name="pref_notify_alternative_summary">
+        Использовать цветные иконки уведомлений на Android 5.0+ (поддерживается не всегда)
+    </string>
+    <string name="pref_notify_success_log">Лог успешного подключения</string>
+    <string name="pref_notify_success_log_summary">
+        Показывать лог успешного подключения при нажатии на соответствующее уведомление
+    </string>
+    <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
+    <string name="pref_notify_success_lock_summary">
+        Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
+    </string>
+
+    <string name="pref_retry_delay">Задержка между попытками</string>
+    <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 5)</string>
+    <string name="pref_retry_count">Количество попыток</string>
+    <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 3)</string>
+
+    <string name="pref_ip_wait">Ожидание IP адреса</string>
+    <string name="pref_ip_wait_summary">
+        Количество секунд, в течение которых приложение ожидает получение IP адреса. Если установлен 0, то приложение
+        будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию: 30)
+    </string>
+
+    <string name="pref_updater_enabled">Проверять автоматически</string>
+    <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
+    <string name="pref_updater_check">Проверить наличие обновлений</string>
+    <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
+    <string name="pref_updater_branch">Ветка обновления</string>
+    <string name="pref_updater_branch_summary">
+        Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
+    </string>
+
+    <string name="update_available">Доступно обновление</string>
+    <string name="update_not_available">Нет доступных обновлений</string>
+    <string name="update_not_available_message">Новые версии будут появляться здесь по мере их публикации.</string>
 
     <string name="developer">Разработчик</string>
     <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Сайт разработчика</string>
     <string name="developer_site_link">https://thedrhax.pw</string>
-    <string name="about">О программе</string>
-    <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
-    <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
-    <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
-    <string name="pref_category_main">Основные настройки</string>
-    <string name="pref_category_notifications">Уведомления</string>
-    <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
-    <string name="pref_retry_delay">Задержка между попытками</string>
-    <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 5)
-    </string>
-    <string name="pref_retry_count">Количество попыток</string>
-    <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 3)</string>
-    <string name="pref_ip_wait">Ожидание IP адреса</string>
-    <string name="pref_ip_wait_summary">Количество секунд, в течение которых приложение ожидает получение IP адреса.
-        Если установлен 0, то приложение будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию:
-        30)
-    </string>
-    <string name="share_fail">Интернет недоступен</string>
-    <string name="share_fail_info">Убедитесь, что вы подключены к интернету, чтобы отправить отчет</string>
-    <string name="manual_connection">Ручное подключение</string>
-    <string name="show_debug_log">Показать подробные сообщения</string>
-    <string name="shortcut_connect">Подключиться</string>
-    <string name="github_repo">Репозиторий GitHub</string>
-    <string name="github_repo_summary">TheDrHax/mosmetro-android</string>
-    <string name="github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
-    <string name="vkontakte">Сообщество ВКонтакте</string>
-    <string name="vkontakte_summary">vk.com/wifi_v_metro</string>
-    <string name="vkontakte_link">https://vk.com/wifi_v_metro</string>
-    <string name="pref_category_connection">Настройки подключения</string>
-    <string name="pref_category_connection_summary">Основные настройки автоматического фонового подключения</string>
-    <string name="pref_notify_alternative">Альтернативные иконки</string>
-    <string name="pref_notify_alternative_summary">Использовать цветные иконки уведомлений на Android 5.0+
-        (поддерживается не всегда)
-    </string>
-    <string name="pref_notify_success_log">Лог успешного подключения</string>
-    <string name="pref_notify_success_log_summary">Показывать лог успешного подключения при нажатии на соответствующее
-        уведомление
-    </string>
-    <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
-    <string name="pref_wifi_reconnect_summary">Пытаться восстановить соединение с сетью Wi-Fi автоматически при
-        потере сигнала или сбросе соединения
-    </string>
-    <string name="pref_updater_check">Проверить наличие обновлений</string>
-    <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
-    <string name="pref_category_updater">Обновления</string>
-    <string name="updater_available">Доступно обновление</string>
-    <string name="updater_not_available">Нет доступных обновлений</string>
-    <string name="updater_not_available_message">Новые версии будут появляться здесь по мере их публикации.</string>
-    <string name="install">Установить</string>
-    <string name="pref_updater_branch">Ветка обновления</string>
-    <string name="pref_updater_branch_summary">Выбор ветки, из которой приложение будет получать обновления (по
-        умолчанию: play)
-    </string>
-    <string name="updater_ignore">Игнор.</string>
-    <string name="updater_later">Позже</string>
-    <string name="pref_updater_enabled">Проверять автоматически</string>
-    <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
-    <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
-    <string name="pref_notify_success_lock_summary">Сделать уведомление об успехе неудаляемым (уведомление будет
-        отображаться, пока подключена сеть Wi-Fi)
-    </string>
-    <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
-    <string name="pref_autoconnect_strict_summary">Включите строгую проверку названия сети, если приложение
-        срабатывает на другие сети
-    </string>
-    <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
-    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям московского метрополитена</string>
+    <string name="developer_github_repo">Репозиторий GitHub</string>
+    <string name="developer_github_repo_summary">TheDrHax/mosmetro-android</string>
+    <string name="developer_github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
+    <string name="developer_vkontakte">Сообщество ВКонтакте</string>
+    <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
+    <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
+
     <string name="manual_connection_default">По умолчанию</string>
     <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
-    <string name="pref_wifi_restart">Перезапуск Wi-Fi</string>
-    <string name="pref_wifi_restart_summary">Переподключаться к Wi-Fi при проблемах с соединением (исправляет
-        ошибку \"Сеть недоступна или не отвечает\")
-    </string>
+    <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
+    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям московского метрополитена</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
-    <string name="manual_connection_shortcut_summary">Добавить иконку быстрого доступа к ручному подключению на домашний
-        экран (настраивается).
+    <string name="manual_connection_shortcut_summary">
+        Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
     </string>
+
 </resources>

@@ -96,11 +96,11 @@ public class DebugActivity extends Activity {
                 Intent send_email = new Intent(Intent.ACTION_SEND);
 
                 send_email.setType("text/plain");
-                send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.share_email)});
-                send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject));
+                send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
+                send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.report_email_subject));
                 send_email.putExtra(Intent.EXTRA_TEXT, logger.getDebug());
 
-                startActivity(Intent.createChooser(send_email, getString(R.string.share_client)));
+                startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
                 return true;
 
             case android.R.id.home:

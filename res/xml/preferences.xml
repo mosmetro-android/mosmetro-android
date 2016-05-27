@@ -156,7 +156,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-            android:title="@string/about">
+            android:title="@string/pref_category_about">
 
         <Preference
             android:key="app_name"
@@ -173,22 +173,22 @@
         </PreferenceScreen>
 
         <PreferenceScreen
-            android:title="@string/github_repo"
-            android:summary="@string/github_repo_summary">
+            android:title="@string/developer_github_repo"
+            android:summary="@string/developer_github_repo_summary">
 
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="@string/github_repo_link" />
+                android:data="@string/developer_github_repo_link" />
 
         </PreferenceScreen>
 
         <PreferenceScreen
-                android:title="@string/vkontakte"
-                android:summary="@string/vkontakte_summary">
+                android:title="@string/developer_vkontakte"
+                android:summary="@string/developer_vkontakte_summary">
 
             <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="@string/vkontakte_link" />
+                    android:data="@string/developer_vkontakte_link" />
 
         </PreferenceScreen>
 

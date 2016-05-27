@@ -101,15 +101,15 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         if (hasUpdate()) {
             dialog = dialog
-                    .setTitle(context.getString(R.string.updater_available))
+                    .setTitle(context.getString(R.string.update_available))
                     .setMessage(current_branch.message)
-                    .setNegativeButton(R.string.updater_ignore, new DialogInterface.OnClickListener() {
+                    .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             current_branch.ignore(true);
                         }
                     })
-                    .setNeutralButton(R.string.updater_later, null)
+                    .setNeutralButton(R.string.later, null)
                     .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -118,8 +118,8 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     });
         } else {
             dialog = dialog
-                    .setTitle(context.getString(R.string.updater_not_available))
-                    .setMessage(context.getString(R.string.updater_not_available_message))
+                    .setTitle(context.getString(R.string.update_not_available))
+                    .setMessage(context.getString(R.string.update_not_available_message))
                     .setNegativeButton(context.getString(R.string.ok), null);
         }
 

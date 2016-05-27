@@ -33,7 +33,7 @@
         </activity>
 
         <activity android:icon="@drawable/ic_launcher"
-                  android:label="@string/shortcut_connect"
+                  android:label="@string/connect"
                   android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"
                   android:theme="@style/AppBaseTheme">
             <intent-filter>

@@ -35,7 +35,7 @@ public class ShortcutActivity extends Activity {
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
         result.putExtra(Intent.EXTRA_SHORTCUT_NAME, SSID.isEmpty() ?
-                getString(R.string.shortcut_connect) : SSID
+                getString(R.string.connect) : SSID
         );
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
