@@ -137,7 +137,7 @@ public class DebugActivity extends Activity {
 
         @Override
         protected Void doInBackground(String... params) {
-            local_logger.date("> ", "");
+            local_logger.date();
 
             Chooser chooser = new Chooser(DebugActivity.this, false, local_logger);
 
@@ -152,7 +152,7 @@ public class DebugActivity extends Activity {
             connection.setLogger(local_logger);
             connection.start();
 
-            local_logger.date("< ", "\n");
+            local_logger.date();
 
             return null;
         }

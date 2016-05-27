@@ -82,18 +82,18 @@ public class ConnectionService extends IntentService {
             case Authenticator.STATUS_CONNECTED:
             case Authenticator.STATUS_ALREADY_CONNECTED:
                 notification
-                        .setTitle("Успешно подключено")
+                        .setTitle(getString(R.string.notification_success))
                         .setIcon(pref_colored_icons ?
                                 R.drawable.ic_notification_success_colored :
                                 R.drawable.ic_notification_success);
 
                 if (settings.getBoolean("pref_notify_success_log", false)) {
                     notification
-                            .setText("Нажмите, чтобы узнать подробности")
+                            .setText(getString(R.string.notification_success_log))
                             .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
                 } else {
                     notification
-                            .setText("Нажмите, чтобы открыть настройки уведомлений")
+                            .setText(getString(R.string.notification_success_settings))
                             .setIntent(new Intent(this, SettingsActivity.class));
                 }
 
@@ -106,8 +106,8 @@ public class ConnectionService extends IntentService {
 
             case Authenticator.STATUS_NOT_REGISTERED:
                 notification
-                        .setTitle("Устройство не зарегистрировано")
-                        .setText("Нажмите, чтобы перейти к регистрации")
+                        .setTitle(getString(R.string.notification_not_registered))
+                        .setText(getString(R.string.notification_not_registered_register))
                         .setIcon(pref_colored_icons ?
                                 R.drawable.ic_notification_register_colored :
                                 R.drawable.ic_notification_register)
@@ -122,8 +122,8 @@ public class ConnectionService extends IntentService {
 
             case Authenticator.STATUS_ERROR:
                 notification
-                        .setTitle("Не удалось подключиться")
-                        .setText("Нажмите, чтобы узнать подробности или попробовать снова")
+                        .setTitle(getString(R.string.notification_error))
+                        .setText(getString(R.string.notification_error_log))
                         .setIcon(pref_colored_icons ?
                                 R.drawable.ic_notification_error_colored :
                                 R.drawable.ic_notification_error)
@@ -167,9 +167,9 @@ public class ConnectionService extends IntentService {
 
         int count = 0;
 
-        logger.log_debug(">> Ожидание получения IP адреса...");
+        logger.log_debug(getString(R.string.ip_wait));
         notify_progress
-                .setText("Ожидание получения IP адреса...")
+                .setText(getString(R.string.ip_wait))
                 .setContinuous()
                 .show();
 
@@ -179,17 +179,30 @@ public class ConnectionService extends IntentService {
             } catch (InterruptedException ignored) {}
 
             if (!isWifiConnected()) {
-                logger.log_debug("< Ошибка: Соединение с сетью прервалось");
+                logger.log_debug(String.format(
+                        getString(R.string.error),
+                        getString(R.string.auth_error_network_disconnected)
+                ));
                 return false;
             }
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
-                logger.log_debug("<< Ошибка: IP адрес не был получен в течение " + pref_ip_wait + " секунд");
+                logger.log_debug(String.format(
+                        getString(R.string.error),
+                        String.format(
+                                getString(R.string.ip_wait_result),
+                                getString(R.string.not),
+                                pref_ip_wait
+                        )
+                ));
                 return false;
             }
         }
 
-        logger.log_debug("<< IP адрес получен в течение " + count/2 + " секунд");
+        logger.log_debug(String.format(
+                getString(R.string.ip_wait_result),
+                "", count/2
+        ));
         return true;
     }
 
@@ -201,7 +214,14 @@ public class ConnectionService extends IntentService {
 
             if (count > 0) {
                 notify_progress
-                        .setText("Ожидание... (попытка " + (count+1) + " из " + pref_retry_count + ")")
+                        .setText(String.format("%s (%s)",
+                                getString(R.string.notification_progress_waiting),
+                                String.format(
+                                        getString(R.string.try_out_of),
+                                        count + 1,
+                                        pref_retry_count
+                                )
+                        ))
                         .setContinuous()
                         .show();
 
@@ -211,13 +231,23 @@ public class ConnectionService extends IntentService {
             }
 
             notify_progress
-                    .setText("Подключаюсь... (попытка " + (count+1) + " из " + pref_retry_count + ")")
+                    .setText(String.format("%s (%s)",
+                            getString(R.string.notification_progress_connecting),
+                            String.format(
+                                    getString(R.string.try_out_of),
+                                    count + 1,
+                                    pref_retry_count
+                            )
+                    ))
                     .show();
 
             result = connection.start();
 
             if (!isWifiConnected()) {
-                logger.log_debug("< Ошибка: Соединение с сетью прервалось");
+                logger.log_debug(String.format(
+                        getString(R.string.error),
+                        getString(R.string.auth_error_network_disconnected)
+                ));
                 result = Authenticator.STATUS_ERROR; break;
             }
 
@@ -253,7 +283,7 @@ public class ConnectionService extends IntentService {
             from_shortcut = true;
         }
 
-        logger.date("> ", "");
+        logger.date();
 
         // Check if Wi-Fi is connected
         if (!isWifiConnected()) return;
@@ -275,12 +305,15 @@ public class ConnectionService extends IntentService {
             }
         });
 
-        notify_progress.setTitle("Подключение к " + connection.getSSID());
+        notify_progress.setTitle(String.format(
+                getString(R.string.auth_connecting),
+                connection.getSSID()
+        ));
 
         // Try to connect
         int result = connect();
 
-        logger.date("< ", "\n");
+        logger.date();
 
         // Notify user if still connected to Wi-Fi
         if (isWifiConnected()) notify(result);

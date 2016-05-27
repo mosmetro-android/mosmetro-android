@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import org.jsoup.Jsoup;
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
@@ -51,7 +52,7 @@ public abstract class Authenticator {
     public int start() {
         stopped = false;
 
-        logger.debug("Версия приложения: " + getVersion());
+        logger.debug(String.format(context.getString(R.string.version), getVersion()));
         int result = connect();
 
         if (stopped) return result;

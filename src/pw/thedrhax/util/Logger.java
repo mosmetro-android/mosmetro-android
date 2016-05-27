@@ -40,9 +40,9 @@ public class Logger implements Parcelable {
         debug(logger.getDebug());
     }
 
-    public void date (String prefix, String postfix) {
+    public void date () {
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        log_debug(prefix + dateFormat.format(new Date()) + postfix);
+        log_debug(dateFormat.format(new Date()));
     }
 
     /*

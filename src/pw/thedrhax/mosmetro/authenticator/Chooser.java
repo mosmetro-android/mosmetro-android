@@ -2,6 +2,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Logger;
 
 public class Chooser {
@@ -16,7 +17,7 @@ public class Chooser {
     }
 
     public Authenticator choose (String SSID) {
-        logger.log_debug(">> Поиск подходящего алгоритма для сети " + SSID);
+        logger.log_debug(String.format(context.getString(R.string.chooser_searching), SSID));
 
         // Trying to match one of Authenticators for this SSID
         Class<? extends Authenticator> result_class = null;
@@ -30,7 +31,9 @@ public class Chooser {
         }
 
         if (result_class == null) {
-            logger.log_debug("<< Ошибка: Вы не подключены ни к одной из поддерживаемых сетей");
+            logger.log_debug(String.format(context.getString(R.string.error),
+                    context.getString(R.string.chooser_not_supported)
+            ));
             return null;
         }
 
@@ -50,7 +53,7 @@ public class Chooser {
 
     public Authenticator choose() {
         // Get SSID from WifiManager
-        logger.log_debug(">> Определение названия сети");
+        logger.log_debug(context.getString(R.string.chooser_ssid));
         WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String SSID = manager.getConnectionInfo().getSSID().replace("\"", "");
 

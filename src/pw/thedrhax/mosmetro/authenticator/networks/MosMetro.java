@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import org.jsoup.select.Elements;
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -32,19 +33,22 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
-        logger.log_debug("> Подключение к сети " + getSSID());
+        logger.log_debug(String.format(context.getString(R.string.auth_connecting), getSSID()));
 
-        logger.log_debug(">> Проверка доступа в интернет");
+        logger.log_debug(context.getString(R.string.auth_checking_connection));
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {
-            logger.log_debug("<< Уже подключено");
+            logger.log_debug(context.getString(R.string.auth_already_connected));
             return STATUS_ALREADY_CONNECTED;
         } else if (connected == CHECK_WRONG_NETWORK) {
-            logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_network)
+            ));
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
             if (settings.getBoolean("pref_wifi_restart", true)) {
-                logger.log_debug(">> Перезапуск Wi-Fi...");
+                logger.log_debug(context.getString(R.string.auth_restarting_wifi));
 
                 WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 manager.reassociate();
@@ -56,13 +60,16 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(20);
 
-        logger.log_debug(">>> Получение начального перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.get("http://wi-fi.ru", null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не получено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
@@ -71,64 +78,75 @@ public class MosMetro extends Authenticator {
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не найдено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(40);
 
-        logger.log_debug(">>> Получение страницы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: страница авторизации не получена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_page)
+            ));
             return STATUS_ERROR;
         }
 
         try {
             Elements forms = client.getPageContent().getElementsByTag("form");
             if (forms.size() > 1) {
-                logger.log_debug("<<< Ошибка: устройство не зарегистрировано в сети");
-
-                logger.log("\nПожалуйста, зайдите на сайт http://wi-fi.ru и пройдите регистрацию, " +
-                        "введя свой номер телефона в появившуюся форму для получения СМС с дальнейшими инструкциями. " +
-                        "Это необходимо сделать только один раз, после чего приложение начнет нормально работать.");
-
-                logger.log("\nПримечание: Разработчик этого приложения не имеет никакого отношения к регистрации. " +
-                        "Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).");
+                logger.log_debug(String.format(
+                        context.getString(R.string.error),
+                        context.getString(R.string.auth_error_not_registered)
+                ));
                 return STATUS_NOT_REGISTERED;
             }
             fields = Client.parseForm(forms.first());
         } catch (Exception ex) {
-            logger.log_debug("<<< Ошибка: форма авторизации не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_form)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(60);
 
-        logger.log_debug(">>> Отправка формы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
             client.post(link, fields);
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(80);
 
-        logger.log_debug(">> Проверка доступа в интернет");
+        logger.log_debug(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug("<< Соединение успешно установлено :3");
+            logger.log_debug(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug("<< Ошибка: доступ в интернет отсутствует");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_connection)
+            ));
             return STATUS_ERROR;
         }
 

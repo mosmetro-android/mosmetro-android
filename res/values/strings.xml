@@ -18,6 +18,10 @@
     <string name="manual_connection">Ручное подключение</string>
     <string name="ignore">Игнор.</string>
     <string name="later">Позже</string>
+    <string name="error" formatted="false">Ошибка: %s</string>
+    <string name="not">не</string>
+    <string name="try_out_of" formatted="false">попытка %d из %d</string>
+    <string name="version" formatted="false">Версия приложения: %s</string>
     <string name="show_debug_log">Показать подробные сообщения</string>
 
     <string name="pref_category_main">Основные настройки</string>
@@ -106,5 +110,46 @@
     <string name="manual_connection_shortcut_summary">
         Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
     </string>
+
+    <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
+    <string name="auth_checking_connection">Проверка доступа в интернет</string>
+    <string name="auth_already_connected">Уже подключено</string>
+    <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
+    <string name="auth_redirect">Получение перенаправления</string>
+    <string name="auth_auth_page">Получение страницы авторизации</string>
+    <string name="auth_auth_form">Отправка формы авторизации</string>
+    <string name="auth_connected">Соединение успешно установлено :3</string>
+
+    <string name="auth_error_connection">доступ в интернет отсутствует</string>
+    <string name="auth_error_network">Сеть недоступна или не отвечает</string>
+    <string name="auth_error_redirect">перенаправление не получено</string>
+    <string name="auth_error_auth_page">страница авторизации не получена</string>
+    <string name="auth_error_not_registered">
+        устройство не зарегистрировано в сети\n Пожалуйста, зайдите на сайт http://wi-fi.ru
+        и пройдите регистрацию, введя свой номер телефона в появившуюся форму для получения СМС с
+        дальнейшими инструкциями. Это необходимо сделать только один раз, после чего приложение начнет
+        нормально работать.\n Примечание: Разработчик этого приложения не имеет никакого отношения к регистрации.
+        Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).
+    </string>
+    <string name="auth_error_auth_form">форма авторизации не найдена</string>
+    <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
+    <string name="auth_error_network_disconnected">соединение с сетью прервалось</string>
+
+    <string name="notification_success">Успешно подключено</string>
+    <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
+    <string name="notification_success_settings">Нажмите, чтобы открыть настройки уведомлений</string>
+    <string name="notification_not_registered">Устройство не зарегистрировано</string>
+    <string name="notification_not_registered_register">Нажмите, чтобы перейти к регистрации</string>
+    <string name="notification_error">Не удалось подключиться</string>
+    <string name="notification_error_log">Нажмите, чтобы узнать подробности или попробовать снова</string>
+    <string name="notification_progress_waiting">Ожидание…</string>
+    <string name="notification_progress_connecting">Подключаюсь…</string>
+
+    <string name="ip_wait">Ожидание получения IP адреса…</string>
+    <string name="ip_wait_result" formatted="false">IP адрес%s получен в течение %d секунд</string>
+
+    <string name="chooser_ssid">Определение названия сети</string>
+    <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
+    <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
 
 </resources>
