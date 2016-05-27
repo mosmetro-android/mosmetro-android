@@ -127,6 +127,9 @@
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
+    <string name="auth_request">Отправка запроса</string>
+    <string name="auth_initial_page">Получение начальной страницы</string>
+    <string name="auth_provider" formatted="false">Подключение к провайдеру %s</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
     <string name="auth_error_network">Сеть недоступна или не отвечает</string>
@@ -142,6 +145,7 @@
     <string name="auth_error_auth_form">форма авторизации не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_network_disconnected">соединение с сетью прервалось</string>
+    <string name="auth_error_provider">провайдер не опознан</string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
@@ -159,4 +163,5 @@
     <string name="chooser_ssid">Определение названия сети</string>
     <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
     <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
+
 </resources>

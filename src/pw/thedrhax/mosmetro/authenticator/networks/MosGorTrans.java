@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mozilla.javascript.Scriptable;
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -41,7 +42,7 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(14);
 
-        logger.log_debug(">>> Получение начального перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.get("http://mosgortrans.ru", null);
             logger.debug(client.getPageContent().outerHtml());
@@ -50,20 +51,26 @@ public class MosGorTrans extends Authenticator {
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не получено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(42);
 
-        logger.log_debug(">>> Получение страницы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: страница авторизации не получена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_page)
+            ));
             return STATUS_ERROR;
         }
 
@@ -71,27 +78,33 @@ public class MosGorTrans extends Authenticator {
             Elements forms = client.getPageContent().getElementsByTag("form");
             fields = Client.parseForm(forms.first());
         } catch (Exception ex) {
-            logger.log_debug("<<< Ошибка: форма авторизации не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_form)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(56);
 
-        logger.log_debug(">>> Отправка формы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
             client.post(link, fields);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(70);
 
-        logger.log_debug(">>> Отправка последнего запроса");
+        logger.log_debug(context.getString(R.string.auth_request));
         try {
             fields = new HashMap<String, String>();
             fields.put("redirect", "http://curlmyip.org");
@@ -100,18 +113,24 @@ public class MosGorTrans extends Authenticator {
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(84);
 
-        logger.log_debug(">> Проверка доступа в интернет");
+        logger.log_debug(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug("<< Соединение успешно установлено :3");
+            logger.log_debug(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug("<< Ошибка: доступ в интернет отсутствует");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_connection)
+            ));
             return STATUS_ERROR;
         }
 
@@ -133,7 +152,7 @@ public class MosGorTrans extends Authenticator {
          *  Meta redirect: enforta.ru/login?dst=... > link
          */
 
-        logger.log_debug(">>> Получение первого перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.get("http://mosgortrans.ru", null);
             logger.debug(client.getPageContent().outerHtml());
@@ -142,7 +161,10 @@ public class MosGorTrans extends Authenticator {
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не получено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
@@ -156,13 +178,16 @@ public class MosGorTrans extends Authenticator {
          *  Form: GET hs.enforta.ru/?mac=...&... > fields, link
          */
 
-        logger.log_debug(">>> Получение начальной страницы");
+        logger.log_debug(context.getString(R.string.auth_initial_page));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: страница не получена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_page)
+            ));
             return STATUS_ERROR;
         }
 
@@ -171,7 +196,10 @@ public class MosGorTrans extends Authenticator {
             fields = Client.parseForm(form);
             link = form.attr("action");
         } catch (Exception ex) {
-            logger.log_debug("<<< Ошибка: форма не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_form)
+            ));
             return STATUS_ERROR;
         }
 
@@ -192,7 +220,7 @@ public class MosGorTrans extends Authenticator {
          *  JavaScript redirect: / > link
          */
 
-        logger.log_debug(">>> Получение четвертого перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             // We need cookies from this page
             client.get(link, fields);
@@ -200,7 +228,10 @@ public class MosGorTrans extends Authenticator {
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не получено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
@@ -229,13 +260,16 @@ public class MosGorTrans extends Authenticator {
          *  Add Fields: data[Signin][username] data[Signin][password]
          */
 
-        logger.log_debug(">>> Получение страницы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: страница авторизации не получена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_page)
+            ));
             return STATUS_ERROR;
         }
 
@@ -250,7 +284,10 @@ public class MosGorTrans extends Authenticator {
             fields.put("data[Signin][password]", settings.getString("pref_enforta_password", ""));
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: форма не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_form)
+            ));
             return STATUS_ERROR;
         }
 
@@ -271,7 +308,7 @@ public class MosGorTrans extends Authenticator {
          *  Meta redirect: enforta.ru/login?dst=... > link
          */
 
-        logger.log_debug(">>> Получение седьмого перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.post(link, fields);
             logger.debug(client.getPageContent().outerHtml());
@@ -280,7 +317,10 @@ public class MosGorTrans extends Authenticator {
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление на найдено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
@@ -294,13 +334,16 @@ public class MosGorTrans extends Authenticator {
          *  Form: GET hs.enforta.ru > fields, link
          */
 
-        logger.log_debug(">>> Получение восьмого перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
@@ -309,7 +352,10 @@ public class MosGorTrans extends Authenticator {
             fields = Client.parseForm(form);
             link = form.attr("action");
         } catch (Exception ex) {
-            logger.log_debug("<<< Ошибка: форма не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_form)
+            ));
             return STATUS_ERROR;
         }
 
@@ -330,7 +376,7 @@ public class MosGorTrans extends Authenticator {
          *  JavaScript redirect: / > link
          */
 
-        logger.log_debug(">>> Получение десятого перенаправления");
+        logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             // We need cookies from this page
             client.get(link, fields);
@@ -339,7 +385,10 @@ public class MosGorTrans extends Authenticator {
             link = "http://hs.enforta.ru"; // TODO: Hardcoded URL
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: перенаправление не получено");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
             return STATUS_ERROR;
         }
 
@@ -361,13 +410,16 @@ public class MosGorTrans extends Authenticator {
          *  Add Fields: username password
          */
 
-        logger.log_debug(">>> Получение итоговой страницы авторизации");
+        logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex){
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: страница не получена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_auth_page)
+            ));
             return STATUS_ERROR;
         }
 
@@ -397,7 +449,10 @@ public class MosGorTrans extends Authenticator {
             link = form.attr("action");
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: форма авторизации не найдена");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
@@ -411,24 +466,30 @@ public class MosGorTrans extends Authenticator {
          *  Meta redirect: hs.enforta.ru
          */
 
-        logger.log_debug(">>> Отправка последнего запроса");
+        logger.log_debug(context.getString(R.string.auth_request));
         try {
             client.post(link, fields);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
-            logger.log_debug("<<< Ошибка: сервер не ответил или вернул ошибку");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_server)
+            ));
             return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(84);
 
-        logger.log_debug(">> Проверка доступа в интернет");
+        logger.log_debug(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug("<< Соединение успешно установлено :3");
+            logger.log_debug(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug("<< Ошибка: доступ в интернет отсутствует");
+            logger.log_debug(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_connection)
+            ));
             return STATUS_ERROR;
         }
 
@@ -457,18 +518,18 @@ public class MosGorTrans extends Authenticator {
 
     @Override
     protected int connect() {
-        logger.log_debug("Подключение к сети " + SSID);
+        logger.log_debug(String.format(context.getString(R.string.auth_connecting), getSSID()));
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
-        logger.log_debug(">> Проверка доступа в интернет");
+        logger.log_debug(context.getString(R.string.auth_checking_connection));
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {
-            logger.log_debug("<< Уже подключено");
+            logger.log_debug(context.getString(R.string.auth_already_connected));
             return STATUS_ALREADY_CONNECTED;
         } else if (connected == CHECK_WRONG_NETWORK) {
-            logger.log_debug("<< Ошибка: Сеть недоступна или не отвечает");
+            logger.log_debug(String.format(context.getString(R.string.error), context.getString(R.string.auth_error_network)));
             return STATUS_ERROR;
         }
 
@@ -476,13 +537,20 @@ public class MosGorTrans extends Authenticator {
 
         switch (provider) {
             case PROVIDER_NETBYNET:
-                logger.log_debug(">> Подключение к провайдеру NetByNet");
+                logger.log_debug(String.format(
+                        context.getString(R.string.auth_provider), "NetByNet"
+                ));
                 return connect_netbynet();
             case PROVIDER_ENFORTA:
-                logger.log_debug(">> Подключение к провайдеру Enforta");
+                logger.log_debug(String.format(
+                        context.getString(R.string.auth_provider), "Enforta"
+                ));
                 return connect_enforta();
             default:
-                logger.log_debug("<< Ошибка: Провайдер не опознан");
+                logger.log_debug(String.format(
+                        context.getString(R.string.error),
+                        context.getString(R.string.auth_error_provider)
+                ));
                 return STATUS_ERROR;
         }
     }
