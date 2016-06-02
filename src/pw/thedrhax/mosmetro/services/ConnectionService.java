@@ -310,6 +310,10 @@ public class ConnectionService extends IntentService {
                 connection.getSSID()
         ));
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ignored) {}
+
         // Try to connect
         int result = connect();
 
