@@ -168,7 +168,7 @@ public class ConnectionService extends IntentService {
                         getString(R.string.error),
                         String.format(
                                 getString(R.string.ip_wait_result),
-                                getString(R.string.not),
+                                " " + getString(R.string.not),
                                 pref_ip_wait
                         )
                 ));
