@@ -62,7 +62,8 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_redirect));
         try {
-            client.get("http://wi-fi.ru", null);
+            // TODO: Make the number of retries configurable
+            client.get("http://wi-fi.ru", null, 3);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -90,7 +91,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
-            client.get(link, null);
+            client.get(link, null, 3);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -124,7 +125,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
-            client.post(link, fields);
+            client.post(link, fields, 3);
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
@@ -161,7 +162,7 @@ public class MosMetro extends Authenticator {
         try {
             client = new OkHttp()
                     .followRedirects(false)
-                    .get("http://wi-fi.ru", null);
+                    .get("http://wi-fi.ru", null, 3);
 
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {

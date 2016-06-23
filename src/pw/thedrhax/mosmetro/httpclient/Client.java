@@ -18,6 +18,35 @@ public abstract class Client {
     public abstract Client get(String link, Map<String,String> params) throws Exception;
     public abstract Client post(String link, Map<String,String> params) throws Exception;
 
+    // TODO: Make one method instead of the following two
+    public Client get(String link, Map<String,String> params, int retries) throws Exception {
+        Exception last_ex = null;
+        for (int i = 0; i < retries; i++) {
+            try {
+                get(link, params);
+            } catch (Exception ex) {
+                last_ex = ex;
+                continue;
+            }
+            return this;
+        }
+        throw last_ex;
+    }
+
+    public Client post(String link, Map<String,String> params, int retries) throws Exception {
+        Exception last_ex = null;
+        for (int i = 0; i < retries; i++) {
+            try {
+                post(link, params);
+            } catch (Exception ex) {
+                last_ex = ex;
+                continue;
+            }
+            return this;
+        }
+        throw last_ex;
+    }
+
     // Parse methods
     public Document getPageContent() throws Exception {
         return document;
