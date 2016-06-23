@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Client {
+    private static final int METHOD_GET = 0;
+    private static final int METHOD_POST = 1;
+
     protected Document document;
 
     protected Client() {}
@@ -18,26 +21,22 @@ public abstract class Client {
     public abstract Client get(String link, Map<String,String> params) throws Exception;
     public abstract Client post(String link, Map<String,String> params) throws Exception;
 
-    // TODO: Make one method instead of the following two
     public Client get(String link, Map<String,String> params, int retries) throws Exception {
-        Exception last_ex = null;
-        for (int i = 0; i < retries; i++) {
-            try {
-                get(link, params);
-            } catch (Exception ex) {
-                last_ex = ex;
-                continue;
-            }
-            return this;
-        }
-        throw last_ex;
+        return requestWithRetries(link, params, retries, METHOD_GET);
+    }
+    public Client post(String link, Map<String,String> params, int retries) throws Exception {
+        return requestWithRetries(link, params, retries, METHOD_POST);
     }
 
-    public Client post(String link, Map<String,String> params, int retries) throws Exception {
+    private Client requestWithRetries(String link, Map<String,String> params,
+                                      int retries, int method) throws Exception {
         Exception last_ex = null;
         for (int i = 0; i < retries; i++) {
             try {
-                post(link, params);
+                switch (method) {
+                    case METHOD_GET: get(link, params); break;
+                    case METHOD_POST: post(link, params); break;
+                }
             } catch (Exception ex) {
                 last_ex = ex;
                 continue;
