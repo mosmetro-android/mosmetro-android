@@ -115,14 +115,12 @@
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>
     <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
-    <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
     <string name="auth_error_network">Сеть недоступна или не отвечает</string>
-    <string name="auth_error_redirect">перенаправление не получено</string>
     <string name="auth_error_auth_page">страница авторизации не получена</string>
     <string name="auth_error_not_registered">
         устройство не зарегистрировано в сети\n Пожалуйста, зайдите на сайт http://wi-fi.ru

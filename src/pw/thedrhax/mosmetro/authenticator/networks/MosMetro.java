@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
+    private String redirect = null;
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
@@ -27,7 +28,6 @@ public class MosMetro extends Authenticator {
 
     @Override
     public int connect() {
-        String link;
         Map<String,String> fields;
 
         if (stopped) return STATUS_INTERRUPTED;
@@ -58,40 +58,12 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(20);
-
-        logger.log_debug(context.getString(R.string.auth_redirect));
-        try {
-            // TODO: Make the number of retries configurable
-            client.get("http://wi-fi.ru", null, 3);
-            logger.debug(client.getPageContent().outerHtml());
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_redirect)
-            ));
-            return STATUS_ERROR;
-        }
-
-        try {
-            link = client.parseMetaRedirect();
-            logger.debug(link);
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_redirect)
-            ));
-            return STATUS_ERROR;
-        }
-
-        if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(40);
+        progressListener.onProgressUpdate(25);
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
-            client.get(link, null, 3);
+            // TODO: Make the number of retries configurable
+            client.get(redirect, null, 3);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -121,11 +93,11 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(60);
+        progressListener.onProgressUpdate(50);
 
         logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
-            client.post(link, fields, 3);
+            client.post(redirect, fields, 3);
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
@@ -138,7 +110,7 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(80);
+        progressListener.onProgressUpdate(75);
 
         logger.log_debug(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
@@ -172,7 +144,8 @@ public class MosMetro extends Authenticator {
         }
 
         try {
-            client.parseMetaRedirect();
+            redirect = client.parseMetaRedirect();
+            logger.debug(redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
             logger.debug(ex);
