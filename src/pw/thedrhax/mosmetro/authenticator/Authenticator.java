@@ -1,8 +1,10 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import org.jsoup.Jsoup;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
@@ -38,6 +40,7 @@ public abstract class Authenticator {
     // Device info
     protected Context context;
     protected boolean automatic;
+    protected SharedPreferences settings;
 
     public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
@@ -45,6 +48,7 @@ public abstract class Authenticator {
 
         this.context = context;
         this.automatic = automatic;
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public abstract String getSSID();
