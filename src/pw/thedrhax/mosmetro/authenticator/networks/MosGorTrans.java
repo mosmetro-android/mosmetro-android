@@ -280,8 +280,8 @@ public class MosGorTrans extends Authenticator {
 
             SharedPreferences settings = PreferenceManager
                     .getDefaultSharedPreferences(context);
-            fields.put("data[Signin][username]", settings.getString("pref_enforta_username", ""));
-            fields.put("data[Signin][password]", settings.getString("pref_enforta_password", ""));
+            fields.put("data[Signin][username]", "username");
+            fields.put("data[Signin][password]", "password");
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug(String.format(

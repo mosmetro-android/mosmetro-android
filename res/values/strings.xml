@@ -89,11 +89,6 @@
         Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
     </string>
 
-    <string name="pref_enforta_username">Логин</string>
-    <string name="pref_enforta_username_summary">Ваш номер телефона, использованный при регистрации в Enforta</string>
-    <string name="pref_enforta_password">Пароль</string>
-    <string name="pref_enforta_password_summary">Пароль, полученный по СМС при регистрации в Enforta</string>
-
     <string name="update_available">Доступно обновление</string>
     <string name="update_not_available">Нет доступных обновлений</string>
     <string name="update_not_available_message">Новые версии будут появляться здесь по мере их публикации.</string>
