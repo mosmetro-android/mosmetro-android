@@ -14,12 +14,9 @@ import java.util.Map;
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
     private String redirect = null;
-    private int pref_retry_count;
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
-
-        pref_retry_count = settings.getInt("pref_retry_count", 3);
     }
 
     @Override
