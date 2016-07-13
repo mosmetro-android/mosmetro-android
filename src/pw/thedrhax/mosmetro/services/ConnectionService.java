@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -21,7 +20,10 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 
 public class ConnectionService extends IntentService {
+    private static final String UNKNOWN_SSID = "<unknown ssid>";
+
     private static boolean running = false;
+    private static String SSID = UNKNOWN_SSID;
     private boolean from_shortcut = false;
 
     // Preferences
@@ -136,30 +138,7 @@ public class ConnectionService extends IntentService {
     private boolean isWifiConnected() {
         if (from_shortcut) return true;
         
-        // Check if Wi-Fi is not enabled
-        if (!manager.isWifiEnabled())
-            return false;
-
-        WifiInfo info = manager.getConnectionInfo();
-
-        // Strict check by supplicant state
-        if (settings.getBoolean("pref_autoconnect_strict", false))
-            if (!info.getSupplicantState().equals(SupplicantState.COMPLETED))
-                return false;
-
-        if (connection == null) {
-            for (Class<? extends Authenticator> authenticator : Authenticator.SUPPORTED_NETWORKS) {
-                try {
-                    if (info.getSSID().replace("\"", "").equals(authenticator.getField("SSID").get(authenticator)))
-                        return true;
-                } catch (Exception ignored) {}
-            }
-        } else {
-            if (connection.getSSID().equals(info.getSSID().replace("\"", "")))
-                return true;
-        }
-
-        return false;
+        return manager.isWifiEnabled() && connection.getSSID().equals(SSID);
     }
 
     private boolean waitForIP() {
@@ -191,7 +170,7 @@ public class ConnectionService extends IntentService {
                         getString(R.string.error),
                         String.format(
                                 getString(R.string.ip_wait_result),
-                                getString(R.string.not),
+                                " " + getString(R.string.not),
                                 pref_ip_wait
                         )
                 ));
@@ -254,17 +233,23 @@ public class ConnectionService extends IntentService {
             if (result == Authenticator.STATUS_NOT_REGISTERED) break;
         } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED && running);
 
-        // Remove progress notification
-        notify_progress.hide();
-
         return result;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        WifiInfo info;
+
+        if (Build.VERSION.SDK_INT >= 14) {
+            info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+        } else {
+            info = manager.getConnectionInfo();
+        }
+        SSID = info != null ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
+
         if ("STOP".equals(intent.getAction())) { // Stop by intent
             stopSelf();
-        } else if (!running) { // Start if not already running
+        } else if (!(UNKNOWN_SSID.equals(SSID) || running)) {
             onStart(intent, startId);
         }
         return START_NOT_STICKY;
@@ -276,7 +261,7 @@ public class ConnectionService extends IntentService {
         running = false;
     }
     
-    public void main(Intent intent) {
+    private void main(Intent intent) {
         // Check if started from one of the shortcuts
         if (intent.getStringExtra("SSID") != null) {
             pref_notify_success_lock = false;
@@ -285,13 +270,11 @@ public class ConnectionService extends IntentService {
 
         logger.date();
 
-        // Check if Wi-Fi is connected
-        if (!isWifiConnected()) return;
-
+        // Select an Authenticator
         if (from_shortcut) {
             connection = new Chooser(this, true, logger).choose(intent.getStringExtra("SSID"));
         } else {
-            connection = new Chooser(this, true, logger).choose();
+            connection = new Chooser(this, true, logger).choose(SSID);
         }
         if (connection == null) return;
 
@@ -310,8 +293,13 @@ public class ConnectionService extends IntentService {
                 connection.getSSID()
         ));
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ignored) {}
+
         // Try to connect
         int result = connect();
+        notify_progress.hide();
 
         logger.date();
 

@@ -1,9 +1,7 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
-import android.preference.PreferenceManager;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
@@ -15,6 +13,7 @@ import java.util.Map;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
+    private String redirect = null;
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
@@ -27,7 +26,6 @@ public class MosMetro extends Authenticator {
 
     @Override
     public int connect() {
-        String link;
         Map<String,String> fields;
 
         if (stopped) return STATUS_INTERRUPTED;
@@ -46,7 +44,6 @@ public class MosMetro extends Authenticator {
                     context.getString(R.string.auth_error_network)
             ));
 
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
             if (settings.getBoolean("pref_wifi_restart", true)) {
                 logger.log_debug(context.getString(R.string.auth_restarting_wifi));
 
@@ -58,39 +55,11 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(20);
-
-        logger.log_debug(context.getString(R.string.auth_redirect));
-        try {
-            client.get("http://wi-fi.ru", null);
-            logger.debug(client.getPageContent().outerHtml());
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_redirect)
-            ));
-            return STATUS_ERROR;
-        }
-
-        try {
-            link = client.parseMetaRedirect();
-            logger.debug(link);
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_redirect)
-            ));
-            return STATUS_ERROR;
-        }
-
-        if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(40);
+        progressListener.onProgressUpdate(25);
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
-            client.get(link, null);
+            client.get(redirect, null, pref_retry_count);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -120,11 +89,11 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(60);
+        progressListener.onProgressUpdate(50);
 
         logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
-            client.post(link, fields);
+            client.post(redirect, fields, pref_retry_count);
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
@@ -137,7 +106,7 @@ public class MosMetro extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(80);
+        progressListener.onProgressUpdate(75);
 
         logger.log_debug(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
@@ -161,7 +130,7 @@ public class MosMetro extends Authenticator {
         try {
             client = new OkHttp()
                     .followRedirects(false)
-                    .get("http://wi-fi.ru", null);
+                    .get("http://wi-fi.ru", null, pref_retry_count);
 
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
@@ -171,7 +140,8 @@ public class MosMetro extends Authenticator {
         }
 
         try {
-            client.parseMetaRedirect();
+            redirect = client.parseMetaRedirect();
+            logger.debug(redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
             logger.debug(ex);

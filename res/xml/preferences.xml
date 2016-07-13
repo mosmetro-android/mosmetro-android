@@ -227,4 +227,19 @@
         </PreferenceScreen>
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/pref_category_contributors">
+
+        <PreferenceScreen
+                android:title="@string/contirutor_revertron"
+                android:summary="@string/contributor_revertron_summary">
+
+            <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="@string/contributor_revertron_link" />
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -1,8 +1,10 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import org.jsoup.Jsoup;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
@@ -39,6 +41,8 @@ public abstract class Authenticator {
     // Device info
     protected Context context;
     protected boolean automatic;
+    protected SharedPreferences settings;
+    protected int pref_retry_count;
 
     public Authenticator (Context context, boolean automatic) {
         logger = new Logger();
@@ -46,6 +50,8 @@ public abstract class Authenticator {
 
         this.context = context;
         this.automatic = automatic;
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
     }
 
     public abstract String getSSID();
