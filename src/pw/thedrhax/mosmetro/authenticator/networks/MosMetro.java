@@ -14,9 +14,12 @@ import java.util.Map;
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
     private String redirect = null;
+    private int pref_retry_count;
 
     public MosMetro (Context context, boolean automatic) {
         super(context, automatic);
+
+        pref_retry_count = settings.getInt("pref_retry_count", 3);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
-            client.get(redirect, null, settings.getInt("pref_retry_count", 3));
+            client.get(redirect, null, pref_retry_count);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -93,7 +96,7 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
-            client.post(redirect, fields, settings.getInt("pref_retry_count", 3));
+            client.post(redirect, fields, pref_retry_count);
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
@@ -130,7 +133,7 @@ public class MosMetro extends Authenticator {
         try {
             client = new OkHttp()
                     .followRedirects(false)
-                    .get("http://wi-fi.ru", null, settings.getInt("pref_retry_count", 3));
+                    .get("http://wi-fi.ru", null, pref_retry_count);
 
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
