@@ -183,6 +183,7 @@ public class DebugActivity extends Activity {
     // Handle debug log checkbox
     public void show_debug_log (View view) {
         show_debug = ((CheckBox)view).isChecked();
-        text_messages.setText(show_debug ? logger.getDebug() : logger.getLog());
+        text_messages.setText("");
+        text_messages.append(show_debug ? logger.getDebug() : logger.getLog());
     }
 }
