@@ -48,7 +48,8 @@
 
         <service android:name="pw.thedrhax.mosmetro.services.ConnectionService" />
 
-        <receiver android:name="pw.thedrhax.mosmetro.services.NetworkReceiver">
+        <receiver android:name="pw.thedrhax.mosmetro.services.NetworkReceiver"
+                  android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
