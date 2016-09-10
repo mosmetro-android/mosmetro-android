@@ -2,7 +2,6 @@ package pw.thedrhax.mosmetro.httpclient.clients;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import pw.thedrhax.mosmetro.httpclient.Client;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class JsoupClient extends Client {
 
         cookies.putAll(response.cookies());
         referer = response.url().toString();
-        document = parseDocument(response);
+        parseDocument(response);
 
         return this;
     }
@@ -49,18 +48,22 @@ public class JsoupClient extends Client {
 
         cookies.putAll(response.cookies());
         referer = response.url().toString();
-        document = parseDocument(response);
+        parseDocument(response);
 
         return this;
     }
 
-    private Document parseDocument (Connection.Response response) throws Exception {
-        Document result = response.parse();
+    private void parseDocument (Connection.Response response) throws Exception {
+        raw_document = response.body();
+
+        if (raw_document == null || raw_document.isEmpty()) {
+            throw new Exception("Empty response");
+        }
+
+        document = response.parse();
 
         // Clean-up useless tags: <script>, <style>
-        result.getElementsByTag("script").remove();
-        result.getElementsByTag("style").remove();
-
-        return result;
+        document.getElementsByTag("script").remove();
+        document.getElementsByTag("style").remove();
     }
 }

@@ -11,6 +11,7 @@ public abstract class Client {
     private static final int METHOD_POST = 1;
 
     protected Document document;
+    protected String raw_document;
     protected String referer = "http://curlmyip.org";
 
     protected Client() {}
@@ -50,6 +51,10 @@ public abstract class Client {
     // Parse methods
     public Document getPageContent() {
         return document;
+    }
+
+    public String getPage() {
+        return raw_document;
     }
 
     public String getReferer() {
