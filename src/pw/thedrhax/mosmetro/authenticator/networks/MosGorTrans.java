@@ -1,21 +1,18 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.mozilla.javascript.Scriptable;
+import org.unbescape.javascript.JavaScriptEscape;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.JsoupClient;
+import pw.thedrhax.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MosGorTrans extends Authenticator {
     public static final String SSID = "MosGorTrans_Free";
@@ -144,7 +141,7 @@ public class MosGorTrans extends Authenticator {
         Map<String,String> fields;
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(7);
+        progressListener.onProgressUpdate(12);
 
         /*
          *  GET mosgortrans.ru
@@ -169,7 +166,7 @@ public class MosGorTrans extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(14);
+        progressListener.onProgressUpdate(24);
 
         /*
          *  GET enforta.ru/login?dst=... < link
@@ -204,17 +201,13 @@ public class MosGorTrans extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(21);
+        progressListener.onProgressUpdate(36);
 
         /*
          *  GET hs.enforta.ru/?mac=...&... < link, fields
          *  Referer: enforta.ru/login?dst=...
          *  --
-         *  300 Redirect: hs.enforta.ru/users/hotspotConnection?... > link
-         */
-
-        /*
-         *  GET hs.enforta.ru/users/hotspotConnection?... < link
+         *  GET hs.enforta.ru/users/hotspotConnection?... < 302
          *  Referer: enforta.ru/login?dst=...
          *  --
          *  JavaScript redirect: / > link
@@ -224,7 +217,7 @@ public class MosGorTrans extends Authenticator {
         try {
             // We need cookies from this page
             client.get(link, fields);
-            link = "http://hs.enforta.ru"; //TODO: Hardcoded URL
+            link = link.split("/?")[0];
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
@@ -236,28 +229,19 @@ public class MosGorTrans extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(28);
+        progressListener.onProgressUpdate(48);
 
         /*
          *  GET hs.enforta.ru < link
-         *  Referer: hs.enforta.ru/users/hotspotConnection
-         *  --
-         *  300 redirect: /webapps/.../splashPage.php?tgr=tr0pn&cbUrl=... > link
-         */
-
-        /*
-         *  GET hs.enforta.ru/webapps/.../splashPage.php?tgr=tr0pn&cbUrl=... < link
          *  Referer: hs.enforta.ru/users/hotspotConnection?...
          *  --
-         *  300 redirect: /?tr0pn=... > link
-         */
-
-        /*
-         *  GET hs.enforta.ru/?tr0pn=... < link
+         *  GET hs.enforta.ru/users/hotspotSignin < 302
          *  Referer: hs.enforta.ru/users/hotspotConnection?...
          *  --
-         *  Form: POST /users/hotspotSignin > fields, link
-         *  Add Fields: data[Signin][username] data[Signin][password]
+         *  Form: POST enforta.ru/login > fields, link
+         *  Add fields:
+         *   * username < doLogin -> username.value
+         *   * password < routeros-md5.hexMD5(chap-id + ? + chap-challenge)
          */
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
@@ -278,10 +262,13 @@ public class MosGorTrans extends Authenticator {
             link = form.attr("action");
             fields = Client.parseForm(form);
 
-            SharedPreferences settings = PreferenceManager
-                    .getDefaultSharedPreferences(context);
-            fields.put("data[Signin][username]", "username");
-            fields.put("data[Signin][password]", "password");
+            String password = JavaScriptEscape.unescapeJavaScript(
+                    client.match("hexMD5\\((.*?)\\);").replaceAll("('|\"| |\\+)", "")
+            );
+            String script = new CachedRetriever(context).get("http://hs.enforta.ru/js/devices/routeros-md5.js", "");
+
+            fields.put("username", client.match("username\\.value = \"(.*?)\";"));
+            fields.put("password", Util.js(script + "; hash = hexMD5(\"" + password + "\")", "hash"));
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug(String.format(
@@ -292,29 +279,21 @@ public class MosGorTrans extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(42);
+        progressListener.onProgressUpdate(60);
 
         /*
-         *  POST hs.enforta.ru/users/hotspotSignin < link
-         *  Referer: hs.enforta.ru/?tr0pn=...
+         *  POST enfrota.ru/login < link, fields
+         *  Referer: hs.enforta.ru/users/hotspotSignin
          *  --
-         *  300 redirect: red....cloud4wiredirect.com/?rr=... > link
+         *  Meta redirect: hs.enforta.ru > link
          */
 
-        /*
-         *  GET red....cloud4wiredirect.com/?rr=... < link
-         *  Referer: hs.enforta.ru/?tr0pn=...
-         *  --
-         *  Meta redirect: enforta.ru/login?dst=... > link
-         */
-
-        logger.log_debug(context.getString(R.string.auth_redirect));
+        logger.log(context.getString(R.string.auth_redirect));
         try {
             client.post(link, fields);
             logger.debug(client.getPageContent().outerHtml());
 
             link = client.parseMetaRedirect();
-            logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug(String.format(
@@ -325,156 +304,36 @@ public class MosGorTrans extends Authenticator {
         }
 
         if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(56);
+        progressListener.onProgressUpdate(72);
 
         /*
-         *  GET enforta.ru/login?dst=... < link
-         *  Referer: red....cloud4wiredirect.com/?rr=...
+         *  GET hs.enforta.ru < link
+         *  Referer: enforta.ru/login
          *  --
-         *  Form: GET hs.enforta.ru > fields, link
+         *  GET hs.enforta.ru/logged/landingPageFrame < 302
+         *  Referer: enforta.ru/login
+         *  --
+         *  GET hs.enforta.ru/c4wportal/advmos2 < 302
+         *  Referer: enforta.ru/login
+         *  --
+         *  GET hs.enforta.ru/users/hotspotConnection?... < 302
+         *  Referer: enforta.ru/login
+         *  --
+         *  GET hs.enforta.ru < 302
+         *  Referer: enforta.ru/login
+         *  --
+         *  Finish!
          */
 
         logger.log_debug(context.getString(R.string.auth_redirect));
         try {
             client.get(link, null);
             logger.debug(client.getPageContent().outerHtml());
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_server)
-            ));
-            return STATUS_ERROR;
-        }
-
-        try {
-            Element form = client.getPageContent().getElementsByTag("form").first();
-            fields = Client.parseForm(form);
-            link = form.attr("action");
-        } catch (Exception ex) {
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_auth_form)
-            ));
-            return STATUS_ERROR;
-        }
-
-        if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(63);
-
-        /*
-         *  GET hs.enforta.ru/?mac=...&... < link, fields
-         *  Referer: enforta.ru/login?dst=...
-         *  --
-         *  300 redirect: /users/hotspotConnection?... > link
-         */
-
-        /*
-         *  GET hs.enforta.ru/users/hotspotConnection?... < link
-         *  Referer: enforta.ru/login?dst=...
-         *  --
-         *  JavaScript redirect: / > link
-         */
-
-        logger.log_debug(context.getString(R.string.auth_redirect));
-        try {
-            // We need cookies from this page
-            client.get(link, fields);
-            logger.debug(client.getPageContent().outerHtml());
-
-            link = "http://hs.enforta.ru"; // TODO: Hardcoded URL
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
-            ));
-            return STATUS_ERROR;
-        }
-
-        if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(0);
-
-        /*
-         *  GET hs.enforta.ru/ < link
-         *  Referer: hs.enforta.ru/users/hotspotConnection?...
-         *  --
-         *  300 redirect: hs.enforta.ru/users/hotspotSignin > link
-         */
-
-        /*
-         *  GET hs.enforta.ru/users/hotspotSignin < link
-         *  Referer: hs.enforta.ru/users/hotspotConnection?...
-         *  --
-         *  Form: POST enforta.ru/login > fields, link
-         *  Add Fields: username password
-         */
-
-        logger.log_debug(context.getString(R.string.auth_auth_page));
-        try {
-            client.get(link, null);
-            logger.debug(client.getPageContent().outerHtml());
-        } catch (Exception ex){
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_auth_page)
-            ));
-            return STATUS_ERROR;
-        }
-
-        try {
-            Element form = client.getPageContent().getElementsByTag("form").first();
-
-            // Generate credentials
-            Map<String,String> auth = Client.parseForm(form);
-            for (Element script : client.getPageContent().getElementsByTag("script")) {
-                if (script.outerHtml().contains("function doLogin()")) {
-                    Pattern p = Pattern.compile("username\\.value = \"(.*?)\";");
-                    Matcher m = p.matcher(script.outerHtml());
-                    if (m.find())
-                        auth.put("username", m.group(1));
-                }
-            }
-
-            SharedPreferences settings = PreferenceManager
-                    .getDefaultSharedPreferences(context);
-
-            auth.put("password", getPasswordHash(
-                    fields.get("chap-id"),
-                    settings.getString("pref_enforta_password", ""),
-                    fields.get("chap-challenge")
-            ));
-
-            link = form.attr("action");
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_server)
-            ));
-            return STATUS_ERROR;
-        }
-
-        if (stopped) return STATUS_INTERRUPTED;
-        progressListener.onProgressUpdate(77);
-
-        /*
-         *  POST enforta.ru/login < link, fields
-         *  Referer: hs.enforta.ru/users/hotspotSignin
-         *  --
-         *  Meta redirect: hs.enforta.ru
-         */
-
-        logger.log_debug(context.getString(R.string.auth_request));
-        try {
-            client.post(link, fields);
-            logger.debug(client.getPageContent().outerHtml());
-        } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_server)
             ));
             return STATUS_ERROR;
         }
@@ -496,24 +355,6 @@ public class MosGorTrans extends Authenticator {
         progressListener.onProgressUpdate(100);
 
         return STATUS_CONNECTED;
-    }
-
-    // TODO: Is Rhino library really necessary?
-    private String getPasswordHash (String chap_id, String password, String chap_challenge) throws Exception {
-        // Initialize Rhino
-        org.mozilla.javascript.Context cx = org.mozilla.javascript.Context.enter();
-        Scriptable scope = cx.initStandardObjects();
-
-        // Get hashing script
-        String script = new CachedRetriever(context).get("http://hs.enforta.ru/js/devices/routeros-md5.js", "");
-
-        // Load hashing script
-        cx.evaluateString(scope, script, "", 1, null);
-
-        // Calculate md5(chap-id + password + chap-challenge)
-        cx.evaluateString(scope, "hash = hexMD5(\"" + chap_id + password + chap_challenge + "\")", "", 1, null);
-
-        return org.mozilla.javascript.Context.toString(scope.get("hash", scope));
     }
 
     @Override

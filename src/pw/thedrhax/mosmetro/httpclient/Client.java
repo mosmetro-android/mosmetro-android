@@ -5,6 +5,8 @@ import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class Client {
     private static final int METHOD_GET = 0;
@@ -101,6 +103,17 @@ public abstract class Client {
         }
 
         return result;
+    }
+
+    public String match (String pattern) {
+        Pattern p = Pattern.compile(pattern, Pattern.DOTALL);
+        Matcher m = p.matcher(document.outerHtml());
+
+        if (m.find()) {
+            return m.group(1);
+        } else {
+            return null;
+        }
     }
 
     // Convert methods
