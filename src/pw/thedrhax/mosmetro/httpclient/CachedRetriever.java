@@ -88,7 +88,7 @@ public class CachedRetriever {
         // Try to retrieve content from server
         try {
             client.get(url, null);
-            result = client.getPageContent().outerHtml().trim();
+            result = client.getPage().trim();
 
             // Write new content to cache
             writeCachedUrl(url, result);
