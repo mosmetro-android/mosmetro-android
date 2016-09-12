@@ -217,7 +217,7 @@ public class MosGorTrans extends Authenticator {
         try {
             // We need cookies from this page
             client.get(link, fields);
-            link = link.split("/?")[0];
+            link = link.split("/login?")[0];
             logger.debug(link);
         } catch (Exception ex) {
             logger.debug(ex);
