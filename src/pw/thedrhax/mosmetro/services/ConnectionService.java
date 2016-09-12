@@ -289,7 +289,8 @@ public class ConnectionService extends IntentService {
         ));
 
         try {
-            Thread.sleep(5000);
+            if (!from_shortcut)
+                Thread.sleep(5000);
         } catch (InterruptedException ignored) {}
 
         // Try to connect
