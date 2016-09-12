@@ -238,14 +238,19 @@ public class ConnectionService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        WifiInfo info;
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+        if (intent.getStringExtra("SSID") != null) {
+            SSID = intent.getStringExtra("SSID");
+            pref_notify_success_lock = false;
+            from_shortcut = true;
         } else {
-            info = manager.getConnectionInfo();
+            WifiInfo info;
+            if (Build.VERSION.SDK_INT >= 14) {
+                info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+            } else {
+                info = manager.getConnectionInfo();
+            }
+            SSID = info != null ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
         }
-        SSID = info != null ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
             stopSelf();
@@ -257,25 +262,15 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         running = true;
-        main(intent);
+        main();
         running = false;
     }
     
-    private void main(Intent intent) {
-        // Check if started from one of the shortcuts
-        if (intent.getStringExtra("SSID") != null) {
-            pref_notify_success_lock = false;
-            from_shortcut = true;
-        }
-
+    private void main() {
         logger.date();
 
         // Select an Authenticator
-        if (from_shortcut) {
-            connection = new Chooser(this, true, logger).choose(intent.getStringExtra("SSID"));
-        } else {
-            connection = new Chooser(this, true, logger).choose(SSID);
-        }
+        connection = new Chooser(this, true, logger).choose(SSID);
         if (connection == null) return;
 
         connection.setLogger(logger);
