@@ -3,7 +3,6 @@ package pw.thedrhax.mosmetro.authenticator.networks;
 import android.content.Context;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.unbescape.javascript.JavaScriptEscape;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
@@ -262,13 +261,11 @@ public class MosGorTrans extends Authenticator {
             link = form.attr("action");
             fields = Client.parseForm(form);
 
-            String password = JavaScriptEscape.unescapeJavaScript(
-                    client.match("hexMD5\\((.*?)\\);").replaceAll("('|\"| |\\+)", "")
-            );
+            String password = client.match("hexMD5\\((.*?)\\);");
             String script = new CachedRetriever(context).get("http://hs.enforta.ru/js/devices/routeros-md5.js", "");
 
             fields.put("username", client.match("username\\.value = \"(.*?)\";"));
-            fields.put("password", Util.js(script + "; hash = hexMD5(\"" + password + "\")", "hash"));
+            fields.put("password", Util.js(script + "; hash = hexMD5(" + password + ")", "hash"));
         } catch (Exception ex) {
             logger.debug(ex);
             logger.log_debug(String.format(
