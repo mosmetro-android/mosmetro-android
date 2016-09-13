@@ -238,11 +238,13 @@ public class ConnectionService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getStringExtra("SSID") != null) {
+        if (intent.getBooleanExtra("background", false)) {
             SSID = intent.getStringExtra("SSID");
             pref_notify_success_lock = false;
             from_shortcut = true;
-        } else {
+        }
+
+        if (!from_shortcut || SSID.isEmpty()) {
             WifiInfo info;
             if (Build.VERSION.SDK_INT >= 14) {
                 info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
