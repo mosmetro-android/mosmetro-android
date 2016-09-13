@@ -64,8 +64,7 @@ public class DebugActivity extends Activity {
 
             if (intent.getBooleanExtra("background", false)) {
                 Intent service = new Intent(this, ConnectionService.class);
-                if (!SSID.isEmpty()) service.putExtra("SSID", SSID);
-
+                service.putExtras(intent);
                 startService(service);
                 finish();
             }
