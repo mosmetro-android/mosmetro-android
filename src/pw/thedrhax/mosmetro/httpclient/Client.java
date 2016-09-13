@@ -107,7 +107,7 @@ public abstract class Client {
 
     public String match (String pattern) {
         Pattern p = Pattern.compile(pattern, Pattern.DOTALL);
-        Matcher m = p.matcher(document.outerHtml());
+        Matcher m = p.matcher(raw_document);
 
         if (m.find()) {
             return m.group(1);
