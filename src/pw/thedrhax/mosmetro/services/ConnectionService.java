@@ -285,10 +285,14 @@ public class ConnectionService extends IntentService {
             }
         });
 
-        notify_progress.setTitle(String.format(
+        notify_progress
+            .setTitle(String.format(
                 getString(R.string.auth_connecting),
                 connection.getSSID()
-        ));
+            ))
+            .setText(getString(R.string.auth_waiting))
+            .setContinuous()
+            .show();
 
         try {
             if (!from_shortcut)
