@@ -57,7 +57,7 @@ public class ConnectionService extends IntentService {
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
         pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "30"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
-        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", false);
+        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
         PendingIntent delete_intent = PendingIntent.getService(
                 this, 0,

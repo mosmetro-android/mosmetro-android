@@ -79,7 +79,7 @@
                     android:key="pref_notify_success_lock"
                     android:title="@string/pref_notify_success_lock"
                     android:summary="@string/pref_notify_success_lock_summary"
-                    android:defaultValue="false" />
+                    android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_notify_fail"
