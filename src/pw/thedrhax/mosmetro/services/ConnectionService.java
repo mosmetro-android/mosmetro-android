@@ -57,7 +57,13 @@ public class ConnectionService extends IntentService {
         pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
         pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "30"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
-        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", false);
+        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
+
+        PendingIntent delete_intent = PendingIntent.getService(
+                this, 0,
+                new Intent(this, ConnectionService.class).setAction("STOP"),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
 
         notify_progress = new Notification(this)
                 .setIcon(pref_colored_icons ?
@@ -65,14 +71,11 @@ public class ConnectionService extends IntentService {
                         R.drawable.ic_notification_connecting)
                 .setId(1)
                 .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14))
-                .setDeleteIntent(PendingIntent.getService(
-                        this, 0,
-                        new Intent(this, ConnectionService.class).setAction("STOP"),
-                        PendingIntent.FLAG_UPDATE_CURRENT)
-                );
+                .setDeleteIntent(delete_intent);
 
         notification = new Notification(this)
-                .setId(0);
+                .setId(0)
+                .setDeleteIntent(delete_intent);
 
         logger = new Logger();
     }
@@ -103,6 +106,8 @@ public class ConnectionService extends IntentService {
                         .setCancellable(!pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
+
+                notification.setCancellable(true);
 
                 return;
 
@@ -285,10 +290,14 @@ public class ConnectionService extends IntentService {
             }
         });
 
-        notify_progress.setTitle(String.format(
+        notify_progress
+            .setTitle(String.format(
                 getString(R.string.auth_connecting),
                 connection.getSSID()
-        ));
+            ))
+            .setText(getString(R.string.auth_waiting))
+            .setContinuous()
+            .show();
 
         try {
             if (!from_shortcut)
