@@ -59,20 +59,23 @@ public class ConnectionService extends IntentService {
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", false);
 
+        PendingIntent delete_intent = PendingIntent.getService(
+                this, 0,
+                new Intent(this, ConnectionService.class).setAction("STOP"),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
         notify_progress = new Notification(this)
                 .setIcon(pref_colored_icons ?
                         R.drawable.ic_notification_connecting_colored :
                         R.drawable.ic_notification_connecting)
                 .setId(1)
                 .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14))
-                .setDeleteIntent(PendingIntent.getService(
-                        this, 0,
-                        new Intent(this, ConnectionService.class).setAction("STOP"),
-                        PendingIntent.FLAG_UPDATE_CURRENT)
-                );
+                .setDeleteIntent(delete_intent);
 
         notification = new Notification(this)
-                .setId(0);
+                .setId(0)
+                .setDeleteIntent(delete_intent);
 
         logger = new Logger();
     }
@@ -103,6 +106,8 @@ public class ConnectionService extends IntentService {
                         .setCancellable(!pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
+
+                notification.setCancellable(true);
 
                 return;
 
