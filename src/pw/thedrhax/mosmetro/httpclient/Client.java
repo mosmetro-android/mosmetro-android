@@ -66,7 +66,7 @@ public abstract class Client {
         for (Element element : document.getElementsByTag("meta")) {
             if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
                 String attr = element.attr("content");
-                if (attr.contains("URL=")) {
+                if (attr.toLowerCase().contains("; url=")) {
                     link = attr.substring(attr.indexOf("=") + 1);
                 } else {
                     link = attr.substring(attr.indexOf(";") + 1);
