@@ -106,7 +106,7 @@
     <string name="manual_connection_default">По умолчанию</string>
     <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
     <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
-    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям московского метрополитена</string>
+    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям метро и МЦК</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
     <string name="manual_connection_shortcut_summary">
         Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
