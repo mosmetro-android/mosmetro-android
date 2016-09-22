@@ -58,7 +58,8 @@ public abstract class Authenticator {
     public int start() {
         stopped = false;
 
-        logger.debug(String.format(context.getString(R.string.version), getVersion()));
+        logger.log(Logger.LEVEL.DEBUG,
+                   String.format(context.getString(R.string.version), getVersion()));
         int result = connect();
 
         if (stopped) return result;

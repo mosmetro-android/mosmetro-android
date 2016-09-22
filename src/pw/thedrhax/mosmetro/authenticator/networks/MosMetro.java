@@ -7,6 +7,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.util.Logger;
 
 import java.net.ProtocolException;
 import java.util.Map;
@@ -31,21 +32,21 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
-        logger.log_debug(String.format(context.getString(R.string.auth_connecting), getSSID()));
+        logger.log(String.format(context.getString(R.string.auth_connecting), getSSID()));
 
-        logger.log_debug(context.getString(R.string.auth_checking_connection));
+        logger.log(context.getString(R.string.auth_checking_connection));
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {
-            logger.log_debug(context.getString(R.string.auth_already_connected));
+            logger.log(context.getString(R.string.auth_already_connected));
             return STATUS_ALREADY_CONNECTED;
         } else if (connected == CHECK_WRONG_NETWORK) {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_network)
             ));
 
             if (settings.getBoolean("pref_wifi_restart", true)) {
-                logger.log_debug(context.getString(R.string.auth_restarting_wifi));
+                logger.log(context.getString(R.string.auth_restarting_wifi));
 
                 WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 manager.reassociate();
@@ -57,13 +58,13 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(25);
 
-        logger.log_debug(context.getString(R.string.auth_auth_page));
+        logger.log(context.getString(R.string.auth_auth_page));
         try {
             client.get(redirect, null, pref_retry_count);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_page)
             ));
@@ -73,7 +74,7 @@ public class MosMetro extends Authenticator {
         try {
             Elements forms = client.getPageContent().getElementsByTag("form");
             if (forms.size() > 1) {
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         context.getString(R.string.error),
                         context.getString(R.string.auth_error_not_registered)
                 ));
@@ -81,7 +82,7 @@ public class MosMetro extends Authenticator {
             }
             fields = Client.parseForm(forms.first());
         } catch (Exception ex) {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_form)
             ));
@@ -91,14 +92,14 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(50);
 
-        logger.log_debug(context.getString(R.string.auth_auth_form));
+        logger.log(context.getString(R.string.auth_auth_form));
         try {
             client.post(redirect, fields, pref_retry_count);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_server)
             ));
@@ -108,11 +109,11 @@ public class MosMetro extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(75);
 
-        logger.log_debug(context.getString(R.string.auth_checking_connection));
+        logger.log(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug(context.getString(R.string.auth_connected));
+            logger.log(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_connection)
             ));
@@ -132,19 +133,19 @@ public class MosMetro extends Authenticator {
                     .followRedirects(false)
                     .get("http://wi-fi.ru", null, pref_retry_count);
 
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network
-            logger.debug(ex);
+            logger.log(Logger.LEVEL.DEBUG, ex);
             return CHECK_WRONG_NETWORK;
         }
 
         try {
             redirect = client.parseMetaRedirect();
-            logger.debug(redirect);
+            logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
-            logger.debug(ex);
+            logger.log(Logger.LEVEL.DEBUG, ex);
             return CHECK_CONNECTED;
         }
 

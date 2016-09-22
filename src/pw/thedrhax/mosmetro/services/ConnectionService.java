@@ -151,7 +151,7 @@ public class ConnectionService extends IntentService {
 
         int count = 0;
 
-        logger.log_debug(getString(R.string.ip_wait));
+        logger.log(getString(R.string.ip_wait));
         notify_progress
                 .setText(getString(R.string.ip_wait))
                 .setContinuous()
@@ -163,7 +163,7 @@ public class ConnectionService extends IntentService {
             } catch (InterruptedException ignored) {}
 
             if (!isWifiConnected()) {
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
                 ));
@@ -171,7 +171,7 @@ public class ConnectionService extends IntentService {
             }
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         getString(R.string.error),
                         String.format(
                                 getString(R.string.ip_wait_result),
@@ -183,7 +183,7 @@ public class ConnectionService extends IntentService {
             }
         }
 
-        logger.log_debug(String.format(
+        logger.log(String.format(
                 getString(R.string.ip_wait_result),
                 "", count/2
         ));
@@ -228,7 +228,7 @@ public class ConnectionService extends IntentService {
             result = connection.start();
 
             if (!isWifiConnected()) {
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
                 ));

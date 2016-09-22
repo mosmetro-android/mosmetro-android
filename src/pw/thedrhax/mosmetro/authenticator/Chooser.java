@@ -19,7 +19,7 @@ public class Chooser {
     public Authenticator choose (String SSID) {
         if (SSID == null) return choose();
 
-        logger.log_debug(String.format(context.getString(R.string.chooser_searching), SSID));
+        logger.log(String.format(context.getString(R.string.chooser_searching), SSID));
 
         // Trying to match one of Authenticators for this SSID
         Class<? extends Authenticator> result_class = null;
@@ -33,7 +33,7 @@ public class Chooser {
         }
 
         if (result_class == null) {
-            logger.log_debug(String.format(context.getString(R.string.error),
+            logger.log(String.format(context.getString(R.string.error),
                     context.getString(R.string.chooser_not_supported)
             ));
             return null;
@@ -55,7 +55,7 @@ public class Chooser {
 
     private Authenticator choose() {
         // Get SSID from WifiManager
-        logger.log_debug(context.getString(R.string.chooser_ssid));
+        logger.log(context.getString(R.string.chooser_ssid));
         WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String SSID = manager.getConnectionInfo().getSSID().replace("\"", "");
         return choose(SSID);

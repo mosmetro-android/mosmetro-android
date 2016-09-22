@@ -2,59 +2,65 @@ package pw.thedrhax.util;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Logger implements Parcelable {
-    private StringBuilder log, debug;
+    public enum LEVEL {
+        INFO,
+        DEBUG,
+    }
+    private Map<LEVEL,StringBuilder> logs;
 
     public Logger () {
-        log = new StringBuilder();
-        debug = new StringBuilder();
+        logs = new HashMap<LEVEL, StringBuilder>();
+        for (LEVEL level : LEVEL.values()) {
+            logs.put(level, new StringBuilder());
+        }
     }
 
     /*
      * Inputs
      */
 
+    public void log (LEVEL level, String message) {
+        logs.get(level).append(message).append("\n");
+    }
+
+    public void log (LEVEL level, Throwable ex) {
+        log(level, Log.getStackTraceString(ex));
+    }
+
     public void log (String message) {
-        log.append(message).append("\n");
+        for (LEVEL level : LEVEL.values()) {
+            log(level, message);
+        }
     }
 
-    public void debug (String message) {
-        debug.append(message).append("\n");
-    }
-
-    public void debug (Exception ex) {
-        debug(Util.exToStr(ex));
-    }
-
-    public void log_debug (String message) {
-        log(message);
-        debug(message);
-    }
+    /*
+     * Logger Utils
+     */
 
     public void merge (Logger logger) {
-        log(logger.getLog());
-        debug(logger.getDebug());
+        for (LEVEL level : LEVEL.values()) {
+            log(level, logger.get(level));
+        }
     }
 
-    public void date () {
-        DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        log_debug(dateFormat.format(new Date()));
+    public void date() {
+        log(DateFormat.getDateTimeInstance().format(new Date()));
     }
 
     /*
      * Outputs
      */
 
-    public String getLog() {
-        return log.toString();
-    }
-
-    public String getDebug() {
-        return debug.toString();
+    public String get (LEVEL level) {
+        return logs.get(level).toString();
     }
 
     /*
@@ -70,8 +76,9 @@ public class Logger implements Parcelable {
         @Override
         public Logger createFromParcel(Parcel source) {
             Logger logger = new Logger();
-            logger.log(source.readString());
-            logger.debug(source.readString());
+            for (LEVEL level : LEVEL.values()) {
+                logger.log(level, source.readString());
+            }
             return logger;
         }
     };
@@ -83,7 +90,8 @@ public class Logger implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(log.toString());
-        dest.writeString(debug.toString());
+        for (LEVEL level : LEVEL.values()) {
+            dest.writeString(get(level));
+        }
     }
 }
