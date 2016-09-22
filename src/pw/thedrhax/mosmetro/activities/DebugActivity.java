@@ -140,12 +140,7 @@ public class DebugActivity extends Activity {
 
             Chooser chooser = new Chooser(DebugActivity.this, false, local_logger);
 
-            Authenticator connection;
-            if (params[0] == null) {
-                connection = chooser.choose();
-            } else {
-                connection = chooser.choose(params[0]);
-            }
+            Authenticator connection = chooser.choose(params[0]);
             if (connection == null) return null;
 
             connection.setLogger(local_logger);
