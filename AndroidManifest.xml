@@ -47,6 +47,7 @@
         </activity>
 
         <service android:name="pw.thedrhax.mosmetro.services.ConnectionService" />
+        <service android:name="pw.thedrhax.mosmetro.services.AuthService" />
 
         <receiver android:name="pw.thedrhax.mosmetro.services.NetworkReceiver"
                   android:enabled="true" android:exported="true">

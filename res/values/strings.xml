@@ -13,6 +13,7 @@
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
+    <string name="interrupted">Операция отменена</string>
     <string name="save">Сохранить</string>
     <string name="install">Установить</string>
     <string name="manual_connection">Ручное подключение</string>
