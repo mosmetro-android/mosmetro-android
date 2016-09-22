@@ -30,8 +30,11 @@ public class ShortcutActivity extends Activity {
         Intent result = new Intent();
 
         Intent shortcut_intent = new Intent(this, DebugActivity.class);
-        shortcut_intent.putExtra("SSID", SSID);
-        shortcut_intent.putExtra("background", ((CheckBox)findViewById(R.id.check_background)).isChecked());
+        shortcut_intent.putExtra(DebugActivity.EXTRA_SSID, SSID);
+        shortcut_intent.putExtra(
+                DebugActivity.EXTRA_BACKGROUND,
+                ((CheckBox)findViewById(R.id.check_background)).isChecked()
+        );
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
         result.putExtra(Intent.EXTRA_SHORTCUT_NAME, SSID.isEmpty() ?

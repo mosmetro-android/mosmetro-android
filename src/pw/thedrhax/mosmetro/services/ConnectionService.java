@@ -93,9 +93,13 @@ public class ConnectionService extends IntentService {
                                 R.drawable.ic_notification_success);
 
                 if (settings.getBoolean("pref_notify_success_log", false)) {
+                    Intent debug = new Intent(this, DebugActivity.class);
+                    debug.setAction(DebugActivity.ACTION_SHOW_LOG);
+                    debug.putExtra(DebugActivity.EXTRA_LOGGER, logger);
+
                     notification
                             .setText(getString(R.string.notification_success_log))
-                            .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
+                            .setIntent(debug);
                 } else {
                     notification
                             .setText(getString(R.string.notification_success_settings))
@@ -128,13 +132,17 @@ public class ConnectionService extends IntentService {
                 return;
 
             case Authenticator.STATUS_ERROR:
+                Intent debug = new Intent(this, DebugActivity.class);
+                debug.setAction(DebugActivity.ACTION_SHOW_LOG);
+                debug.putExtra(DebugActivity.EXTRA_LOGGER, logger);
+
                 notification
                         .setTitle(getString(R.string.notification_error))
                         .setText(getString(R.string.notification_error_log))
                         .setIcon(pref_colored_icons ?
                                 R.drawable.ic_notification_error_colored :
                                 R.drawable.ic_notification_error)
-                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
+                        .setIntent(debug)
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
         }

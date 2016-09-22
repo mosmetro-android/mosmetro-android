@@ -21,6 +21,13 @@ import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
+    public static final String ACTION_DEFAULT = "default";
+    public static final String ACTION_SHOW_LOG = "show log";
+
+    public static final String EXTRA_LOGGER = "logger";
+    public static final String EXTRA_SSID = "SSID";
+    public static final String EXTRA_BACKGROUND = "background";
+
     // UI Elements
     private TextView text_messages;
     private Button button_connect;
@@ -31,6 +38,7 @@ public class DebugActivity extends Activity {
 
     // Settings
     private String SSID = null;
+    private String action = ACTION_DEFAULT;
 
     /** Called when the activity is first created. */
     @Override
@@ -51,28 +59,27 @@ public class DebugActivity extends Activity {
             }
         };
 
-        // Check for log from ConnectionService
-        try {
-            // Intent from the ConnectionService
-            Bundle bundle = getIntent().getExtras();
-            logger.merge((Logger)bundle.getParcelable("logger"));
-            return;
-        } catch (NullPointerException ignored) {}
+        String intent_action = getIntent().getAction();
+        if (intent_action != null) {
+            if (ACTION_SHOW_LOG.equals(intent_action)) {
+                // Intent from the ConnectionService
+                Bundle bundle = getIntent().getExtras();
+                logger.merge((Logger) bundle.getParcelable(EXTRA_LOGGER));
+            } else {
+                // Intent from the SettingsActivity or from shortcuts
+                String SSID = getIntent().getStringExtra(EXTRA_SSID);
 
-        try {
-            // Intent from the SettingsActivity or from shortcuts
-            Intent intent = getIntent();
-            String SSID = intent.getStringExtra("SSID");
+                if (getIntent().getBooleanExtra(EXTRA_BACKGROUND, false)) {
+                    Intent service = new Intent(this, ConnectionService.class);
+                    service.putExtras(getIntent());
+                    startService(service);
+                    finish();
+                }
 
-            if (intent.getBooleanExtra("background", false)) {
-                Intent service = new Intent(this, ConnectionService.class);
-                service.putExtras(intent);
-                startService(service);
-                finish();
+                if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
             }
-
-            if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
-        } catch (NullPointerException ignored) {}
+            action = intent_action;
+        }
 
         bindService(new Intent(this, AuthService.class), auth_conn, BIND_AUTO_CREATE);
     }
@@ -183,7 +190,8 @@ public class DebugActivity extends Activity {
                 }
             });
 
-            button_connect(null);
+            if (!action.equals(ACTION_SHOW_LOG))
+                button_connect(null);
         }
     }
 }
