@@ -72,6 +72,7 @@ public class DebugActivity extends Activity {
                 if (getIntent().getBooleanExtra(EXTRA_BACKGROUND, false)) {
                     Intent service = new Intent(this, ConnectionService.class);
                     service.putExtras(getIntent());
+                    service.setAction(ConnectionService.ACTION_SHORTCUT);
                     startService(service);
                     finish();
                 }

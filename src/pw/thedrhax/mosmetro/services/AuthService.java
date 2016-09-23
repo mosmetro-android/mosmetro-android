@@ -44,8 +44,10 @@ public class AuthService extends Service {
             if ((task == null) || (AsyncTask.Status.FINISHED == task.getStatus()))
                 task = new AuthTask(connection);
 
-            if (task.getStatus() == AsyncTask.Status.PENDING)
-                task.execute();
+            if (task.getStatus() == AsyncTask.Status.PENDING) {
+                // Workaround from http://stackoverflow.com/a/11977186
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
+            }
         }
 
         public void stop() {
