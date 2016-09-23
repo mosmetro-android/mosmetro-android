@@ -8,6 +8,7 @@ import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.JsoupClient;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 import java.util.HashMap;
@@ -38,16 +39,16 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(14);
 
-        logger.log_debug(context.getString(R.string.auth_redirect));
+        logger.log(context.getString(R.string.auth_redirect));
         try {
             client.get("http://mosgortrans.ru", null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
             
             link = client.getReferer() + "&nobot=2";
-            logger.debug(link);
+            logger.log(Logger.LEVEL.DEBUG, link);
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
             ));
@@ -57,13 +58,13 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(42);
 
-        logger.log_debug(context.getString(R.string.auth_auth_page));
+        logger.log(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_page)
             ));
@@ -74,7 +75,7 @@ public class MosGorTrans extends Authenticator {
             Elements forms = client.getPageContent().getElementsByTag("form");
             fields = Client.parseForm(forms.first());
         } catch (Exception ex) {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_form)
             ));
@@ -84,13 +85,13 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(56);
 
-        logger.log_debug(context.getString(R.string.auth_auth_form));
+        logger.log(context.getString(R.string.auth_auth_form));
         try {
             client.post(link, fields);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_server)
             ));
@@ -100,16 +101,16 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(70);
 
-        logger.log_debug(context.getString(R.string.auth_request));
+        logger.log(context.getString(R.string.auth_request));
         try {
             fields = new HashMap<String, String>();
             fields.put("redirect", "http://curlmyip.org");
 
             client.post("http://192.168.2.1", fields);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_server)
             ));
@@ -119,11 +120,11 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(84);
 
-        logger.log_debug(context.getString(R.string.auth_checking_connection));
+        logger.log(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug(context.getString(R.string.auth_connected));
+            logger.log(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_connection)
             ));
@@ -148,16 +149,16 @@ public class MosGorTrans extends Authenticator {
          *  Meta redirect: enforta.ru/login?dst=... > link
          */
 
-        logger.log_debug(context.getString(R.string.auth_redirect));
+        logger.log(context.getString(R.string.auth_redirect));
         try {
             client.get("http://mosgortrans.ru", null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
 
             link = client.parseMetaRedirect();
-            logger.debug(link);
+            logger.log(Logger.LEVEL.DEBUG, link);
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
             ));
@@ -174,13 +175,13 @@ public class MosGorTrans extends Authenticator {
          *  Form: GET hs.enforta.ru/?mac=...&... > fields, link
          */
 
-        logger.log_debug(context.getString(R.string.auth_initial_page));
+        logger.log(context.getString(R.string.auth_initial_page));
         try {
             client.get(link, null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_page)
             ));
@@ -192,7 +193,7 @@ public class MosGorTrans extends Authenticator {
             fields = Client.parseForm(form);
             link = form.attr("action");
         } catch (Exception ex) {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_form)
             ));
@@ -212,15 +213,15 @@ public class MosGorTrans extends Authenticator {
          *  JavaScript redirect: / > link
          */
 
-        logger.log_debug(context.getString(R.string.auth_redirect));
+        logger.log(context.getString(R.string.auth_redirect));
         try {
             // We need cookies from this page
             client.get(link, fields);
             link = link.split("/login?")[0];
-            logger.debug(link);
+            logger.log(Logger.LEVEL.DEBUG, link);
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
             ));
@@ -243,13 +244,13 @@ public class MosGorTrans extends Authenticator {
          *   * password < routeros-md5.hexMD5(chap-id + ? + chap-challenge)
          */
 
-        logger.log_debug(context.getString(R.string.auth_auth_page));
+        logger.log(context.getString(R.string.auth_auth_page));
         try {
             client.get(link, null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_page)
             ));
@@ -267,8 +268,8 @@ public class MosGorTrans extends Authenticator {
             fields.put("username", client.match("username\\.value = \"(.*?)\";"));
             fields.put("password", Util.js(script + "; hash = hexMD5(" + password + ")", "hash"));
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_form)
             ));
@@ -288,12 +289,12 @@ public class MosGorTrans extends Authenticator {
         logger.log(context.getString(R.string.auth_redirect));
         try {
             client.post(link, fields);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
 
             link = client.parseMetaRedirect();
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
             ));
@@ -322,13 +323,13 @@ public class MosGorTrans extends Authenticator {
          *  Finish!
          */
 
-        logger.log_debug(context.getString(R.string.auth_redirect));
+        logger.log(context.getString(R.string.auth_redirect));
         try {
             client.get(link, null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
-            logger.debug(ex);
-            logger.log_debug(String.format(
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_redirect)
             ));
@@ -338,11 +339,11 @@ public class MosGorTrans extends Authenticator {
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(84);
 
-        logger.log_debug(context.getString(R.string.auth_checking_connection));
+        logger.log(context.getString(R.string.auth_checking_connection));
         if (isConnected() == CHECK_CONNECTED) {
-            logger.log_debug(context.getString(R.string.auth_connected));
+            logger.log(context.getString(R.string.auth_connected));
         } else {
-            logger.log_debug(String.format(
+            logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_connection)
             ));
@@ -356,18 +357,18 @@ public class MosGorTrans extends Authenticator {
 
     @Override
     protected int connect() {
-        logger.log_debug(String.format(context.getString(R.string.auth_connecting), getSSID()));
+        logger.log(String.format(context.getString(R.string.auth_connecting), getSSID()));
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
-        logger.log_debug(context.getString(R.string.auth_checking_connection));
+        logger.log(context.getString(R.string.auth_checking_connection));
         int connected = isConnected();
         if (connected == CHECK_CONNECTED) {
-            logger.log_debug(context.getString(R.string.auth_already_connected));
+            logger.log(context.getString(R.string.auth_already_connected));
             return STATUS_ALREADY_CONNECTED;
         } else if (connected == CHECK_WRONG_NETWORK) {
-            logger.log_debug(String.format(context.getString(R.string.error), context.getString(R.string.auth_error_network)));
+            logger.log(String.format(context.getString(R.string.error), context.getString(R.string.auth_error_network)));
             return STATUS_ERROR;
         }
 
@@ -375,17 +376,17 @@ public class MosGorTrans extends Authenticator {
 
         switch (provider) {
             case PROVIDER_NETBYNET:
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         context.getString(R.string.auth_provider), "NetByNet"
                 ));
                 return connect_netbynet();
             case PROVIDER_ENFORTA:
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         context.getString(R.string.auth_provider), "Enforta"
                 ));
                 return connect_enforta();
             default:
-                logger.log_debug(String.format(
+                logger.log(String.format(
                         context.getString(R.string.error),
                         context.getString(R.string.auth_error_provider)
                 ));
@@ -398,10 +399,10 @@ public class MosGorTrans extends Authenticator {
         Client client = new JsoupClient().followRedirects(false);
         try {
             client.get("http://mosgortrans.ru", null);
-            logger.debug(client.getPageContent().outerHtml());
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
             // Server not responding => wrong network
-            logger.debug(ex);
+            logger.log(Logger.LEVEL.DEBUG, ex);
             return CHECK_WRONG_NETWORK;
         }
 
@@ -430,7 +431,7 @@ public class MosGorTrans extends Authenticator {
             }
         } catch (Exception ex) {
             // Redirect not found => connected
-            logger.debug(ex);
+            logger.log(Logger.LEVEL.DEBUG, ex);
             return CHECK_CONNECTED;
         }
 
