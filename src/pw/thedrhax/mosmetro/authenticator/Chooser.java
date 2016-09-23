@@ -1,21 +1,25 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
-import android.net.wifi.WifiManager;
+import android.content.Intent;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.WifiUtils;
 
 public class Chooser {
     private Context context;
     private Logger logger;
+    private WifiUtils wifi;
 
     public Chooser(Context context, Logger logger) {
         this.logger = logger;
         this.context = context;
+        wifi = new WifiUtils(context);
     }
 
     public Authenticator choose (String SSID) {
-        if (SSID == null) return choose();
+        if (SSID == null) return choose(wifi.get());
 
         logger.log(String.format(context.getString(R.string.chooser_searching), SSID));
 
@@ -51,11 +55,7 @@ public class Chooser {
         return result;
     }
 
-    private Authenticator choose() {
-        // Get SSID from WifiManager
-        logger.log(context.getString(R.string.chooser_ssid));
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String SSID = manager.getConnectionInfo().getSSID().replace("\"", "");
-        return choose(SSID);
+    public Authenticator choose (Intent intent) {
+        return choose(wifi.get(intent));
     }
 }
