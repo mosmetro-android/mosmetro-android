@@ -94,4 +94,13 @@ public class Logger implements Parcelable {
             dest.writeString(get(level));
         }
     }
+
+    /*
+     * Logger interface
+     */
+
+    public interface Control {
+        Logger getLogger();
+        void setLogger(Logger logger);
+    }
 }

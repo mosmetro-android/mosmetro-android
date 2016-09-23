@@ -13,6 +13,7 @@
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
+    <string name="interrupted">Операция отменена</string>
     <string name="save">Сохранить</string>
     <string name="install">Установить</string>
     <string name="manual_connection">Ручное подключение</string>
@@ -36,10 +37,6 @@
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
     <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
-    <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
-    <string name="pref_autoconnect_strict_summary">
-        Включите строгую проверку названия сети, если приложение срабатывает на другие сети
-    </string>
 
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
@@ -69,8 +66,6 @@
         Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
     </string>
 
-    <string name="pref_retry_delay">Задержка между попытками</string>
-    <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 5)</string>
     <string name="pref_retry_count">Количество попыток</string>
     <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 3)</string>
 
@@ -157,7 +152,6 @@
     <string name="ip_wait">Ожидание получения IP адреса…</string>
     <string name="ip_wait_result" formatted="false">IP адрес%s получен в течение %d секунд</string>
 
-    <string name="chooser_ssid">Определение названия сети</string>
     <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
     <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
 

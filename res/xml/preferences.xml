@@ -35,24 +35,11 @@
                         android:defaultValue="3" />
 
                 <EditTextPreference
-                        android:key="pref_retry_delay"
-                        android:inputType="number"
-                        android:title="@string/pref_retry_delay"
-                        android:summary="@string/pref_retry_delay_summary"
-                        android:defaultValue="5" />
-
-                <EditTextPreference
                         android:key="pref_ip_wait"
                         android:inputType="number"
                         android:title="@string/pref_ip_wait"
                         android:summary="@string/pref_ip_wait_summary"
                         android:defaultValue="30" />
-
-                <CheckBoxPreference
-                        android:key="pref_autoconnect_strict"
-                        android:title="@string/pref_autoconnect_strict"
-                        android:summary="@string/pref_autoconnect_strict_summary"
-                        android:defaultValue="false" />
 
             </PreferenceCategory>
 

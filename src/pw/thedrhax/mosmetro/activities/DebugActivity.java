@@ -1,24 +1,36 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.Chooser;
+import pw.thedrhax.mosmetro.services.AuthService;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
+    public static final String ACTION_DEFAULT = "default";
+    public static final String ACTION_SHOW_LOG = "show log";
+
+    public static final String EXTRA_LOGGER = "logger";
+    public static final String EXTRA_SSID = "SSID";
+    public static final String EXTRA_BACKGROUND = "background";
+
     // UI Elements
     private TextView text_messages;
+    private Button button_connect;
     
     // Logger
     private Logger logger;
@@ -26,6 +38,7 @@ public class DebugActivity extends Activity {
 
     // Settings
     private String SSID = null;
+    private String action = ACTION_DEFAULT;
 
     /** Called when the activity is first created. */
     @Override
@@ -33,7 +46,8 @@ public class DebugActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.debug_activity);
 
-        text_messages = (TextView)findViewById(R.id.text_messages);
+        text_messages = (TextView) findViewById(R.id.text_messages);
+        button_connect = (Button) findViewById(R.id.button_connect);
 
         logger = new Logger() {
             @Override
@@ -45,33 +59,42 @@ public class DebugActivity extends Activity {
             }
         };
 
-        // Check for log from ConnectionService
-        try {
-            // Intent from the ConnectionService
-            Bundle bundle = getIntent().getExtras();
-            logger.merge((Logger)bundle.getParcelable("logger"));
-            return;
-        } catch (NullPointerException ignored) {}
+        String intent_action = getIntent().getAction();
+        if (intent_action != null) {
+            if (ACTION_SHOW_LOG.equals(intent_action)) {
+                // Intent from the ConnectionService
+                Bundle bundle = getIntent().getExtras();
+                logger.merge((Logger) bundle.getParcelable(EXTRA_LOGGER));
+            } else {
+                // Intent from the SettingsActivity or from shortcuts
+                String SSID = getIntent().getStringExtra(EXTRA_SSID);
 
-        try {
-            // Intent from the SettingsActivity or from shortcuts
-            Intent intent = getIntent();
-            String SSID = intent.getStringExtra("SSID");
+                if (getIntent().getBooleanExtra(EXTRA_BACKGROUND, false)) {
+                    Intent service = new Intent(this, ConnectionService.class);
+                    service.putExtras(getIntent());
+                    service.setAction(ConnectionService.ACTION_SHORTCUT);
+                    startService(service);
+                    finish();
+                }
 
-            if (intent.getBooleanExtra("background", false)) {
-                Intent service = new Intent(this, ConnectionService.class);
-                service.putExtras(intent);
-                startService(service);
-                finish();
+                if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
             }
+            action = intent_action;
+        }
 
-            if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
-        } catch (NullPointerException ignored) {}
-
-        button_connect(null);
+        bindService(new Intent(this, AuthService.class), auth_conn, BIND_AUTO_CREATE);
     }
 
-    // ActionBar Menu
+    @Override
+    protected void onDestroy() {
+        unbindService(auth_conn);
+        super.onDestroy();
+    }
+
+    /*
+     * ActionBar Menu
+     */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -84,6 +107,7 @@ public class DebugActivity extends Activity {
 
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -108,56 +132,20 @@ public class DebugActivity extends Activity {
     }
 
     /*
-     * Run manual connection in background thread
+     * Buttons and CheckBoxes
      */
-
-    private class AuthTask extends AsyncTask<String, String, Void> {
-        private Logger local_logger;
-
-        public AuthTask() {
-            local_logger = new Logger() {
-                @Override
-                public void log(LEVEL level, String message) {
-                    super.log(level, message);
-                    publishProgress(level.toString(), message);
-                }
-            };
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            local_logger.date();
-
-            Chooser chooser = new Chooser(DebugActivity.this, false, local_logger);
-
-            Authenticator connection = chooser.choose(params[0]);
-            if (connection == null) return null;
-
-            connection.setLogger(local_logger);
-            connection.start();
-
-            local_logger.date();
-
-            return null;
-        }
-
-        // Show log messages in the UI thread
-        @Override
-        protected void onProgressUpdate(String... values) {
-            logger.log(Logger.LEVEL.valueOf(values[0]), values[1]);
-        }
-    }
-
-    // Current instance of AuthTask is stored here
-    private AuthTask task;
 
     // Handle manual connection button
     public void button_connect (View view) {
-        if ((task == null) || (AsyncTask.Status.FINISHED == task.getStatus()))
-            task = new AuthTask();
+        if (button_connect.getText().equals(getString(R.string.cancel))) {
+            auth_service.stop();
+            return;
+        }
 
-        if (task.getStatus() != AsyncTask.Status.RUNNING)
-            task.execute(SSID);
+        Authenticator connection = new Chooser(this, false, logger).choose(SSID);
+        if (connection == null) return;
+
+        auth_service.start(connection);
     }
 
     // Handle debug log checkbox
@@ -165,5 +153,46 @@ public class DebugActivity extends Activity {
         show_debug = ((CheckBox)view).isChecked();
         text_messages.setText("");
         text_messages.append(logger.get(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO));
+    }
+
+    /*
+     * Binding implementation
+     */
+
+    private ServiceConnection auth_conn = new AuthServiceConnection();
+    private AuthService.AuthBinder auth_service;
+
+    private class AuthServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            auth_service = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            auth_service = (AuthService.AuthBinder) service;
+
+            auth_service.setLogger(logger);
+            auth_service.setCallback(new AuthService.Callback() {
+                @Override
+                public void onPreExecute() {
+                    button_connect.setText(R.string.cancel);
+                }
+
+                @Override
+                public void onPostExecute(int result) {
+                    button_connect.setText(R.string.retry);
+                }
+
+                @Override
+                public void onCancelled() {
+                    logger.log(getString(R.string.interrupted));
+                    button_connect.setText(R.string.retry);
+                }
+            });
+
+            if (!action.equals(ACTION_SHOW_LOG))
+                button_connect(null);
+        }
     }
 }
