@@ -25,7 +25,7 @@
                     android:summary="@string/pref_wifi_restart_summary"
                     android:defaultValue="true" />
 
-            <PreferenceCategory android:title="Параметры подключения">
+            <PreferenceCategory android:title="@string/pref_category_connection">
 
                 <EditTextPreference
                         android:key="pref_retry_count"
