@@ -401,7 +401,9 @@ public class ConnectionService extends Service {
     private class WiFiMonitorTask extends AsyncTask<Void,Void,Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            while (connection.getSSID().equals(wifi.get()) && !isCancelled()) {
+            while (connection.getSSID().equals(wifi.get())
+                    && manager.isWifiEnabled()
+                    && !isCancelled()) {
                 try { Thread.sleep(500); } catch (InterruptedException ignored) {}
             }
             return null;
