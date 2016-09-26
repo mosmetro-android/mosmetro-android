@@ -95,6 +95,8 @@ public class ConnectionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent == null) return START_NOT_STICKY;
+		
         // Stop from notification
         if (ACTION_STOP.equals(intent.getAction())) {
             stopSelf(); return START_NOT_STICKY;
