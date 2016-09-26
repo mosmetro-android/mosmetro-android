@@ -74,6 +74,12 @@
                     android:summary="@string/pref_notify_fail_summary"
                     android:icon="@drawable/ic_notification_error_colored"
                     android:defaultValue="true" />
+                
+            <CheckBoxPreference
+                android:key="pref_notify_fail_preserve"
+                android:title="@string/pref_notify_fail_preserve"
+                android:summary="@string/pref_notify_fail_preserve_summary"
+                android:defaultValue="false" />
 
             <CheckBoxPreference
                     android:key="pref_notify_progress"

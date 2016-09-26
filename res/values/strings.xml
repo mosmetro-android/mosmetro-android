@@ -56,6 +56,8 @@
     <string name="pref_notify_alternative_summary">
         Использовать цветные иконки уведомлений на Android 5.0+ (поддерживается не всегда)
     </string>
+    <string name="pref_notify_fail_preserve">Сохранять уведомление об ошибке</string>
+    <string name="pref_notify_fail_preserve_summary">Оставлять уведомление об ошибке при остановке фонового процесса для последующего просмотра лога</string>
     <string name="pref_notify_success_log">Лог успешного подключения</string>
     <string name="pref_notify_success_log_summary">
         Показывать лог успешного подключения при нажатии на соответствующее уведомление

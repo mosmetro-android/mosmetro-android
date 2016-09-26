@@ -208,7 +208,7 @@ public class ConnectionService extends Service {
                 debug.putExtra(DebugActivity.EXTRA_LOGGER, logger);
 
                 notification
-                        .setId(2)
+                        .setId(settings.getBoolean("pref_notify_fail_preserve", false) ? 2 : 0)
                         .setTitle(getString(R.string.notification_error))
                         .setText(getString(R.string.notification_error_log))
                         .setIcon(pref_colored_icons ?
