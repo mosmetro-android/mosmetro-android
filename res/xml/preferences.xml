@@ -49,6 +49,12 @@
                         android:defaultValue="30" />
 
                 <CheckBoxPreference
+                        android:key="pref_internet_check"
+                        android:title="@string/pref_internet_check"
+                        android:summary="@string/pref_internet_check_summary"
+                        android:defaultValue="true" />
+
+                <CheckBoxPreference
                         android:key="pref_autoconnect_strict"
                         android:title="@string/pref_autoconnect_strict"
                         android:summary="@string/pref_autoconnect_strict_summary"

@@ -323,7 +323,7 @@ public class ConnectionService extends IntentService {
             } catch (InterruptedException ignored) {}
 
             // Check internet connection each 10 seconds
-            if (++count == 10) {
+            if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
                 count = 0;
                 if (connection.isConnected() != Authenticator.CHECK_CONNECTED)
                     break;
