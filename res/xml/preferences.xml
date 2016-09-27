@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_autoconnect"
+        android:title="@string/pref_autoconnect"
+        android:summary="@string/pref_autoconnect_summary"
+        android:defaultValue="true" />
+
+    <PreferenceCategory
+        android:title="@string/manual_connection">
+        <!-- TODO: Uncomment this then another networks will be available
+        <Preference
+                android:title="@string/manual_connection_default"
+                android:summary="@string/manual_connection_default_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
+        </Preference>
+        -->
+
+        <Preference
+            android:title="@string/manual_connection_mosmetro"
+            android:summary="@string/manual_connection_mosmetro_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+                <extra android:name="SSID" android:value="MosMetro_Free" />
+            </intent>
+        </Preference>
+
+        <Preference
+            android:title="@string/manual_connection_shortcut"
+            android:summary="@string/manual_connection_shortcut_summary">
+            <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+        </Preference>
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_category_main">
 
         <PreferenceScreen
             android:title="@string/pref_category_connection"
             android:summary="@string/pref_category_connection_summary">
-
-            <CheckBoxPreference
-                    android:key="pref_autoconnect"
-                    android:title="@string/pref_autoconnect"
-                    android:summary="@string/pref_autoconnect_summary"
-                    android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_wifi_reconnect"
@@ -53,12 +80,6 @@
                         android:title="@string/pref_internet_check"
                         android:summary="@string/pref_internet_check_summary"
                         android:defaultValue="true" />
-
-                <CheckBoxPreference
-                        android:key="pref_autoconnect_strict"
-                        android:title="@string/pref_autoconnect_strict"
-                        android:summary="@string/pref_autoconnect_strict_summary"
-                        android:defaultValue="false" />
 
             </PreferenceCategory>
 
@@ -109,33 +130,6 @@
 
         </PreferenceScreen>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/manual_connection">
-        <!-- TODO: Uncomment this then another networks will be available
-        <Preference
-                android:title="@string/manual_connection_default"
-                android:summary="@string/manual_connection_default_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
-        </Preference>
-        -->
-
-        <Preference
-                android:title="@string/manual_connection_mosmetro"
-                android:summary="@string/manual_connection_mosmetro_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
-                <extra android:name="SSID" android:value="MosMetro_Free" />
-            </intent>
-        </Preference>
-
-        <Preference
-                android:title="@string/manual_connection_shortcut"
-                android:summary="@string/manual_connection_shortcut_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
-        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory

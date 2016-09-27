@@ -26,7 +26,7 @@
 
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
-    <string name="pref_category_connection_summary">Основные настройки автоматического фонового подключения</string>
+    <string name="pref_category_connection_summary">Настройки автоматического фонового подключения</string>
     <string name="pref_category_notifications">Уведомления</string>
     <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
     <string name="pref_category_updater">Обновления</string>
@@ -35,10 +35,6 @@
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
     <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
-    <string name="pref_autoconnect_strict">Строгая проверка Wi-Fi</string>
-    <string name="pref_autoconnect_strict_summary">
-        Включите строгую проверку названия сети, если приложение срабатывает на другие сети
-    </string>
 
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
