@@ -126,13 +126,9 @@ public class MosMetro extends Authenticator {
     
     @Override
     public int isConnected() {
-        Client client;
+        Client client = new OkHttp().followRedirects(false);
         try {
-            client = new OkHttp()
-                    .followRedirects(false)
-                    .get("http://wi-fi.ru", null, pref_retry_count);
-
-            logger.debug(client.getPageContent().outerHtml());
+            client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ex) {
             // Server not responding => wrong network
             logger.debug(ex);
@@ -141,6 +137,7 @@ public class MosMetro extends Authenticator {
 
         try {
             redirect = client.parseMetaRedirect();
+            logger.debug(client.getPageContent().outerHtml());
             logger.debug(redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
