@@ -315,17 +315,18 @@ public class ConnectionService extends IntentService {
 
         if (from_shortcut || result > Authenticator.STATUS_ALREADY_CONNECTED) return;
 
-        // Wait until Wi-Fi is disconnected
+        // Wait while internet connection is available
         int count = 0;
         while (isWifiConnected()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
 
-            // Check internet connection each 5 seconds
-            if (++count == 5*2 && connection.isConnected() != Authenticator.CHECK_CONNECTED) {
-                startService(new Intent(this, ConnectionService.class)); // Restart this service
-                break;
+            // Check internet connection each 10 seconds
+            if (++count == 10) {
+                count = 0;
+                if (connection.isConnected() != Authenticator.CHECK_CONNECTED)
+                    break;
             }
         }
 
