@@ -35,7 +35,7 @@
     <string name="pref_category_contributors">Отдельное спасибо</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
-    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
+    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с поддерживаемыми сетями Wi-Fi</string>
 
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
