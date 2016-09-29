@@ -96,7 +96,7 @@ public class ConnectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent == null) return START_NOT_STICKY;
-		
+
         // Stop from notification
         if (ACTION_STOP.equals(intent.getAction())) {
             stopSelf(); return START_NOT_STICKY;
@@ -443,7 +443,7 @@ public class ConnectionService extends Service {
                 } catch (InterruptedException ignored) {}
 
                 // Check internet connection each 10 seconds
-                if (++count == 10) {
+                if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
                     count = 0;
                     if (connection.isConnected() != Authenticator.CHECK_CONNECTED)
                         break;

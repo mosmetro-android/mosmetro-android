@@ -27,7 +27,7 @@
 
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
-    <string name="pref_category_connection_summary">Основные настройки автоматического фонового подключения</string>
+    <string name="pref_category_connection_summary">Настройки автоматического фонового подключения</string>
     <string name="pref_category_notifications">Уведомления</string>
     <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
     <string name="pref_category_updater">Обновления</string>
@@ -45,6 +45,9 @@
     <string name="pref_wifi_restart_summary">
         Переподключаться к Wi-Fi при проблемах с соединением (исправляет ошибку \"Сеть недоступна или не отвечает\")
     </string>
+
+    <string name="pref_internet_check">Периодическая проверка соединения</string>
+    <string name="pref_internet_check_summary">Проверять соединение с интернетом каждые 10 секунд и перезапускать подключение при ошибке.</string>
 
     <string name="pref_notify_success">Успешное подключение</string>
     <string name="pref_notify_fail">Неудачное подключение</string>

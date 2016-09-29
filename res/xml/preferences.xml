@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_autoconnect"
+        android:title="@string/pref_autoconnect"
+        android:summary="@string/pref_autoconnect_summary"
+        android:defaultValue="true" />
+
+    <PreferenceCategory
+        android:title="@string/manual_connection">
+        <!-- TODO: Uncomment this when another networks will be available
+        <Preference
+                android:title="@string/manual_connection_default"
+                android:summary="@string/manual_connection_default_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
+        </Preference>
+        -->
+
+        <Preference
+            android:title="@string/manual_connection_mosmetro"
+            android:summary="@string/manual_connection_mosmetro_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+                <extra android:name="SSID" android:value="MosMetro_Free" />
+            </intent>
+        </Preference>
+
+        <Preference
+            android:title="@string/manual_connection_shortcut"
+            android:summary="@string/manual_connection_shortcut_summary">
+            <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+        </Preference>
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_category_main">
 
         <PreferenceScreen
             android:title="@string/pref_category_connection"
             android:summary="@string/pref_category_connection_summary">
-
-            <CheckBoxPreference
-                    android:key="pref_autoconnect"
-                    android:title="@string/pref_autoconnect"
-                    android:summary="@string/pref_autoconnect_summary"
-                    android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_wifi_reconnect"
@@ -25,7 +52,7 @@
                     android:summary="@string/pref_wifi_restart_summary"
                     android:defaultValue="true" />
 
-            <PreferenceCategory android:title="Параметры подключения">
+            <PreferenceCategory android:title="@string/pref_category_connection">
 
                 <EditTextPreference
                         android:key="pref_retry_count"
@@ -40,6 +67,12 @@
                         android:title="@string/pref_ip_wait"
                         android:summary="@string/pref_ip_wait_summary"
                         android:defaultValue="30" />
+
+                <CheckBoxPreference
+                        android:key="pref_internet_check"
+                        android:title="@string/pref_internet_check"
+                        android:summary="@string/pref_internet_check_summary"
+                        android:defaultValue="true" />
 
             </PreferenceCategory>
 
@@ -74,7 +107,7 @@
                     android:summary="@string/pref_notify_fail_summary"
                     android:icon="@drawable/ic_notification_error_colored"
                     android:defaultValue="true" />
-                
+
             <CheckBoxPreference
                 android:key="pref_notify_fail_preserve"
                 android:title="@string/pref_notify_fail_preserve"
@@ -96,33 +129,6 @@
 
         </PreferenceScreen>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/manual_connection">
-        <!-- TODO: Uncomment this when another networks will be available
-        <Preference
-                android:title="@string/manual_connection_default"
-                android:summary="@string/manual_connection_default_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
-        </Preference>
-        -->
-
-        <Preference
-                android:title="@string/manual_connection_mosmetro"
-                android:summary="@string/manual_connection_mosmetro_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
-                <extra android:name="SSID" android:value="MosMetro_Free" />
-            </intent>
-        </Preference>
-
-        <Preference
-                android:title="@string/manual_connection_shortcut"
-                android:summary="@string/manual_connection_shortcut_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
-        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
