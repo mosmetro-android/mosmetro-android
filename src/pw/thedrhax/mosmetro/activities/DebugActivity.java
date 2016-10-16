@@ -138,7 +138,7 @@ public class DebugActivity extends Activity {
         protected Void doInBackground(String... params) {
             local_logger.date();
 
-            Chooser chooser = new Chooser(DebugActivity.this, false, local_logger);
+            Chooser chooser = new Chooser(DebugActivity.this, local_logger);
 
             Authenticator connection;
             if (params[0] == null) {

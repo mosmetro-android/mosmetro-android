@@ -277,7 +277,7 @@ public class ConnectionService extends IntentService {
         logger.date();
 
         // Select an Authenticator
-        connection = new Chooser(this, true, logger).choose(SSID);
+        connection = new Chooser(this, logger).choose(SSID);
         if (connection == null) return;
 
         connection.setLogger(logger);
