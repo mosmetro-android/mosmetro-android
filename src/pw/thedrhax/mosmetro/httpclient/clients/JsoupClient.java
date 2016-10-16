@@ -25,6 +25,7 @@ public class JsoupClient extends Client {
         Connection.Response response = Jsoup
                 .connect(link + requestToString(params))
                 .cookies(cookies)
+                .header("User-Agent", user_agent)
                 .followRedirects(followRedirects)
                 .method(Connection.Method.GET)
                 .execute();
@@ -42,6 +43,7 @@ public class JsoupClient extends Client {
                 .connect(link)
                 .data(params)
                 .cookies(cookies)
+                .header("User-Agent", user_agent)
                 .followRedirects(followRedirects)
                 .method(Connection.Method.POST)
                 .execute();

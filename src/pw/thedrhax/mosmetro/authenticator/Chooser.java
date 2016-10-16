@@ -9,15 +9,13 @@ import pw.thedrhax.util.WifiUtils;
 
 public class Chooser {
     private Context context;
-    private boolean automatic;
     private Logger logger;
 
     private WifiUtils wifi;
 
-    public Chooser(Context context, boolean automatic, Logger logger) {
+    public Chooser(Context context, Logger logger) {
         this.logger = logger;
         this.context = context;
-        this.automatic = automatic;
 
         wifi = new WifiUtils(context);
     }
@@ -49,8 +47,8 @@ public class Chooser {
         Authenticator result;
         try {
             result = result_class
-                    .getConstructor(Context.class, boolean.class)
-                    .newInstance(context, automatic);
+                    .getConstructor(Context.class)
+                    .newInstance(context);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

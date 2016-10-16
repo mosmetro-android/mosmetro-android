@@ -113,13 +113,13 @@ public class ConnectionService extends Service {
 
         // Create new Authenticator instance
         if (ACTION_SHORTCUT.equals(intent.getAction())) {
-            connection = new Chooser(this, false, logger)
+            connection = new Chooser(this, logger)
                     .choose(intent.getStringExtra(DebugActivity.EXTRA_SSID));
             from_shortcut = true;
         }
 
         if (connection == null)
-            connection = new Chooser(this, true, logger).choose(intent);
+            connection = new Chooser(this, logger).choose(intent);
 
         if (connection == null) {
             stopSelf(); return START_NOT_STICKY;
@@ -300,6 +300,8 @@ public class ConnectionService extends Service {
 
         @Override
         protected void onPostExecute(Boolean result) {
+            wifi_task.setReconnect(true);
+
             if (result) {
                 logger.log(String.format(
                         getString(R.string.ip_wait_result),
@@ -399,6 +401,12 @@ public class ConnectionService extends Service {
      */
 
     private class WiFiMonitorTask extends AsyncTask<Void,Void,Void> {
+        private boolean reconnect = false;
+
+        public void setReconnect (boolean reconnect) {
+            this.reconnect = reconnect;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
             while (connection.getSSID().equals(wifi.get())
@@ -412,7 +420,7 @@ public class ConnectionService extends Service {
         @Override
         protected void onPostExecute(Void aVoid) {
             // Try to reconnect the Wi-Fi network
-            if (settings.getBoolean("pref_wifi_reconnect", false)) {
+            if (settings.getBoolean("pref_wifi_reconnect", false) && reconnect) {
                 try {
                     for (WifiConfiguration network : manager.getConfiguredNetworks()) {
                         if (network.SSID.replace("\"", "").equals(connection.getSSID())) {

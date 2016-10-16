@@ -16,8 +16,8 @@ public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
     private String redirect = null;
 
-    public MosMetro (Context context, boolean automatic) {
-        super(context, automatic);
+    public MosMetro (Context context) {
+        super(context);
     }
 
     @Override

@@ -40,16 +40,14 @@ public abstract class Authenticator {
 
     // Device info
     protected Context context;
-    protected boolean automatic;
     protected SharedPreferences settings;
     protected int pref_retry_count;
 
-    public Authenticator (Context context, boolean automatic) {
+    public Authenticator (Context context) {
         logger = new Logger();
         client = new OkHttp();
 
         this.context = context;
-        this.automatic = automatic;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
     }
@@ -132,7 +130,6 @@ public abstract class Authenticator {
 
         Map<String,String> params = new HashMap<String, String>();
         params.put("version", getVersion());
-        params.put("automatic", automatic ? "1" : "0");
         params.put("connected", result == STATUS_CONNECTED ? "1" : "0");
         params.put("ssid", getSSID());
 

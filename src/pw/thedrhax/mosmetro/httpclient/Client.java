@@ -15,11 +15,16 @@ public abstract class Client {
     protected Document document;
     protected String raw_document;
     protected String referer = "http://curlmyip.org";
+    protected String user_agent = System.getProperty("http.agent");
 
     protected Client() {}
 
     // Settings methods
     public abstract Client followRedirects(boolean follow);
+
+    public Client setUserAgent(String user_agent) {
+        this.user_agent = user_agent; return this;
+    }
 
     // IO methods
     public abstract Client get(String link, Map<String,String> params) throws Exception;

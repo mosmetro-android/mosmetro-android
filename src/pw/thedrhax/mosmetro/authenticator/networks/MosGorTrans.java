@@ -22,8 +22,8 @@ public class MosGorTrans extends Authenticator {
 
     private int provider = 0;
 
-    public MosGorTrans (Context context, boolean automatic) {
-        super(context, automatic);
+    public MosGorTrans (Context context) {
+        super(context);
         client = new JsoupClient();
     }
 
