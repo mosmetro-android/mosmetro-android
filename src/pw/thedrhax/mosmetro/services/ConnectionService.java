@@ -113,13 +113,13 @@ public class ConnectionService extends Service {
 
         // Create new Authenticator instance
         if (ACTION_SHORTCUT.equals(intent.getAction())) {
-            connection = new Chooser(this, false, logger)
+            connection = new Chooser(this, logger)
                     .choose(intent.getStringExtra(DebugActivity.EXTRA_SSID));
             from_shortcut = true;
         }
 
         if (connection == null)
-            connection = new Chooser(this, true, logger).choose(intent);
+            connection = new Chooser(this, logger).choose(intent);
 
         if (connection == null) {
             stopSelf(); return START_NOT_STICKY;

@@ -31,7 +31,7 @@ public class DebugActivity extends Activity {
     // UI Elements
     private TextView text_messages;
     private Button button_connect;
-    
+
     // Logger
     private Logger logger;
     private boolean show_debug = false;
@@ -142,7 +142,7 @@ public class DebugActivity extends Activity {
             return;
         }
 
-        Authenticator connection = new Chooser(this, false, logger).choose(SSID);
+        Authenticator connection = new Chooser(this, logger).choose(SSID);
         if (connection == null) return;
 
         auth_service.start(connection);

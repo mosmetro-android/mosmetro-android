@@ -59,6 +59,7 @@ public class OkHttp extends Client {
         Request request = new Request.Builder()
                 .url(link + requestToString(params))
                 .addHeader("Referer", referer)
+                .addHeader("User-Agent", user_agent)
                 .get()
                 .build();
 
@@ -79,6 +80,7 @@ public class OkHttp extends Client {
         Request request = new Request.Builder()
                 .url(link)
                 .addHeader("Referer", referer)
+                .addHeader("User-Agent", user_agent)
                 .post(body.build())
                 .build();
 

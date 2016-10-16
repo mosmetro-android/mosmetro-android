@@ -5,8 +5,8 @@ import android.content.Context;
 public class AURA extends MosMetro {
 	public static String SSID = "AURA";
 	
-	public AURA (Context context, boolean automatic) {
-		super(context, automatic);
+	public AURA (Context context) {
+		super(context);
 	}
 	
 	@Override
