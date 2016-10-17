@@ -22,6 +22,8 @@ public abstract class Client {
         this.user_agent = user_agent; return this;
     }
 
+    public abstract Client setCookie(String url, String name, String value);
+
     // IO methods
     public abstract Client get(String link, Map<String,String> params) throws Exception;
     public abstract Client post(String link, Map<String,String> params) throws Exception;

@@ -32,7 +32,9 @@ public class OkHttp extends Client {
 
                     @Override
                     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                        this.cookies.put(url, cookies);
+                        List<Cookie> url_cookies = loadForRequest(url);
+                        url_cookies.addAll(cookies);
+                        this.cookies.put(url, url_cookies);
                     }
 
                     @Override
@@ -42,6 +44,15 @@ public class OkHttp extends Client {
                     }
                 })
                 .build();
+    }
+
+    @Override
+    public Client setCookie(String url, String name, String value) {
+        HttpUrl httpUrl = HttpUrl.parse(url);
+        List<Cookie> url_cookies = client.cookieJar().loadForRequest(httpUrl);
+        url_cookies.add(Cookie.parse(httpUrl, name + "=" + value));
+        client.cookieJar().saveFromResponse(httpUrl, url_cookies);
+        return this;
     }
 
     @Override
