@@ -112,6 +112,7 @@
     </string>
 
     <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
+    <string name="auth_version" formatted="false">Версия алгоритма: %d</string>
     <string name="auth_waiting">Ожидание...</string>
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>

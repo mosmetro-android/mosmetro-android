@@ -14,6 +14,7 @@ import java.util.Map;
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
     private String redirect = null;
+    private int version = 2;
 
     public MosMetro (Context context) {
         super(context);
@@ -26,7 +27,7 @@ public class MosMetro extends Authenticator {
 
     @Override
     public int connect() {
-        Map<String,String> fields;
+        Map<String,String> fields = null;
 
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(0);
@@ -54,12 +55,16 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
+        logger.log_debug(String.format(context.getString(R.string.auth_version), version));
+
         if (stopped) return STATUS_INTERRUPTED;
         progressListener.onProgressUpdate(25);
 
         logger.log_debug(context.getString(R.string.auth_auth_page));
         try {
             client.get(redirect, null, pref_retry_count);
+            if (version == 2)
+                client.get(redirect + "/auth", null, pref_retry_count);
             logger.debug(client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.debug(ex);
@@ -70,22 +75,24 @@ public class MosMetro extends Authenticator {
             return STATUS_ERROR;
         }
 
-        try {
-            Elements forms = client.getPageContent().getElementsByTag("form");
-            if (forms.size() > 1) {
+        if (version == 1) {
+            try {
+                Elements forms = client.getPageContent().getElementsByTag("form");
+                if (forms.size() > 1) {
+                    logger.log_debug(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_not_registered)
+                    ));
+                    return STATUS_NOT_REGISTERED;
+                }
+                fields = Client.parseForm(forms.first());
+            } catch (Exception ex) {
                 logger.log_debug(String.format(
                         context.getString(R.string.error),
-                        context.getString(R.string.auth_error_not_registered)
+                        context.getString(R.string.auth_error_auth_form)
                 ));
-                return STATUS_NOT_REGISTERED;
+                return STATUS_ERROR;
             }
-            fields = Client.parseForm(forms.first());
-        } catch (Exception ex) {
-            logger.log_debug(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_auth_form)
-            ));
-            return STATUS_ERROR;
         }
 
         if (stopped) return STATUS_INTERRUPTED;
@@ -93,7 +100,13 @@ public class MosMetro extends Authenticator {
 
         logger.log_debug(context.getString(R.string.auth_auth_form));
         try {
-            client.post(redirect, fields, pref_retry_count);
+            switch (version) {
+                case 1: client.post(redirect, fields, pref_retry_count); break;
+                case 2:
+                    client.setCookie(redirect, "afVideoPassed", "0");
+                    client.post(redirect + "/auth/init?segment=metro", null, pref_retry_count);
+                    break;
+            }
             logger.debug(client.getPageContent().outerHtml());
         } catch (ProtocolException ignored) { // Too many follow-up requests
         } catch (Exception ex) {
@@ -144,6 +157,9 @@ public class MosMetro extends Authenticator {
             logger.debug(ex);
             return CHECK_CONNECTED;
         }
+
+        if (redirect.contains("login.wi-fi.ru")) // Fallback to the first version
+            version = 1;
 
         // Redirect found => not connected
         return CHECK_NOT_CONNECTED;
