@@ -37,15 +37,11 @@ public class DebugActivity extends Activity {
 
         logger = new Logger() {
             @Override
-            public void log(String message) {
-                super.log(message);
-                if (!show_debug) text_messages.append(message + "\n");
-            }
+            public void log(LEVEL level, String message) {
+                super.log(level, message);
 
-            @Override
-            public void debug(String message) {
-                super.debug(message);
-                if (show_debug) text_messages.append(message + "\n");
+                if ((level == LEVEL.INFO && !show_debug) || (level == LEVEL.DEBUG && show_debug))
+                    text_messages.append(message + "\n");
             }
         };
 
@@ -97,7 +93,7 @@ public class DebugActivity extends Activity {
                 send_email.setType("text/plain");
                 send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
                 send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.report_email_subject));
-                send_email.putExtra(Intent.EXTRA_TEXT, logger.getDebug());
+                send_email.putExtra(Intent.EXTRA_TEXT, logger.get(Logger.LEVEL.DEBUG));
 
                 startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
                 return true;
@@ -121,15 +117,9 @@ public class DebugActivity extends Activity {
         public AuthTask() {
             local_logger = new Logger() {
                 @Override
-                public void log(String message) {
-                    super.log(message);
-                    publishProgress("log", message);
-                }
-
-                @Override
-                public void debug(String message) {
-                    super.debug(message);
-                    publishProgress("debug", message);
+                public void log(LEVEL level, String message) {
+                    super.log(level, message);
+                    publishProgress(level.toString(), message);
                 }
             };
         }
@@ -140,12 +130,7 @@ public class DebugActivity extends Activity {
 
             Chooser chooser = new Chooser(DebugActivity.this, local_logger);
 
-            Authenticator connection;
-            if (params[0] == null) {
-                connection = chooser.choose();
-            } else {
-                connection = chooser.choose(params[0]);
-            }
+            Authenticator connection = chooser.choose(params[0]);
             if (connection == null) return null;
 
             connection.setLogger(local_logger);
@@ -159,11 +144,7 @@ public class DebugActivity extends Activity {
         // Show log messages in the UI thread
         @Override
         protected void onProgressUpdate(String... values) {
-            if (values[0].equals("log")) {
-                logger.log(values[1]);
-            } else {
-                logger.debug(values[1]);
-            }
+            logger.log(Logger.LEVEL.valueOf(values[0]), values[1]);
         }
     }
 
@@ -183,6 +164,6 @@ public class DebugActivity extends Activity {
     public void show_debug_log (View view) {
         show_debug = ((CheckBox)view).isChecked();
         text_messages.setText("");
-        text_messages.append(show_debug ? logger.getDebug() : logger.getLog());
+        text_messages.append(logger.get(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO));
     }
 }
