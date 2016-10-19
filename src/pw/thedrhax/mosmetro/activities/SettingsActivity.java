@@ -1,13 +1,25 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 
@@ -20,6 +32,58 @@ public class SettingsActivity extends Activity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_donate:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.action_donate)
+                        .setMessage(R.string.action_donate_summary)
+                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setNegativeButton(R.string.donate_webmoney, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ClipboardManager clipboard = (ClipboardManager)
+                                        getSystemService(Context.CLIPBOARD_SERVICE);
+
+                                ClipData clip = ClipData.newPlainText(
+                                        getString(R.string.donate_webmoney),
+                                        getString(R.string.donate_webmoney_data)
+                                );
+                                clipboard.setPrimaryClip(clip);
+
+                                Toast.makeText(SettingsActivity.this,
+                                        R.string.clipboard_copy,
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        })
+                        .setPositiveButton(R.string.donate_yandex, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(getString(R.string.donate_yandex_data)));
+                                startActivity(intent);
+                            }
+                        })
+                        .show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

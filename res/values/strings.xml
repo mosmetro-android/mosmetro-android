@@ -24,6 +24,7 @@
     <string name="try_out_of" formatted="false">попытка %d из %d</string>
     <string name="version" formatted="false">Версия приложения: %s</string>
     <string name="show_debug_log">Показать подробные сообщения</string>
+    <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
 
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
@@ -35,7 +36,7 @@
     <string name="pref_category_contributors">Отдельное спасибо</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>
-    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с сетью Wi-Fi MosMetro_Free</string>
+    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с поддерживаемыми сетями Wi-Fi</string>
 
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
@@ -113,6 +114,7 @@
     </string>
 
     <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
+    <string name="auth_version" formatted="false">Версия алгоритма: %d</string>
     <string name="auth_waiting">Ожидание...</string>
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>
@@ -154,5 +156,16 @@
     <string name="contirutor_revertron">Revertron</string>
     <string name="contributor_revertron_summary">Множество рекомендаций по алгоритмам</string>
     <string name="contributor_revertron_link">https://github.com/Revertron</string>
+
+    <string name="action_donate">Поддержать проект</string>
+    <string name="action_donate_summary">
+        Вы можете материально поддержать проект одним из следующих способов.
+        Деньги пойдут на оплату хостинга и запасы печенек. Спасибо! :)
+    </string>
+
+    <string name="donate_webmoney">WebMoney</string>
+    <string name="donate_webmoney_data">R401534033407</string>
+    <string name="donate_yandex">Яндекс.Деньги</string>
+    <string name="donate_yandex_data">https://money.yandex.ru/to/410014087156910</string>
 
 </resources>

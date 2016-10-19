@@ -12,6 +12,7 @@ public abstract class Client {
 
     protected Document document;
     protected String user_agent = System.getProperty("http.agent");
+    protected String raw_document;
 
     protected Client() {}
 
@@ -21,6 +22,8 @@ public abstract class Client {
     public Client setUserAgent(String user_agent) {
         this.user_agent = user_agent; return this;
     }
+
+    public abstract Client setCookie(String url, String name, String value);
 
     // IO methods
     public abstract Client get(String link, Map<String,String> params) throws Exception;
@@ -52,8 +55,12 @@ public abstract class Client {
     }
 
     // Parse methods
-    public Document getPageContent() throws Exception {
+    public Document getPageContent() {
         return document;
+    }
+
+    public String getPage() {
+        return raw_document;
     }
 
     public String parseLinkRedirect() throws Exception {
