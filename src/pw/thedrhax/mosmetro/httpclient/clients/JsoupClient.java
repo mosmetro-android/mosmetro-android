@@ -21,6 +21,12 @@ public class JsoupClient extends Client {
     }
 
     @Override
+    public Client setCookie(String url, String name, String value) {
+        cookies.put(name, value);
+        return this;
+    }
+
+    @Override
     public Client get(String link, Map<String, String> params) throws Exception {
         Connection.Response response = Jsoup
                 .connect(link + requestToString(params))
