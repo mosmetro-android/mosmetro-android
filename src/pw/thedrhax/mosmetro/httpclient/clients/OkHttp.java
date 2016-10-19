@@ -2,7 +2,6 @@ package pw.thedrhax.mosmetro.httpclient.clients;
 
 import okhttp3.*;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import pw.thedrhax.mosmetro.httpclient.Client;
 
 import javax.net.ssl.HostnameVerifier;
@@ -75,7 +74,7 @@ public class OkHttp extends Client {
                 .build();
 
         referer = link;
-        document = parseDocument(client.newCall(request).execute());
+        parseDocument(client.newCall(request).execute());
 
         return this;
     }
@@ -96,26 +95,24 @@ public class OkHttp extends Client {
                 .build();
 
         referer = link;
-        document = parseDocument(client.newCall(request).execute());
+        parseDocument(client.newCall(request).execute());
 
         return this;
     }
 
-    private Document parseDocument (Response response) throws Exception {
+    private void parseDocument (Response response) throws Exception {
         ResponseBody body = response.body();
-        String content = body.string();
+        raw_document = body.string();
         body.close();
 
-        if (content == null || content.isEmpty()) {
+        if (raw_document == null || raw_document.isEmpty()) {
             throw new Exception("Empty response");
         }
 
-        Document result = Jsoup.parse(content);
+        document = Jsoup.parse(raw_document);
 
         // Clean-up useless tags: <script>, <style>
-        result.getElementsByTag("script").remove();
-        result.getElementsByTag("style").remove();
-
-        return result;
+        document.getElementsByTag("script").remove();
+        document.getElementsByTag("style").remove();
     }
 }

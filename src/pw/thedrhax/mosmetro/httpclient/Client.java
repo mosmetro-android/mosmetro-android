@@ -12,6 +12,7 @@ public abstract class Client {
 
     protected Document document;
     protected String user_agent = System.getProperty("http.agent");
+    protected String raw_document;
 
     protected Client() {}
 
@@ -54,8 +55,12 @@ public abstract class Client {
     }
 
     // Parse methods
-    public Document getPageContent() throws Exception {
+    public Document getPageContent() {
         return document;
+    }
+
+    public String getPage() {
+        return raw_document;
     }
 
     public String parseLinkRedirect() throws Exception {
