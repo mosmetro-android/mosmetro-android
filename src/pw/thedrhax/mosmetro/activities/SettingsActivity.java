@@ -102,7 +102,10 @@ public class SettingsActivity extends Activity {
         Preference app_name = settings.findPreference("app_name");
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            app_name.setSummary("Версия: " + pInfo.versionName + "-" + pInfo.versionCode);
+            app_name.setSummary(String.format(
+                    getString(R.string.version),
+                    pInfo.versionName + "-" + pInfo.versionCode)
+            );
         } catch (PackageManager.NameNotFoundException ex) {
             app_name.setSummary("");
         }
