@@ -17,8 +17,6 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Notification;
 
 public class NewsChecker {
-    private static final String NEWS_URL = "https://thedrhax.github.io/mosmetro-android/news.json";
-
     private Context context;
     private SharedPreferences settings;
     private int pref_retry_count;
@@ -38,7 +36,7 @@ public class NewsChecker {
 
     public boolean check() {
         try {
-            client.get(NEWS_URL, null, pref_retry_count);
+            client.get(URLs.NEWS_URL, null, pref_retry_count);
         } catch (Exception ex) {
             return false;
         }
