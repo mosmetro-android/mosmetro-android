@@ -67,6 +67,8 @@
     <string name="pref_notify_success_lock_summary">
         Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
     </string>
+    <string name="pref_notify_news">Сообщения от разработчика</string>
+    <string name="pref_notify_news_summary">В случае проблем, я смогу сообщить вам о том, что происходит с приложением.</string>
 
     <string name="pref_retry_delay">Задержка между попытками</string>
     <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 5)</string>

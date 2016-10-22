@@ -12,6 +12,7 @@ import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.util.Logger;
 
 import java.util.HashMap;
@@ -135,5 +136,8 @@ public abstract class Authenticator {
         try {
             new OkHttp().post(STATISTICS_URL, params);
         } catch (Exception ignored) {}
+
+        if (settings.getBoolean("pref_notify_news", true))
+            new NewsChecker(context).check();
     }
 }
