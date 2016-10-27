@@ -51,9 +51,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         force_check = force[0];
 
         try {
-            UPDATE_INFO_URL = Jsoup.parse(
-                    retriever.get(CachedRetriever.BASE_URL_SOURCE, "")
-            ).getElementsByTag("body").html() + "/update.php";
+            UPDATE_INFO_URL = retriever.get(URLs.STAT_URL_SRC, URLs.STAT_URL_DEF) + URLs.STAT_REL_UPDATE;
         } catch (NullPointerException ex) {
             update_failed = true;
             return null;

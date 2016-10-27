@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class CachedRetriever {
-    public static final String BASE_URL_SOURCE = "https://thedrhax.github.io/mosmetro-android/base-url";
-
     private SharedPreferences settings;
     private JSONArray cache_storage;
     private Client client;
