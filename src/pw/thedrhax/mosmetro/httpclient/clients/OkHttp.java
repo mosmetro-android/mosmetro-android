@@ -83,8 +83,10 @@ public class OkHttp extends Client {
     public Client post(String link, Map<String, String> params) throws Exception {
         FormBody.Builder body = new FormBody.Builder();
 
-        for (Map.Entry<String,String> entry : params.entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                body.add(entry.getKey(), entry.getValue());
+            }
         }
 
         Request request = new Request.Builder()

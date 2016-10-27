@@ -2,6 +2,9 @@ package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.jsoup.select.Elements;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Authenticator;
@@ -123,7 +126,19 @@ public class MosMetro extends Authenticator {
         progressListener.onProgressUpdate(75);
 
         logger.log(context.getString(R.string.auth_checking_connection));
-        if (isConnected() == CHECK_CONNECTED) {
+        boolean status = false;
+        switch (version) {
+            case 1: status = (isConnected() == CHECK_CONNECTED); break;
+            case 2:
+                try {
+                    JSONObject response = (JSONObject)new JSONParser().parse(client.getPage());
+                    status = (Boolean)response.get("result");
+                } catch (Exception ex) {
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                }
+                break;
+        }
+        if (status) {
             logger.log(context.getString(R.string.auth_connected));
         } else {
             logger.log(String.format(

@@ -83,6 +83,13 @@
                 android:summary="@string/pref_category_notifications_summary">
 
             <CheckBoxPreference
+                    android:key="pref_notify_news"
+                    android:title="@string/pref_notify_news"
+                    android:summary="@string/pref_notify_news_summary"
+                    android:icon="@drawable/ic_notification_message_colored"
+                    android:defaultValue="true" />
+
+            <CheckBoxPreference
                     android:key="pref_notify_success"
                     android:title="@string/pref_notify_success"
                     android:summary="@string/pref_notify_success_summary"
