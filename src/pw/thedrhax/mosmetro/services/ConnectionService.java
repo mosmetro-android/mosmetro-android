@@ -137,6 +137,19 @@ public class ConnectionService extends IntentService {
                         .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
+
+                return;
+
+            case UNSUPPORTED:
+                notification
+                        .setTitle(getString(R.string.notification_unsupported))
+                        .setText(getString(R.string.notification_error_log))
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
+                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
+                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
+                        .show();
         }
     }
 
@@ -237,10 +250,7 @@ public class ConnectionService extends IntentService {
             }
 
             if (result == Authenticator.RESULT.NOT_REGISTERED) break;
-        } while (++count < pref_retry_count && running &&
-                (result == Authenticator.RESULT.ALREADY_CONNECTED
-                        || result == Authenticator.RESULT.CONNECTED)
-        );
+        } while (++count < pref_retry_count && running && result == Authenticator.RESULT.ERROR);
 
         return result;
     }

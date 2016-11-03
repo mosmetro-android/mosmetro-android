@@ -109,6 +109,8 @@
     <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
     <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
     <string name="manual_connection_mosmetro_summary">Подключение к основным сетям метро и МЦК</string>
+    <string name="manual_connection_mosgortrans">MosGorTrans_Free</string>
+    <string name="manual_connection_mosgortrans_summary">Подключение к сети московского наземного транспорта</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
     <string name="manual_connection_shortcut_summary">
         Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
@@ -120,12 +122,16 @@
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>
     <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
+    <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
+    <string name="auth_request">Отправка запроса</string>
+    <string name="auth_provider" formatted="false">Подключение к провайдеру %s</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
     <string name="auth_error_network">Сеть недоступна или не отвечает</string>
+    <string name="auth_error_redirect">перенаправление не получено</string>
     <string name="auth_error_auth_page">страница авторизации не получена</string>
     <string name="auth_error_not_registered">
         устройство не зарегистрировано в сети\n Пожалуйста, зайдите на сайт http://wi-fi.ru
@@ -137,6 +143,11 @@
     <string name="auth_error_auth_form">форма авторизации не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_network_disconnected">соединение с сетью прервалось</string>
+    <string name="auth_error_provider">провайдер не опознан</string>
+    <string name="auth_error_provider_unsupported" formatted="false">
+        провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют
+        два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
+    </string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
@@ -145,6 +156,7 @@
     <string name="notification_not_registered_register">Нажмите, чтобы перейти к регистрации</string>
     <string name="notification_error">Не удалось подключиться</string>
     <string name="notification_error_log">Нажмите, чтобы узнать подробности или попробовать снова</string>
+    <string name="notification_unsupported">Сеть не поддерживается</string>
     <string name="notification_progress_waiting">Ожидание…</string>
     <string name="notification_progress_connecting">Подключаюсь…</string>
 

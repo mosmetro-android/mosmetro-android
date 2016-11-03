@@ -8,14 +8,6 @@
 
     <PreferenceCategory
         android:title="@string/manual_connection">
-        <!-- TODO: Uncomment this then another networks will be available
-        <Preference
-                android:title="@string/manual_connection_default"
-                android:summary="@string/manual_connection_default_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity"/>
-        </Preference>
-        -->
 
         <Preference
             android:title="@string/manual_connection_mosmetro"
@@ -23,6 +15,15 @@
 
             <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
                 <extra android:name="SSID" android:value="MosMetro_Free" />
+            </intent>
+        </Preference>
+
+        <Preference
+            android:title="@string/manual_connection_mosgortrans"
+            android:summary="@string/manual_connection_mosgortrans_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+                <extra android:name="SSID" android:value="MosGorTrans_Free" />
             </intent>
         </Preference>
 
