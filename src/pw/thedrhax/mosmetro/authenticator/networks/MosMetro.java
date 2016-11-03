@@ -67,8 +67,11 @@ public class MosMetro extends Authenticator {
         logger.log(context.getString(R.string.auth_auth_page));
         try {
             client.get(redirect, null, pref_retry_count);
-            if (version == 2)
+            if (version == 2) {
+                if (redirect.contains("?"))
+                    redirect = redirect.split("/?")[0];
                 client.get(redirect + "/auth", null, pref_retry_count);
+            }
             logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
             logger.log(Logger.LEVEL.DEBUG, ex);
