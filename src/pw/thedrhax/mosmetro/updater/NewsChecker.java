@@ -3,6 +3,8 @@ package pw.thedrhax.mosmetro.updater;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -49,17 +51,29 @@ public class NewsChecker {
             return false;
         }
 
-        long id;
+        long id, max_version;
         String title, message;
         Uri url;
         try {
             id = (Long)data.get("id");
+            max_version = (Long)data.get("max_version");
             title = (String)data.get("title");
             message = (String)data.get("message");
             url = Uri.parse((String)data.get("url"));
         } catch (ClassCastException ex) {
             return false;
         } catch (NullPointerException ex) {
+            return false;
+        }
+
+        try {
+            PackageInfo pInfo = context
+                    .getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+
+            if (max_version < pInfo.versionCode)
+                return false;
+        } catch (PackageManager.NameNotFoundException ex) {
             return false;
         }
 
@@ -76,7 +90,6 @@ public class NewsChecker {
                 .setTitle(title)
                 .setText(message)
                 .show();
-
 
         settings.edit()
                 .putLong("pref_notify_news_id", id)
