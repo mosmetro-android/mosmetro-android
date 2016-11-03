@@ -5,7 +5,18 @@ import org.jsoup.Jsoup;
 import pw.thedrhax.mosmetro.httpclient.Client;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+
+import java.security.cert.CertificateException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +27,40 @@ public class OkHttp extends Client {
 
     private String referer = "http://curlmyip.org";
 
+    private SSLSocketFactory trustAllCerts() {
+        // Create a trust manager that does not validate certificate chains
+        final TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {
+                    }
+
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[]{};
+                    }
+                }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            // Create an ssl socket factory with our all-trusting manager
+            return sslContext.getSocketFactory();
+        } catch (NoSuchAlgorithmException ignored) {
+        } catch (KeyManagementException ignored) {}
+
+        return null;
+    }
+
     public OkHttp() {
         client = new OkHttpClient.Builder()
                 // Don't verify the hostname
@@ -25,6 +70,7 @@ public class OkHttp extends Client {
                         return true;
                     }
                 })
+                .sslSocketFactory(trustAllCerts())
                 // Store cookies for this session
                 .cookieJar(new CookieJar() {
                     private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<HttpUrl, List<Cookie>>();
