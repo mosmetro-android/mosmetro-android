@@ -1,6 +1,7 @@
 package pw.thedrhax.mosmetro.authenticator.networks;
 
 import android.content.Context;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 
 import org.json.simple.JSONObject;
@@ -68,8 +69,8 @@ public class MosMetro extends Authenticator {
         try {
             client.get(redirect, null, pref_retry_count);
             if (version == 2) {
-                if (redirect.contains("?"))
-                    redirect = redirect.split("/?")[0];
+                Uri redirect_uri = Uri.parse(redirect);
+                redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
                 client.get(redirect + "/auth", null, pref_retry_count);
             }
             logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
