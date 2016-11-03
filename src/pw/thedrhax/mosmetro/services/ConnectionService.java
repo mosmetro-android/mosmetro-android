@@ -80,12 +80,12 @@ public class ConnectionService extends IntentService {
         logger = new Logger();
     }
 
-    private void notify (int result) {
+    private void notify (Authenticator.RESULT result) {
         if (!running) return;
 
         switch (result) {
-            case Authenticator.STATUS_CONNECTED:
-            case Authenticator.STATUS_ALREADY_CONNECTED:
+            case CONNECTED:
+            case ALREADY_CONNECTED:
                 notification
                         .setTitle(getString(R.string.notification_success))
                         .setIcon(pref_colored_icons ?
@@ -111,7 +111,7 @@ public class ConnectionService extends IntentService {
 
                 return;
 
-            case Authenticator.STATUS_NOT_REGISTERED:
+            case NOT_REGISTERED:
                 notification
                         .setTitle(getString(R.string.notification_not_registered))
                         .setText(getString(R.string.notification_not_registered_register))
@@ -127,7 +127,7 @@ public class ConnectionService extends IntentService {
 
                 return;
 
-            case Authenticator.STATUS_ERROR:
+            case ERROR:
                 notification
                         .setTitle(getString(R.string.notification_error))
                         .setText(getString(R.string.notification_error_log))
@@ -190,11 +190,12 @@ public class ConnectionService extends IntentService {
         return true;
     }
 
-    private int connect() {
-        int result, count = 0;
+    private Authenticator.RESULT connect() {
+        Authenticator.RESULT result;
+        int count = 0;
 
         do {
-            if (!waitForIP()) return Authenticator.STATUS_ERROR;
+            if (!waitForIP()) return Authenticator.RESULT.ERROR;
 
             if (count > 0) {
                 notify_progress
@@ -232,11 +233,14 @@ public class ConnectionService extends IntentService {
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
                 ));
-                result = Authenticator.STATUS_ERROR; break;
+                result = Authenticator.RESULT.ERROR; break;
             }
 
-            if (result == Authenticator.STATUS_NOT_REGISTERED) break;
-        } while (++count < pref_retry_count && result > Authenticator.STATUS_ALREADY_CONNECTED && running);
+            if (result == Authenticator.RESULT.NOT_REGISTERED) break;
+        } while (++count < pref_retry_count && running &&
+                (result == Authenticator.RESULT.ALREADY_CONNECTED
+                        || result == Authenticator.RESULT.CONNECTED)
+        );
 
         return result;
     }
@@ -305,7 +309,7 @@ public class ConnectionService extends IntentService {
         } catch (InterruptedException ignored) {}
 
         // Try to connect
-        int result = connect();
+        Authenticator.RESULT result = connect();
         notify_progress.hide();
 
         logger.date();
@@ -313,7 +317,8 @@ public class ConnectionService extends IntentService {
         // Notify user if still connected to Wi-Fi
         if (isWifiConnected()) notify(result);
 
-        if (from_shortcut || result > Authenticator.STATUS_ALREADY_CONNECTED) return;
+        if (from_shortcut || (result == Authenticator.RESULT.ALREADY_CONNECTED
+                || result == Authenticator.RESULT.CONNECTED)) return;
 
         // Wait while internet connection is available
         int count = 0;
@@ -325,7 +330,7 @@ public class ConnectionService extends IntentService {
             // Check internet connection each 10 seconds
             if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
                 count = 0;
-                if (connection.isConnected() != Authenticator.CHECK_CONNECTED)
+                if (connection.isConnected() != Authenticator.CHECK.CONNECTED)
                     break;
             }
         }

@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.networks.MosGorTrans;
 import pw.thedrhax.mosmetro.updater.URLs;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
 import pw.thedrhax.mosmetro.authenticator.networks.MosMetro;
@@ -20,19 +21,19 @@ import java.util.Map;
 
 public abstract class Authenticator {
     public static final Class<? extends Authenticator>[] SUPPORTED_NETWORKS =
-            new Class[] {MosMetro.class, AURA.class};
+            new Class[] {MosMetro.class, AURA.class, MosGorTrans.class};
 
     // Result state
-    public static final int STATUS_CONNECTED = 0;
-    public static final int STATUS_ALREADY_CONNECTED = 1;
-    public static final int STATUS_NOT_REGISTERED = 2;
-    public static final int STATUS_ERROR = 3;
-    public static final int STATUS_INTERRUPTED = 4;
+    public static enum RESULT {
+        CONNECTED, ALREADY_CONNECTED,
+        NOT_REGISTERED, ERROR,
+        INTERRUPTED, UNSUPPORTED
+    }
 
     // Network check state
-    public static final int CHECK_CONNECTED = 0;
-    public static final int CHECK_WRONG_NETWORK = 1;
-    public static final int CHECK_NOT_CONNECTED = 2;
+    public static enum CHECK {
+        CONNECTED, WRONG_NETWORK, NOT_CONNECTED
+    }
 
 	protected Logger logger;
     protected Client client;
@@ -54,16 +55,16 @@ public abstract class Authenticator {
 
     public abstract String getSSID();
 
-    public int start() {
+    public RESULT start() {
         stopped = false;
 
         logger.log(Logger.LEVEL.DEBUG,
                    String.format(context.getString(R.string.version), getVersion()));
-        int result = connect();
+        RESULT result = connect();
 
         if (stopped) return result;
 
-        if (result <= STATUS_ALREADY_CONNECTED)
+        if (result == RESULT.CONNECTED || result == RESULT.ALREADY_CONNECTED)
             submit_info(result);
 
         return result;
@@ -85,9 +86,9 @@ public abstract class Authenticator {
      * Connection sequence
      */
 
-    public abstract int isConnected();
+    public abstract CHECK isConnected();
 
-    protected abstract int connect();
+    protected abstract RESULT connect();
 
     /*
      * Progress reporting
@@ -122,13 +123,13 @@ public abstract class Authenticator {
         }
     }
 
-    private void submit_info (int result) {
+    private void submit_info (RESULT result) {
         String STATISTICS_URL = new CachedRetriever(context)
                 .get(URLs.STAT_URL_SRC, URLs.STAT_URL_DEF) + URLs.STAT_REL_CHECK;
 
         Map<String,String> params = new HashMap<String, String>();
         params.put("version", getVersion());
-        params.put("connected", result == STATUS_CONNECTED ? "1" : "0");
+        params.put("connected", result == RESULT.CONNECTED ? "1" : "0");
         params.put("ssid", getSSID());
 
         try {

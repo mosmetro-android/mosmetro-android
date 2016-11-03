@@ -31,20 +31,20 @@ public class MosMetro extends Authenticator {
     }
 
     @Override
-    public int connect() {
+    public RESULT connect() {
         Map<String,String> fields = null;
 
-        if (stopped) return STATUS_INTERRUPTED;
+        if (stopped) return RESULT.INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
         logger.log(String.format(context.getString(R.string.auth_connecting), getSSID()));
 
         logger.log(context.getString(R.string.auth_checking_connection));
-        int connected = isConnected();
-        if (connected == CHECK_CONNECTED) {
+        CHECK connected = isConnected();
+        if (connected == CHECK.CONNECTED) {
             logger.log(context.getString(R.string.auth_already_connected));
-            return STATUS_ALREADY_CONNECTED;
-        } else if (connected == CHECK_WRONG_NETWORK) {
+            return RESULT.ALREADY_CONNECTED;
+        } else if (connected == CHECK.WRONG_NETWORK) {
             logger.log(String.format(
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_network)
@@ -57,12 +57,12 @@ public class MosMetro extends Authenticator {
                 manager.reassociate();
             }
 
-            return STATUS_ERROR;
+            return RESULT.ERROR;
         }
 
         logger.log(String.format(context.getString(R.string.auth_version), version));
 
-        if (stopped) return STATUS_INTERRUPTED;
+        if (stopped) return RESULT.INTERRUPTED;
         progressListener.onProgressUpdate(25);
 
         logger.log(context.getString(R.string.auth_auth_page));
@@ -80,7 +80,7 @@ public class MosMetro extends Authenticator {
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_auth_page)
             ));
-            return STATUS_ERROR;
+            return RESULT.ERROR;
         }
 
         if (version == 1) {
@@ -91,7 +91,7 @@ public class MosMetro extends Authenticator {
                             context.getString(R.string.error),
                             context.getString(R.string.auth_error_not_registered)
                     ));
-                    return STATUS_NOT_REGISTERED;
+                    return RESULT.NOT_REGISTERED;
                 }
                 fields = Client.parseForm(forms.first());
             } catch (Exception ex) {
@@ -99,11 +99,11 @@ public class MosMetro extends Authenticator {
                         context.getString(R.string.error),
                         context.getString(R.string.auth_error_auth_form)
                 ));
-                return STATUS_ERROR;
+                return RESULT.ERROR;
             }
         }
 
-        if (stopped) return STATUS_INTERRUPTED;
+        if (stopped) return RESULT.INTERRUPTED;
         progressListener.onProgressUpdate(50);
 
         logger.log(context.getString(R.string.auth_auth_form));
@@ -123,16 +123,16 @@ public class MosMetro extends Authenticator {
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_server)
             ));
-            return STATUS_ERROR;
+            return RESULT.ERROR;
         }
 
-        if (stopped) return STATUS_INTERRUPTED;
+        if (stopped) return RESULT.INTERRUPTED;
         progressListener.onProgressUpdate(75);
 
         logger.log(context.getString(R.string.auth_checking_connection));
         boolean status = false;
         switch (version) {
-            case 1: status = (isConnected() == CHECK_CONNECTED); break;
+            case 1: status = (isConnected() == CHECK.CONNECTED); break;
             case 2:
                 try {
                     JSONObject response = (JSONObject)new JSONParser().parse(client.getPage());
@@ -149,23 +149,23 @@ public class MosMetro extends Authenticator {
                     context.getString(R.string.error),
                     context.getString(R.string.auth_error_connection)
             ));
-            return STATUS_ERROR;
+            return RESULT.ERROR;
         }
 
         progressListener.onProgressUpdate(100);
 
-        return STATUS_CONNECTED;
+        return RESULT.CONNECTED;
     }
     
     @Override
-    public int isConnected() {
+    public CHECK isConnected() {
         Client client = new OkHttp().followRedirects(false);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ex) {
             // Server not responding => wrong network
             logger.log(Logger.LEVEL.DEBUG, ex);
-            return CHECK_WRONG_NETWORK;
+            return CHECK.WRONG_NETWORK;
         }
 
         try {
@@ -175,13 +175,13 @@ public class MosMetro extends Authenticator {
         } catch (Exception ex) {
             // Redirect not found => connected
             logger.log(Logger.LEVEL.DEBUG, ex);
-            return CHECK_CONNECTED;
+            return CHECK.CONNECTED;
         }
 
         if (redirect.contains("login.wi-fi.ru")) // Fallback to the first version
             version = 1;
 
         // Redirect found => not connected
-        return CHECK_NOT_CONNECTED;
+        return CHECK.NOT_CONNECTED;
     }
 }
