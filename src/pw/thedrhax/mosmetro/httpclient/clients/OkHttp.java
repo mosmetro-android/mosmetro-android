@@ -163,4 +163,9 @@ public class OkHttp extends Client {
         document.getElementsByTag("script").remove();
         document.getElementsByTag("style").remove();
     }
+
+    @Override
+    public String getReferer() {
+        return referer;
+    }
 }

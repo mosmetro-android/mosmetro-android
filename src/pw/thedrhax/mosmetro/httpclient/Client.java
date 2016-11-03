@@ -63,6 +63,8 @@ public abstract class Client {
         return raw_document;
     }
 
+    public abstract String getReferer();
+
     public String parseLinkRedirect() throws Exception {
         String link = document.getElementsByTag("a").first().attr("href");
 
