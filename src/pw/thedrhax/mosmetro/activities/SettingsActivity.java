@@ -7,8 +7,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -22,6 +20,7 @@ import android.widget.Toast;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Version;
 
 import java.util.List;
 
@@ -100,15 +99,10 @@ public class SettingsActivity extends Activity {
 
         // Add version name and code
         Preference app_name = settings.findPreference("app_name");
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            app_name.setSummary(String.format(
-                    getString(R.string.version),
-                    pInfo.versionName + "-" + pInfo.versionCode)
-            );
-        } catch (PackageManager.NameNotFoundException ex) {
-            app_name.setSummary("");
-        }
+        app_name.setSummary(String.format(
+                getString(R.string.version),
+                new Version(this).getFormattedVersion())
+        );
 
         /*
             Update checking

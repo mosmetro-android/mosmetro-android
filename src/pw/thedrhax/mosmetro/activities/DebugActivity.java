@@ -2,8 +2,6 @@ package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,6 +15,7 @@ import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Version;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -92,16 +91,10 @@ public class DebugActivity extends Activity {
             case R.id.action_share:
                 Intent send_email = new Intent(Intent.ACTION_SEND);
 
-                String version = "unknown";
-                try {
-                    PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                    version = pInfo.versionName + "-" + pInfo.versionCode;
-                } catch (PackageManager.NameNotFoundException ignored) {}
-
                 send_email.setType("text/plain");
                 send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
                 send_email.putExtra(Intent.EXTRA_SUBJECT, String.format(
-                        getString(R.string.report_email_subject), version
+                        getString(R.string.report_email_subject), new Version(this).getFormattedVersion()
                 ));
                 send_email.putExtra(Intent.EXTRA_TEXT, logger.get(Logger.LEVEL.DEBUG));
 

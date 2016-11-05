@@ -2,8 +2,6 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.updater.URLs;
@@ -14,6 +12,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Version;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,8 +56,9 @@ public abstract class Authenticator {
     public RESULT start() {
         stopped = false;
 
-        logger.log(Logger.LEVEL.DEBUG,
-                   String.format(context.getString(R.string.version), getVersion()));
+        logger.log(Logger.LEVEL.DEBUG, String.format(
+                context.getString(R.string.version), new Version(context).getFormattedVersion()
+        ));
         RESULT result = connect();
 
         if (stopped) return result;
@@ -112,22 +112,12 @@ public abstract class Authenticator {
      * System info
      */
 
-    private String getVersion() {
-        PackageInfo pInfo;
-        try {
-            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return pInfo.versionName + "-" + pInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException ex) {
-            return "";
-        }
-    }
-
     private void submit_info (RESULT result) {
         String STATISTICS_URL = new CachedRetriever(context)
                 .get(URLs.STAT_URL_SRC, URLs.STAT_URL_DEF) + URLs.STAT_REL_CHECK;
 
         Map<String,String> params = new HashMap<String, String>();
-        params.put("version", getVersion());
+        params.put("version", new Version(context).getFormattedVersion());
         params.put("connected", result == RESULT.CONNECTED ? "1" : "0");
         params.put("ssid", getSSID());
 
