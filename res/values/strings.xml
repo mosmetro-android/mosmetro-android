@@ -5,7 +5,7 @@
     <string name="report">Отправить отчет</string>
     <string name="report_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
     <string name="report_email_address">mosmetro@thedrhax.pw</string>
-    <string name="report_email_subject">Отчет об ошибке</string>
+    <string name="report_email_subject" formatted="false">Версия %s</string>
     <string name="report_choose_client">Выберите E-mail клиент…</string>
 
     <string name="retry">Попробовать снова</string>
