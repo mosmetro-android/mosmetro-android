@@ -11,9 +11,9 @@ public class MosGorTrans extends MosMetro {
     public static final String SSID = "MosGorTrans_Free";
 
     private static enum PROVIDER {
-        NETBYNET, ENFORTA
+        UNKNOWN, NETBYNET, ENFORTA
     }
-    private PROVIDER provider = PROVIDER.NETBYNET;
+    private PROVIDER provider = PROVIDER.UNKNOWN;
 
     public MosGorTrans (Context context) {
         super(context);
@@ -75,10 +75,12 @@ public class MosGorTrans extends MosMetro {
 
     @Override
     public CHECK isConnected() {
-        // Check for NetByNet
+        // Check for NetByNet using MosMetro implementation
         CHECK result = super.isConnected();
-        if (result != CHECK.CONNECTED)
+        if (result != CHECK.CONNECTED || provider == PROVIDER.NETBYNET) {
+            provider = PROVIDER.NETBYNET;
             return result;
+        }
 
         // Check for other networks
         Client client = new OkHttp().followRedirects(false);
@@ -92,15 +94,10 @@ public class MosGorTrans extends MosMetro {
         }
 
         // Provider selection based on previous request
-        if (provider == PROVIDER.NETBYNET)
-            if (client.getPage().contains("enforta.ru")) {
-                provider = PROVIDER.ENFORTA;
-            }
+        if (client.getPage().contains("enforta.ru"))
+            provider = PROVIDER.ENFORTA;
 
         switch (provider) {
-            case NETBYNET:
-                return CHECK.CONNECTED;
-
             case ENFORTA:
                 try {
                     client.parseMetaRedirect();
@@ -109,6 +106,13 @@ public class MosGorTrans extends MosMetro {
                     logger.log(Logger.LEVEL.DEBUG, ex);
                     return CHECK.CONNECTED;
                 }
+
+            default:
+                logger.log(String.format(
+                        context.getString(R.string.error),
+                        context.getString(R.string.auth_error_provider)
+                ));
+                return CHECK.CONNECTED;
         }
 
         // Redirect found => not connected
