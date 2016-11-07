@@ -56,7 +56,7 @@ public abstract class Authenticator {
     public RESULT start() {
         stopped = false;
 
-        logger.log(Logger.LEVEL.DEBUG, String.format(
+        logger.log(String.format(
                 context.getString(R.string.version), new Version(context).getFormattedVersion()
         ));
         RESULT result = connect();
