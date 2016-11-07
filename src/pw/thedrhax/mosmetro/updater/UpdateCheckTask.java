@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -15,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
+import pw.thedrhax.util.Version;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -171,18 +170,8 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         private int getVersion() {
-            if (by_build) {
-                return settings.getInt("pref_updater_build", 0);
-            } else {
-                try {
-                    PackageInfo pInfo = context
-                            .getPackageManager().getPackageInfo(context.getPackageName(), 0);
-
-                    return pInfo.versionCode;
-                } catch (PackageManager.NameNotFoundException ex) {
-                    return Integer.MAX_VALUE;
-                }
-            }
+            return by_build ?
+                    settings.getInt("pref_updater_build", 0) : new Version(context).getVersionCode();
         }
 
         public boolean hasUpdate() {

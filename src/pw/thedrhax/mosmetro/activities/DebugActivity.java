@@ -15,6 +15,7 @@ import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Version;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -92,7 +93,9 @@ public class DebugActivity extends Activity {
 
                 send_email.setType("text/plain");
                 send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
-                send_email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.report_email_subject));
+                send_email.putExtra(Intent.EXTRA_SUBJECT, String.format(
+                        getString(R.string.report_email_subject), new Version(this).getFormattedVersion()
+                ));
                 send_email.putExtra(Intent.EXTRA_TEXT, logger.get(Logger.LEVEL.DEBUG));
 
                 startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
