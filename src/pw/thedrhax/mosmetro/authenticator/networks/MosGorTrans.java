@@ -26,8 +26,6 @@ public class MosGorTrans extends MosMetro {
 
     @Override
     public RESULT connect() {
-        logger.log(String.format(context.getString(R.string.auth_connecting), getSSID()));
-
         if (stopped) return RESULT.INTERRUPTED;
         progressListener.onProgressUpdate(0);
 
