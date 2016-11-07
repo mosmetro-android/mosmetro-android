@@ -127,7 +127,7 @@
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
     <string name="auth_request">Отправка запроса</string>
-    <string name="auth_provider" formatted="false">Подключение к провайдеру %s</string>
+    <string name="auth_provider" formatted="false">Провайдер: %s</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
     <string name="auth_error_network">Сеть недоступна или не отвечает</string>
