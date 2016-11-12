@@ -327,7 +327,7 @@ public class ConnectionService extends IntentService {
         // Notify user if still connected to Wi-Fi
         if (isWifiConnected()) notify(result);
 
-        if (from_shortcut || (result == Authenticator.RESULT.ALREADY_CONNECTED
+        if (from_shortcut || !(result == Authenticator.RESULT.ALREADY_CONNECTED
                 || result == Authenticator.RESULT.CONNECTED)) return;
 
         // Wait while internet connection is available
