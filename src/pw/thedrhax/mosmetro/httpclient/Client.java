@@ -13,6 +13,7 @@ public abstract class Client {
     protected Document document;
     protected String user_agent = System.getProperty("http.agent");
     protected String raw_document;
+    protected int code = 200;
 
     protected Client() {}
 
@@ -64,6 +65,10 @@ public abstract class Client {
     }
 
     public abstract String getReferer();
+
+    public int getResponseCode() {
+        return code;
+    }
 
     public String parseLinkRedirect() throws Exception {
         String link = document.getElementsByTag("a").first().attr("href");

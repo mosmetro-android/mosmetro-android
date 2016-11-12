@@ -151,10 +151,11 @@ public class OkHttp extends Client {
     private void parseDocument (Response response) throws Exception {
         ResponseBody body = response.body();
         raw_document = body.string();
+        code = response.code();
         body.close();
 
         if (raw_document == null || raw_document.isEmpty()) {
-            throw new Exception("Empty response");
+            throw new Exception("Empty response: " + code);
         }
 
         document = Jsoup.parse(raw_document);
