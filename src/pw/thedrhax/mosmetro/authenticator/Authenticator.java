@@ -12,6 +12,7 @@ import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
+import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
@@ -56,6 +57,8 @@ public abstract class Authenticator {
 
     public RESULT start() {
         stopped = false;
+
+        AndroidHacks.bindToWiFi(context);
 
         logger.log(String.format(
                 context.getString(R.string.version), new Version(context).getFormattedVersion()
