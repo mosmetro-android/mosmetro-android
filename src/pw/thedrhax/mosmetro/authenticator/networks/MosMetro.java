@@ -175,7 +175,7 @@ public class MosMetro extends Authenticator {
         } catch (Exception ex) {
             // Redirect not found => connected
             logger.log(Logger.LEVEL.DEBUG, ex);
-            return CHECK.CONNECTED;
+            return super.isConnected();
         }
 
         if (redirect.contains("login.wi-fi.ru")) // Fallback to the first version

@@ -48,6 +48,8 @@
 
     <string name="pref_internet_check">Периодическая проверка соединения</string>
     <string name="pref_internet_check_summary">Проверять соединение с интернетом каждые 10 секунд и перезапускать подключение при ошибке.</string>
+    <string name="pref_internet_check_strict">Надёжная проверка соединения</string>
+    <string name="pref_internet_check_strict_summary">Более медленная проверка через подключение к одному из публичных серверов в интернете.</string>
 
     <string name="pref_notify_success">Успешное подключение</string>
     <string name="pref_notify_fail">Неудачное подключение</string>

@@ -86,7 +86,20 @@ public abstract class Authenticator {
      * Connection sequence
      */
 
-    public abstract CHECK isConnected();
+    public CHECK isConnected() {
+        if (!settings.getBoolean("pref_internet_check_strict", false))
+            return CHECK.CONNECTED;
+
+        Client client = new OkHttp();
+        try {
+            client.get("http://google.ru/generate_204", null);
+        } catch (Exception ex) {
+            if (client.getResponseCode() == 204)
+                return CHECK.CONNECTED;
+        }
+
+        return CHECK.NOT_CONNECTED;
+    }
 
     protected abstract RESULT connect();
 
