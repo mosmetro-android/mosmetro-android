@@ -12,32 +12,26 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.Version;
 
 public class NewsChecker {
     private Context context;
     private SharedPreferences settings;
-    private int pref_retry_count;
     private boolean pref_colored_icons;
-
-    private Client client;
 
     public NewsChecker(Context context) {
         this.context = context;
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-        pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
-
-        client = new OkHttp();
     }
 
     public boolean check() {
+        String content;
         try {
-            client.get(URLs.NEWS_URL, null, pref_retry_count);
+            content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");
         } catch (Exception ex) {
             return false;
         }
@@ -45,7 +39,7 @@ public class NewsChecker {
         JSONParser parser = new JSONParser();
         JSONObject data;
         try {
-            data = (JSONObject)parser.parse(client.getPage());
+            data = (JSONObject)parser.parse(content);
         } catch (ParseException ex) {
             return false;
         }
