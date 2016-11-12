@@ -106,10 +106,6 @@ public class MosGorTrans extends MosMetro {
                 }
 
             default:
-                logger.log(String.format(
-                        context.getString(R.string.error),
-                        context.getString(R.string.auth_error_provider)
-                ));
                 return CHECK.CONNECTED;
         }
 
