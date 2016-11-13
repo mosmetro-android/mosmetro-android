@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="pw.thedrhax.mosmetro"
-      android:versionCode="43"
-      android:versionName="1.7">
-      
+    package="pw.thedrhax.mosmetro"
+    android:installLocation="auto"
+    android:versionCode="43"
+    android:versionName="1.7">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
