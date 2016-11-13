@@ -21,7 +21,12 @@ public class AndroidHacks {
             NetworkInfo info = cm.getNetworkInfo(i);
             if (info.getType() == ConnectivityManager.TYPE_WIFI)
                 if (info.getState() == NetworkInfo.State.CONNECTED) {
-                    cm.bindProcessToNetwork(i);
+                    if (Build.VERSION.SDK_INT < 23)
+                        try {
+                            ConnectivityManager.setProcessDefaultNetwork(i);
+                        } catch (IllegalStateException ignored) {}
+                    else
+                        cm.bindProcessToNetwork(i);
                     break;
                 }
         }
