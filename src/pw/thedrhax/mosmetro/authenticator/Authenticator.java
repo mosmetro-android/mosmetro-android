@@ -14,6 +14,7 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public abstract class Authenticator {
 
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
-        this.pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
+        this.pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
     }
 
     public abstract String getSSID();

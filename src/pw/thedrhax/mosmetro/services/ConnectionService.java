@@ -18,6 +18,7 @@ import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
+import pw.thedrhax.util.Util;
 
 public class ConnectionService extends IntentService {
     private static final String UNKNOWN_SSID = "<unknown ssid>";
@@ -53,9 +54,9 @@ public class ConnectionService extends IntentService {
 
         manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        pref_retry_count = Integer.parseInt(settings.getString("pref_retry_count", "3"));
-        pref_retry_delay = Integer.parseInt(settings.getString("pref_retry_delay", "5"));
-        pref_ip_wait = Integer.parseInt(settings.getString("pref_ip_wait", "30"));
+        pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
+        pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
+        pref_ip_wait = Util.getIntPreference(settings, "pref_ip_wait", 30);
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
