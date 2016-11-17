@@ -270,7 +270,8 @@ public class ConnectionService extends IntentService {
             } else {
                 info = manager.getConnectionInfo();
             }
-            SSID = info != null ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
+            SSID = (info != null && info.getSSID() != null)
+                    ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
         }
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
