@@ -75,16 +75,33 @@ public class OkHttp extends Client {
                 .cookieJar(new CookieJar() {
                     private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<HttpUrl, List<Cookie>>();
 
+                    private HttpUrl getHost (HttpUrl url) {
+                        return HttpUrl.parse("http://" + url.host());
+                    }
+
                     @Override
                     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                        List<Cookie> url_cookies = loadForRequest(url);
-                        url_cookies.addAll(cookies);
-                        this.cookies.put(url, url_cookies);
+                        HttpUrl host = getHost(url);
+                        List<Cookie> url_cookies = loadForRequest(host);
+                        // TODO: You can do better, come on!
+                        for (Cookie cookie : cookies) {
+                            List<Cookie> for_deletion = new ArrayList<Cookie>();
+                            for (Cookie old_cookie : url_cookies) {
+                                if (cookie.name().equals(old_cookie.name()))
+                                    for_deletion.add(old_cookie);
+                            }
+                            for (Cookie old_cookie : for_deletion) {
+                                url_cookies.remove(old_cookie);
+                            }
+                            url_cookies.add(cookie);
+                        }
+                        this.cookies.put(host, url_cookies);
                     }
 
                     @Override
                     public List<Cookie> loadForRequest(HttpUrl url) {
-                        List<Cookie> url_cookies = cookies.get(url);
+                        HttpUrl host = getHost(url);
+                        List<Cookie> url_cookies = cookies.get(host);
                         return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
                     }
                 })
@@ -94,7 +111,7 @@ public class OkHttp extends Client {
     @Override
     public Client setCookie(String url, String name, String value) {
         HttpUrl httpUrl = HttpUrl.parse(url);
-        List<Cookie> url_cookies = client.cookieJar().loadForRequest(httpUrl);
+        List<Cookie> url_cookies = new ArrayList<Cookie>();
         url_cookies.add(Cookie.parse(httpUrl, name + "=" + value));
         client.cookieJar().saveFromResponse(httpUrl, url_cookies);
         return this;
