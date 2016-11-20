@@ -172,6 +172,9 @@
     <string name="contirutor_revertron">Revertron</string>
     <string name="contributor_revertron_summary">Множество рекомендаций по алгоритмам</string>
     <string name="contributor_revertron_link">https://github.com/Revertron</string>
+    <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>
+    <string name="contributor_Mikhail_Kuropatkin">Mikhail Kuropatkin</string>
+    <string name="contributor_Mikhail_Kuropatkin_link">https://facebook.com/kuropatkin</string>
 
     <string name="action_donate">Поддержать проект</string>
     <string name="action_donate_summary">
