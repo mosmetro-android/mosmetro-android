@@ -12,6 +12,7 @@ public abstract class Client {
 
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
+    public static final String HEADER_CSRF = "X-CSRF-Token";
 
     protected Document document;
     protected Map<String,String> headers;
