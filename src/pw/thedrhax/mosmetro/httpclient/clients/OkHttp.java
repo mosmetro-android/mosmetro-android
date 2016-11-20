@@ -1,7 +1,9 @@
 package pw.thedrhax.mosmetro.httpclient.clients;
 
 import okhttp3.*;
-import org.jsoup.Jsoup;
+
+import org.jsoup.*;
+
 import pw.thedrhax.mosmetro.httpclient.Client;
 
 import javax.net.ssl.HostnameVerifier;
@@ -24,8 +26,6 @@ import java.util.Map;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
-
-    private String referer = "http://curlmyip.org";
 
     private SSLSocketFactory trustAllCerts() {
         // Create a trust manager that does not validate certificate chains
@@ -129,15 +129,16 @@ public class OkHttp extends Client {
 
     @Override
     public Client get(String link, Map<String, String> params) throws Exception {
-        Request request = new Request.Builder()
+        Request.Builder builder = new Request.Builder()
                 .url(link + requestToString(params))
-                .addHeader("Referer", referer)
-                .addHeader("User-Agent", user_agent)
-                .get()
-                .build();
+                .get();
 
-        referer = link;
-        parseDocument(client.newCall(request).execute());
+        for (String name : headers.keySet()) {
+            builder.addHeader(name, getHeader(name));
+        }
+
+        setHeader(HEADER_REFERER, link);
+        parseDocument(client.newCall(builder.build()).execute());
 
         return this;
     }
@@ -152,15 +153,16 @@ public class OkHttp extends Client {
             }
         }
 
-        Request request = new Request.Builder()
+        Request.Builder builder = new Request.Builder()
                 .url(link)
-                .addHeader("Referer", referer)
-                .addHeader("User-Agent", user_agent)
-                .post(body.build())
-                .build();
+                .post(body.build());
 
-        referer = link;
-        parseDocument(client.newCall(request).execute());
+        for (String name : headers.keySet()) {
+            builder.addHeader(name, getHeader(name));
+        }
+
+        setHeader(HEADER_REFERER, link);
+        parseDocument(client.newCall(builder.build()).execute());
 
         return this;
     }
@@ -180,10 +182,5 @@ public class OkHttp extends Client {
         // Clean-up useless tags: <script>, <style>
         document.getElementsByTag("script").remove();
         document.getElementsByTag("style").remove();
-    }
-
-    @Override
-    public String getReferer() {
-        return referer;
     }
 }

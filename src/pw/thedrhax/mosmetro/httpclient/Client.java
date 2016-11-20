@@ -10,18 +10,29 @@ public abstract class Client {
     private static final int METHOD_GET = 0;
     private static final int METHOD_POST = 1;
 
+    public static final String HEADER_USER_AGENT = "User-Agent";
+    public static final String HEADER_REFERER = "Referer";
+
     protected Document document;
-    protected String user_agent = System.getProperty("http.agent");
+    protected Map<String,String> headers;
     protected String raw_document;
     protected int code = 200;
 
-    protected Client() {}
+    protected Client() {
+        headers = new HashMap<String, String>();
+        setHeader(HEADER_USER_AGENT, System.getProperty("http.agent"));
+        setHeader(HEADER_REFERER, "http://curlmyip.org");
+    }
 
     // Settings methods
     public abstract Client followRedirects(boolean follow);
 
-    public Client setUserAgent(String user_agent) {
-        this.user_agent = user_agent; return this;
+    public Client setHeader (String name, String value) {
+        headers.put(name, value); return this;
+    }
+
+    public String getHeader (String name) {
+        return headers.containsKey(name) ? headers.get(name) : null;
     }
 
     public abstract Client setCookie(String url, String name, String value);
@@ -63,8 +74,6 @@ public abstract class Client {
     public String getPage() {
         return raw_document;
     }
-
-    public abstract String getReferer();
 
     public int getResponseCode() {
         return code;
