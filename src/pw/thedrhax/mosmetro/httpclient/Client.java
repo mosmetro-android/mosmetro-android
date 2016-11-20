@@ -79,18 +79,30 @@ public abstract class Client {
         return link;
     }
 
+    public String parseMetaContent (String name) throws Exception {
+        String value = null;
+
+        for (Element element : document.getElementsByTag("meta")) {
+            if (name.equalsIgnoreCase(element.attr("name")) ||
+                    name.equalsIgnoreCase(element.attr("http-equiv"))) {
+                value = element.attr("content");
+            }
+        }
+
+        if (value == null || value.isEmpty())
+            throw new Exception ("Meta tag not found");
+
+        return value;
+    }
+
     public String parseMetaRedirect() throws Exception {
         String link = null;
 
-        for (Element element : document.getElementsByTag("meta")) {
-            if (element.attr("http-equiv").equalsIgnoreCase("refresh")) {
-                String attr = element.attr("content");
-                if (attr.toLowerCase().contains("; url=")) {
-                    link = attr.substring(attr.indexOf("=") + 1);
-                } else {
-                    link = attr.substring(attr.indexOf(";") + 1);
-                }
-            }
+        String attr = parseMetaContent("refresh");
+        if (attr.toLowerCase().contains("; url=")) {
+            link = attr.substring(attr.indexOf("=") + 1);
+        } else {
+            link = attr.substring(attr.indexOf(";") + 1);
         }
 
         if (link == null || link.isEmpty())
