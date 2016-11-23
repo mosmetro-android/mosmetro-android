@@ -3,9 +3,6 @@ package pw.thedrhax.mosmetro.authenticator.networks;
 import android.content.Context;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.util.Logger;
 
 public class MosGorTrans extends MosMetro {
     public static final String SSID = "MosGorTrans_Free";
@@ -44,6 +41,11 @@ public class MosGorTrans extends MosMetro {
 
         if (stopped) return RESULT.INTERRUPTED;
 
+        if (redirect != null) {
+            if (redirect.contains("wi-fi.ru")) provider = PROVIDER.NETBYNET;
+            if (redirect.contains("enforta")) provider = PROVIDER.ENFORTA;
+        }
+
         switch (provider) {
             case NETBYNET:
                 logger.log(String.format(
@@ -69,47 +71,5 @@ public class MosGorTrans extends MosMetro {
                 ));
                 return RESULT.ERROR;
         }
-    }
-
-    @Override
-    public CHECK isConnected() {
-        // Check for NetByNet using MosMetro implementation
-        CHECK result = super.isConnected();
-        if (result != CHECK.CONNECTED || provider == PROVIDER.NETBYNET) {
-            provider = PROVIDER.NETBYNET;
-            return result;
-        }
-
-        // Check for other networks
-        Client client = new OkHttp().followRedirects(false);
-        try {
-            client.get("http://mosgortrans.ru", null);
-            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
-        } catch (Exception ex) {
-            // Server not responding => wrong network
-            logger.log(Logger.LEVEL.DEBUG, ex);
-            return CHECK.WRONG_NETWORK;
-        }
-
-        // Provider selection based on previous request
-        if (client.getPage().contains("enforta.ru"))
-            provider = PROVIDER.ENFORTA;
-
-        switch (provider) {
-            case ENFORTA:
-                try {
-                    client.parseMetaRedirect();
-                    break;
-                } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    return CHECK.CONNECTED;
-                }
-
-            default:
-                return CHECK.CONNECTED;
-        }
-
-        // Redirect found => not connected
-        return CHECK.NOT_CONNECTED;
     }
 }

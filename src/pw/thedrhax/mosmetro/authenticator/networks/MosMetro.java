@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
-    private String redirect = null;
+    protected String redirect = null;
     private int version = 2;
 
     public MosMetro (Context context) {
