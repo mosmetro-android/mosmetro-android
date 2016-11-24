@@ -26,9 +26,10 @@ public abstract class Authenticator {
 
     // Result state
     public static enum RESULT {
-        CONNECTED, ALREADY_CONNECTED,
-        NOT_REGISTERED, ERROR,
-        INTERRUPTED, UNSUPPORTED
+        CONNECTED, ALREADY_CONNECTED, // Success
+        NOT_REGISTERED, ERROR, // Fail
+        CAPTCHA, // Needs user's interaction == Stopped
+        INTERRUPTED, UNSUPPORTED // Stopped
     }
 
     // Network check state

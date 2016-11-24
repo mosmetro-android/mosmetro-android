@@ -3,6 +3,7 @@ package pw.thedrhax.mosmetro.httpclient;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public abstract class Client {
     // IO methods
     public abstract Client get(String link, Map<String,String> params) throws Exception;
     public abstract Client post(String link, Map<String,String> params) throws Exception;
+    public abstract InputStream getInputStream(String link) throws Exception;
 
     public Client get(String link, Map<String,String> params, int retries) throws Exception {
         return requestWithRetries(link, params, retries, METHOD_GET);

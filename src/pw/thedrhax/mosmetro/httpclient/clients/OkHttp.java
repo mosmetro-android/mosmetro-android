@@ -13,6 +13,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -165,6 +166,18 @@ public class OkHttp extends Client {
         parseDocument(client.newCall(builder.build()).execute());
 
         return this;
+    }
+
+    @Override
+    public InputStream getInputStream(String link) throws Exception {
+        Request.Builder builder = new Request.Builder().url(link).get();
+
+        for (String name : headers.keySet()) {
+            builder.addHeader(name, getHeader(name));
+        }
+
+        Response response = client.newCall(builder.build()).execute();
+        return response.body().byteStream();
     }
 
     private void parseDocument (Response response) throws Exception {

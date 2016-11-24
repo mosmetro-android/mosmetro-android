@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:src="@drawable/ic_notification_error_colored"
+        android:id="@+id/image_captcha"
+        android:layout_width="match_parent"
+        android:padding="32dp"
+        android:layout_height="128dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/text_captcha"
+        android:layout_margin="8dp" />
+
+    <Button
+        android:text="@string/send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/submit_button" />
+
+</LinearLayout>

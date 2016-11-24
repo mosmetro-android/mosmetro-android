@@ -141,6 +141,20 @@ public class ConnectionService extends IntentService {
 
                 return;
 
+            case CAPTCHA:
+                notification
+                        .setTitle(getString(R.string.notification_captcha))
+                        .setText(getString(R.string.notification_captcha_summary))
+                        .setIcon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
+                        .setIntent(new Intent(this, DebugActivity.class)
+                                    .putExtra("logger", logger)
+                                    .putExtra("captcha", true)
+                        )
+                        .show();
+                return;
+
             case UNSUPPORTED:
                 notification
                         .setTitle(getString(R.string.notification_unsupported))
@@ -251,6 +265,7 @@ public class ConnectionService extends IntentService {
             }
 
             if (result == Authenticator.RESULT.NOT_REGISTERED) break;
+            if (result == Authenticator.RESULT.CAPTCHA) break;
         } while (++count < pref_retry_count && running && result == Authenticator.RESULT.ERROR);
 
         return result;
