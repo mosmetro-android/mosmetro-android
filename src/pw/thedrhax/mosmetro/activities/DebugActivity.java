@@ -64,6 +64,7 @@ public class DebugActivity extends Activity {
                 service.putExtras(intent);
                 startService(service);
                 finish();
+                return;
             }
 
             if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
