@@ -85,10 +85,6 @@ public class MosMetro extends Authenticator {
                 redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
                 client.get(redirect + "/auth", null, pref_retry_count);
                 logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-
-                String csrf_token = client.parseMetaContent("csrf-token");
-                client.setHeader(Client.HEADER_CSRF, csrf_token);
-                logger.log(Logger.LEVEL.DEBUG, "CSRF Token: " + csrf_token);
             }
             logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
         } catch (Exception ex) {
@@ -167,6 +163,10 @@ public class MosMetro extends Authenticator {
             switch (version) {
                 case 1: client.post(redirect, fields, pref_retry_count); break;
                 case 2:
+                    String csrf_token = client.parseMetaContent("csrf-token");
+                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+                    logger.log(Logger.LEVEL.DEBUG, "CSRF Token: " + csrf_token);
+
                     client.setCookie(redirect, "afVideoPassed", "0");
                     client.post(redirect + "/auth/init?segment=metro", null, pref_retry_count);
                     break;
