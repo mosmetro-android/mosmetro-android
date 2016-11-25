@@ -84,6 +84,7 @@ public class MosMetro extends Authenticator {
                 Uri redirect_uri = Uri.parse(redirect);
                 redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
                 client.get(redirect + "/auth", null, pref_retry_count);
+                logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
 
                 String csrf_token = client.parseMetaContent("csrf-token");
                 client.setHeader(Client.HEADER_CSRF, csrf_token);
