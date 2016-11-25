@@ -121,7 +121,7 @@ public class MosMetro extends Authenticator {
             logger.log(context.getString(R.string.auth_captcha));
             try {
                 Element form = client.getPageContent().getElementsByTag("form").first();
-                if ("captcha__container".equals(form.attr("class"))) {
+                if (form != null && "captcha__container".equals(form.attr("class"))) {
                     if (context instanceof Activity) {
                         // Retrieving captcha from server
                         Element captcha_img = form.getElementsByTag("img").first();
