@@ -79,6 +79,22 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             branches.add(branch);
         }
 
+        // Check if selected branch is deleted
+        if (current_branch == null && branches.size() > 0) {
+            // Fallback to master
+            settings.edit()
+                    .putInt("pref_updater_build", 0)
+                    .putInt("pref_updater_ignore", 0)
+                    .putString("pref_updater_branch", "master")
+                    .apply();
+            for (Branch branch : branches) {
+                if (branch.name.equals("master")) {
+                    current_branch = branch;
+                    break;
+                }
+            }
+        }
+
         if (current_branch == null) {
             update_failed = true;
             return null;
