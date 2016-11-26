@@ -7,13 +7,15 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:id="@+id/text_captcha"
         android:layout_alignBottom="@+id/image_captcha"
         android:layout_toRightOf="@+id/image_captcha"
         android:layout_marginBottom="8dp"
         android:layout_toLeftOf="@+id/submit_button"
-        android:layout_toStartOf="@+id/submit_button" />
+        android:layout_toStartOf="@+id/submit_button"
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionDone" />
 
     <Button
         android:text="@android:string/ok"

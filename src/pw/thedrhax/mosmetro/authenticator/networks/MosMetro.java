@@ -8,10 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -274,10 +277,21 @@ public class MosMetro extends Authenticator {
             dialog.setTitle(R.string.auth_captcha_dialog);
             dialog.setContentView(R.layout.captcha_dialog);
 
-            Button submit_button = (Button) dialog.findViewById(R.id.submit_button);
-            final EditText text_captcha = (EditText) dialog.findViewById(R.id.text_captcha);
-            ImageView image_captcha = (ImageView) dialog.findViewById(R.id.image_captcha);
+            final Button submit_button = (Button) dialog.findViewById(R.id.submit_button);
 
+            final EditText text_captcha = (EditText) dialog.findViewById(R.id.text_captcha);
+            text_captcha.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    if (i == EditorInfo.IME_ACTION_DONE) {
+                        submit_button.performClick();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            ImageView image_captcha = (ImageView) dialog.findViewById(R.id.image_captcha);
             image_captcha.setImageBitmap(captcha);
 
             submit_button.setOnClickListener(new View.OnClickListener() {
