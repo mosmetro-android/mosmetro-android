@@ -127,6 +127,11 @@
     <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_captcha">Проверка наличия каптчи</string>
     <string name="auth_captcha_dialog">Введите код с картинки</string>
+    <string name="auth_captcha_dialog_summary">
+        Компания МаксимаТелеком требует вводить этот код время от времени для входа в систему.
+        При входе через браузер вам не только придётся ввести этот код, но ещё и посмотреть рекламу.
+        Извините за временные неудобства.
+    </string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
