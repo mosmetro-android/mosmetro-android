@@ -18,7 +18,6 @@ import org.json.simple.parser.JSONParser;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.InputStream;
 import java.net.ProtocolException;
 import java.util.Map;
 
@@ -122,44 +121,35 @@ public class MosMetro extends Authenticator {
             try {
                 Element form = client.getPageContent().getElementsByTag("form").first();
                 if (form != null && "captcha__container".equals(form.attr("class"))) {
-                    if (context instanceof Activity) {
-                        // Retrieving captcha from server
-                        Element captcha_img = form.getElementsByTag("img").first();
-                        String captcha_url = redirect + captcha_img.attr("src");
-                        InputStream captcha_stream = client.getInputStream(captcha_url);
-                        Bitmap captcha = BitmapFactory.decodeStream(captcha_stream);
+                    // Retrieving captcha from server
+                    Element captcha_img = form.getElementsByTag("img").first();
+                    Bitmap captcha = BitmapFactory.decodeStream(
+                            client.getInputStream(redirect + captcha_img.attr("src"))
+                    );
 
-                        // Asking user to enter the code
-                        CaptchaRunnable captchaRunnable = new CaptchaRunnable(captcha);
-                        ((Activity)context).runOnUiThread(captchaRunnable);
-                        String code = captchaRunnable.getResult();
-
-                        if (code == null || code.isEmpty()) {
-                            logger.log(String.format(
-                                    context.getString(R.string.error),
-                                    context.getString(R.string.auth_error_captcha))
-                            );
-                            return RESULT.CAPTCHA;
-                        }
-
-                        logger.log(Logger.LEVEL.DEBUG, String.format(
-                                context.getString(R.string.auth_captcha_result),
-                                code
-                        ));
-
-                        // Sending captcha form
-                        fields = Client.parseForm(form);
-                        fields.put("_rucaptcha", code);
-                        logger.log(context.getString(R.string.auth_request));
-                        client.post(redirect + form.attr("action"), fields, pref_retry_count);
-                        logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-                    } else {
+                    // Asking user to enter the code
+                    String code = new CaptchaRunnable(captcha).getResult();
+                    if (code.isEmpty()) {
                         logger.log(String.format(
                                 context.getString(R.string.error),
                                 context.getString(R.string.auth_error_captcha))
                         );
                         return RESULT.CAPTCHA;
                     }
+
+                    logger.log(Logger.LEVEL.DEBUG, String.format(
+                            context.getString(R.string.auth_captcha_result), code
+                    ));
+
+                    if (stopped) return RESULT.INTERRUPTED;
+                    progressListener.onProgressUpdate(38);
+
+                    // Sending captcha form
+                    logger.log(context.getString(R.string.auth_request));
+                    fields = Client.parseForm(form);
+                    fields.put("_rucaptcha", code);
+                    client.post(redirect + form.attr("action"), fields, pref_retry_count);
+                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
                 }
             } catch (Exception ex) {
                 logger.log(Logger.LEVEL.DEBUG, ex);
@@ -255,15 +245,17 @@ public class MosMetro extends Authenticator {
     private class CaptchaRunnable implements Runnable {
         private boolean locked = true;
         private String result = "";
-
         private Bitmap captcha;
 
         public String getResult() {
+            ((Activity)context).runOnUiThread(this);
+
             while (locked && !stopped) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ignored) {}
             }
+
             return result;
         }
 
@@ -273,6 +265,11 @@ public class MosMetro extends Authenticator {
 
         @Override
         public void run() {
+            // Dialog can be created only on the Activity context
+            if (!(context instanceof Activity)) {
+                locked = false; return;
+            }
+
             final Dialog dialog = new Dialog(context);
             dialog.setTitle(R.string.auth_captcha_dialog);
             dialog.setContentView(R.layout.captcha_dialog);
