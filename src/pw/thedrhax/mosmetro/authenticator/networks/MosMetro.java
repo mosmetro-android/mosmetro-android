@@ -134,7 +134,18 @@ public class MosMetro extends Authenticator {
                         ((Activity)context).runOnUiThread(captchaRunnable);
                         String code = captchaRunnable.getResult();
 
-                        if (code == null || code.isEmpty()) return RESULT.CAPTCHA;
+                        if (code == null || code.isEmpty()) {
+                            logger.log(String.format(
+                                    context.getString(R.string.error),
+                                    context.getString(R.string.auth_error_captcha))
+                            );
+                            return RESULT.CAPTCHA;
+                        }
+
+                        logger.log(Logger.LEVEL.DEBUG, String.format(
+                                context.getString(R.string.auth_captcha_result),
+                                code
+                        ));
 
                         // Sending captcha form
                         fields = Client.parseForm(form);
