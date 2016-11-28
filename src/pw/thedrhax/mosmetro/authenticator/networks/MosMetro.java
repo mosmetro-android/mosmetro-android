@@ -246,17 +246,22 @@ public class MosMetro extends Authenticator {
     }
 
     private class CaptchaRunnable implements Runnable {
-        private boolean locked = true;
+        private boolean locked;
         private String result = "";
         private Bitmap captcha;
 
         public String getResult() {
-            ((Activity)context).runOnUiThread(this);
+            // Dialog can be created only on the Activity context
+            if (context instanceof Activity) {
+                locked = true;
 
-            while (locked && !stopped) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
+                ((Activity)context).runOnUiThread(this);
+
+                while (locked && !stopped) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ignored) {}
+                }
             }
 
             return result;
@@ -268,11 +273,6 @@ public class MosMetro extends Authenticator {
 
         @Override
         public void run() {
-            // Dialog can be created only on the Activity context
-            if (!(context instanceof Activity)) {
-                locked = false; return;
-            }
-
             final Dialog dialog = new Dialog(context);
             dialog.setTitle(R.string.auth_captcha_dialog);
             dialog.setContentView(R.layout.captcha_dialog);
