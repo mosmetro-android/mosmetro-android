@@ -11,6 +11,7 @@ public abstract class Client {
     private static final int METHOD_GET = 0;
     private static final int METHOD_POST = 1;
 
+    public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
@@ -23,6 +24,8 @@ public abstract class Client {
     protected Client() {
         headers = new HashMap<String, String>();
         setHeader(HEADER_USER_AGENT, System.getProperty("http.agent"));
+        setHeader(HEADER_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9," +
+                "image/webp,*/*;q=0.8");
         setHeader(HEADER_REFERER, "http://curlmyip.org");
     }
 
