@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -126,12 +127,9 @@ public class MosMetro extends Authenticator {
                 if (form != null && "captcha__container".equals(form.attr("class"))) {
                     // Retrieving captcha from server
                     Element captcha_img = form.getElementsByTag("img").first();
-                    Bitmap captcha = BitmapFactory.decodeStream(
-                            client.getInputStream(redirect + captcha_img.attr("src"))
-                    );
 
                     // Asking user to enter the code
-                    String code = new CaptchaRunnable(captcha).getResult();
+                    String code = new CaptchaRunnable(redirect + captcha_img.attr("src")).getResult();
                     if (code.isEmpty()) {
                         logger.log(String.format(
                                 context.getString(R.string.error),
@@ -248,7 +246,7 @@ public class MosMetro extends Authenticator {
     private class CaptchaRunnable implements Runnable {
         private boolean locked;
         private String result = "";
-        private Bitmap captcha;
+        private String url;
 
         public String getResult() {
             // Dialog can be created only on the Activity context
@@ -267,8 +265,8 @@ public class MosMetro extends Authenticator {
             return result;
         }
 
-        public CaptchaRunnable (Bitmap captcha) {
-            this.captcha = captcha;
+        public CaptchaRunnable (String url) {
+            this.url = url;
         }
 
         @Override
@@ -291,8 +289,30 @@ public class MosMetro extends Authenticator {
                 }
             });
 
-            ImageView image_captcha = (ImageView) dialog.findViewById(R.id.image_captcha);
-            image_captcha.setImageBitmap(captcha);
+            final ImageView image_captcha = (ImageView) dialog.findViewById(R.id.image_captcha);
+            image_captcha.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AsyncTask<Void,Void,Bitmap>() {
+                        @Override
+                        protected Bitmap doInBackground(Void... voids) {
+                            try {
+                                return BitmapFactory.decodeStream(client.getInputStream(url));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                logger.log(Logger.LEVEL.DEBUG, ex);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Bitmap bitmap) {
+                            if (bitmap != null) image_captcha.setImageBitmap(bitmap);
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            });
+            image_captcha.performClick();
 
             submit_button.setOnClickListener(new View.OnClickListener() {
                 @Override
