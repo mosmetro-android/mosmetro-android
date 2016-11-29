@@ -23,9 +23,15 @@ public abstract class Client {
 
     protected Client() {
         headers = new HashMap<String, String>();
-        setHeader(HEADER_USER_AGENT, System.getProperty("http.agent"));
-        setHeader(HEADER_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9," +
-                "image/webp,*/*;q=0.8");
+
+        String ua = System.getProperty("http.agent");
+        setHeader(HEADER_USER_AGENT,
+                "Mozilla/5.0 " + ua.substring(ua.indexOf("("), ua.indexOf(")") + 1) +
+                " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.85 Mobile Safari/537.36"
+        );
+        setHeader(HEADER_ACCEPT,
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        );
     }
 
     // Settings methods
