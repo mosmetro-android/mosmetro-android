@@ -125,8 +125,8 @@
     <string name="auth_already_connected">Уже подключено</string>
     <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
     <string name="auth_redirect">Получение перенаправления</string>
-    <string name="auth_captcha">Проверка наличия каптчи</string>
-    <string name="auth_captcha_result">Каптча введена: %s</string>
+    <string name="auth_captcha">Проверка наличия капчи</string>
+    <string name="auth_captcha_result">Капча введена: %s</string>
     <string name="auth_captcha_dialog">Введите код с картинки</string>
     <string name="auth_captcha_dialog_summary">
         Компания МаксимаТелеком требует вводить этот код время от времени для входа в систему.
@@ -158,7 +158,7 @@
         провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют
         два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
     </string>
-    <string name="auth_error_captcha">требуется ввод каптчи</string>
+    <string name="auth_error_captcha">требуется ввод капчи</string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
