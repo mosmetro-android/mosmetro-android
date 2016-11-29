@@ -26,7 +26,6 @@ public abstract class Client {
         setHeader(HEADER_USER_AGENT, System.getProperty("http.agent"));
         setHeader(HEADER_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9," +
                 "image/webp,*/*;q=0.8");
-        setHeader(HEADER_REFERER, "http://curlmyip.org");
     }
 
     // Settings methods
