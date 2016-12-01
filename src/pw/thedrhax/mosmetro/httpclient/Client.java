@@ -45,6 +45,11 @@ public abstract class Client {
         return headers.containsKey(name) ? headers.get(name) : null;
     }
 
+    public Client resetHeaders () {
+        headers = new HashMap<String, String>();
+        return this;
+    }
+
     public abstract Client setCookie(String url, String name, String value);
 
     // IO methods
@@ -135,7 +140,7 @@ public abstract class Client {
         return link;
     }
 
-    public static Map<String,String> parseForm (Element form) throws Exception {
+    public static Map<String,String> parseForm (Element form) {
         Map<String,String> result = new HashMap<String,String>();
 
         for (Element input : form.getElementsByTag("input")) {

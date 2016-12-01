@@ -125,7 +125,6 @@
     <string name="auth_already_connected">Уже подключено</string>
     <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
     <string name="auth_redirect">Получение перенаправления</string>
-    <string name="auth_captcha">Проверка наличия капчи</string>
     <string name="auth_captcha_result">Капча введена: %s</string>
     <string name="auth_captcha_dialog">Введите код с картинки</string>
     <string name="auth_captcha_dialog_summary">
@@ -133,6 +132,9 @@
         Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
         \nНажмите на изображение, чтобы обновить его.
     </string>
+    <string name="auth_captcha_bypass">Требуется ввод капчи. Пытаюсь обойти…</string>
+    <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
+    <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
@@ -159,6 +161,7 @@
         два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
     </string>
     <string name="auth_error_captcha">требуется ввод капчи</string>
+    <string name="auth_error_captcha_image">не удалось найти изображение</string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>

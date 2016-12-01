@@ -121,39 +121,74 @@ public class MosMetro extends Authenticator {
 
         // Handle captcha request
         if (version == 2) {
-            logger.log(context.getString(R.string.auth_captcha));
-            try {
-                Element form = client.getPageContent().getElementsByTag("form").first();
-                if (form != null && "captcha__container".equals(form.attr("class"))) {
-                    // Retrieving captcha from server
-                    Element captcha_img = form.getElementsByTag("img").first();
+            Element form = client.getPageContent().getElementsByTag("form").first();
+            if (form != null && "captcha__container".equals(form.attr("class"))) {
+                // Trying to bypass captcha using official backdoor
+                logger.log(context.getString(R.string.auth_captcha_bypass));
+                try {
+                    int code = new OkHttp()
+                            .resetHeaders()
+                            .setHeader(Client.HEADER_USER_AGENT,
+                                    "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
+                            )
+                            .get("https://ammw.wi-fi.ru/netinfo/auth", null, pref_retry_count)
+                            .getResponseCode();
 
-                    // Asking user to enter the code
-                    String code = new CaptchaRunnable(redirect + captcha_img.attr("src")).getResult();
-                    if (code.isEmpty()) {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
-                                context.getString(R.string.auth_error_captcha))
-                        );
-                        return RESULT.CAPTCHA;
+                    if (code == 200 && isConnected() == CHECK.CONNECTED) {
+                        logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                        return RESULT.CONNECTED;
+                    } else {
+                        throw new Exception("Internet check failed");
                     }
+                } catch (Exception ex) {
+                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                }
 
-                    logger.log(Logger.LEVEL.DEBUG, String.format(
-                            context.getString(R.string.auth_captcha_result), code
-                    ));
+                // Parsing captcha URL
+                String captcha_url;
+                try {
+                    Element captcha_img = form.getElementsByTag("img").first();
+                    captcha_url = redirect + captcha_img.attr("src");
+                } catch (Exception ex) {
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_captcha_image))
+                    );
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    return RESULT.ERROR;
+                }
 
-                    if (stopped) return RESULT.INTERRUPTED;
-                    progressListener.onProgressUpdate(38);
+                // Asking user to enter the code
+                String code = new CaptchaRunnable(captcha_url).getResult();
+                if (code.isEmpty()) {
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_captcha))
+                    );
+                    return RESULT.CAPTCHA;
+                }
 
-                    // Sending captcha form
-                    logger.log(context.getString(R.string.auth_request));
-                    fields = Client.parseForm(form);
-                    fields.put("_rucaptcha", code);
+                logger.log(Logger.LEVEL.DEBUG, String.format(
+                        context.getString(R.string.auth_captcha_result), code
+                ));
+
+                // Sending captcha form
+                logger.log(context.getString(R.string.auth_request));
+                fields = Client.parseForm(form);
+                fields.put("_rucaptcha", code);
+
+                try {
                     client.post(redirect + form.attr("action"), fields, pref_retry_count);
                     logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+                } catch (Exception ex) {
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return RESULT.ERROR;
                 }
-            } catch (Exception ex) {
-                logger.log(Logger.LEVEL.DEBUG, ex);
             }
         }
 
