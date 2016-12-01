@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center">
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/text_captcha"
-        android:layout_alignBottom="@+id/image_captcha"
-        android:layout_toRightOf="@+id/image_captcha"
-        android:layout_marginBottom="8dp"
-        android:layout_toLeftOf="@+id/submit_button"
-        android:layout_toStartOf="@+id/submit_button"
-        android:inputType="text"
-        android:maxLines="1"
-        android:imeOptions="actionDone" />
 
     <Button
         android:text="@android:string/ok"
@@ -34,10 +22,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
-        android:padding="8dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textSize="12sp"
+        android:padding="8dp" />
 
     <ImageView
         android:src="@drawable/ic_notification_error_colored"
@@ -46,16 +35,20 @@
         android:layout_width="96dp"
         android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingBottom="8dp" />
 
-    <TextView
-        android:text="@string/auth_captcha_dialog_update"
-        android:layout_width="wrap_content"
+    <EditText
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView3"
-        android:padding="8dp"
-        android:layout_below="@+id/text_captcha"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:id="@+id/text_captcha"
+        android:inputType="textVisiblePassword"
+        android:maxLines="1"
+        android:imeOptions="actionDone"
+        android:layout_below="@+id/textView2"
+        android:layout_toRightOf="@+id/image_captcha"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/submit_button"
+        android:layout_toStartOf="@+id/submit_button" />
 
 </RelativeLayout>
