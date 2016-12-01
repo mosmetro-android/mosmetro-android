@@ -24,7 +24,7 @@ public class Chooser {
         for (Class<? extends Authenticator> network : Authenticator.SUPPORTED_NETWORKS) {
             try {
                 String class_ssid = (String) network.getField("SSID").get(network);
-                if ((SSID.equals(class_ssid))) {
+                if ((SSID.equalsIgnoreCase(class_ssid))) {
                     result_class = network; break;
                 }
             } catch (Exception ignored) {}
