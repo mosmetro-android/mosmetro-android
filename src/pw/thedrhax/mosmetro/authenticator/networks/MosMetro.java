@@ -156,7 +156,7 @@ public class MosMetro extends Authenticator {
                             context.getString(R.string.auth_error_captcha_image))
                     );
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    return RESULT.ERROR;
+                    return RESULT.CAPTCHA;
                 }
 
                 // Asking user to enter the code
