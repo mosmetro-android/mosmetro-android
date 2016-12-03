@@ -267,7 +267,6 @@ public class MosMetro extends Authenticator {
             logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
-            logger.log(Logger.LEVEL.DEBUG, ex);
             return super.isConnected();
         }
 
