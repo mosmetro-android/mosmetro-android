@@ -40,46 +40,64 @@ public class SettingsActivity extends Activity {
         return true;
     }
 
+    private void donate_dialog() {
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i) {
+                    case 0: // Yandex.Money
+                        Intent yandex = new Intent(Intent.ACTION_VIEW);
+                        yandex.setData(Uri.parse(getString(R.string.donate_yandex_data)));
+                        startActivity(yandex);
+                        break;
+
+                    case 1: // WebMoney
+                        ClipboardManager clipboard = (ClipboardManager)
+                                getSystemService(Context.CLIPBOARD_SERVICE);
+
+                        ClipData clip = ClipData.newPlainText("",
+                                getString(R.string.donate_webmoney_data)
+                        );
+                        clipboard.setPrimaryClip(clip);
+
+                        Toast.makeText(SettingsActivity.this,
+                                R.string.clipboard_copy,
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        break;
+
+                    case 2: // GitHub
+                        Intent github = new Intent(Intent.ACTION_VIEW);
+                        github.setData(Uri.parse(getString(R.string.developer_github_repo_link)));
+                        startActivity(github);
+                        break;
+
+                    case 3: // VK
+                        Intent vk = new Intent(Intent.ACTION_VIEW);
+                        vk.setData(Uri.parse(getString(R.string.developer_vkontakte_link)));
+                        startActivity(vk);
+                        break;
+
+                    case 4: // Google Play
+                        Intent google = new Intent(Intent.ACTION_VIEW);
+                        google.setData(Uri.parse(getString(R.string.developer_google_play_link)));
+                        startActivity(google);
+                        break;
+                }
+            }
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.action_donate)
+                .setItems(R.array.donate_options, listener)
+                .show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_donate:
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.action_donate)
-                        .setMessage(R.string.action_donate_summary)
-                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
-                        .setNegativeButton(R.string.donate_webmoney, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ClipboardManager clipboard = (ClipboardManager)
-                                        getSystemService(Context.CLIPBOARD_SERVICE);
-
-                                ClipData clip = ClipData.newPlainText(
-                                        getString(R.string.donate_webmoney),
-                                        getString(R.string.donate_webmoney_data)
-                                );
-                                clipboard.setPrimaryClip(clip);
-
-                                Toast.makeText(SettingsActivity.this,
-                                        R.string.clipboard_copy,
-                                        Toast.LENGTH_SHORT
-                                ).show();
-                            }
-                        })
-                        .setPositiveButton(R.string.donate_yandex, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse(getString(R.string.donate_yandex_data)));
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
+                donate_dialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);

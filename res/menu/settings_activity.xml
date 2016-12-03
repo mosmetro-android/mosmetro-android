@@ -4,6 +4,7 @@
     <item
         android:id="@+id/action_donate"
         android:title="@string/action_donate"
-        android:showAsAction="never" />
+        android:titleCondensed="@string/action_donate_cond"
+        android:showAsAction="ifRoom" />
 
 </menu>

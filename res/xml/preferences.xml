@@ -216,6 +216,15 @@
 
         </PreferenceScreen>
 
+        <PreferenceScreen
+            android:title="@string/developer_google_play">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/developer_google_play_link" />
+
+        </PreferenceScreen>
+
     </PreferenceCategory>
 
     <PreferenceCategory
