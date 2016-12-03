@@ -7,4 +7,10 @@
             android:title="@string/report"
             android:showAsAction="ifRoom" />
 
+    <item
+            android:id="@+id/action_clear"
+            android:icon="@drawable/ic_menu_delete"
+            android:title="@string/screen_clear"
+            android:showAsAction="ifRoom" />
+
 </menu>

@@ -35,16 +35,7 @@ public class DebugActivity extends Activity {
 		setContentView(R.layout.debug_activity);
 
         text_messages = (TextView)findViewById(R.id.text_messages);
-
-        logger = new Logger() {
-            @Override
-            public void log(LEVEL level, String message) {
-                super.log(level, message);
-
-                if ((level == LEVEL.INFO && !show_debug) || (level == LEVEL.DEBUG && show_debug))
-                    text_messages.append(message + "\n");
-            }
-        };
+        logger_init();
 
         // Check for log from ConnectionService
         try {
@@ -72,6 +63,20 @@ public class DebugActivity extends Activity {
         } catch (NullPointerException ignored) {}
 
         button_connect(null);
+    }
+
+    private void logger_init() {
+        text_messages.setText("");
+
+        logger = new Logger() {
+            @Override
+            public void log(LEVEL level, String message) {
+                super.log(level, message);
+
+                if ((level == LEVEL.INFO && !show_debug) || (level == LEVEL.DEBUG && show_debug))
+                    text_messages.append(message + "\n");
+            }
+        };
     }
 
     // ActionBar Menu
@@ -105,6 +110,10 @@ public class DebugActivity extends Activity {
 
             case android.R.id.home:
                 finish();
+                return true;
+
+            case R.id.action_clear:
+                logger_init();
                 return true;
 
             default:
