@@ -3,6 +3,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -11,37 +12,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Выберите режим подключения"
+                android:text="@string/shortcut_mode"
                 android:id="@+id/textView" android:layout_gravity="center_horizontal" android:layout_margin="10dp"
-        />
+            android:textColor="@android:color/black" />
 
-        <RadioGroup android:layout_width="fill_parent" android:layout_height="fill_parent"
-        >
+        <RadioGroup android:layout_width="fill_parent" android:layout_height="fill_parent">
 
             <RadioButton
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Автоматическое определение названия сети"
+                    android:text="@string/shortcut_automatic"
                     android:id="@+id/radio_auto" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
-                    android:textSize="18dp" android:layout_marginBottom="5dp"
-                    android:checked="true" android:onClick="network_selected"/>
+                    android:textSize="18sp" android:layout_marginBottom="5dp"
+                    android:checked="true" android:onClick="network_selected" />
 
             <RadioButton android:layout_width="fill_parent" android:layout_height="wrap_content"
-                         android:text="MosMetro_Free / AURA" android:id="@+id/radio_mosmetro"
-                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18dp"
-                         android:layout_marginBottom="5dp" android:onClick="network_selected"/>
+                         android:text="@string/manual_connection_mosmetro" android:id="@+id/radio_mosmetro"
+                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18sp"
+                         android:layout_marginBottom="5dp" android:onClick="network_selected" />
+
             <RadioButton android:layout_width="fill_parent" android:layout_height="wrap_content"
-                         android:text="MosGorTrans_Free" android:id="@+id/radio_mosgortrans"
-                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18dp"
-                         android:layout_marginBottom="5dp" android:onClick="network_selected"/>
+                         android:text="@string/manual_connection_mosgortrans" android:id="@+id/radio_mosgortrans"
+                         android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:textSize="18sp"
+                         android:layout_marginBottom="5dp" android:onClick="network_selected" />
 
         </RadioGroup>
     </LinearLayout>
     <CheckBox
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Подключаться в фоне"
-            android:id="@+id/check_background" android:layout_weight="0" android:textSize="18dp" android:layout_margin="5dp"
+            android:text="@string/shortcut_background"
+            android:id="@+id/check_background" android:layout_weight="0" android:textSize="18sp" android:layout_margin="5dp"
     />
     <LinearLayout
             android:orientation="horizontal"

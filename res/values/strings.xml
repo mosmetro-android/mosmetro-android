@@ -108,16 +108,18 @@
     <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
 
-    <string name="manual_connection_default">По умолчанию</string>
-    <string name="manual_connection_default_summary">Название сети будет выбрано автоматически</string>
-    <string name="manual_connection_mosmetro">MosMetro_Free / AURA</string>
-    <string name="manual_connection_mosmetro_summary">Подключение к основным сетям метро и МЦК</string>
-    <string name="manual_connection_mosgortrans">MosGorTrans_Free</string>
-    <string name="manual_connection_mosgortrans_summary">Подключение к сети московского наземного транспорта</string>
+    <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс</string>
+    <string name="manual_connection_mosmetro_summary">MosMetro_Free, AURA, MT_Free</string>
+    <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
+    <string name="manual_connection_mosgortrans_summary">MosGorTrans_Free, MT_Free</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
     <string name="manual_connection_shortcut_summary">
         Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
     </string>
+
+    <string name="shortcut_mode">Выберите режим подключения</string>
+    <string name="shortcut_automatic">Автоматическое определение названия сети</string>
+    <string name="shortcut_background">Подключаться в фоне</string>
 
     <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
     <string name="auth_version" formatted="false">Версия алгоритма: %d</string>
