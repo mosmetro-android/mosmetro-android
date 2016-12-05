@@ -171,7 +171,7 @@ public class ConnectionService extends IntentService {
     private boolean isWifiConnected() {
         if (from_shortcut) return true;
         
-        return manager.isWifiEnabled() && connection.getSSID().equals(SSID);
+        return manager.isWifiEnabled() && connection.getSSID().equalsIgnoreCase(SSID);
     }
 
     private boolean waitForIP() {
