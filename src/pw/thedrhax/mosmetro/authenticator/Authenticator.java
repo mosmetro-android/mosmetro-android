@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.networks.MT_Free;
+import pw.thedrhax.mosmetro.authenticator.networks.MT_FREE;
 import pw.thedrhax.mosmetro.authenticator.networks.MosGorTrans;
 import pw.thedrhax.mosmetro.updater.URLs;
 import pw.thedrhax.mosmetro.authenticator.networks.AURA;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 public abstract class Authenticator {
     public static final Class<? extends Authenticator>[] SUPPORTED_NETWORKS =
-            new Class[] {MosMetro.class, AURA.class, MT_Free.class, MosGorTrans.class};
+            new Class[] {MosMetro.class, AURA.class, MT_FREE.class, MosGorTrans.class};
 
     // Result state
     public static enum RESULT {

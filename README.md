@@ -13,7 +13,7 @@
 | MosMetro_Free | [NetByNet](http://www.netbynet.ru) | МЦК | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 | MosGorTrans_Free | [NetByNet](http://www.netbynet.ru) | Автобусы | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 | MosGorTrans_Free | [Enforta](http://www.enforta.ru/) | Остановки | :no_entry: | [MosGorTrans](/src/pw/thedrhax/mosmetro/authenticator/networks/MosGorTrans.java) |
-| MT_Free | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро, ... | :large_blue_circle: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
+| MT_FREE | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро, Автобусы, ... | :large_blue_circle: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 
 ## Сборка
 
