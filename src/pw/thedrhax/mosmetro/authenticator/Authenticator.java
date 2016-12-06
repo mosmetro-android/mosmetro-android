@@ -134,11 +134,11 @@ public abstract class Authenticator {
 
     private void submit_info (RESULT result) {
         String STATISTICS_URL = new CachedRetriever(context)
-                .get(URLs.STAT_URL_SRC, URLs.STAT_URL_DEF) + URLs.STAT_REL_CHECK;
+                .get(URLs.API_URL_SOURCE, URLs.API_URL_DEFAULT) + URLs.API_REL_STATISTICS;
 
         Map<String,String> params = new HashMap<String, String>();
         params.put("version", new Version(context).getFormattedVersion());
-        params.put("connected", result == RESULT.CONNECTED ? "1" : "0");
+        params.put("success", result == RESULT.CONNECTED ? "true" : "false");
         params.put("ssid", getSSID());
 
         try {

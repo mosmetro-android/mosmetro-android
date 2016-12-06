@@ -8,9 +8,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Version;
@@ -19,8 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
-    private String UPDATE_INFO_URL;
-
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
@@ -45,34 +43,33 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
     @Override
     protected Void doInBackground (Boolean... force) {
+        force_check = force[0];
         CachedRetriever retriever = new CachedRetriever(context);
 
-        force_check = force[0];
-
-        try {
-            UPDATE_INFO_URL = retriever.get(URLs.STAT_URL_SRC, URLs.STAT_URL_DEF) + URLs.STAT_REL_UPDATE;
-        } catch (NullPointerException ex) {
-            update_failed = true;
-            return null;
-        }
+        // Generate base URL
+        String UPDATE_INFO_URL = retriever.get(
+                URLs.API_URL_SOURCE, URLs.API_URL_DEFAULT
+        ) + URLs.API_REL_BRANCHES;
 
         // Retrieve info from server
-        String content;
-        try {
-            content = retriever.get(UPDATE_INFO_URL, 60*60, "");
-
-            if (content == null || content.isEmpty())
-                throw new Exception ("Failed to receive info from the update server");
-        } catch (Exception ex) {
+        String content = retriever.get(UPDATE_INFO_URL, 60*60, "");
+        if (content.isEmpty()) {
             update_failed = true;
             return null;
         }
 
         // Parse server answer
-        Document document = Jsoup.parse(content);
+        JSONObject branches_json;
+        try {
+            branches_json = (JSONObject) new JSONParser().parse(content);
+        } catch (ParseException ex) {
+            update_failed = true;
+            return null;
+        }
+
         branches = new LinkedList<Branch>();
-        for (Element element : document.getElementsByTag("branch")) {
-            Branch branch = new Branch(element);
+        for (Object key : branches_json.keySet()) {
+            Branch branch = new Branch((String)key, (JSONObject)branches_json.get(key));
             if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
                 current_branch = branch;
             }
@@ -87,6 +84,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     .putInt("pref_updater_ignore", 0)
                     .putString("pref_updater_branch", "master")
                     .apply();
+
             for (Branch branch : branches) {
                 if (branch.name.equals("master")) {
                     current_branch = branch;
@@ -154,40 +152,22 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     public class Branch {
         public String name;
         public String message;
+        public String url;
 
         private int version;
         private boolean by_build = false; // Check by build number instead of version code
 
-        public Branch (Element element) {
-            name = element.attr("id");
-
-            int version = 0, build = 0;
-
-            for (Element key : element.getElementsByTag("key")) {
-                try {
-                    if (key.attr("id").equals("version"))
-                        version = Integer.parseInt(key.html());
-                } catch (NumberFormatException ignored) {}
-
-                try {
-                    if (key.attr("id").equals("build"))
-                        build = Integer.parseInt(key.html());
-                } catch (NumberFormatException ignored) {}
-
-                if (key.attr("id").equals("by_build") &&
-                        key.html().equals("1"))
-                    by_build = true;
-
-                if (key.attr("id").equals("message"))
-                    message = key.html().replace("<br>", "");
-            }
-
-            this.version = by_build ? build : version;
+        public Branch (String name, JSONObject data) {
+            this.name = name;
+            this.by_build = "1".equals(data.get("by_build"));
+            this.version = Integer.parseInt((String)data.get(by_build ? "build" : "version"));
+            this.message = ((String)data.get("message")).replace("<br>", "");
+            this.url = (String)data.get("url");
         }
 
         private int getVersion() {
-            return by_build ?
-                    settings.getInt("pref_updater_build", 0) : new Version(context).getVersionCode();
+            return by_build ? settings.getInt("pref_updater_build", 0)
+                            : new Version(context).getVersionCode();
         }
 
         public boolean hasUpdate() {
@@ -208,9 +188,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     .putInt("pref_updater_build", version)
                     .apply();
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(UPDATE_INFO_URL + "?download=" + name));
-            context.startActivity(intent);
+            context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)));
         }
     }
 }
