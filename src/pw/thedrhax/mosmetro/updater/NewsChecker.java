@@ -25,45 +25,38 @@ public class NewsChecker {
         this.context = context;
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
+        pref_colored_icons = (Build.VERSION.SDK_INT <= 20)
+                || settings.getBoolean("pref_notify_alternative", false);
     }
 
-    public boolean check() {
-        String content;
-        try {
-            content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");
-        } catch (Exception ex) {
-            return false;
-        }
+    public void check() {
+        String content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");;
 
-        JSONParser parser = new JSONParser();
         JSONObject data;
         try {
-            data = (JSONObject)parser.parse(content);
+            data = (JSONObject) new JSONParser().parse(content);
         } catch (ParseException ex) {
-            return false;
+            return;
         }
 
         long id, max_version;
         String title, message;
         Uri url;
         try {
-            id = (Long)data.get("id");
-            max_version = (Long)data.get("max_version");
+            id = Integer.parseInt((String)data.get("id"));
+            max_version = Integer.parseInt((String)data.get("max_version"));
             title = (String)data.get("title");
             message = (String)data.get("message");
             url = Uri.parse((String)data.get("url"));
-        } catch (ClassCastException ex) {
-            return false;
-        } catch (NullPointerException ex) {
-            return false;
+        } catch (Exception ex) {
+            return;
         }
 
         if (max_version < new Version(context).getVersionCode())
-            return false;
+            return;
 
         if (settings.getLong("pref_notify_news_id", 0) >= id)
-            return false;
+            return;
 
         new Notification(context)
                 .setCancellable(true)
@@ -79,7 +72,5 @@ public class NewsChecker {
         settings.edit()
                 .putLong("pref_notify_news_id", id)
                 .apply();
-
-        return true;
     }
 }
