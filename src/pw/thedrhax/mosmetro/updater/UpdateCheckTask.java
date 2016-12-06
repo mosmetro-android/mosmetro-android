@@ -52,11 +52,10 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         ) + URLs.API_REL_BRANCHES;
 
         // Retrieve info from server
-        String content = retriever.get(UPDATE_INFO_URL, 60*60, "");
-        if (content.isEmpty()) {
-            update_failed = true;
-            return null;
-        }
+        String content = retriever.get(UPDATE_INFO_URL, 60*60,
+                "{\"" + settings.getString("pref_updater_branch", "play") + "\":" +
+                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"0\",\"message\":\"none\"}}"
+        );
 
         // Parse server answer
         JSONObject branches_json;
