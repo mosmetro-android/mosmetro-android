@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -128,10 +129,21 @@ public class MosMetro extends Authenticator {
                 try {
                     int code = new OkHttp()
                             .resetHeaders()
-                            .setHeader(Client.HEADER_USER_AGENT,
-                                    "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
+                            .setHeader(
+                                    new String(Base64.decode(
+                                        "VXNlci1BZ2VudA==", Base64.DEFAULT
+                                    )),
+                                    new String(Base64.decode(
+                                        "QXV0b01vc01ldHJvV2lmaS8xLjUuMCAo" +
+                                        "TGludXg7IEFuZHJvaWQgNC40LjQ7IEEw" +
+                                        "MTIzIEJ1aWxkL0tUVTg0UCk=", Base64.DEFAULT
+                                    ))
                             )
-                            .get("https://ammw.wi-fi.ru/netinfo/auth", null, pref_retry_count)
+                            .get(
+                                    new String(Base64.decode(
+                                        "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25l" +
+                                        "dGluZm8vYXV0aA==", Base64.DEFAULT
+                                    )), null, pref_retry_count)
                             .getResponseCode();
 
                     if (code == 200 && isConnected() == CHECK.CONNECTED) {
@@ -141,8 +153,8 @@ public class MosMetro extends Authenticator {
                         throw new Exception("Internet check failed");
                     }
                 } catch (Exception ex) {
-                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                     logger.log(Logger.LEVEL.DEBUG, ex);
+                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                 }
 
                 // Parsing captcha URL
