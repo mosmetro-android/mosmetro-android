@@ -85,10 +85,11 @@ public class CachedRetriever {
 
         // Try to retrieve content from server
         try {
-            client.get(url, null);
-            result = client.getPage().trim();
+            if (client.get(url, null).getResponseCode() != 200)
+                throw new Exception("Response Code != 200");
 
             // Write new content to cache
+            result = client.getPage().trim();
             writeCachedUrl(url, result);
         } catch (Exception ex) {
             // Get expired cache if can't retrieve content
