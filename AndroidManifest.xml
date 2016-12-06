@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pw.thedrhax.mosmetro"
     android:installLocation="auto"
-    android:versionCode="49"
+    android:versionCode="50"
     android:versionName="1.7.2">
 
     <uses-permission android:name="android.permission.INTERNET" />
