@@ -187,7 +187,11 @@ public class OkHttp extends Client {
         body.close();
 
         if (raw_document == null || raw_document.isEmpty()) {
-            throw new Exception("Empty response: " + code);
+            if (code == 200) {
+                return;
+            } else {
+                throw new Exception("Empty response: " + code);
+            }
         }
 
         document = Jsoup.parse(raw_document);
