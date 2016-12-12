@@ -88,6 +88,12 @@
                         android:summary="@string/pref_internet_check_strict_summary"
                         android:defaultValue="false" />
 
+                <CheckBoxPreference
+                        android:key="pref_wifi_bind"
+                        android:title="@string/pref_wifi_bind"
+                        android:summary="@string/pref_wifi_bind_summary"
+                        android:defaultValue="false" />
+
             </PreferenceCategory>
 
         </PreferenceScreen>
