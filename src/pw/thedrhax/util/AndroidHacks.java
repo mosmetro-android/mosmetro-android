@@ -19,7 +19,7 @@ public class AndroidHacks {
 
         for (Network i : cm.getAllNetworks()) {
             NetworkInfo info = cm.getNetworkInfo(i);
-            if (info.getType() == ConnectivityManager.TYPE_WIFI)
+            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI)
                 if (info.getState() == NetworkInfo.State.CONNECTED) {
                     if (Build.VERSION.SDK_INT < 23)
                         try {
