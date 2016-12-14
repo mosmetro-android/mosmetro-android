@@ -336,6 +336,7 @@ public class ConnectionService extends IntentService {
         } catch (InterruptedException ignored) {}
 
         // Try to connect
+        notification.hide();
         Authenticator.RESULT result = connect();
         notify_progress.hide();
 
