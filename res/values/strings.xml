@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Moscow Metro Wi-Fi autologin</string>
+    <string name="app_name">Mosmetro Wi-Fi autologin</string>
 
     <string name="report">Send report</string>
     <string name="report_info">You can send report by email or save a logfile.</string>
