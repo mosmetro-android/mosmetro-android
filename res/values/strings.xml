@@ -1,211 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wi-Fi в метро</string>
+    <string name="app_name">Mosmetro Wi-Fi autologin</string>
 
-    <string name="report">Отправить отчет</string>
-    <string name="report_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
+    <string name="report">Send report</string>
+    <string name="report_info">You can send report by email or save a logfile.</string>
     <string name="report_email_address">mosmetro@thedrhax.pw</string>
-    <string name="report_email_subject" formatted="false">Версия %s</string>
-    <string name="report_choose_client">Выберите E-mail клиент…</string>
+    <string name="report_email_subject" formatted="false">Version %s</string>
+    <string name="report_choose_client">Choose email client…</string>
 
-    <string name="retry">Попробовать снова</string>
-    <string name="connect">Подключиться</string>
-    <string name="send">Отправить</string>
-    <string name="ok">Хорошо</string>
-    <string name="cancel">Отмена</string>
-    <string name="save">Сохранить</string>
-    <string name="install">Установить</string>
-    <string name="manual_connection">Ручное подключение</string>
-    <string name="ignore">Игнор.</string>
-    <string name="later">Позже</string>
-    <string name="error" formatted="false">Ошибка: %s</string>
-    <string name="not">не</string>
-    <string name="try_out_of" formatted="false">попытка %d из %d</string>
-    <string name="version" formatted="false">Версия приложения: %s</string>
-    <string name="show_debug_log">Показать подробные сообщения</string>
-    <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
-    <string name="screen_clear">Очистить экран</string>
+    <string name="retry">Try again</string>
+    <string name="connect">Connect</string>
+    <string name="send">Send</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="install">Install</string>
+    <string name="manual_connection">Connect manually</string>
+    <string name="ignore">Ignore.</string>
+    <string name="later">Later</string>
+    <string name="error" formatted="false">Error: %s</string>
+    <string name="not">not</string>
+    <string name="try_out_of" formatted="false">try %d out of %d</string>
+    <string name="version" formatted="false">Application version: %s</string>
+    <string name="show_debug_log">Show verbose messages</string>
+    <string name="clipboard_copy">Text copied to clipboard</string>
+    <string name="screen_clear">Clear screen</string>
 
-    <string name="pref_category_main">Основные настройки</string>
-    <string name="pref_category_connection">Настройки подключения</string>
-    <string name="pref_category_connection_summary">Настройки автоматического фонового подключения</string>
-    <string name="pref_category_notifications">Уведомления</string>
-    <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
-    <string name="pref_category_updater">Обновления</string>
-    <string name="pref_category_about">О программе</string>
-    <string name="pref_category_contributors">Отдельное спасибо</string>
+    <string name="pref_category_main">Main preferences</string>
+    <string name="pref_category_connection">Connection preferences</string>
+    <string name="pref_category_connection_summary">Automatic background connection preferences</string>
+    <string name="pref_category_notifications">Notifications</string>
+    <string name="pref_category_notifications_summary">Enable/disable various notifications</string>
+    <string name="pref_category_updater">Updates</string>
+    <string name="pref_category_about">About</string>
+    <string name="pref_category_contributors">Acknowledgments</string>
 
-    <string name="pref_autoconnect">Автоматическая авторизация</string>
-    <string name="pref_autoconnect_summary">Подключаться автоматически при соединении с поддерживаемыми сетями Wi-Fi</string>
+    <string name="pref_autoconnect">Automatic authentication</string>
+    <string name="pref_autoconnect_summary">Login automatically when connected to supported Wi-Fi networks</string>
 
-    <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
+    <string name="pref_wifi_reconnect">Wi-Fi reconnection</string>
     <string name="pref_wifi_reconnect_summary">
-        Пытаться восстановить соединение с сетью Wi-Fi автоматически при потере сигнала или сбросе соединения
+        Try to reconnect to Wi-Fi network automatically when Wi-F signal is lost or connection is reset
     </string>
-    <string name="pref_wifi_restart">Перезапуск Wi-Fi</string>
+    <string name="pref_wifi_restart">Wi-Fi restart</string>
     <string name="pref_wifi_restart_summary">
-        Переподключаться к Wi-Fi при проблемах с соединением (исправляет ошибку \"Сеть недоступна или не отвечает\")
+        Restart Wi-Fi when connection problems are encountered (fixes \"Network is not available\" problem)
     </string>
-    <string name="pref_wifi_bind">Привязка процесса к сети</string>
-    <string name="pref_wifi_bind_summary">Предотвращает утечку трафика через мобильную сеть, но может вызывать проблемы с VPN.</string>
+    <string name="pref_wifi_bind">Bind process to the network</string>
+    <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network but may cause problems with VPN.</string>
 
-    <string name="pref_internet_check">Периодическая проверка соединения</string>
-    <string name="pref_internet_check_summary">Проверять соединение с интернетом каждые 10 секунд и перезапускать подключение при ошибке.</string>
-    <string name="pref_internet_check_strict">Надёжная проверка соединения</string>
-    <string name="pref_internet_check_strict_summary">Более медленная проверка через подключение к одному из публичных серверов в интернете.</string>
+    <string name="pref_internet_check">Periodic connection check</string>
+    <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
+    <string name="pref_internet_check_strict">Robust connection check</string>
+    <string name="pref_internet_check_strict_summary">Slower check done by trying to connect to one of the public servers on the Internet.</string>
 
-    <string name="pref_notify_success">Успешное подключение</string>
-    <string name="pref_notify_fail">Неудачное подключение</string>
-    <string name="pref_notify_progress">Процесс подключения</string>
-    <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
-    <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
-    <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
-    <string name="pref_notify_alternative">Альтернативные иконки</string>
+    <string name="pref_notify_success">Connected successfully</string>
+    <string name="pref_notify_fail">Connection failure</string>
+    <string name="pref_notify_progress">Connection process</string>
+    <string name="pref_notify_success_summary">Notify on successful connection</string>
+    <string name="pref_notify_fail_summary">Notify on failure</string>
+    <string name="pref_notify_progress_summary">Show connection progress (Android 4.0+)</string>
+    <string name="pref_notify_alternative">Alternative icons</string>
     <string name="pref_notify_alternative_summary">
-        Использовать цветные иконки уведомлений на Android 5.0+ (поддерживается не всегда)
+        Use color icons for notifications on Android 5.0+ (not always supported)
     </string>
-    <string name="pref_notify_success_log">Лог успешного подключения</string>
+    <string name="pref_notify_success_log">Successful connection log</string>
     <string name="pref_notify_success_log_summary">
-        Показывать лог успешного подключения при нажатии на соответствующее уведомление
+        Show successful connection log when corresponding notification is clicked
     </string>
-    <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
+    <string name="pref_notify_success_lock">Locked notification</string>
     <string name="pref_notify_success_lock_summary">
-        Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
+        Lock successful connection notification (notification will remain during the whole Wi-Fi connection)
     </string>
-    <string name="pref_notify_news">Сообщения от разработчика</string>
-    <string name="pref_notify_news_summary">В случае проблем, я смогу сообщить вам о том, что происходит с приложением.</string>
+    <string name="pref_notify_news">Developer news</string>
+    <string name="pref_notify_news_summary">I will be able to inform you in case of problems with application.</string>
 
-    <string name="pref_retry_delay">Задержка между попытками</string>
-    <string name="pref_retry_delay_summary">Количество секунд, выжидаемых перед повторной попыткой (по умолчанию: 5)</string>
-    <string name="pref_retry_count">Количество попыток</string>
-    <string name="pref_retry_count_summary">Количество повторных попыток при ошибке (по умолчанию: 3)</string>
+    <string name="pref_retry_delay">Delay between retries</string>
+    <string name="pref_retry_delay_summary">Number of seconds between retries (default: 5)</string>
+    <string name="pref_retry_count">Retry count</string>
+    <string name="pref_retry_count_summary">Number of retries on error (default: 3)</string>
 
-    <string name="pref_ip_wait">Ожидание IP адреса</string>
+    <string name="pref_ip_wait">Waiting for IP address</string>
     <string name="pref_ip_wait_summary">
-        Количество секунд, в течение которых приложение ожидает получение IP адреса. Если установлен 0, то приложение
-        будет ждать до тех пор, пока устройство не отключится от сети. (по умолчанию: 30)
+        Number of seconds during which application waits for IP address assignment.
+        If 0, application will wait until device disconnects from the netwok (default: 30).
     </string>
 
-    <string name="pref_updater_enabled">Проверять автоматически</string>
-    <string name="pref_updater_enabled_summary">Проверять наличие обновлений при запуске приложения</string>
-    <string name="pref_updater_check">Проверить наличие обновлений</string>
-    <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
-    <string name="pref_updater_branch">Ветка обновления</string>
+    <string name="pref_updater_enabled">Check automatically</string>
+    <string name="pref_updater_enabled_summary">Check for updates on application start</string>
+    <string name="pref_updater_check">Check for updates</string>
+    <string name="pref_updater_check_summary">Check for new application version on developer website</string>
+    <string name="pref_updater_branch">Update branch</string>
     <string name="pref_updater_branch_summary">
-        Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
+        Choose branch from which application will receive updates (default: play)
     </string>
 
-    <string name="update_available">Доступно обновление</string>
-    <string name="update_not_available">Нет доступных обновлений</string>
-    <string name="update_not_available_message">Новые версии будут появляться здесь по мере их публикации.</string>
+    <string name="update_available">Update is available</string>
+    <string name="update_not_available">No updates available</string>
+    <string name="update_not_available_message">New versions will be displayed here when published.</string>
 
-    <string name="developer">Разработчик</string>
-    <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
-    <string name="developer_site">Сайт разработчика</string>
+    <string name="developer">Developer</string>
+    <string name="developer_info">Dmitry Karikh (mosmetro@thedrhax.pw)</string>
+    <string name="developer_site">Developer website</string>
     <string name="developer_site_link">https://thedrhax.pw</string>
-    <string name="developer_github_repo">Репозиторий GitHub</string>
+    <string name="developer_github_repo">GitHub repository</string>
     <string name="developer_github_repo_summary">TheDrHax/mosmetro-android</string>
     <string name="developer_github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
-    <string name="developer_google_play">Страница приложения в Google Play</string>
+    <string name="developer_google_play">Google Play application webpage</string>
     <string name="developer_google_play_link">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
-    <string name="developer_vkontakte">Сообщество ВКонтакте</string>
+    <string name="developer_vkontakte">VK community</string>
     <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
 
-    <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс</string>
+    <string name="manual_connection_mosmetro">Metro, Moscow Central Circle (MCC), Aeroexpress</string>
     <string name="manual_connection_mosmetro_summary">MosMetro_Free, AURA, MT_FREE</string>
-    <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
+    <string name="manual_connection_mosgortrans">Autobus, Tram etc.</string>
     <string name="manual_connection_mosgortrans_summary">MosGorTrans_Free, MT_FREE</string>
-    <string name="manual_connection_shortcut">Создать ярлык</string>
+    <string name="manual_connection_shortcut">Create shortcut</string>
     <string name="manual_connection_shortcut_summary">
-        Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
+        Create shortcut for manual connection on home screen (configurable).
     </string>
 
-    <string name="shortcut_mode">Выберите режим подключения</string>
-    <string name="shortcut_automatic">Автоматическое определение названия сети</string>
-    <string name="shortcut_background">Подключаться в фоне</string>
+    <string name="shortcut_mode">Select connection mode</string>
+    <string name="shortcut_automatic">Automatically identify network</string>
+    <string name="shortcut_background">Connect in the background</string>
 
-    <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
-    <string name="auth_version" formatted="false">Версия алгоритма: %d</string>
-    <string name="auth_waiting">Ожидание…</string>
-    <string name="auth_checking_connection">Проверка доступа в интернет</string>
-    <string name="auth_already_connected">Уже подключено</string>
-    <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
-    <string name="auth_redirect">Получение перенаправления</string>
-    <string name="auth_captcha_result">Капча введена: %s</string>
-    <string name="auth_captcha_dialog">Введите код с картинки</string>
+    <string name="auth_connecting" formatted="false">Connecting to network %s</string>
+    <string name="auth_version" formatted="false">Algorithm version: %d</string>
+    <string name="auth_waiting">Waiting…</string>
+    <string name="auth_checking_connection">Checing Internet connection</string>
+    <string name="auth_already_connected">Already connected</string>
+    <string name="auth_restarting_wifi">Restarting Wi-Fi…</string>
+    <string name="auth_redirect">Getting redirection</string>
+    <string name="auth_captcha_result">CAPTCHA entered: %s</string>
+    <string name="auth_captcha_dialog">Enter the code from the image</string>
     <string name="auth_captcha_dialog_summary">
-        Компания МаксимаТелеком требует вводить этот код время от времени для входа в систему.
-        Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
-        \nНажмите на изображение, чтобы обновить его.
+        MaximaTelecom asks to enter this code from time to time to login.
+        Here you can enter it without watching ads.
+        \nClick on the image to update it.
     </string>
-    <string name="auth_captcha_bypass">Требуется ввод капчи. Пытаюсь обойти…</string>
-    <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
-    <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
-    <string name="auth_auth_page">Получение страницы авторизации</string>
-    <string name="auth_auth_form">Отправка формы авторизации</string>
-    <string name="auth_connected">Соединение успешно установлено :3</string>
-    <string name="auth_request">Отправка запроса</string>
-    <string name="auth_provider" formatted="false">Провайдер: %s</string>
+    <string name="auth_captcha_bypass">CAPTCHA requested. Trying to bypass…</string>
+    <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
+    <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
+    <string name="auth_auth_page">Getting login page</string>
+    <string name="auth_auth_form">Sending login form</string>
+    <string name="auth_connected">Connection established :3</string>
+    <string name="auth_request">Sending request</string>
+    <string name="auth_provider" formatted="false">Provider: %s</string>
 
-    <string name="auth_error_connection">доступ в интернет отсутствует</string>
-    <string name="auth_error_network">Сеть недоступна или не отвечает</string>
-    <string name="auth_error_redirect">перенаправление не получено</string>
-    <string name="auth_error_auth_page">страница авторизации не получена</string>
+    <string name="auth_error_connection">Internet connection is not available</string>
+    <string name="auth_error_network">Network is not available</string>
+    <string name="auth_error_redirect">redirect is not received</string>
+    <string name="auth_error_auth_page">login page is not received</string>
     <string name="auth_error_not_registered">
-        устройство не зарегистрировано в сети\n Пожалуйста, зайдите на сайт http://wi-fi.ru
-        и пройдите регистрацию, введя свой номер телефона в появившуюся форму для получения СМС с
-        дальнейшими инструкциями. Это необходимо сделать только один раз, после чего приложение начнет
-        нормально работать.\n Примечание: Разработчик этого приложения не имеет никакого отношения к регистрации.
-        Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).
+        device is not registered in the network\n Please, open http://wi-fi.ru
+        and register with your phone number to get SMS with further instructions.
+        It is only required the first time, after that application will work normally.\n
+        Disclaimer: This application developer has nothing to do with registration.
+        Registration is required by MaximaTelecom ISP (http://maximatelecom.ru).
     </string>
-    <string name="auth_error_auth_form">форма авторизации не найдена</string>
-    <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
-    <string name="auth_error_network_disconnected">соединение с сетью прервалось</string>
-    <string name="auth_error_provider">провайдер не опознан</string>
+    <string name="auth_error_auth_form">login form not found</string>
+    <string name="auth_error_server">server does not respond or responds with error</string>
+    <string name="auth_error_network_disconnected">network disconnected</string>
+    <string name="auth_error_provider">unable to identify the provider</string>
     <string name="auth_error_provider_unsupported" formatted="false">
-        провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют
-        два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
+        provider %s is not supported by application yet. Maybe the network is maintained by two providers
+        one of which is not supported yet. We apologize for inconvenience.
     </string>
-    <string name="auth_error_captcha">требуется ввод капчи</string>
-    <string name="auth_error_captcha_image">не удалось найти изображение</string>
+    <string name="auth_error_captcha">CAPTCHA required</string>
+    <string name="auth_error_captcha_image">unable to find the image</string>
 
-    <string name="notification_success">Успешно подключено</string>
-    <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
-    <string name="notification_success_settings">Нажмите, чтобы открыть настройки уведомлений</string>
-    <string name="notification_not_registered">Устройство не зарегистрировано</string>
-    <string name="notification_not_registered_register">Нажмите, чтобы перейти к регистрации</string>
-    <string name="notification_error">Не удалось подключиться</string>
-    <string name="notification_error_log">Нажмите, чтобы узнать подробности или попробовать снова</string>
-    <string name="notification_unsupported">Сеть не поддерживается</string>
-    <string name="notification_progress_waiting">Ожидание…</string>
-    <string name="notification_progress_connecting">Подключаюсь…</string>
-    <string name="notification_captcha">Требуется ввести код</string>
-    <string name="notification_captcha_summary">Нажмите сюда, чтобы ввести код с картинки</string>
+    <string name="notification_success">Successfully connected</string>
+    <string name="notification_success_log">Click for details</string>
+    <string name="notification_success_settings">Click to open notification preferences</string>
+    <string name="notification_not_registered">Device is not registered</string>
+    <string name="notification_not_registered_register">Click to proceed with registration</string>
+    <string name="notification_error">Unable to connect</string>
+    <string name="notification_error_log">Click to get details or retry</string>
+    <string name="notification_unsupported">Network is not supported</string>
+    <string name="notification_progress_waiting">Waiting…</string>
+    <string name="notification_progress_connecting">Connecting…</string>
+    <string name="notification_captcha">CAPTCHA is required</string>
+    <string name="notification_captcha_summary">Click here to pass CAPTCHA manually</string>
 
-    <string name="ip_wait">Ожидание получения IP адреса…</string>
-    <string name="ip_wait_result" formatted="false">IP адрес%s получен в течение %d секунд</string>
+    <string name="ip_wait">Waiting for IP address…</string>
+    <string name="ip_wait_result" formatted="false">IP address%s assigned within %d seconds</string>
 
-    <string name="chooser_ssid">Определение названия сети</string>
-    <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
-    <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
+    <string name="chooser_ssid">Identifying the network</string>
+    <string name="chooser_searching">Looking up algorithm for the network %s</string>
+    <string name="chooser_not_supported">You are not connected to any of the supported networks</string>
 
     <string name="contirutor_revertron">Revertron</string>
-    <string name="contributor_revertron_summary">Множество рекомендаций по алгоритмам</string>
+    <string name="contributor_revertron_summary">Numerous algorithm recommendations</string>
     <string name="contributor_revertron_link">https://github.com/Revertron</string>
-    <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>
+    <string name="contrinutor_Mikhail_Kuropatkin_summary">Helped collecting authentication dumps</string>
     <string name="contributor_Mikhail_Kuropatkin">Mikhail Kuropatkin</string>
     <string name="contributor_Mikhail_Kuropatkin_link">https://facebook.com/kuropatkin</string>
 
-    <string name="action_donate">Поддержать проект</string>
-    <string name="action_donate_cond">Поддержать</string>
+    <string name="action_donate">Donate</string>
+    <string name="action_donate_cond">Donate</string>
 
     <string-array name="donate_options">
-        <item>Яндекс.Деньги или карта</item>
+        <item>Yandex.Money or credit card</item>
         <item>WebMoney</item>
-        <item>Помочь в разработке (GitHub)</item>
-        <item>Вступить в группу (ВКонтакте)</item>
-        <item>Оставить отзыв (Google Play)</item>
+        <item>Help with development (GitHub)</item>
+        <item>Join the community (VK)</item>
+        <item>Give feedback (Google Play)</item>
     </string-array>
     <string name="donate_webmoney_data">R401534033407</string>
     <string name="donate_yandex_data">https://money.yandex.ru/to/410014087156910</string>
