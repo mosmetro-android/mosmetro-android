@@ -1,6 +1,8 @@
-bin
-gen
-.idea/workspace.xml
-.idea/tasks.xml
-proguard_logs
+build
 local.properties
+.gradle
+.idea
+gradle
+gradlew
+gradlew.bat
+mosmetro-android.iml
