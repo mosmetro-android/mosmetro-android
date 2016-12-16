@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mosmetro Wi-Fi autologin</string>
+    <string name="app_name">Moscow Wi-Fi autologin</string>
 
     <string name="report">Send report</string>
     <string name="report_info">You can send report by email or save a logfile.</string>
@@ -11,12 +11,12 @@
     <string name="retry">Try again</string>
     <string name="connect">Connect</string>
     <string name="send">Send</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="install">Install</string>
     <string name="manual_connection">Connect manually</string>
-    <string name="ignore">Ignore.</string>
+    <string name="ignore">Ignore</string>
     <string name="later">Later</string>
     <string name="error" formatted="false">Error: %s</string>
     <string name="not">not</string>
@@ -40,7 +40,7 @@
 
     <string name="pref_wifi_reconnect">Wi-Fi reconnection</string>
     <string name="pref_wifi_reconnect_summary">
-        Try to reconnect to Wi-Fi network automatically when Wi-F signal is lost or connection is reset
+        Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset
     </string>
     <string name="pref_wifi_restart">Wi-Fi restart</string>
     <string name="pref_wifi_restart_summary">
@@ -51,7 +51,7 @@
 
     <string name="pref_internet_check">Periodic connection check</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
-    <string name="pref_internet_check_strict">Robust connection check</string>
+    <string name="pref_internet_check_strict">Reliable connection check</string>
     <string name="pref_internet_check_strict_summary">Slower check done by trying to connect to one of the public servers on the Internet.</string>
 
     <string name="pref_notify_success">Connected successfully</string>
@@ -70,7 +70,7 @@
     </string>
     <string name="pref_notify_success_lock">Locked notification</string>
     <string name="pref_notify_success_lock_summary">
-        Lock successful connection notification (notification will remain during the whole Wi-Fi connection)
+        Lock successful connection notification (notification will remain while Wi-Fi is connected)
     </string>
     <string name="pref_notify_news">Developer news</string>
     <string name="pref_notify_news_summary">I will be able to inform you in case of problems with application.</string>
@@ -82,8 +82,8 @@
 
     <string name="pref_ip_wait">Waiting for IP address</string>
     <string name="pref_ip_wait_summary">
-        Number of seconds during which application waits for IP address assignment.
-        If 0, application will wait until device disconnects from the netwok (default: 30).
+        Number of seconds to wait for IP address assignment.
+        If 0 is set, application will wait until device disconnects from the netwok (default: 30).
     </string>
 
     <string name="pref_updater_enabled">Check automatically</string>
@@ -112,9 +112,9 @@
     <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
 
-    <string name="manual_connection_mosmetro">Metro, Moscow Central Circle (MCC), Aeroexpress</string>
+    <string name="manual_connection_mosmetro">Metro, MCC, Aeroexpress</string>
     <string name="manual_connection_mosmetro_summary">MosMetro_Free, AURA, MT_FREE</string>
-    <string name="manual_connection_mosgortrans">Autobus, Tram etc.</string>
+    <string name="manual_connection_mosgortrans">Bus, Tram etc.</string>
     <string name="manual_connection_mosgortrans_summary">MosGorTrans_Free, MT_FREE</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
     <string name="manual_connection_shortcut_summary">
@@ -122,18 +122,18 @@
     </string>
 
     <string name="shortcut_mode">Select connection mode</string>
-    <string name="shortcut_automatic">Automatically identify network</string>
+    <string name="shortcut_automatic">Automatically identify the network</string>
     <string name="shortcut_background">Connect in the background</string>
 
-    <string name="auth_connecting" formatted="false">Connecting to network %s</string>
+    <string name="auth_connecting" formatted="false">Connecting to %s</string>
     <string name="auth_version" formatted="false">Algorithm version: %d</string>
     <string name="auth_waiting">Waiting…</string>
-    <string name="auth_checking_connection">Checing Internet connection</string>
+    <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>
     <string name="auth_restarting_wifi">Restarting Wi-Fi…</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_captcha_result">CAPTCHA entered: %s</string>
-    <string name="auth_captcha_dialog">Enter the code from the image</string>
+    <string name="auth_captcha_dialog">Please solve the CAPTCHA</string>
     <string name="auth_captcha_dialog_summary">
         MaximaTelecom asks to enter this code from time to time to login.
         Here you can enter it without watching ads.
@@ -197,11 +197,11 @@
     <string name="contributor_Mikhail_Kuropatkin">Mikhail Kuropatkin</string>
     <string name="contributor_Mikhail_Kuropatkin_link">https://telegram.me/kuropatkin</string>
     <string name="contributor_Alexander_Krotov">Alexander Krotov</string>
-    <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
+    <string name="contributor_Alexander_Krotov_summary">First Pull-request, Gradle migration, English translation</string>
     <string name="contributor_Alexander_Krotov_link">https://github.com/ilabdsf</string>
 
-    <string name="action_donate">Donate</string>
-    <string name="action_donate_cond">Donate</string>
+    <string name="action_donate">Support the project</string>
+    <string name="action_donate_cond">Support</string>
 
     <string-array name="donate_options">
         <item>Yandex.Money or credit card</item>
