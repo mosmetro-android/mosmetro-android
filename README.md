@@ -13,11 +13,13 @@
 | MosMetro_Free | [NetByNet](http://www.netbynet.ru) | МЦК | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 | MosGorTrans_Free | [NetByNet](http://www.netbynet.ru) | Автобусы | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 | MosGorTrans_Free | [Enforta](http://www.enforta.ru/) | Остановки | :no_entry: | [MosGorTrans](/src/pw/thedrhax/mosmetro/authenticator/networks/MosGorTrans.java) |
-| MT_FREE | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро, Автобусы, ... | :large_blue_circle: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
+| MT_FREE | [МаксимаТелеком](http://maximatelecom.ru/ru#/) + [NetByNet](http://www.netbynet.ru) | Метро, Автобусы, ... | :white_check_mark: | [MosMetro v1/v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
 
 ## Сборка
 
-Проект, импортируется в среду разработки IntelliJ IDEA или совместимые (изначально проект разрабатывался в AIDE, поэтому он не использует Gradle). Для сборки проекта потребуется Android SDK.
+Проект импортируется в среду разработки IntelliJ IDEA или совместимые, например Android Studio. Для сборки проекта потребуется Android SDK и Gradle.
+
+Сборка в AIDE также поддерживается, но нужно вручную скачать [все](https://github.com/TheDrHax/mosmetro-android/tree/fc75df9b0c26489522ccf5581061fa57b5e6cd0f/libs) используемые библиотеки в директорию /libs. При этом в приложении не будет отображаться название и код версии, если специально не отредактировать для этого AndroidManifest.xml.
 
 ## Тестирование в Google Play
 

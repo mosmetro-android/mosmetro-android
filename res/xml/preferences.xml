@@ -256,5 +256,14 @@
 
         </PreferenceScreen>
 
+        <PreferenceScreen
+            android:title="@string/contributor_Alexander_Krotov"
+            android:summary="@string/contributor_Alexander_Krotov_summary">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/contributor_Alexander_Krotov_link" />
+
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>
