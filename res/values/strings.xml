@@ -25,6 +25,7 @@
     <string name="show_debug_log">Show verbose messages</string>
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
+    <string name="about">About</string>
 
     <string name="pref_category_main">Main preferences</string>
     <string name="pref_category_connection">Connection preferences</string>
@@ -32,7 +33,6 @@
     <string name="pref_category_notifications">Notifications</string>
     <string name="pref_category_notifications_summary">Enable/disable various notifications</string>
     <string name="pref_category_updater">Updates</string>
-    <string name="pref_category_about">About</string>
     <string name="pref_category_contributors">Acknowledgments</string>
 
     <string name="pref_autoconnect">Automatic authentication</string>

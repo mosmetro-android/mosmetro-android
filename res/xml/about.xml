@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="app_name"
+        android:icon="@drawable/ic_launcher"
+        android:title="@string/app_name" />
+
+    <PreferenceScreen
+        android:title="@string/developer"
+        android:summary="@string/developer_info">
+
+        <intent
+            android:action="android.intent.action.SENDTO"
+            android:data="mailto:mosmetro@thedrhax.pw" />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:title="@string/developer_github_repo"
+        android:summary="@string/developer_github_repo_summary">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/developer_github_repo_link" />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:title="@string/developer_vkontakte"
+        android:summary="@string/developer_vkontakte_summary">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/developer_vkontakte_link" />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:title="@string/developer_site"
+        android:summary="@string/developer_site_link">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/developer_site_link" />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:title="@string/developer_google_play">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/developer_google_play_link" />
+
+    </PreferenceScreen>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_contributors">
+
+        <PreferenceScreen
+            android:title="@string/contirutor_revertron"
+            android:summary="@string/contributor_revertron_summary">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/contributor_revertron_link" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="@string/contributor_Mikhail_Kuropatkin"
+            android:summary="@string/contrinutor_Mikhail_Kuropatkin_summary">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/contributor_Mikhail_Kuropatkin_link" />
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="@string/contributor_Alexander_Krotov"
+            android:summary="@string/contributor_Alexander_Krotov_summary">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/contributor_Alexander_Krotov_link" />
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

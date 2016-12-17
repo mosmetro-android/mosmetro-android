@@ -101,6 +101,10 @@ public class SettingsActivity extends Activity {
             case R.id.action_donate:
                 donate_dialog();
                 return true;
+
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -116,13 +120,6 @@ public class SettingsActivity extends Activity {
                 .replace(android.R.id.content, settings)
                 .commit();
         getFragmentManager().executePendingTransactions();
-
-        // Add version name and code
-        Preference app_name = settings.findPreference("app_name");
-        app_name.setSummary(String.format(
-                getString(R.string.version),
-                new Version(this).getFormattedVersion())
-        );
 
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect = (CheckBoxPreference)settings

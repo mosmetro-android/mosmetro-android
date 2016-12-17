@@ -25,6 +25,7 @@
     <string name="show_debug_log">Показать подробные сообщения</string>
     <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
     <string name="screen_clear">Очистить экран</string>
+    <string name="about">О программе</string>
 
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
@@ -32,7 +33,6 @@
     <string name="pref_category_notifications">Уведомления</string>
     <string name="pref_category_notifications_summary">Включение/отключение различных уведомлений</string>
     <string name="pref_category_updater">Обновления</string>
-    <string name="pref_category_about">О программе</string>
     <string name="pref_category_contributors">Отдельное спасибо</string>
 
     <string name="pref_autoconnect">Автоматическая авторизация</string>

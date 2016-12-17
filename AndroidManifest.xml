@@ -31,6 +31,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="pw.thedrhax.mosmetro.activities.AboutActivity"
+            android:label="@string/about"
+            android:icon="@drawable/ic_launcher"
+            android:theme="@style/AppBaseTheme"
+            android:configChanges="orientation|screenSize" />
+
         <activity android:icon="@drawable/ic_launcher"
                   android:label="@string/connect"
                   android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"
