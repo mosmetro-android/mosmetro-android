@@ -23,6 +23,13 @@
             android:text="@string/show_debug_log"
             android:id="@+id/show_debug_log" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
             android:onClick="show_debug_log"/>
-    <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/retry"
-            android:id="@+id/button_connect" android:onClick="button_connect" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/retry"
+            android:id="@+id/button_connect" android:onClick="button_connect" android:layout_weight="1" />
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/manual_connection_shortcut"
+            android:id="@+id/button_shortcut" android:onClick="button_shortcut" android:layout_weight="1" />
+    </LinearLayout>
 </LinearLayout>

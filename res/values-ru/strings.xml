@@ -104,9 +104,6 @@
     <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс</string>
     <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
-    <string name="manual_connection_shortcut_summary">
-        Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
-    </string>
 
     <string name="shortcut_mode">Выберите режим подключения</string>
     <string name="shortcut_automatic">Автоматическое определение названия сети</string>

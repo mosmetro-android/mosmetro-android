@@ -38,7 +38,7 @@
             android:configChanges="orientation|screenSize" />
 
         <activity android:icon="@drawable/ic_launcher"
-                  android:label="@string/connect"
+                  android:label="@string/manual_connection_shortcut"
                   android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"
                   android:theme="@style/AppBaseTheme">
             <intent-filter>

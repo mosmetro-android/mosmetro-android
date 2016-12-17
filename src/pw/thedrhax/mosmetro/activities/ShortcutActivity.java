@@ -3,6 +3,8 @@ package pw.thedrhax.mosmetro.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import pw.thedrhax.mosmetro.R;
@@ -14,6 +16,26 @@ public class ShortcutActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shortcut_activity);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Show back button in menu
+        try {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ignored) {}
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void network_selected (View view) {
@@ -45,7 +67,7 @@ public class ShortcutActivity extends Activity {
                 Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)
         );
 
-        if (getIntent().getAction().equals("android.intent.action.CREATE_SHORTCUT")) {
+        if ("android.intent.action.CREATE_SHORTCUT".equals(getIntent().getAction())) {
             setResult(RESULT_OK, result);
         } else {
             result.setAction("com.android.launcher.action.INSTALL_SHORTCUT");

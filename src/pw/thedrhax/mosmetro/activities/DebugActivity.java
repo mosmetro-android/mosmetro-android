@@ -121,6 +121,10 @@ public class DebugActivity extends Activity {
         }
     }
 
+    public void button_shortcut (View view) {
+        startActivity(new Intent(this, ShortcutActivity.class));
+    }
+
     /*
      * Run manual connection in background thread
      */

@@ -113,9 +113,6 @@
     <string name="manual_connection_mosgortrans">Bus, Tram etc.</string>
     <string name="manual_connection_mosgortrans_summary" translatable="false">MosGorTrans_Free, MT_FREE</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
-    <string name="manual_connection_shortcut_summary">
-        Create shortcut for manual connection on home screen (configurable).
-    </string>
 
     <string name="shortcut_mode">Select connection mode</string>
     <string name="shortcut_automatic">Automatically identify the network</string>
