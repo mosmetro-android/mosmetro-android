@@ -164,7 +164,7 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean isWifiConnected() {
-        return from_shortcut || wifi.isEnabled() && wifi.get().equalsIgnoreCase(SSID);
+        return from_shortcut || wifi.isEnabled() && wifi.getSSID().equalsIgnoreCase(SSID);
     }
 
     private boolean waitForIP() {
@@ -278,7 +278,7 @@ public class ConnectionService extends IntentService {
         }
 
         if (!from_shortcut || SSID.isEmpty())
-            SSID = wifi.get(intent);
+            SSID = wifi.getSSID(intent);
 
         if (!(WifiUtils.UNKNOWN_SSID.equals(SSID) || running)) { // Start if SSID has changed
             onStart(intent, startId);

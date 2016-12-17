@@ -19,7 +19,7 @@ public class Chooser {
     }
 
     public Authenticator choose (String SSID) {
-        if (SSID == null) return choose(wifi.get());
+        if (SSID == null) return choose(wifi.getSSID());
 
         logger.log(String.format(context.getString(R.string.chooser_searching), SSID));
 
@@ -56,6 +56,6 @@ public class Chooser {
     }
 
     public Authenticator choose (Intent intent) {
-        return choose(wifi.get(intent));
+        return choose(wifi.getSSID(intent));
     }
 }

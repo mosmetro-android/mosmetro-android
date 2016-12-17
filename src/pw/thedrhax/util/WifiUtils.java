@@ -16,16 +16,27 @@ public class WifiUtils {
         this.manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
-    public static String clear (String text) {
+    /*
+     * Read-only methods
+     */
+
+    public boolean isEnabled() {
+        return manager.isWifiEnabled();
+    }
+
+    // Clear SSID from platform-specific symbols
+    private static String clear (String text) {
         return (text != null && !text.isEmpty()) ? text.replace("\"", "") : UNKNOWN_SSID;
     }
 
-    public String get() {
+    // Get SSID directly from WifiManager
+    public String getSSID() {
         return clear(manager.getConnectionInfo().getSSID());
     }
 
-    public String get (Intent intent) {
-        if (intent == null) return get();
+    // Get SSID from Intent's EXTRA_WIFI_INFO (API > 14)
+    public String getSSID(Intent intent) {
+        if (intent == null) return getSSID();
 
         // Get SSID from Intent
         if (Build.VERSION.SDK_INT >= 14) {
@@ -34,9 +45,19 @@ public class WifiUtils {
                 return clear(info.getSSID());
         }
 
-        return get();
+        return getSSID();
     }
 
+    // Get current IP from WifiManager
+    public int getIP() {
+        return manager.getConnectionInfo().getIpAddress();
+    }
+
+    /*
+     * Control methods
+     */
+
+    // Reconnect to SSID (only if already configured)
     public void reconnect(String SSID) {
         try {
             for (WifiConfiguration network : manager.getConfiguredNetworks()) {
@@ -46,13 +67,5 @@ public class WifiUtils {
                 }
             }
         } catch (NullPointerException ignored) {}
-    }
-
-    public int getIP() {
-        return manager.getConnectionInfo().getIpAddress();
-    }
-
-    public boolean isEnabled() {
-        return manager.isWifiEnabled();
     }
 }
