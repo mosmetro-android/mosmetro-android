@@ -4,7 +4,7 @@
 
     <string name="report">Send report</string>
     <string name="report_info">You can send report by email or save a logfile.</string>
-    <string name="report_email_address">mosmetro@thedrhax.pw</string>
+    <string name="report_email_address" translatable="false">mosmetro@thedrhax.pw</string>
     <string name="report_email_subject" formatted="false">Version %s</string>
     <string name="report_choose_client">Choose email client…</string>
 
@@ -102,20 +102,20 @@
     <string name="developer">Developer</string>
     <string name="developer_info">Dmitry Karikh (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Developer website</string>
-    <string name="developer_site_link">https://thedrhax.pw</string>
+    <string name="developer_site_link" translatable="false">https://thedrhax.pw</string>
     <string name="developer_github_repo">GitHub repository</string>
-    <string name="developer_github_repo_summary">TheDrHax/mosmetro-android</string>
-    <string name="developer_github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
+    <string name="developer_github_repo_summary" translatable="false">TheDrHax/mosmetro-android</string>
+    <string name="developer_github_repo_link" translatable="false">https://github.com/TheDrHax/mosmetro-android</string>
     <string name="developer_google_play">Google Play application webpage</string>
-    <string name="developer_google_play_link">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
+    <string name="developer_google_play_link" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
     <string name="developer_vkontakte">VK community</string>
-    <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
-    <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
+    <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
+    <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
 
     <string name="manual_connection_mosmetro">Metro, MCC, Aeroexpress</string>
-    <string name="manual_connection_mosmetro_summary">MosMetro_Free, AURA, MT_FREE</string>
+    <string name="manual_connection_mosmetro_summary" translatable="false">MosMetro_Free, AURA, MT_FREE</string>
     <string name="manual_connection_mosgortrans">Bus, Tram etc.</string>
-    <string name="manual_connection_mosgortrans_summary">MosGorTrans_Free, MT_FREE</string>
+    <string name="manual_connection_mosgortrans_summary" translatable="false">MosGorTrans_Free, MT_FREE</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
     <string name="manual_connection_shortcut_summary">
         Create shortcut for manual connection on home screen (configurable).
@@ -190,15 +190,15 @@
     <string name="chooser_searching">Looking up algorithm for the network %s</string>
     <string name="chooser_not_supported">You are not connected to any of the supported networks</string>
 
-    <string name="contirutor_revertron">Revertron</string>
+    <string name="contirutor_revertron" translatable="false">Revertron</string>
     <string name="contributor_revertron_summary">Numerous algorithm recommendations</string>
-    <string name="contributor_revertron_link">https://github.com/Revertron</string>
+    <string name="contributor_revertron_link" translatable="false">https://github.com/Revertron</string>
     <string name="contrinutor_Mikhail_Kuropatkin_summary">Helped collecting authentication dumps</string>
-    <string name="contributor_Mikhail_Kuropatkin">Mikhail Kuropatkin</string>
-    <string name="contributor_Mikhail_Kuropatkin_link">https://telegram.me/kuropatkin</string>
-    <string name="contributor_Alexander_Krotov">Alexander Krotov</string>
+    <string name="contributor_Mikhail_Kuropatkin" translatable="false">Mikhail Kuropatkin</string>
+    <string name="contributor_Mikhail_Kuropatkin_link" translatable="false">https://telegram.me/kuropatkin</string>
+    <string name="contributor_Alexander_Krotov" translatable="false">Alexander Krotov</string>
     <string name="contributor_Alexander_Krotov_summary">First Pull-request, Gradle migration, English translation</string>
-    <string name="contributor_Alexander_Krotov_link">https://github.com/ilabdsf</string>
+    <string name="contributor_Alexander_Krotov_link" translatable="false">https://github.com/ilabdsf</string>
 
     <string name="action_donate">Support the project</string>
     <string name="action_donate_cond">Support</string>
@@ -210,7 +210,7 @@
         <item>Join the community (VK)</item>
         <item>Give feedback (Google Play)</item>
     </string-array>
-    <string name="donate_webmoney_data">R401534033407</string>
-    <string name="donate_yandex_data">https://money.yandex.ru/to/410014087156910</string>
+    <string name="donate_webmoney_data" translatable="false">R401534033407</string>
+    <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>
 
 </resources>

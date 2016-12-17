@@ -4,7 +4,6 @@
 
     <string name="report">Отправить отчет</string>
     <string name="report_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
-    <string name="report_email_address">mosmetro@thedrhax.pw</string>
     <string name="report_email_subject" formatted="false">Версия %s</string>
     <string name="report_choose_client">Выберите E-mail клиент…</string>
 
@@ -102,20 +101,12 @@
     <string name="developer">Разработчик</string>
     <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Сайт разработчика</string>
-    <string name="developer_site_link">https://thedrhax.pw</string>
     <string name="developer_github_repo">Репозиторий GitHub</string>
-    <string name="developer_github_repo_summary">TheDrHax/mosmetro-android</string>
-    <string name="developer_github_repo_link">https://github.com/TheDrHax/mosmetro-android</string>
     <string name="developer_google_play">Страница приложения в Google Play</string>
-    <string name="developer_google_play_link">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
     <string name="developer_vkontakte">Сообщество ВКонтакте</string>
-    <string name="developer_vkontakte_summary">vk.com/wifi_v_metro</string>
-    <string name="developer_vkontakte_link">https://vk.com/wifi_v_metro</string>
 
     <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс</string>
-    <string name="manual_connection_mosmetro_summary">MosMetro_Free, AURA, MT_FREE</string>
     <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
-    <string name="manual_connection_mosgortrans_summary">MosGorTrans_Free, MT_FREE</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
     <string name="manual_connection_shortcut_summary">
         Добавить иконку быстрого доступа к ручному подключению на домашний экран (настраивается).
@@ -190,14 +181,8 @@
     <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
     <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
 
-    <string name="contirutor_revertron">Revertron</string>
     <string name="contributor_revertron_summary">Множество рекомендаций по алгоритмам</string>
-    <string name="contributor_revertron_link">https://github.com/Revertron</string>
     <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>
-    <string name="contributor_Mikhail_Kuropatkin">Mikhail Kuropatkin</string>
-    <string name="contributor_Mikhail_Kuropatkin_link">https://facebook.com/kuropatkin</string>
-    <string name="contributor_Alexander_Krotov">Alexander Krotov</string>
-    <string name="contributor_Alexander_Krotov_link">https://github.com/ilabdsf</string>
     <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
 
     <string name="action_donate">Поддержать проект</string>
@@ -210,7 +195,5 @@
         <item>Вступить в группу (ВКонтакте)</item>
         <item>Оставить отзыв (Google Play)</item>
     </string-array>
-    <string name="donate_webmoney_data">R401534033407</string>
-    <string name="donate_yandex_data">https://money.yandex.ru/to/410014087156910</string>
 
 </resources>
