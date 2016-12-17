@@ -2,13 +2,9 @@ package pw.thedrhax.mosmetro.services;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import pw.thedrhax.mosmetro.R;
@@ -19,16 +15,15 @@ import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.Util;
+import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
-    private static final String UNKNOWN_SSID = "<unknown ssid>";
-
     private static boolean running = false;
-    private static String SSID = UNKNOWN_SSID;
+    private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
 
     // Preferences
-    private WifiManager manager;
+    private WifiUtils wifi;
     private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_retry_delay;
@@ -52,7 +47,7 @@ public class ConnectionService extends IntentService {
     public void onCreate() {
 		super.onCreate();
 
-        manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        wifi = new WifiUtils(this);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
@@ -169,9 +164,7 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean isWifiConnected() {
-        if (from_shortcut) return true;
-        
-        return manager.isWifiEnabled() && connection.getSSID().equalsIgnoreCase(SSID);
+        return from_shortcut || wifi.isEnabled() && wifi.get().equalsIgnoreCase(SSID);
     }
 
     private boolean waitForIP() {
@@ -185,7 +178,7 @@ public class ConnectionService extends IntentService {
                 .setContinuous()
                 .show();
 
-        while (manager.getConnectionInfo().getIpAddress() == 0 && running) {
+        while (wifi.getIP() == 0 && running) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
@@ -273,26 +266,21 @@ public class ConnectionService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if ("STOP".equals(intent.getAction())) { // Stop by intent
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
         if (intent.getBooleanExtra("background", false)) {
             SSID = intent.getStringExtra("SSID");
             pref_notify_success_lock = false;
             from_shortcut = true;
         }
 
-        if (!from_shortcut || SSID.isEmpty()) {
-            WifiInfo info;
-            if (Build.VERSION.SDK_INT >= 14) {
-                info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-            } else {
-                info = manager.getConnectionInfo();
-            }
-            SSID = (info != null && info.getSSID() != null)
-                    ? info.getSSID().replace("\"", "") : UNKNOWN_SSID;
-        }
+        if (!from_shortcut || SSID.isEmpty())
+            SSID = wifi.get(intent);
 
-        if ("STOP".equals(intent.getAction())) { // Stop by intent
-            stopSelf();
-        } else if (!(UNKNOWN_SSID.equals(SSID) || running)) {
+        if (!(WifiUtils.UNKNOWN_SSID.equals(SSID) || running)) { // Start if SSID has changed
             onStart(intent, startId);
         }
         return START_NOT_STICKY;
@@ -300,16 +288,15 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         running = true;
-        main();
+
+        connection = new Chooser(this, logger).choose(SSID);
+        if (connection != null) main();
+
         running = false;
     }
     
     private void main() {
         logger.date();
-
-        // Select an Authenticator
-        connection = new Chooser(this, logger).choose(SSID);
-        if (connection == null) return;
 
         connection.setLogger(logger);
         connection.setProgressListener(new Authenticator.ProgressListener() {
@@ -366,20 +353,13 @@ public class ConnectionService extends IntentService {
         notification.hide();
 
         // Try to reconnect the Wi-Fi network
-        if (settings.getBoolean("pref_wifi_reconnect", false)) {
-            try {
-                for (WifiConfiguration network : manager.getConfiguredNetworks()) {
-                    if (network.SSID.replace("\"", "").equals(connection.getSSID())) {
-                        manager.enableNetwork(network.networkId, true);
-                        manager.reconnect();
-                    }
-                }
-            } catch (NullPointerException ignored) {}
-        }
+        if (settings.getBoolean("pref_wifi_reconnect", false))
+            wifi.reconnect(connection.getSSID());
 	}
 	
 	@Override
     public void onDestroy() {
+        SSID = WifiUtils.UNKNOWN_SSID;
         if (connection != null) connection.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();

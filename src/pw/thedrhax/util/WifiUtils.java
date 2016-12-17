@@ -2,11 +2,14 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 
 public class WifiUtils {
+    public static final String UNKNOWN_SSID = "<unknown ssid>";
+
     private WifiManager manager;
 
     public WifiUtils(Context context) {
@@ -14,7 +17,7 @@ public class WifiUtils {
     }
 
     public static String clear (String text) {
-        return text.replace("\"", "");
+        return (text != null && !text.isEmpty()) ? text.replace("\"", "") : UNKNOWN_SSID;
     }
 
     public String get() {
@@ -32,5 +35,24 @@ public class WifiUtils {
         }
 
         return get();
+    }
+
+    public void reconnect(String SSID) {
+        try {
+            for (WifiConfiguration network : manager.getConfiguredNetworks()) {
+                if (clear(network.SSID).equals(SSID)) {
+                    manager.enableNetwork(network.networkId, true);
+                    manager.reassociate();
+                }
+            }
+        } catch (NullPointerException ignored) {}
+    }
+
+    public int getIP() {
+        return manager.getConnectionInfo().getIpAddress();
+    }
+
+    public boolean isEnabled() {
+        return manager.isWifiEnabled();
     }
 }

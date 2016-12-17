@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -134,17 +132,9 @@ public class SettingsActivity extends Activity {
             public boolean onPreferenceChange(Preference preference, Object o) {
                 Context context = SettingsActivity.this;
                 Intent service = new Intent(context, ConnectionService.class);
-                if (!pref_autoconnect.isChecked()) {
-                    if (Build.VERSION.SDK_INT >= 14) {
-                        WifiManager manager = (WifiManager)context
-                                .getSystemService(Context.WIFI_SERVICE);
-                        service.putExtra(WifiManager.EXTRA_WIFI_INFO, manager.getConnectionInfo());
-                    }
-                } else {
+                if (pref_autoconnect.isChecked())
                     service.setAction("STOP");
-                }
                 context.startService(service);
-
                 return true;
             }
         });

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.view.KeyEvent;
@@ -31,6 +30,7 @@ import pw.thedrhax.mosmetro.authenticator.Authenticator;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.WifiUtils;
 
 public class MosMetro extends Authenticator {
     public static final String SSID = "MosMetro_Free";
@@ -68,9 +68,7 @@ public class MosMetro extends Authenticator {
 
             if (settings.getBoolean("pref_wifi_restart", true)) {
                 logger.log(context.getString(R.string.auth_restarting_wifi));
-
-                WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-                manager.reassociate();
+                new WifiUtils(context).reconnect(SSID);
             }
 
             return RESULT.ERROR;
