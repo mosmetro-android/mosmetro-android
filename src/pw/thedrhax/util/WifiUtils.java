@@ -20,8 +20,11 @@ public class WifiUtils {
      * Read-only methods
      */
 
-    public boolean isEnabled() {
-        return manager.isWifiEnabled();
+    // Wi-Fi connectivity conditions
+    public boolean isConnected(String SSID) {
+        if (!manager.isWifiEnabled()) return false;
+        if (!getSSID().equalsIgnoreCase(SSID)) return false;
+        return true;
     }
 
     // Clear SSID from platform-specific symbols

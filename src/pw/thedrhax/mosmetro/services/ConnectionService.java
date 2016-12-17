@@ -47,7 +47,12 @@ public class ConnectionService extends IntentService {
     public void onCreate() {
 		super.onCreate();
 
-        wifi = new WifiUtils(this);
+        wifi = new WifiUtils(this) {
+            @Override
+            public boolean isConnected(String SSID) {
+                return from_shortcut || super.isConnected(SSID);
+            }
+        };
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
@@ -163,10 +168,6 @@ public class ConnectionService extends IntentService {
         }
     }
 
-    private boolean isWifiConnected() {
-        return from_shortcut || wifi.isEnabled() && wifi.getSSID().equalsIgnoreCase(SSID);
-    }
-
     private boolean waitForIP() {
         if (from_shortcut) return true;
 
@@ -183,7 +184,7 @@ public class ConnectionService extends IntentService {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
 
-            if (!isWifiConnected()) {
+            if (!wifi.isConnected(SSID)) {
                 logger.log(String.format(
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
@@ -249,7 +250,7 @@ public class ConnectionService extends IntentService {
 
             result = connection.start();
 
-            if (!isWifiConnected()) {
+            if (!wifi.isConnected(SSID)) {
                 logger.log(String.format(
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
@@ -330,14 +331,14 @@ public class ConnectionService extends IntentService {
         logger.date();
 
         // Notify user if still connected to Wi-Fi
-        if (isWifiConnected()) notify(result);
+        if (wifi.isConnected(SSID)) notify(result);
 
         if (from_shortcut || !(result == Authenticator.RESULT.ALREADY_CONNECTED
                 || result == Authenticator.RESULT.CONNECTED)) return;
 
         // Wait while internet connection is available
         int count = 0;
-        while (isWifiConnected()) {
+        while (wifi.isConnected(SSID)) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
