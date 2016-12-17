@@ -38,20 +38,16 @@
     <string name="pref_autoconnect">Automatic authentication</string>
     <string name="pref_autoconnect_summary">Login automatically when connected to supported Wi-Fi networks</string>
 
-    <string name="pref_wifi_reconnect">Wi-Fi reconnection</string>
+    <string name="pref_wifi_reconnect">Reconnect to Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
-        Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset
-    </string>
-    <string name="pref_wifi_restart">Wi-Fi restart</string>
-    <string name="pref_wifi_restart_summary">
-        Restart Wi-Fi when connection problems are encountered (fixes \"Network is not available\" problem)
+        Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset.
     </string>
     <string name="pref_wifi_bind">Bind process to the network</string>
     <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network but may cause problems with VPN.</string>
 
-    <string name="pref_internet_check">Periodic connection check</string>
+    <string name="pref_internet_check">Connection monitoring</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
-    <string name="pref_internet_check_strict">Reliable connection check</string>
+    <string name="pref_internet_check_strict">Reliable check</string>
     <string name="pref_internet_check_strict_summary">Slower check done by trying to connect to one of the public servers on the Internet.</string>
 
     <string name="pref_notify_success">Connected successfully</string>
@@ -212,5 +208,7 @@
     </string-array>
     <string name="donate_webmoney_data" translatable="false">R401534033407</string>
     <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>
+    <string name="pref_category_wifi">Wi-Fi control</string>
+    <string name="pref_category_internet">Internet checks</string>
 
 </resources>

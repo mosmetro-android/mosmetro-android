@@ -39,18 +39,14 @@
 
     <string name="pref_wifi_reconnect">Переподключение к Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
-        Пытаться восстановить соединение с сетью Wi-Fi автоматически при потере сигнала или сбросе соединения
-    </string>
-    <string name="pref_wifi_restart">Перезапуск Wi-Fi</string>
-    <string name="pref_wifi_restart_summary">
-        Переподключаться к Wi-Fi при проблемах с соединением (исправляет ошибку \"Сеть недоступна или не отвечает\")
+        Пытаться восстановить соединение с сетью Wi-Fi автоматически при потере сигнала или сбросе соединения.
     </string>
     <string name="pref_wifi_bind">Привязка процесса к сети</string>
-    <string name="pref_wifi_bind_summary">Предотвращает утечку трафика через мобильную сеть, но может вызывать проблемы с VPN.</string>
+    <string name="pref_wifi_bind_summary">Предотвращает утечку трафика через мобильную сеть, но может вызвать проблемы с VPN.</string>
 
-    <string name="pref_internet_check">Периодическая проверка соединения</string>
+    <string name="pref_internet_check">Мониторинг соединения</string>
     <string name="pref_internet_check_summary">Проверять соединение с интернетом каждые 10 секунд и перезапускать подключение при ошибке.</string>
-    <string name="pref_internet_check_strict">Надёжная проверка соединения</string>
+    <string name="pref_internet_check_strict">Надёжная проверка</string>
     <string name="pref_internet_check_strict_summary">Более медленная проверка через подключение к одному из публичных серверов в интернете.</string>
 
     <string name="pref_notify_success">Успешное подключение</string>
@@ -195,5 +191,7 @@
         <item>Вступить в группу (ВКонтакте)</item>
         <item>Оставить отзыв (Google Play)</item>
     </string-array>
+    <string name="pref_category_internet">Проверка соединения</string>
+    <string name="pref_category_wifi">Управление Wi-Fi</string>
 
 </resources>

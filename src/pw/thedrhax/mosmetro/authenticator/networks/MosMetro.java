@@ -66,7 +66,7 @@ public class MosMetro extends Authenticator {
                     context.getString(R.string.auth_error_network)
             ));
 
-            if (settings.getBoolean("pref_wifi_restart", true)) {
+            if (settings.getBoolean("pref_wifi_reconnect", true)) {
                 logger.log(context.getString(R.string.auth_restarting_wifi));
                 new WifiUtils(context).reconnect(SSID);
             }

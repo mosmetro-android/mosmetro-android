@@ -41,6 +41,8 @@
             android:title="@string/pref_category_connection"
             android:summary="@string/pref_category_connection_summary">
 
+            <PreferenceCategory android:title="@string/pref_category_wifi" />
+
             <CheckBoxPreference
                     android:key="pref_wifi_reconnect"
                     android:title="@string/pref_wifi_reconnect"
@@ -48,53 +50,47 @@
                     android:defaultValue="false" />
 
             <CheckBoxPreference
-                    android:key="pref_wifi_restart"
-                    android:title="@string/pref_wifi_restart"
-                    android:summary="@string/pref_wifi_restart_summary"
-                    android:defaultValue="true" />
+                    android:key="pref_wifi_bind"
+                    android:title="@string/pref_wifi_bind"
+                    android:summary="@string/pref_wifi_bind_summary"
+                    android:defaultValue="false" />
 
-            <PreferenceCategory android:title="@string/pref_category_connection">
+            <PreferenceCategory android:title="@string/pref_category_internet" />
 
-                <EditTextPreference
-                        android:key="pref_retry_count"
-                        android:inputType="number"
-                        android:title="@string/pref_retry_count"
-                        android:summary="@string/pref_retry_count_summary"
-                        android:defaultValue="3" />
+            <CheckBoxPreference
+                android:key="pref_internet_check"
+                android:title="@string/pref_internet_check"
+                android:summary="@string/pref_internet_check_summary"
+                android:defaultValue="true" />
 
-                <EditTextPreference
-                        android:key="pref_retry_delay"
-                        android:inputType="number"
-                        android:title="@string/pref_retry_delay"
-                        android:summary="@string/pref_retry_delay_summary"
-                        android:defaultValue="5" />
+            <CheckBoxPreference
+                android:key="pref_internet_check_strict"
+                android:title="@string/pref_internet_check_strict"
+                android:summary="@string/pref_internet_check_strict_summary"
+                android:defaultValue="false" />
 
-                <EditTextPreference
-                        android:key="pref_ip_wait"
-                        android:inputType="number"
-                        android:title="@string/pref_ip_wait"
-                        android:summary="@string/pref_ip_wait_summary"
-                        android:defaultValue="30" />
+            <PreferenceCategory android:title="@string/pref_category_connection" />
 
-                <CheckBoxPreference
-                        android:key="pref_internet_check"
-                        android:title="@string/pref_internet_check"
-                        android:summary="@string/pref_internet_check_summary"
-                        android:defaultValue="true" />
+            <EditTextPreference
+                android:key="pref_retry_count"
+                android:inputType="number"
+                android:title="@string/pref_retry_count"
+                android:summary="@string/pref_retry_count_summary"
+                android:defaultValue="3" />
 
-                <CheckBoxPreference
-                        android:key="pref_internet_check_strict"
-                        android:title="@string/pref_internet_check_strict"
-                        android:summary="@string/pref_internet_check_strict_summary"
-                        android:defaultValue="false" />
+            <EditTextPreference
+                android:key="pref_retry_delay"
+                android:inputType="number"
+                android:title="@string/pref_retry_delay"
+                android:summary="@string/pref_retry_delay_summary"
+                android:defaultValue="5" />
 
-                <CheckBoxPreference
-                        android:key="pref_wifi_bind"
-                        android:title="@string/pref_wifi_bind"
-                        android:summary="@string/pref_wifi_bind_summary"
-                        android:defaultValue="false" />
-
-            </PreferenceCategory>
+            <EditTextPreference
+                android:key="pref_ip_wait"
+                android:inputType="number"
+                android:title="@string/pref_ip_wait"
+                android:summary="@string/pref_ip_wait_summary"
+                android:defaultValue="30" />
 
         </PreferenceScreen>
 
