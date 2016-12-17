@@ -37,6 +37,16 @@
             android:theme="@style/AppBaseTheme"
             android:configChanges="orientation|screenSize" />
 
+        <activity android:name="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity android:icon="@drawable/ic_launcher"
                   android:label="@string/manual_connection_shortcut"
                   android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"

@@ -49,17 +49,9 @@ public class DebugActivity extends Activity {
         try {
             // Intent from the SettingsActivity or from shortcuts
             Intent intent = getIntent();
-            String SSID = intent.getStringExtra("SSID");
-
-            if (intent.getBooleanExtra("background", false)) {
-                Intent service = new Intent(this, ConnectionService.class);
-                service.putExtras(intent);
-                startService(service);
-                finish();
-                return;
+            if (intent.hasExtra(SSID)) {
+                SSID = intent.getStringExtra("SSID");
             }
-
-            if (SSID != null && !SSID.isEmpty()) this.SSID = SSID;
         } catch (NullPointerException ignored) {}
 
         button_connect(null);

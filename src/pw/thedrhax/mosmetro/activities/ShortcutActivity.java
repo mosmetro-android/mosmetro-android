@@ -8,9 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.util.WifiUtils;
 
 public class ShortcutActivity extends Activity {
-    private String SSID = "";
+    private String SSID = WifiUtils.UNKNOWN_SSID;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class ShortcutActivity extends Activity {
     public void network_selected (View view) {
         switch (view.getId()) {
             case R.id.radio_auto:
-                SSID = ""; break;
+                break;
 
             case R.id.radio_mosmetro:
                 SSID = "MosMetro_Free"; break;
@@ -54,13 +55,16 @@ public class ShortcutActivity extends Activity {
     public void button_save (View view) {
         Intent result = new Intent();
 
-        Intent shortcut_intent = new Intent(this, DebugActivity.class);
-        shortcut_intent.putExtra("SSID", SSID);
-        shortcut_intent.putExtra("background", ((CheckBox)findViewById(R.id.check_background)).isChecked());
+        Boolean background = ((CheckBox)findViewById(R.id.check_background)).isChecked();
+
+        Intent shortcut_intent = new Intent(
+                this, background ? ConnectionServiceActivity.class : DebugActivity.class
+        ).putExtra("SSID", SSID);
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
-        result.putExtra(Intent.EXTRA_SHORTCUT_NAME, SSID.isEmpty() ?
-                getString(R.string.connect) : SSID
+        result.putExtra(
+                Intent.EXTRA_SHORTCUT_NAME,
+                WifiUtils.UNKNOWN_SSID.equals(SSID) ? getString(R.string.connect) : SSID
         );
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,

@@ -104,7 +104,7 @@ public class ConnectionService extends IntentService {
                 }
 
                 notification
-                        .setCancellable(!pref_notify_success_lock)
+                        .setCancellable(from_shortcut || !pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
 
@@ -272,14 +272,15 @@ public class ConnectionService extends IntentService {
             return START_NOT_STICKY;
         }
 
-        if (intent.getBooleanExtra("background", false)) {
+        if (intent.hasExtra("SSID")) {
             SSID = intent.getStringExtra("SSID");
-            pref_notify_success_lock = false;
             from_shortcut = true;
         }
 
-        if (!from_shortcut || SSID.isEmpty())
+        if (SSID.isEmpty() || WifiUtils.UNKNOWN_SSID.equals(SSID)) {
             SSID = wifi.getSSID(intent);
+            from_shortcut = false;
+        }
 
         if (!(WifiUtils.UNKNOWN_SSID.equals(SSID) || running)) { // Start if SSID has changed
             onStart(intent, startId);
