@@ -49,7 +49,7 @@ public class DebugActivity extends Activity {
         try {
             // Intent from the SettingsActivity or from shortcuts
             Intent intent = getIntent();
-            if (intent.hasExtra(SSID)) {
+            if (intent.hasExtra("SSID")) {
                 SSID = intent.getStringExtra("SSID");
             }
         } catch (NullPointerException ignored) {}
