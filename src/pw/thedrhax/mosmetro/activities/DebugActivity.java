@@ -34,6 +34,7 @@ import pw.thedrhax.mosmetro.authenticator.Chooser;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
+import pw.thedrhax.util.*;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -69,6 +70,8 @@ public class DebugActivity extends Activity {
             Intent intent = getIntent();
             if (intent.hasExtra("SSID")) {
                 SSID = intent.getStringExtra("SSID");
+                if (WifiUtils.UNKNOWN_SSID.equals(SSID))
+                    SSID = new WifiUtils(this).getSSID();
             }
         } catch (NullPointerException ignored) {}
 
