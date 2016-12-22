@@ -108,8 +108,8 @@
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
 
-    <string name="manual_connection_mosmetro">Metro, MCC, Aeroexpress</string>
-    <string name="manual_connection_mosmetro_summary" translatable="false">MosMetro_Free, AURA, MT_FREE</string>
+    <string name="manual_connection_mosmetro">Metro, MCC, Aeroexpress, Airports</string>
+    <string name="manual_connection_mosmetro_summary" translatable="false">MosMetro_Free, AURA, MT_FREE, Air_WiFi_Free</string>
     <string name="manual_connection_mosgortrans">Bus, Tram etc.</string>
     <string name="manual_connection_mosgortrans_summary" translatable="false">MosGorTrans_Free, MT_FREE</string>
     <string name="manual_connection_shortcut">Create shortcut</string>

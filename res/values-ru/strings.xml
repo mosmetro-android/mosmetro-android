@@ -101,7 +101,7 @@
     <string name="developer_google_play">Страница приложения в Google Play</string>
     <string name="developer_vkontakte">Сообщество ВКонтакте</string>
 
-    <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс</string>
+    <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс, Аэропорты</string>
     <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
 
