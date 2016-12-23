@@ -17,8 +17,8 @@ android {
         applicationId 'pw.thedrhax.mosmetro'
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 50
-        versionName "1.7.2"
+        versionCode 51
+        versionName "1.7.3"
     }
 
     if (project.hasProperty("RELEASE_STORE_FILE")) {
