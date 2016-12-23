@@ -46,7 +46,6 @@ public class ConnectionService extends IntentService {
     private int pref_retry_count;
     private int pref_retry_delay;
     private int pref_ip_wait;
-    private boolean pref_colored_icons;
     private boolean pref_notify_success_lock;
 
     // Notifications
@@ -75,7 +74,6 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
         pref_ip_wait = Util.getIntPreference(settings, "pref_ip_wait", 30);
-        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
         PendingIntent delete_intent = PendingIntent.getService(
@@ -85,9 +83,7 @@ public class ConnectionService extends IntentService {
         );
 
         notify_progress = new Notification(this)
-                .setIcon(pref_colored_icons ?
-                        R.drawable.ic_notification_connecting_colored :
-                        R.drawable.ic_notification_connecting)
+                .setIcon(R.drawable.ic_notification_connecting)
                 .setId(1)
                 .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14))
                 .setDeleteIntent(delete_intent);
@@ -107,9 +103,7 @@ public class ConnectionService extends IntentService {
             case ALREADY_CONNECTED:
                 notification
                         .setTitle(getString(R.string.notification_success))
-                        .setIcon(pref_colored_icons ?
-                                R.drawable.ic_notification_success_colored :
-                                R.drawable.ic_notification_success);
+                        .setIcon(R.drawable.ic_notification_success);
 
                 if (settings.getBoolean("pref_notify_success_log", false)) {
                     notification
@@ -134,9 +128,7 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle(getString(R.string.notification_not_registered))
                         .setText(getString(R.string.notification_not_registered_register))
-                        .setIcon(pref_colored_icons ?
-                                R.drawable.ic_notification_register_colored :
-                                R.drawable.ic_notification_register)
+                        .setIcon(R.drawable.ic_notification_register)
                         .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://wi-fi.ru")))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .setId(2)
@@ -150,9 +142,7 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle(getString(R.string.notification_error))
                         .setText(getString(R.string.notification_error_log))
-                        .setIcon(pref_colored_icons ?
-                                R.drawable.ic_notification_error_colored :
-                                R.drawable.ic_notification_error)
+                        .setIcon(R.drawable.ic_notification_error)
                         .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
@@ -163,9 +153,7 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle(getString(R.string.notification_captcha))
                         .setText(getString(R.string.notification_captcha_summary))
-                        .setIcon(pref_colored_icons ?
-                                R.drawable.ic_notification_register_colored :
-                                R.drawable.ic_notification_register)
+                        .setIcon(R.drawable.ic_notification_register)
                         .setIntent(new Intent(this, DebugActivity.class)
                                     .putExtra("logger", logger)
                                     .putExtra("captcha", true)
@@ -177,9 +165,7 @@ public class ConnectionService extends IntentService {
                 notification
                         .setTitle(getString(R.string.notification_unsupported))
                         .setText(getString(R.string.notification_error_log))
-                        .setIcon(pref_colored_icons ?
-                                R.drawable.ic_notification_register_colored :
-                                R.drawable.ic_notification_register)
+                        .setIcon(R.drawable.ic_notification_register)
                         .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();

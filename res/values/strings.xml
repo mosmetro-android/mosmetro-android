@@ -57,10 +57,6 @@
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="pref_notify_fail_summary">Notify on failure</string>
     <string name="pref_notify_progress_summary">Show connection progress (Android 4.0+)</string>
-    <string name="pref_notify_alternative">Alternative icons</string>
-    <string name="pref_notify_alternative_summary">
-        Use color icons for notifications on Android 5.0+ (not always supported)
-    </string>
     <string name="pref_notify_success_log">Successful connection log</string>
     <string name="pref_notify_success_log_summary">
         Show successful connection log when corresponding notification is clicked

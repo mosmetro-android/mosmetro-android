@@ -37,14 +37,11 @@ import pw.thedrhax.util.Version;
 public class NewsChecker {
     private Context context;
     private SharedPreferences settings;
-    private boolean pref_colored_icons;
 
     public NewsChecker(Context context) {
         this.context = context;
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-        pref_colored_icons = (Build.VERSION.SDK_INT <= 20)
-                || settings.getBoolean("pref_notify_alternative", false);
     }
 
     public void check() {
@@ -79,9 +76,7 @@ public class NewsChecker {
         new Notification(context)
                 .setCancellable(true)
                 .setId(255)
-                .setIcon(pref_colored_icons ?
-                        R.drawable.ic_notification_message_colored :
-                        R.drawable.ic_notification_message)
+                .setIcon(R.drawable.ic_notification_message)
                 .setIntent(new Intent(Intent.ACTION_VIEW).setData(url))
                 .setTitle(title)
                 .setText(message)
