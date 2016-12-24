@@ -207,8 +207,7 @@ public class SettingsActivity extends Activity {
                                 .apply();
                         dialog.dismiss();
                     }
-                })
-                .setCancelable(false);
+                });
 
         if (!settings.getBoolean("pref_battery_saving_ignore", false))
             if (!pu.isBatterySavingIgnored())
