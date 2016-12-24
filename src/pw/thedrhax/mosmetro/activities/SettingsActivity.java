@@ -40,11 +40,12 @@ import android.widget.Toast;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
-import pw.thedrhax.util.Version;
 
 import java.util.List;
 
 public class SettingsActivity extends Activity {
+    private SettingsFragment settings;
+
     public static class SettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -127,38 +128,9 @@ public class SettingsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Populate preferences
-        final SettingsFragment settings = new SettingsFragment();
-        getFragmentManager()
-                .beginTransaction()
-                .replace(android.R.id.content, settings)
-                .commit();
-        getFragmentManager().executePendingTransactions();
-
-        // Start/stop service on pref_autoconnect change
-        final CheckBoxPreference pref_autoconnect = (CheckBoxPreference)settings
-                .findPreference("pref_autoconnect");
-        pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                Context context = SettingsActivity.this;
-                Intent service = new Intent(context, ConnectionService.class);
-                if (pref_autoconnect.isChecked())
-                    service.setAction("STOP");
-                context.startService(service);
-                return true;
-            }
-        });
-
-        /*
-            Update checking
-         */
-
-        final ListPreference pref_updater_branch = (ListPreference)settings.findPreference("pref_updater_branch");
+    private void update_checker_setup() {
+        final ListPreference pref_updater_branch =
+                (ListPreference) settings.findPreference("pref_updater_branch");
         pref_updater_branch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -208,5 +180,35 @@ public class SettingsActivity extends Activity {
             pref_updater_check
                     .getOnPreferenceClickListener()
                     .onPreferenceClick(null);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Populate preferences
+        settings = new SettingsFragment();
+        getFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, settings)
+                .commit();
+        getFragmentManager().executePendingTransactions();
+
+        // Start/stop service on pref_autoconnect change
+        final CheckBoxPreference pref_autoconnect =
+                (CheckBoxPreference) settings.findPreference("pref_autoconnect");
+        pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                Context context = SettingsActivity.this;
+                Intent service = new Intent(context, ConnectionService.class);
+                if (pref_autoconnect.isChecked())
+                    service.setAction("STOP");
+                context.startService(service);
+                return true;
+            }
+        });
+
+        update_checker_setup();
     }
 }
