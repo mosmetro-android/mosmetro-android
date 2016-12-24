@@ -18,10 +18,14 @@
 
 package pw.thedrhax.util;
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 
 public class Notification {
@@ -71,7 +75,10 @@ public class Notification {
     }
 
     public Notification setIcon (int icon) {
-        builder = builder.setSmallIcon(icon);
+        builder = builder
+                .setSmallIcon(icon)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), icon));
+
         return this;
     }
 
