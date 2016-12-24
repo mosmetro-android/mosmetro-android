@@ -25,6 +25,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -40,11 +41,13 @@ import android.widget.Toast;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.PermissionUtils;
 
 import java.util.List;
 
 public class SettingsActivity extends Activity {
-    private SettingsFragment settings;
+    private SettingsFragment fragment;
+    private SharedPreferences settings;
 
     public static class SettingsFragment extends PreferenceFragment {
         @Override
@@ -130,13 +133,11 @@ public class SettingsActivity extends Activity {
 
     private void update_checker_setup() {
         final ListPreference pref_updater_branch =
-                (ListPreference) settings.findPreference("pref_updater_branch");
+                (ListPreference) fragment.findPreference("pref_updater_branch");
         pref_updater_branch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                PreferenceManager
-                        .getDefaultSharedPreferences(SettingsActivity.this)
-                        .edit()
+                settings.edit()
                         .putInt("pref_updater_build", 0)
                         .putInt("pref_updater_ignore", 0)
                         .putString("pref_updater_branch", (String)newValue)
@@ -148,7 +149,7 @@ public class SettingsActivity extends Activity {
         });
 
         // Force check
-        Preference pref_updater_check = settings.findPreference("pref_updater_check");
+        Preference pref_updater_check = fragment.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -174,12 +175,44 @@ public class SettingsActivity extends Activity {
         });
 
         // Check for updates on start if enabled
-        if (PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean("pref_updater_enabled", true))
+        if (settings.getBoolean("pref_updater_enabled", true))
             pref_updater_check
                     .getOnPreferenceClickListener()
                     .onPreferenceClick(null);
+    }
+
+    private void energy_saving_setup() {
+        final PermissionUtils pu = new PermissionUtils(this);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_battery_saving)
+                .setMessage(R.string.dialog_battery_saving_summary)
+                .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pu.requestBatterySavingIgnore();
+                    }
+                })
+                .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pu.openBatterySavingSettings();
+                    }
+                })
+                .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settings.edit()
+                                .putBoolean("pref_battery_saving_ignore", true)
+                                .apply();
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(false);
+
+        if (!settings.getBoolean("pref_battery_saving_ignore", false))
+            if (!pu.isBatterySavingIgnored())
+                dialog.show();
     }
 
     @Override
@@ -187,16 +220,18 @@ public class SettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Populate preferences
-        settings = new SettingsFragment();
+        fragment = new SettingsFragment();
         getFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, settings)
+                .replace(android.R.id.content, fragment)
                 .commit();
         getFragmentManager().executePendingTransactions();
 
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
+
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =
-                (CheckBoxPreference) settings.findPreference("pref_autoconnect");
+                (CheckBoxPreference) fragment.findPreference("pref_autoconnect");
         pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
@@ -210,5 +245,6 @@ public class SettingsActivity extends Activity {
         });
 
         update_checker_setup();
+        energy_saving_setup();
     }
 }

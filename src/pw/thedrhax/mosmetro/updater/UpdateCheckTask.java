@@ -131,7 +131,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             dialog = dialog
                     .setTitle(context.getString(R.string.update_available))
                     .setMessage(current_branch.message)
-                    .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
+                    .setNegativeButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             current_branch.ignore(true);
