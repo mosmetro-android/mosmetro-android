@@ -57,12 +57,6 @@
                 android:summary="@string/pref_internet_check_summary"
                 android:defaultValue="true" />
 
-            <CheckBoxPreference
-                android:key="pref_internet_check_strict"
-                android:title="@string/pref_internet_check_strict"
-                android:summary="@string/pref_internet_check_strict_summary"
-                android:defaultValue="false" />
-
             <PreferenceCategory android:title="@string/pref_category_connection" />
 
             <EditTextPreference

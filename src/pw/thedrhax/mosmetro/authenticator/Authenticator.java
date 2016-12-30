@@ -115,9 +115,6 @@ public abstract class Authenticator {
      */
 
     public CHECK isConnected() {
-        if (!settings.getBoolean("pref_internet_check_strict", false))
-            return CHECK.CONNECTED;
-
         Client client = new OkHttp();
         try {
             client.get("http://google.ru/generate_204", null);
@@ -125,7 +122,6 @@ public abstract class Authenticator {
             if (client.getResponseCode() == 204)
                 return CHECK.CONNECTED;
         }
-
         return CHECK.NOT_CONNECTED;
     }
 

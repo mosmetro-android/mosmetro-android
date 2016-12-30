@@ -48,8 +48,6 @@
 
     <string name="pref_internet_check">Connection monitoring</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
-    <string name="pref_internet_check_strict">Reliable check</string>
-    <string name="pref_internet_check_strict_summary">Slower check done by trying to connect to one of the public servers on the Internet.</string>
 
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_fail">Connection failure</string>
