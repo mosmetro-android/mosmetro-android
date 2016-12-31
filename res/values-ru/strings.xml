@@ -3,14 +3,12 @@
     <string name="app_name">Wi-Fi в метро</string>
 
     <string name="report">Отправить отчет</string>
-    <string name="report_info">Вы можете отправить отчет по e-mail, либо сохранить лог в файл.</string>
     <string name="report_email_subject" formatted="false">Версия %s</string>
     <string name="report_choose_client">Выберите E-mail клиент…</string>
 
     <string name="retry">Попробовать снова</string>
     <string name="connect">Подключиться</string>
     <string name="in_background">В фоне</string>
-    <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
@@ -108,7 +106,6 @@
     <string name="auth_waiting">Ожидание…</string>
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>
-    <string name="auth_restarting_wifi">Перезапуск Wi-Fi…</string>
     <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_captcha_result">Капча введена: %s</string>
     <string name="auth_captcha_dialog">Введите код с картинки</string>
@@ -124,10 +121,8 @@
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
     <string name="auth_request">Отправка запроса</string>
-    <string name="auth_provider" formatted="false">Провайдер: %s</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
-    <string name="auth_error_network">Сеть недоступна или не отвечает</string>
     <string name="auth_error_redirect">перенаправление не получено</string>
     <string name="auth_error_auth_page">страница авторизации не получена</string>
     <string name="auth_error_not_registered">
@@ -163,10 +158,6 @@
 
     <string name="ip_wait">Ожидание получения IP адреса…</string>
     <string name="ip_wait_result" formatted="false">IP адрес%s получен в течение %d секунд</string>
-
-    <string name="chooser_ssid">Определение названия сети</string>
-    <string name="chooser_searching">Поиск подходящего алгоритма для сети %s</string>
-    <string name="chooser_not_supported">Вы не подключены ни к одной из поддерживаемых сетей</string>
 
     <string name="contributor_revertron_summary">Множество рекомендаций по алгоритмам</string>
     <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>

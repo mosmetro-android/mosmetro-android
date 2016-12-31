@@ -3,7 +3,6 @@
     <string name="app_name">Moscow Wi-Fi autologin</string>
 
     <string name="report">Send report</string>
-    <string name="report_info">You can send report by email or save a logfile.</string>
     <string name="report_email_address" translatable="false">mosmetro@thedrhax.pw</string>
     <string name="report_email_subject" formatted="false">Version %s</string>
     <string name="report_choose_client">Choose email client…</string>
@@ -11,7 +10,6 @@
     <string name="retry">Try again</string>
     <string name="connect">Connect</string>
     <string name="in_background">In background</string>
-    <string name="send">Send</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -116,7 +114,6 @@
     <string name="auth_waiting">Waiting…</string>
     <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>
-    <string name="auth_restarting_wifi">Restarting Wi-Fi…</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_captcha_result">CAPTCHA entered: %s</string>
     <string name="auth_captcha_dialog">Please solve the CAPTCHA</string>
@@ -132,10 +129,8 @@
     <string name="auth_auth_form">Sending login form</string>
     <string name="auth_connected">Connection established :3</string>
     <string name="auth_request">Sending request</string>
-    <string name="auth_provider" formatted="false">Provider: %s</string>
 
     <string name="auth_error_connection">Internet connection is not available</string>
-    <string name="auth_error_network">Network is not available</string>
     <string name="auth_error_redirect">redirect is not received</string>
     <string name="auth_error_auth_page">login page is not received</string>
     <string name="auth_error_not_registered">
@@ -171,10 +166,6 @@
 
     <string name="ip_wait">Waiting for IP address…</string>
     <string name="ip_wait_result" formatted="false">IP address%s assigned within %d seconds</string>
-
-    <string name="chooser_ssid">Identifying the network</string>
-    <string name="chooser_searching">Looking up algorithm for the network %s</string>
-    <string name="chooser_not_supported">You are not connected to any of the supported networks</string>
 
     <string name="contirutor_revertron" translatable="false">Revertron</string>
     <string name="contributor_revertron_summary">Numerous algorithm recommendations</string>
