@@ -25,11 +25,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
-import pw.thedrhax.mosmetro.authenticator.Authenticator;
-import pw.thedrhax.mosmetro.authenticator.Chooser;
+import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.Util;
@@ -54,7 +54,7 @@ public class ConnectionService extends IntentService {
 
     // Authenticator
     private Logger logger;
-    private Authenticator connection;
+    private Provider provider;
 
     public ConnectionService () {
 		super("ConnectionService");
@@ -95,7 +95,7 @@ public class ConnectionService extends IntentService {
         logger = new Logger();
     }
 
-    private void notify (Authenticator.RESULT result) {
+    private void notify (Provider.RESULT result) {
         if (!running) return;
 
         switch (result) {
@@ -161,7 +161,7 @@ public class ConnectionService extends IntentService {
                         .show();
                 return;
 
-            case UNSUPPORTED:
+            case NOT_SUPPORTED:
                 notification
                         .setTitle(getString(R.string.notification_unsupported))
                         .setText(getString(R.string.notification_error_log))
@@ -216,12 +216,12 @@ public class ConnectionService extends IntentService {
         return true;
     }
 
-    private Authenticator.RESULT connect() {
-        Authenticator.RESULT result;
+    private Provider.RESULT connect() {
+        Provider.RESULT result;
         int count = 0;
 
         do {
-            if (!waitForIP()) return Authenticator.RESULT.ERROR;
+            if (!waitForIP()) return Provider.RESULT.ERROR;
 
             if (count > 0) {
                 notify_progress
@@ -252,19 +252,19 @@ public class ConnectionService extends IntentService {
                     ))
                     .show();
 
-            result = connection.start();
+            result = provider.start();
 
             if (!wifi.isConnected(SSID)) {
                 logger.log(String.format(
                         getString(R.string.error),
                         getString(R.string.auth_error_network_disconnected)
                 ));
-                result = Authenticator.RESULT.ERROR; break;
+                result = Provider.RESULT.ERROR; break;
             }
 
-            if (result == Authenticator.RESULT.NOT_REGISTERED) break;
-            if (result == Authenticator.RESULT.CAPTCHA) break;
-        } while (++count < pref_retry_count && running && result == Authenticator.RESULT.ERROR);
+            if (result == Provider.RESULT.NOT_REGISTERED) break;
+            if (result == Provider.RESULT.CAPTCHA) break;
+        } while (++count < pref_retry_count && running && result == Provider.RESULT.ERROR);
 
         return result;
     }
@@ -276,27 +276,23 @@ public class ConnectionService extends IntentService {
             return START_NOT_STICKY;
         }
 
-        if (intent.hasExtra("SSID")) {
-            SSID = intent.getStringExtra("SSID");
-            from_shortcut = true;
-        }
+        from_shortcut = intent.hasExtra("force") && intent.getBooleanExtra("force", false);
+        SSID = wifi.getSSID(intent);
 
-        if (SSID.isEmpty() || WifiUtils.UNKNOWN_SSID.equals(SSID)) {
-            SSID = wifi.getSSID(intent);
-            from_shortcut = false;
-        }
+        if (!running) // Ignore if service is already running
+            if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
+                onStart(intent, startId);
 
-        if (!(WifiUtils.UNKNOWN_SSID.equals(SSID) || running)) { // Start if SSID has changed
-            onStart(intent, startId);
-        }
         return START_NOT_STICKY;
     }
 
     public void onHandleIntent(Intent intent) {
         running = true;
 
-        connection = new Chooser(this, logger).choose(SSID);
-        if (connection != null) main();
+        if (Provider.isSSIDSupported(SSID) || from_shortcut) {
+            provider = Provider.find(this);
+            main();
+        }
 
         running = false;
     }
@@ -304,8 +300,8 @@ public class ConnectionService extends IntentService {
     private void main() {
         logger.date();
 
-        connection.setLogger(logger);
-        connection.setProgressListener(new Authenticator.ProgressListener() {
+        provider.setLogger(logger);
+        provider.setCallback(new Provider.ICallback() {
             @Override
             public void onProgressUpdate(int progress) {
                 notify_progress
@@ -315,10 +311,7 @@ public class ConnectionService extends IntentService {
         });
 
         notify_progress
-            .setTitle(String.format(
-                getString(R.string.auth_connecting),
-                connection.getSSID()
-            ))
+            .setTitle(String.format(getString(R.string.auth_connecting), SSID))
             .setText(getString(R.string.auth_waiting))
             .setContinuous()
             .show();
@@ -330,7 +323,7 @@ public class ConnectionService extends IntentService {
 
         // Try to connect
         notification.hide();
-        Authenticator.RESULT result = connect();
+        Provider.RESULT result = connect();
         notify_progress.hide();
 
         logger.date();
@@ -338,8 +331,8 @@ public class ConnectionService extends IntentService {
         // Notify user if still connected to Wi-Fi
         if (wifi.isConnected(SSID)) notify(result);
 
-        if (from_shortcut || !(result == Authenticator.RESULT.ALREADY_CONNECTED
-                || result == Authenticator.RESULT.CONNECTED)) return;
+        if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
+                || result == Provider.RESULT.CONNECTED)) return;
 
         // Wait while internet connection is available
         int count = 0;
@@ -351,7 +344,7 @@ public class ConnectionService extends IntentService {
             // Check internet connection each 10 seconds
             if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
                 count = 0;
-                if (connection.isConnected() != Authenticator.CHECK.CONNECTED)
+                if (!provider.isConnected())
                     break;
             }
         }
@@ -360,13 +353,13 @@ public class ConnectionService extends IntentService {
 
         // Try to reconnect the Wi-Fi network
         if (settings.getBoolean("pref_wifi_reconnect", false))
-            wifi.reconnect(connection.getSSID());
+            wifi.reconnect(SSID);
 	}
 	
 	@Override
     public void onDestroy() {
         SSID = WifiUtils.UNKNOWN_SSID;
-        if (connection != null) connection.stop();
+        if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
     }

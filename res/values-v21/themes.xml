@@ -4,4 +4,5 @@
         <item name="android:colorPrimary">#212121</item>
         <item name="android:colorPrimaryDark">#000000</item>
     </style>
+    <style name="AppBaseTheme.Dialog" parent="@android:style/Theme.Material.Light.Dialog" />
 </resources>

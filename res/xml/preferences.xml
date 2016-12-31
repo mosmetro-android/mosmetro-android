@@ -6,27 +6,12 @@
         android:summary="@string/pref_autoconnect_summary"
         android:defaultValue="true" />
 
-    <PreferenceCategory
-        android:title="@string/manual_connection">
+    <Preference
+        android:title="@string/manual_connection"
+        android:summary="@string/manual_connection_summary">
 
-        <Preference
-            android:title="@string/manual_connection_mosmetro"
-            android:summary="@string/manual_connection_mosmetro_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
-                <extra android:name="SSID" android:value="MosMetro_Free" />
-            </intent>
-        </Preference>
-
-        <Preference
-            android:title="@string/manual_connection_mosgortrans"
-            android:summary="@string/manual_connection_mosgortrans_summary">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
-                <extra android:name="SSID" android:value="MosGorTrans_Free" />
-            </intent>
-        </Preference>
-    </PreferenceCategory>
+        <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity" />
+    </Preference>
 
     <PreferenceCategory
         android:title="@string/pref_category_main">

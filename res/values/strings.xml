@@ -10,12 +10,13 @@
 
     <string name="retry">Try again</string>
     <string name="connect">Connect</string>
+    <string name="in_background">In background</string>
     <string name="send">Send</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="install">Install</string>
-    <string name="manual_connection">Connect manually</string>
+
     <string name="ignore_short">Ignore</string>
     <string name="ignore">Ignore</string>
     <string name="later">Later</string>
@@ -103,18 +104,15 @@
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
 
-    <string name="manual_connection_mosmetro">Metro, MCC, Aeroexpress, Airports</string>
-    <string name="manual_connection_mosmetro_summary" translatable="false">MosMetro_Free, AURA, MT_FREE, Air_WiFi_Free</string>
-    <string name="manual_connection_mosgortrans">Bus, Tram etc.</string>
-    <string name="manual_connection_mosgortrans_summary" translatable="false">MosGorTrans_Free, MT_FREE</string>
+    <string name="manual_connection">Manual connection</string>
+    <string name="manual_connection_summary">You can connect here if this application is ignoring Wi-Fi state</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
 
-    <string name="shortcut_mode">Select connection mode</string>
-    <string name="shortcut_automatic">Automatically identify the network</string>
     <string name="shortcut_background">Connect in the background</string>
+    <string name="shortcut_force">Even if network name is unknown</string>
 
     <string name="auth_connecting" formatted="false">Connecting to %s</string>
-    <string name="auth_version" formatted="false">Algorithm version: %d</string>
+    <string name="algorithm_name" formatted="false">Algorithm name: %s</string>
     <string name="auth_waiting">Waiting…</string>
     <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>

@@ -51,7 +51,7 @@
         <activity android:icon="@drawable/ic_launcher"
                   android:label="@string/manual_connection_shortcut"
                   android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"
-                  android:theme="@style/AppBaseTheme">
+                  android:theme="@style/AppBaseTheme.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />

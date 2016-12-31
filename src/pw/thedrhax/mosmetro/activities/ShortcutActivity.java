@@ -25,16 +25,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.util.WifiUtils;
 
 public class ShortcutActivity extends Activity {
-    private String SSID = WifiUtils.UNKNOWN_SSID;
+    private CheckBox check_background;
+    private CheckBox check_force;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shortcut_activity);
+
+        check_background = (CheckBox)findViewById(R.id.check_background);
+        check_force = (CheckBox)findViewById(R.id.check_force);
     }
 
     @Override
@@ -57,32 +61,23 @@ public class ShortcutActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void network_selected (View view) {
-        switch (view.getId()) {
-            case R.id.radio_auto:
-                break;
-
-            case R.id.radio_mosmetro:
-                SSID = "MosMetro_Free"; break;
-
-            case R.id.radio_mosgortrans:
-                SSID = "MosGorTrans_Free"; break;
-        }
+    public void check_background(View view) {
+        check_force.setEnabled(check_background.isChecked());
     }
 
-    public void button_save (View view) {
+    public void button_save(View view) {
         Intent result = new Intent();
 
-        Boolean background = ((CheckBox)findViewById(R.id.check_background)).isChecked();
+        boolean background = check_background.isChecked();
 
         Intent shortcut_intent = new Intent(
                 this, background ? ConnectionServiceActivity.class : DebugActivity.class
-        ).putExtra("SSID", SSID);
+        ).putExtra("force", check_force.isChecked());
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_NAME,
-                WifiUtils.UNKNOWN_SSID.equals(SSID) ? getString(R.string.connect) : SSID
+                background ? getString(R.string.in_background) : getString(R.string.connect)
         );
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,

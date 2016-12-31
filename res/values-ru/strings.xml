@@ -9,12 +9,12 @@
 
     <string name="retry">Попробовать снова</string>
     <string name="connect">Подключиться</string>
+    <string name="in_background">В фоне</string>
     <string name="send">Отправить</string>
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
     <string name="install">Установить</string>
-    <string name="manual_connection">Ручное подключение</string>
     <string name="ignore_short">Игнор.</string>
     <string name="ignore">Игнорировать</string>
     <string name="later">Позже</string>
@@ -96,16 +96,15 @@
     <string name="developer_google_play">Страница приложения в Google Play</string>
     <string name="developer_vkontakte">Сообщество ВКонтакте</string>
 
-    <string name="manual_connection_mosmetro">Метро, МЦК, Аэроэкспресс, Аэропорты</string>
-    <string name="manual_connection_mosgortrans">Автобусы, Трамваи и т.д.</string>
+    <string name="manual_connection">Ручное подключение</string>
+    <string name="manual_connection_summary">Вы можете подключиться здесь, если приложение игнорирует состояние Wi-Fi</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
 
-    <string name="shortcut_mode">Выберите режим подключения</string>
-    <string name="shortcut_automatic">Автоматическое определение названия сети</string>
     <string name="shortcut_background">Подключаться в фоне</string>
+    <string name="shortcut_force">Даже если название сети неизвестно</string>
 
     <string name="auth_connecting" formatted="false">Подключение к сети %s</string>
-    <string name="auth_version" formatted="false">Версия алгоритма: %d</string>
+    <string name="algorithm_name" formatted="false">Название алгоритма: %s</string>
     <string name="auth_waiting">Ожидание…</string>
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>

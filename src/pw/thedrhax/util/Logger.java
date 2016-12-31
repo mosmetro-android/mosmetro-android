@@ -41,6 +41,11 @@ public class Logger implements Parcelable {
         }
     }
 
+    public interface ILogger<T> {
+        T setLogger(Logger logger);
+        Logger getLogger();
+    }
+
     /*
      * Inputs
      */

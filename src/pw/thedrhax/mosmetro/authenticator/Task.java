@@ -16,19 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.authenticator.networks;
+package pw.thedrhax.mosmetro.authenticator;
 
-import android.content.Context;
+import java.util.HashMap;
 
-public class Air_WiFi_Free extends MosMetro {
-	public static String SSID = "Air_WiFi_Free";
-
-	public Air_WiFi_Free(Context context) {
-		super(context);
-	}
-	
-	@Override
-	public String getSSID() {
-		return "Air_WiFi_Free";
-	}
+public interface Task {
+    /**
+     * Main body of the Task.
+     * @param vars  Mutable Map for sending and receiving data between Tasks.
+     * @return      True on success; false on unrecoverable exception.
+     */
+    boolean run(HashMap<String,Object> vars);
 }

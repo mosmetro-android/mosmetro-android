@@ -28,13 +28,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.Authenticator;
-import pw.thedrhax.mosmetro.authenticator.Chooser;
-import pw.thedrhax.mosmetro.services.ConnectionService;
+import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
-import pw.thedrhax.util.*;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -43,9 +41,6 @@ public class DebugActivity extends Activity {
     // Logger
     private Logger logger;
     private boolean show_debug = false;
-
-    // Settings
-    private String SSID = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -63,16 +58,6 @@ public class DebugActivity extends Activity {
             logger.merge((Logger)bundle.getParcelable("logger"));
             if (!getIntent().getBooleanExtra("captcha", false))
                 return;
-        } catch (NullPointerException ignored) {}
-
-        try {
-            // Intent from the SettingsActivity or from shortcuts
-            Intent intent = getIntent();
-            if (intent.hasExtra("SSID")) {
-                SSID = intent.getStringExtra("SSID");
-                if (SSID.isEmpty() || WifiUtils.UNKNOWN_SSID.equals(SSID))
-                    SSID = new WifiUtils(this).getSSID();
-            }
         } catch (NullPointerException ignored) {}
 
         button_connect(null);
@@ -142,7 +127,7 @@ public class DebugActivity extends Activity {
      * Run manual connection in background thread
      */
 
-    private class AuthTask extends AsyncTask<String, String, Void> {
+    private class AuthTask extends AsyncTask<Void, String, Void> {
         private Logger local_logger;
 
         public AuthTask() {
@@ -156,19 +141,11 @@ public class DebugActivity extends Activity {
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(Void... params) {
             local_logger.date();
-
-            Chooser chooser = new Chooser(DebugActivity.this, local_logger);
-
-            Authenticator connection = chooser.choose(params[0]);
-            if (connection == null) return null;
-
-            connection.setLogger(local_logger);
-            connection.start();
-
+            Provider provider = Provider.find(DebugActivity.this).setLogger(local_logger);
+            provider.start();
             local_logger.date();
-
             return null;
         }
 
@@ -188,7 +165,7 @@ public class DebugActivity extends Activity {
             task = new AuthTask();
 
         if (task.getStatus() != AsyncTask.Status.RUNNING)
-            task.execute(SSID);
+            task.execute();
     }
 
     // Handle debug log checkbox
