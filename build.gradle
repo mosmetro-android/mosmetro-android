@@ -19,6 +19,8 @@ android {
         targetSdkVersion 25
         versionCode 51
         versionName "1.7.3"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     if (project.hasProperty("RELEASE_STORE_FILE")) {
@@ -68,4 +70,5 @@ dependencies {
     }
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.android.support.test:runner:0.5'
 }
