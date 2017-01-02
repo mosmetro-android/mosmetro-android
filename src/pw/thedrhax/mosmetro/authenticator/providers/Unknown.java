@@ -25,7 +25,6 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.Client;
 
 /**
  * The Unknown class is used to tell user that this provider is not
@@ -64,10 +63,5 @@ public class Unknown extends Provider {
                 return false;
             }
         });
-    }
-
-    @Override
-    public boolean match(Client client) {
-        return true;
     }
 }

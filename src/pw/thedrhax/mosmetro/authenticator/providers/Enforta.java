@@ -56,8 +56,13 @@ public class Enforta extends Provider {
         });
     }
 
-    @Override
-    public boolean match(Client client) {
+    /**
+     * Checks if current network is supported by this Provider implementation.
+     * @param client    Client instance to get the information from. Provider.find()
+     *                  will execute one request to be analyzed by this method.
+     * @return          True if response matches this Provider implementation.
+     */
+    public static boolean match(Client client) {
         try {
             return client.parseMetaRedirect().contains("enforta");
         } catch (Exception ex) {

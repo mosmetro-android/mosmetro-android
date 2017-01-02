@@ -320,10 +320,15 @@ public class MosMetroV2 extends Provider {
         return false;
     }
 
-    @Override
-    public boolean match(Client client) {
+    /**
+     * Checks if current network is supported by this Provider implementation.
+     * @param client    Client instance to get the information from. Provider.find()
+     *                  will execute one request to be analyzed by this method.
+     * @return          True if response matches this Provider implementation.
+     */
+    public static boolean match(Client client) {
         try {
-            redirect = client.parseMetaRedirect();
+            String redirect = client.parseMetaRedirect();
             return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
         } catch (Exception ex) {
             return false;

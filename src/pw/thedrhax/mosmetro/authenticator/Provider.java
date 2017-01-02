@@ -55,6 +55,11 @@ import pw.thedrhax.util.WifiUtils;
 public abstract class Provider extends LinkedList<Task> implements Logger.ILogger<Provider> {
     /**
      * List of supported Providers
+     *
+     * Every Provider in this list must implement the
+     *  "public static boolean match(Client)"
+     * method to be detected by Provider.find().
+     * @see MosMetroV1
      */
     private static final List<Class<? extends Provider>> PROVIDERS =
             new LinkedList<Class<? extends Provider>>() {{
@@ -98,10 +103,12 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     @NonNull public static Provider find(Context context, Client client) {
         for (Class<? extends Provider> provider_class : PROVIDERS) {
             try {
-                Provider provider = provider_class
-                        .getConstructor(Context.class)
-                        .newInstance(context);
-                if (provider.match(client)) return provider;
+                if ((Boolean)provider_class
+                        .getMethod("match", Client.class)
+                        .invoke(null, client))
+                    return provider_class
+                            .getConstructor(Context.class)
+                            .newInstance(context);
             } catch (Exception ignored) {}
         }
         return new Unknown(context);
@@ -133,15 +140,6 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
         // TODO: Issue #70
         return false;
     }
-
-    /**
-     * Checks if current network is supported by this IProvider implementation.
-     * @param client    Client instance to get the information from. Authenticator
-     *                  will execute one request to be analyzed by this method.
-     * @return          True if current network belongs to this Provider; otherwise,
-     *                  false is returned.
-     */
-    public abstract boolean match(Client client);
 
     /**
      * Main constructor
