@@ -21,6 +21,7 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,7 +61,6 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 add(MosMetroV1.class);
                 add(MosMetroV2.class);
                 add(Enforta.class);
-                add(Unknown.class); // MUST be at the end of this list
             }};
 
     /**
@@ -95,7 +95,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      *
      * @see Client
      */
-    public static Provider find(Context context, Client client) {
+    @NonNull public static Provider find(Context context, Client client) {
         for (Class<? extends Provider> provider_class : PROVIDERS) {
             try {
                 Provider provider = provider_class
@@ -104,8 +104,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 if (provider.match(client)) return provider;
             } catch (Exception ignored) {}
         }
-
-        return null;
+        return new Unknown(context);
     }
 
     /**
