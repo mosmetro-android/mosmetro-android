@@ -71,7 +71,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     /**
      * List of supported SSIDs
      */
-    private static final String[] SSIDs = {
+    public static final String[] SSIDs = {
             "MosMetro_Free",
             "AURA",
             "MosGorTrans_Free",
