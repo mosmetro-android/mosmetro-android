@@ -188,7 +188,7 @@
     <string name="contributor_Alexander_Krotov_summary">First Pull-request, Gradle migration, English translation</string>
     <string name="contributor_Alexander_Krotov_link" translatable="false">https://github.com/ilabdsf</string>
 
-    <string name="action_donate">Support the project</string>
+    <string name="action_donate">Support the project (optional)</string>
     <string name="action_donate_cond">Support</string>
 
     <string-array name="donate_options">
@@ -197,6 +197,7 @@
         <item>Help with development (GitHub)</item>
         <item>Join the community (VK)</item>
         <item>Give feedback (Google Play)</item>
+        <item>Cancel</item>
     </string-array>
     <string name="donate_webmoney_data" translatable="false">R401534033407</string>
     <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>

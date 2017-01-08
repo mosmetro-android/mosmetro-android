@@ -173,7 +173,7 @@
     <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>
     <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
 
-    <string name="action_donate">Поддержать проект</string>
+    <string name="action_donate">Поддержать проект (необязательно)</string>
     <string name="action_donate_cond">Поддержать</string>
 
     <string-array name="donate_options">
@@ -182,6 +182,7 @@
         <item>Помочь в разработке (GitHub)</item>
         <item>Вступить в группу (ВКонтакте)</item>
         <item>Оставить отзыв (Google Play)</item>
+        <item>Отмена</item>
     </string-array>
     <string name="pref_category_internet">Проверка соединения</string>
     <string name="pref_category_wifi">Управление Wi-Fi</string>
