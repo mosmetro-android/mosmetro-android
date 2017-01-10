@@ -22,8 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,17 +35,16 @@ import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.Version;
 
 public class NewsChecker {
-    private Context context;
-    private SharedPreferences settings;
+    private final Context context;
+    private final SharedPreferences settings;
 
-    public NewsChecker(Context context) {
+    public NewsChecker(@NonNull Context context) {
         this.context = context;
-
-        settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void check() {
-        String content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");;
+        String content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");
 
         JSONObject data;
         try {
@@ -67,7 +66,7 @@ public class NewsChecker {
             return;
         }
 
-        if (max_version < new Version(context).getVersionCode())
+        if (max_version < Version.getVersionCode())
             return;
 
         if (settings.getLong("pref_notify_news_id", 0) >= id)

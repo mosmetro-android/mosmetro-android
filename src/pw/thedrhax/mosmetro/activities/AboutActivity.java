@@ -40,10 +40,9 @@ public class AboutActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Show back button in menu
-        try {
+        if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ignored) {}
-
+        }
         return true;
     }
 
@@ -73,7 +72,7 @@ public class AboutActivity extends Activity {
         Preference app_name = settings.findPreference("app_name");
         app_name.setSummary(String.format(
                 getString(R.string.version),
-                new Version(this).getFormattedVersion())
+                Version.getFormattedVersion())
         );
     }
 }

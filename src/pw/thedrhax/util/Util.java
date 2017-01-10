@@ -20,7 +20,9 @@ package pw.thedrhax.util;
 
 import android.content.SharedPreferences;
 
-public class Util {
+public final class Util {
+    private Util() {
+    }
 
     // TODO: Store Integers instead of Strings in SharedPreferences
     public static int getIntPreference (SharedPreferences settings, String name, int def_value) {

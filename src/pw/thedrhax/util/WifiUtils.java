@@ -24,13 +24,14 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 public class WifiUtils {
     public static final String UNKNOWN_SSID = "<unknown ssid>";
 
-    private WifiManager manager;
+    private final WifiManager manager;
 
-    public WifiUtils(Context context) {
+    public WifiUtils(@NonNull Context context) {
         this.manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 

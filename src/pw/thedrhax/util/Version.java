@@ -18,30 +18,23 @@
 
 package pw.thedrhax.util;
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 
-public class Version {
-    private PackageInfo pInfo = null;
+import pw.thedrhax.mosmetro.BuildConfig;
 
-    public Version (Context context) {
-        try {
-            pInfo = context
-                    .getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException ignored) {}
+public final class Version {
+    private Version() {
     }
 
-    public String getVersionName() {
-        return (pInfo != null) ? pInfo.versionName : "unknown";
+    @NonNull private static String getVersionName() {
+        return BuildConfig.VERSION_NAME;
     }
 
-    public int getVersionCode() {
-        return (pInfo != null) ? pInfo.versionCode : Integer.MAX_VALUE;
+    public static int getVersionCode() {
+        return BuildConfig.VERSION_CODE;
     }
 
-    public String getFormattedVersion() {
+    @NonNull public static String getFormattedVersion() {
         return getVersionName() + "-" + getVersionCode();
     }
 }

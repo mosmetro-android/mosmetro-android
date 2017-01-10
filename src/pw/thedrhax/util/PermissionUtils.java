@@ -24,39 +24,47 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 
-public class PermissionUtils {
-    private Context context;
-    private PowerManager pm;
+import java.lang.ref.WeakReference;
 
-    public PermissionUtils(Context context) {
-        this.context = context;
+import pw.thedrhax.mosmetro.BuildConfig;
+
+public final class PermissionUtils {
+    private final WeakReference<Context> context;
+    private final PowerManager pm;
+
+    public PermissionUtils(@NonNull Context context) {
+        this.context = new WeakReference<>(context);
         pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     }
 
-    /*
-     * Battery saving permissions
-     */
-
+    /** Battery saving permissions. */
     public boolean isBatterySavingIgnored() {
         if (Build.VERSION.SDK_INT >= 23)
-            return pm.isIgnoringBatteryOptimizations(context.getPackageName());
+            return pm.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID);
         else
             return true;
     }
 
     public void requestBatterySavingIgnore() {
-        if (Build.VERSION.SDK_INT >= 23)
-            context.startActivity(new Intent()
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (context.get() != null) {
+                context.get().startActivity(new Intent()
                     .setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                    .setData(Uri.parse("package:" + context.getPackageName()))
-            );
+                    .setData(Uri.parse("package:" + context.get().getPackageName()))
+                );
+            }
+        }
     }
 
     public void openBatterySavingSettings() {
-        if (Build.VERSION.SDK_INT >= 23)
-            context.startActivity(new Intent()
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (context.get() != null) {
+                context.get().startActivity(new Intent()
                     .setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-            );
+                );
+            }
+        }
     }
 }

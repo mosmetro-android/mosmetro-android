@@ -26,15 +26,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
-import pw.thedrhax.util.Version;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
+import pw.thedrhax.util.Version;
 
 public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     // Info from the app
@@ -84,7 +86,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             return null;
         }
 
-        branches = new LinkedList<Branch>();
+        branches = new LinkedList<>();
         for (Object key : branches_json.keySet()) {
             Branch branch = new Branch((String)key, (JSONObject)branches_json.get(key));
             if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
@@ -184,7 +186,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         private int getVersion() {
             return by_build ? settings.getInt("pref_updater_build", 0)
-                            : new Version(context).getVersionCode();
+                            : Version.getVersionCode();
         }
 
         public boolean hasUpdate() {
