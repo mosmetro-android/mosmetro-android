@@ -196,4 +196,6 @@
     <string name="dialog_battery_saving">Energy saving</string>
     <string name="dialog_battery_saving_summary">Starting with Android 6.0, you need to add this application to the energy saving whitelist, so that it can access the network in the background. Otherwise, background process may completely freeze due to the new energy saving policy.</string>
 
+    <string name="receiver_auto_connect">Auto connect</string>
+
 </resources>
