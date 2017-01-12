@@ -57,7 +57,8 @@
 
         <activity
             android:name=".activities.ShortcutActivity"
-            android:label="@string/manual_connection_shortcut">
+            android:label="@string/manual_connection_shortcut"
+            android:theme="@style/AppBaseTheme">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
                 <category android:name="android.intent.category.DEFAULT"/>
