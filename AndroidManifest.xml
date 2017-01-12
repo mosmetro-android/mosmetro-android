@@ -48,7 +48,7 @@
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay"
-            tools:targetApi="lollipop">
+            tools:ignore="UnusedAttribute">
             <intent-filter>
                 <action android:name="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
