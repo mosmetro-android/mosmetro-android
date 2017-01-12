@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -63,5 +64,9 @@ public class Unknown extends Provider {
                 return false;
             }
         });
+    }
+
+    @NonNull @Override public String getName() {
+        return "Unknown";
     }
 }

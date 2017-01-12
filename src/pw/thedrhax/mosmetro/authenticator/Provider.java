@@ -180,7 +180,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      * Get Provider's short description.
      * @return Provider's name.
      */
-    public String getName() {
+    @NonNull public String getName() {
         return this.getClass().getSimpleName();
     }
 

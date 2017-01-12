@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import org.jsoup.select.Elements;
 
@@ -188,6 +189,10 @@ public class MosMetroV1 extends Provider {
 
         // Redirect found => not connected
         return false;
+    }
+
+    @NonNull @Override public String getName() {
+        return "MosMetroV1";
     }
 
     /**
