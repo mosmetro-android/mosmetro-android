@@ -16,12 +16,12 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
+        android:theme="@style/AppBaseTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
             android:name=".activities.DebugActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/manual_connection"
-            android:theme="@style/AppBaseTheme">
+            android:label="@string/manual_connection">
             <intent-filter>
                 <action android:name="pw.thedrhax.mosmetro.activities.DebugActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -31,9 +31,7 @@
         <activity
             android:name=".activities.SettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            android:theme="@style/AppBaseTheme">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -43,9 +41,7 @@
         <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/about"
-            android:theme="@style/AppBaseTheme"/>
+            android:label="@string/about"/>
 
         <activity
             android:name=".activities.ConnectionServiceActivity"
@@ -61,7 +57,6 @@
 
         <activity
             android:name=".activities.ShortcutActivity"
-            android:icon="@drawable/ic_launcher"
             android:label="@string/manual_connection_shortcut"
             android:theme="@style/AppBaseTheme.Dialog">
             <intent-filter>
