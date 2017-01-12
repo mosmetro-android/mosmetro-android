@@ -158,7 +158,11 @@ public class ConnectionService extends IntentService {
                                     .putExtra("logger", logger)
                                     .putExtra("captcha", true)
                         )
+                        .setId(2)
                         .show();
+                        
+                notification.setId(0); // Reset ID to default
+                
                 return;
 
             case NOT_SUPPORTED:
@@ -315,11 +319,6 @@ public class ConnectionService extends IntentService {
             .setText(getString(R.string.auth_waiting))
             .setContinuous()
             .show();
-
-        try {
-            if (!from_shortcut)
-                Thread.sleep(5000);
-        } catch (InterruptedException ignored) {}
 
         // Try to connect
         notification.hide();
