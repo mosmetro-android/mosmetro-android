@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
@@ -326,11 +327,6 @@ public class ConnectionService extends IntentService {
             .setText(getString(R.string.auth_waiting))
             .setContinuous()
             .show();
-
-        try {
-            if (!from_shortcut)
-                Thread.sleep(5000);
-        } catch (InterruptedException ignored) {}
 
         // Try to connect
         notification.hide();
