@@ -158,7 +158,11 @@ public class ConnectionService extends IntentService {
                                     .putExtra("logger", logger)
                                     .putExtra("captcha", true)
                         )
+                        .setId(2)
                         .show();
+                        
+                notification.setId(0); // Reset ID to default
+                
                 return;
 
             case UNSUPPORTED:
