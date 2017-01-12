@@ -18,15 +18,20 @@
 
 package pw.thedrhax.util;
 
-import android.content.SharedPreferences;
+import android.content.Context;
+import android.preference.PreferenceManager;
 
 public class Util {
 
     // TODO: Store Integers instead of Strings in SharedPreferences
-    public static int getIntPreference (SharedPreferences settings, String name, int def_value) {
+    public static int getIntPreference (Context context, String name, int def_value) {
         int result = def_value;
         try {
-            result = Integer.parseInt(settings.getString(name, Integer.valueOf(def_value).toString()));
+            result = Integer.parseInt(
+                    PreferenceManager
+                            .getDefaultSharedPreferences(context)
+                            .getString(name, Integer.valueOf(def_value).toString())
+            );
         } catch (NumberFormatException ignored) {}
         return result;
     }

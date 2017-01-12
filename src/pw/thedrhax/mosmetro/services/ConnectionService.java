@@ -71,9 +71,9 @@ public class ConnectionService extends IntentService {
             }
         };
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
-        pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
-        pref_ip_wait = Util.getIntPreference(settings, "pref_ip_wait", 30);
+        pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
+        pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
+        pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
         PendingIntent delete_intent = PendingIntent.getService(
