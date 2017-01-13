@@ -28,6 +28,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 public final class AndroidHacks {
+    private AndroidHacks() {}
 
     // Bind current process to a specific network
     // Refactored answer from Stack Overflow: http://stackoverflow.com/a/28664841

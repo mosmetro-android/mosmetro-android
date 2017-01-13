@@ -22,6 +22,7 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 
 public final class Util {
+    private Util() {}
 
     // TODO: Store Integers instead of Strings in SharedPreferences
     public static int getIntPreference (Context context, String name, int def_value) {

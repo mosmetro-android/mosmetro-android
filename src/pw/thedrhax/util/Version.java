@@ -30,6 +30,8 @@ import pw.thedrhax.mosmetro.BuildConfig;
  * @author Savelii Zagurskii <saveliyzagurskiy@gmail.com>
  */
 public final class Version {
+    private Version() {}
+
     @NonNull private static String getVersionName() {
         return BuildConfig.VERSION_NAME;
     }
