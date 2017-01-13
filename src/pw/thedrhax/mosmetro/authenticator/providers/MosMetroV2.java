@@ -412,7 +412,9 @@ public class MosMetroV2 extends Provider {
                         @Override
                         protected Bitmap doInBackground(Void... voids) {
                             try {
-                                return BitmapFactory.decodeStream(client.getInputStream(url));
+                                return BitmapFactory.decodeStream(
+                                        client.getInputStream(url, pref_retry_count)
+                                );
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 logger.log(Logger.LEVEL.DEBUG, ex);

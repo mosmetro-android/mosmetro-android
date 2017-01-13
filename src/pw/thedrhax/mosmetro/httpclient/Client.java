@@ -81,6 +81,17 @@ public abstract class Client {
     public Client post(String link, Map<String,String> params, int retries) throws Exception {
         return requestWithRetries(link, params, retries, METHOD_POST);
     }
+    public InputStream getInputStream(String link, int retries) throws Exception {
+        Exception last_ex = null;
+        for (int i = 0; i < retries; i++) {
+            try {
+                return getInputStream(link);
+            } catch (Exception ex) {
+                last_ex = ex;
+            }
+        }
+        throw last_ex;
+    }
 
     private Client requestWithRetries(String link, Map<String,String> params,
                                       int retries, int method) throws Exception {

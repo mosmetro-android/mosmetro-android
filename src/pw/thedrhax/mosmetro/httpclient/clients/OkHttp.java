@@ -18,11 +18,17 @@
 
 package pw.thedrhax.mosmetro.httpclient.clients;
 
-import okhttp3.*;
+import org.jsoup.Jsoup;
 
-import org.jsoup.*;
-
-import pw.thedrhax.mosmetro.httpclient.Client;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -31,17 +37,15 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-
-import java.security.cert.CertificateException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import pw.thedrhax.mosmetro.httpclient.Client;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
@@ -195,6 +199,10 @@ public class OkHttp extends Client {
         }
 
         Response response = client.newCall(builder.build()).execute();
+
+        if (response.code() != 200)
+            throw new Exception("Empty response: " + code);
+
         return response.body().byteStream();
     }
 
