@@ -20,13 +20,11 @@ package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.util.Version;
 
 public class AboutActivity extends Activity {
     public static class AboutFragment extends PreferenceFragment {
@@ -68,12 +66,5 @@ public class AboutActivity extends Activity {
                 .replace(android.R.id.content, settings)
                 .commit();
         getFragmentManager().executePendingTransactions();
-
-        // Add version name and code
-        Preference app_name = settings.findPreference("app_name");
-        app_name.setSummary(String.format(
-                getString(R.string.version),
-                new Version(this).getFormattedVersion())
-        );
     }
 }

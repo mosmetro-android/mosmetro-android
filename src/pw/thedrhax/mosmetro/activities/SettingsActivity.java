@@ -38,12 +38,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.List;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.PermissionUtils;
-
-import java.util.List;
+import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
@@ -122,10 +123,6 @@ public class SettingsActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_donate:
                 donate_dialog();
-                return true;
-
-            case R.id.action_about:
-                startActivity(new Intent(this, AboutActivity.class));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -227,6 +224,13 @@ public class SettingsActivity extends Activity {
         getFragmentManager().executePendingTransactions();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Add version name and code
+        Preference app_name = fragment.findPreference("app_name");
+        app_name.setSummary(String.format(
+                getString(R.string.version),
+                new Version(this).getFormattedVersion())
+        );
 
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =

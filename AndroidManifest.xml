@@ -41,7 +41,12 @@
         <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/about"/>
+            android:label="@string/about">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.AboutActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activities.ConnectionServiceActivity"
