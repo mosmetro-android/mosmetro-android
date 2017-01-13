@@ -18,30 +18,27 @@
 
 package pw.thedrhax.util;
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 
-public class Version {
-    private PackageInfo pInfo = null;
+import pw.thedrhax.mosmetro.BuildConfig;
 
-    public Version (Context context) {
-        try {
-            pInfo = context
-                    .getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException ignored) {}
+/**
+ * The Version util class is used to get formatted application version
+ * information from build-time constants.
+ *
+ * @author Dmitry Karikh <the.dr.hax@gmail.com>
+ * @author Savelii Zagurskii <saveliyzagurskiy@gmail.com>
+ */
+public final class Version {
+    @NonNull private static String getVersionName() {
+        return BuildConfig.VERSION_NAME;
     }
 
-    public String getVersionName() {
-        return (pInfo != null) ? pInfo.versionName : "unknown";
+    public static int getVersionCode() {
+        return BuildConfig.VERSION_CODE;
     }
 
-    public int getVersionCode() {
-        return (pInfo != null) ? pInfo.versionCode : Integer.MAX_VALUE;
-    }
-
-    public String getFormattedVersion() {
+    @NonNull public static String getFormattedVersion() {
         return getVersionName() + "-" + getVersionCode();
     }
 }

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import org.json.simple.JSONObject;
@@ -67,7 +66,7 @@ public class NewsChecker {
             return;
         }
 
-        if (max_version < new Version(context).getVersionCode())
+        if (max_version < Version.getVersionCode())
             return;
 
         if (settings.getLong("pref_notify_news_id", 0) >= id)

@@ -229,7 +229,7 @@ public class SettingsActivity extends Activity {
         Preference app_name = fragment.findPreference("app_name");
         app_name.setSummary(String.format(
                 getString(R.string.version),
-                new Version(this).getFormattedVersion())
+                Version.getFormattedVersion())
         );
 
         // Start/stop service on pref_autoconnect change

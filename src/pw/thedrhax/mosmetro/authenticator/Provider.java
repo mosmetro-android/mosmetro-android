@@ -223,7 +223,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                         .get(URLs.API_URL_SOURCE, URLs.API_URL_DEFAULT) + URLs.API_REL_STATISTICS;
 
                 Map<String,String> params = new HashMap<>();
-                params.put("version", new Version(context).getFormattedVersion());
+                params.put("version", Version.getFormattedVersion());
                 params.put("success", connected ? "true" : "false");
                 params.put("ssid", new WifiUtils(context).getSSID());
                 params.put("provider", getName());
