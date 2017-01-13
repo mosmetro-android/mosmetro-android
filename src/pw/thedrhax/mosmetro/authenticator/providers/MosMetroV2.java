@@ -26,7 +26,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
@@ -319,10 +318,6 @@ public class MosMetroV2 extends Provider {
 
         // Redirect found => not connected
         return false;
-    }
-
-    @NonNull @Override public String getName() {
-        return "MosMetroV2";
     }
 
     /**
