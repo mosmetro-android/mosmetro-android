@@ -38,10 +38,9 @@ public class AboutActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Show back button in menu
-        try {
+        if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ignored) {}
-
+        }
         return true;
     }
 

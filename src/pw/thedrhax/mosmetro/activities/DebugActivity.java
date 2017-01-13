@@ -84,9 +84,9 @@ public class DebugActivity extends Activity {
         inflater.inflate(R.menu.debug_activity, menu);
 
         // Show back button in menu
-        try {
+        if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ignored) {}
+        }
 
         return true;
     }
