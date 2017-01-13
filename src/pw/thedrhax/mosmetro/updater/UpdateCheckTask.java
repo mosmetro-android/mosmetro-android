@@ -86,7 +86,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             return null;
         }
 
-        branches = new LinkedList<Branch>();
+        branches = new LinkedList<>();
         for (Object key : branches_json.keySet()) {
             Branch branch = new Branch((String)key, (JSONObject)branches_json.get(key));
             if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
