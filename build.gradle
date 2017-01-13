@@ -44,14 +44,22 @@ android {
     }
 
     sourceSets {
+        // Test sources.
+        test.java.srcDir 'src/test/java'
+        androidTest.java.srcDir 'src/androidTest/java'
+
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
+            java {
+                srcDir 'src'
+                exclude 'androidTest/**'
+                exclude 'test/**'
+            }
         }
 
         lintOptions {
@@ -65,10 +73,19 @@ repositories {
 }
 
 dependencies {
+    // Runtime dependencies.
+    compile 'com.android.support:support-annotations:25.1.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'org.jsoup:jsoup:1.8.3'
     compile ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.android.support.test:runner:0.5'
+
+    // Test dependencies.
+    testCompile 'junit:junit:4.12'
+
+    // Needed because there is a conflict in 'com.android.support.test:runner' package.
+    // Here we explicitly define the version for the 'androidTest' sources build variant.
+    androidTestCompile 'com.android.support:support-annotations:25.1.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
 }
