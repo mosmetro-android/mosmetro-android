@@ -38,6 +38,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.mosmetro.updater.URLs;
+import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
@@ -196,6 +197,8 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      * Start the connection sequence defined in child classes.
      */
     public RESULT start() {
+        AndroidHacks.bindToWiFi(context);
+
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
         logger.log(String.format(context.getString(R.string.algorithm_name), getName()));
