@@ -121,8 +121,9 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      */
     public static Provider find(Context context) {
         Client client = new OkHttp().followRedirects(false);
+        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         try {
-            client.get("http://wi-fi.ru", null);
+            client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ignored) {}
         return find(context, client);
     }
@@ -148,7 +149,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     public Provider(Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
-        this.pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
+        this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         this.client = new OkHttp();
     }
 

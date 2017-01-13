@@ -71,9 +71,9 @@ public class ConnectionService extends IntentService {
             }
         };
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        pref_retry_count = Util.getIntPreference(settings, "pref_retry_count", 3);
-        pref_retry_delay = Util.getIntPreference(settings, "pref_retry_delay", 5);
-        pref_ip_wait = Util.getIntPreference(settings, "pref_ip_wait", 30);
+        pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
+        pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
+        pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
         pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
         PendingIntent delete_intent = PendingIntent.getService(
@@ -158,7 +158,11 @@ public class ConnectionService extends IntentService {
                                     .putExtra("logger", logger)
                                     .putExtra("captcha", true)
                         )
+                        .setId(2)
                         .show();
+                        
+                notification.setId(0); // Reset ID to default
+                
                 return;
 
             case NOT_SUPPORTED:
@@ -315,11 +319,6 @@ public class ConnectionService extends IntentService {
             .setText(getString(R.string.auth_waiting))
             .setContinuous()
             .show();
-
-        try {
-            if (!from_shortcut)
-                Thread.sleep(5000);
-        } catch (InterruptedException ignored) {}
 
         // Try to connect
         notification.hide();

@@ -137,4 +137,19 @@
             android:enabled="false" />
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/about">
+
+        <Preference
+            android:key="app_name"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/app_name" />
+
+        <Preference
+            android:title="@string/more_information"
+            android:summary="@string/more_information_summary">
+            <intent android:action="pw.thedrhax.mosmetro.activities.AboutActivity" />
+        </Preference>
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -163,7 +163,7 @@
     <string name="contrinutor_Mikhail_Kuropatkin_summary">Помощь в сборе дампов авторизации</string>
     <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
 
-    <string name="action_donate">Поддержать проект</string>
+    <string name="action_donate">Поддержать проект (необязательно)</string>
     <string name="action_donate_cond">Поддержать</string>
 
     <string-array name="donate_options">
@@ -172,6 +172,7 @@
         <item>Помочь в разработке (GitHub)</item>
         <item>Вступить в группу (ВКонтакте)</item>
         <item>Оставить отзыв (Google Play)</item>
+        <item>Отмена</item>
     </string-array>
     <string name="pref_category_internet">Проверка соединения</string>
     <string name="pref_category_wifi">Управление Wi-Fi</string>
@@ -180,4 +181,7 @@
     <string name="dialog_battery_saving">Энергосбережение</string>
     <string name="dialog_battery_saving_summary">Начиная с Android 6.0, вам необходимо внести это приложение в белый список энергосбережения, чтобы оно могло получать доступ к сети в фоновом режиме. В противном случае возможно зависание фонового процесса из-за новой политики энергосбережения.</string>
 
+    <string name="receiver_auto_connect">Автоподключение</string>
+    <string name="more_information">Больше информации</string>
+    <string name="more_information_summary">Ссылки, сообщества, благодарности</string>
 </resources>
