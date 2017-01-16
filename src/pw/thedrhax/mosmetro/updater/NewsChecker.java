@@ -29,6 +29,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Notification;
@@ -44,7 +45,7 @@ public class NewsChecker {
     }
 
     public void check() {
-        String content = new CachedRetriever(context).get(URLs.NEWS_URL, 30*60, "{}");
+        String content = new CachedRetriever(context).get(BuildConfig.NEWS_URL, 30*60, "{}");
 
         JSONObject data;
         try {
