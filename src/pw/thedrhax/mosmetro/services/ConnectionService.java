@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
 import pw.thedrhax.mosmetro.R;
@@ -188,9 +189,7 @@ public class ConnectionService extends IntentService {
                 .show();
 
         while (wifi.getIP() == 0 && running) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {}
+            SystemClock.sleep(1000);
 
             if (!wifi.isConnected(SSID)) {
                 logger.log(String.format(
@@ -240,9 +239,7 @@ public class ConnectionService extends IntentService {
                         .setContinuous()
                         .show();
 
-                try {
-                    Thread.sleep(pref_retry_delay * 1000);
-                } catch (InterruptedException ignored) {}
+                SystemClock.sleep(pref_retry_delay * 1000);
             }
 
             notify_progress
@@ -336,9 +333,7 @@ public class ConnectionService extends IntentService {
         // Wait while internet connection is available
         int count = 0;
         while (wifi.isConnected(SSID)) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {}
+            SystemClock.sleep(1000);
 
             // Check internet connection each 10 seconds
             if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {

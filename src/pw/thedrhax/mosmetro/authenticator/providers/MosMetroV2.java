@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
@@ -367,9 +368,7 @@ public class MosMetroV2 extends Provider {
                 ((Activity)context).runOnUiThread(this);
 
                 while (locked && !stopped) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ignored) {}
+                    SystemClock.sleep(100);
                 }
             }
 
