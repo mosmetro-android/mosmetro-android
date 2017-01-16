@@ -174,6 +174,7 @@ public class MosMetroV2 extends Provider {
                         if (code == 200 && isConnected()) {
                             logger.log(context.getString(R.string.auth_captcha_bypass_success));
                             vars.put("result", RESULT.CONNECTED);
+                            vars.put("captcha", "bypass");
                             return false;
                         } else {
                             throw new Exception("Internet check failed");
@@ -212,6 +213,7 @@ public class MosMetroV2 extends Provider {
                     logger.log(Logger.LEVEL.DEBUG, String.format(
                             context.getString(R.string.auth_captcha_result), code
                     ));
+                    vars.put("captcha", "entered");
 
                     // Sending captcha form
                     logger.log(context.getString(R.string.auth_request));
