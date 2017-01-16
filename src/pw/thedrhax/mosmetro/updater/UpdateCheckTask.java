@@ -34,6 +34,7 @@ import org.json.simple.parser.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
+import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Version;
@@ -68,8 +69,8 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         // Generate base URL
         String UPDATE_INFO_URL = retriever.get(
-                URLs.API_URL_SOURCE, URLs.API_URL_DEFAULT
-        ) + URLs.API_REL_BRANCHES;
+                BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
+        ) + BuildConfig.API_REL_BRANCHES;
 
         // Retrieve info from server
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
