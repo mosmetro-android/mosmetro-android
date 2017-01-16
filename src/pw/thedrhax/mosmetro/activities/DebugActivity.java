@@ -143,7 +143,7 @@ public class DebugActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             local_logger.date();
-            Provider provider = Provider.find(DebugActivity.this).setLogger(local_logger);
+            Provider provider = Provider.find(DebugActivity.this, local_logger);
             provider.start();
             local_logger.date();
             return null;

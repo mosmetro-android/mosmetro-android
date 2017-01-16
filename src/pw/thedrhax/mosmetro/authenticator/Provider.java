@@ -118,15 +118,29 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     /**
      * Find Provider by sending predefined request to "wi-fi.ru" to get the redirect.
      * @param context   Android Context required to create the new instance.
+     * @param logger    Logger to get debug messages from this method and the resulting Provider.
      * @return          New Provider instance.
      */
-    public static Provider find(Context context) {
+    @NonNull public static Provider find(Context context, Logger logger) {
         Client client = new OkHttp().followRedirects(false);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
-        } catch (Exception ignored) {}
-        return find(context, client);
+        } catch (Exception ex) {
+            logger.log(Logger.LEVEL.DEBUG, ex);
+            logger.log(String.format(
+                    context.getString(R.string.error),
+                    context.getString(R.string.auth_error_redirect)
+            ));
+            return new Unknown(context).setLogger(logger);
+        }
+
+        // If Provider is Unknown, write response body to log
+        Provider provider = find(context, client).setLogger(logger);
+        if (provider instanceof Unknown) {
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+        }
+        return provider;
     }
 
     /**

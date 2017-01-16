@@ -291,7 +291,7 @@ public class ConnectionService extends IntentService {
         running = true;
 
         if (Provider.isSSIDSupported(SSID) || from_shortcut) {
-            provider = Provider.find(this);
+            provider = Provider.find(this, logger);
             main();
         }
 
@@ -301,7 +301,6 @@ public class ConnectionService extends IntentService {
     private void main() {
         logger.date();
 
-        provider.setLogger(logger);
         provider.setCallback(new Provider.ICallback() {
             @Override
             public void onProgressUpdate(int progress) {
