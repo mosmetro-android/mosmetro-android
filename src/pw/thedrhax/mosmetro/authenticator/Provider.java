@@ -222,8 +222,9 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                     default: return false;
                 }
 
-                String STATISTICS_URL = new CachedRetriever(context)
-                        .get(BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT) + BuildConfig.API_REL_STATISTICS;
+                String STATISTICS_URL = new CachedRetriever(context).get(
+                        BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
+                ) + BuildConfig.API_REL_STATISTICS;
 
                 Map<String,String> params = new HashMap<>();
                 params.put("version", Version.getFormattedVersion());
