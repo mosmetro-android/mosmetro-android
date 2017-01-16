@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center">
 
     <Button
-        android:text="@android:string/ok"
+        android:id="@+id/submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/submit_button"
         android:layout_alignBaseline="@+id/text_captcha"
         android:layout_alignBottom="@+id/text_captcha"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp" />
+        android:text="@android:string/ok"/>
 
     <TextView
-        android:text="@string/auth_captcha_dialog_summary"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView2"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="12sp"
-        android:padding="8dp" />
+        android:layout_alignParentTop="true"
+        android:padding="8dp"
+        android:text="@string/auth_captcha_dialog_summary"
+        android:textSize="12sp"/>
 
     <ImageView
-        android:src="@drawable/ic_notification_error"
         android:id="@+id/image_captcha"
-        android:layout_height="64dp"
         android:layout_width="96dp"
-        android:layout_below="@+id/textView2"
+        android:layout_height="64dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:paddingBottom="8dp" />
+        android:layout_below="@+id/textView2"
+        android:paddingBottom="8dp"
+        android:src="@drawable/ic_notification_error"/>
 
     <EditText
+        android:id="@+id/text_captcha"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/text_captcha"
-        android:inputType="textVisiblePassword"
-        android:maxLines="1"
-        android:imeOptions="actionDone"
         android:layout_below="@+id/textView2"
-        android:layout_toRightOf="@+id/image_captcha"
         android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/submit_button"
-        android:layout_toStartOf="@+id/submit_button" />
+        android:layout_toRightOf="@+id/image_captcha"
+        android:layout_toStartOf="@+id/submit_button"
+        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
+        android:imeOptions="actionDone"
+        android:inputType="textVisiblePassword"
+        android:maxLines="1"/>
 
 </RelativeLayout>
