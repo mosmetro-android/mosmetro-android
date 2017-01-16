@@ -213,9 +213,13 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     public RESULT start() {
         AndroidHacks.bindToWiFi(context);
 
+        logger.log(String.format(
+                context.getString(R.string.version), Version.getFormattedVersion()
+        ));
+        logger.log(String.format(context.getString(R.string.algorithm_name), getName()));
+
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
-        logger.log(String.format(context.getString(R.string.algorithm_name), getName()));
         for (Task task : this) {
             if (stopped) return RESULT.INTERRUPTED;
             callback.onProgressUpdate((indexOf(task) + 1) * 100 / size());
