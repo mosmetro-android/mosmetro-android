@@ -8,13 +8,13 @@
 
 | Название сети | Провайдер | Где применяется | ? | Алгоритм |
 | --- | --- | --- | --- | --- | --- |
-| MosMetro_Free | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
-| AURA | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро, Аэроэкспресс (?) | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
-| MosMetro_Free | [NetByNet](http://www.netbynet.ru) | МЦК | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
-| MosGorTrans_Free | [NetByNet](http://www.netbynet.ru) | Автобусы | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
-| MosGorTrans_Free | [Enforta](http://www.enforta.ru/) | Остановки | :no_entry: | [MosGorTrans](/src/pw/thedrhax/mosmetro/authenticator/networks/MosGorTrans.java) |
-| MT_FREE | [МаксимаТелеком](http://maximatelecom.ru/ru#/) + [NetByNet](http://www.netbynet.ru) | Метро, Автобусы, ... | :white_check_mark: | [MosMetro v1/v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
-| Air_WiFi_Free | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Аэропорт Внуково | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/networks/MosMetro.java) |
+| MosMetro_Free | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV2.java) |
+| AURA | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Метро, Аэроэкспресс (?) | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV2.java) |
+| MosMetro_Free | [NetByNet](http://www.netbynet.ru) | МЦК | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV1.java) |
+| MosGorTrans_Free | [NetByNet](http://www.netbynet.ru) | Автобусы | :white_check_mark: | [MosMetro v1](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV1.java) |
+| MosGorTrans_Free | [Enforta](http://www.enforta.ru/) | Остановки | :no_entry: | [MosGorTrans](/src/pw/thedrhax/mosmetro/authenticator/providers/Unknown.java) |
+| MT_FREE | [МаксимаТелеком](http://maximatelecom.ru/ru#/) + [NetByNet](http://www.netbynet.ru) | Метро, Автобусы, ... | :white_check_mark: | [MosMetro v1/v2](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV1.java) |
+| Air_WiFi_Free | [МаксимаТелеком](http://maximatelecom.ru/ru#/) | Аэропорт Внуково | :white_check_mark: | [MosMetro v2](/src/pw/thedrhax/mosmetro/authenticator/providers/MosMetroV2.java) |
 
 ## Сборка
 
