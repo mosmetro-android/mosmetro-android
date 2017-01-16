@@ -21,14 +21,16 @@ package pw.thedrhax.mosmetro.httpclient;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 
 public class CachedRetriever {
     private SharedPreferences settings;
@@ -64,16 +66,20 @@ public class CachedRetriever {
         return null;
     }
 
+    public void remove(String url) {
+        Collection<Object> remove = new LinkedList<Object>();
+        for (Object object : cache_storage)
+            if (((JSONObject)object).get("url").equals(url))
+                remove.add(object);
+        cache_storage.removeAll(remove);
+
+        // Write cache to preferences
+        settings.edit().putString("CachedRetriever", cache_storage.toString()).apply();
+    }
+
     private void writeCachedUrl (String url, String content) {
         // Remove old entries
-        Collection<Object> remove = new LinkedList<Object>();
-        for (Object object : cache_storage) {
-            JSONObject temp = (JSONObject)object;
-
-            if (temp.get("url").equals(url))
-                remove.add(object);
-        }
-        cache_storage.removeAll(remove);
+        remove(url);
 
         // Create new entry
         JSONObject result = new JSONObject();
@@ -85,9 +91,7 @@ public class CachedRetriever {
         cache_storage.add(result);
 
         // Write cache to preferences
-        settings.edit()
-                .putString("CachedRetriever", cache_storage.toString())
-                .apply();
+        settings.edit().putString("CachedRetriever", cache_storage.toString()).apply();
     }
 
     public String get (String url, int ttl, String default_value) {

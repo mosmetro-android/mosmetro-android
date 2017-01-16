@@ -72,6 +72,9 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                 BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
         ) + BuildConfig.API_REL_BRANCHES;
 
+        // Clear branch cache
+        if (force_check) retriever.remove(UPDATE_INFO_URL);
+
         // Retrieve info from server
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
                 "{\"" + settings.getString("pref_updater_branch", "play") + "\":" +
