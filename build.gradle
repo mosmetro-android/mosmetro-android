@@ -26,7 +26,7 @@ android {
         buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
 
         // Default stat URL
-        buildConfigField "String", "API_URL_DEFAULT", "\"http://wi-fi.metro-it.com\""
+        buildConfigField "String", "API_URL_DEFAULT", "\"http://mosmetro.duckdns.org\""
 
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v1/statistics.php\""
