@@ -18,6 +18,8 @@
 
 package pw.thedrhax.mosmetro.httpclient;
 
+import android.os.SystemClock;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -88,6 +90,7 @@ public abstract class Client {
                 return getInputStream(link);
             } catch (Exception ex) {
                 last_ex = ex;
+                SystemClock.sleep(1000);
             }
         }
         throw last_ex;
@@ -102,11 +105,11 @@ public abstract class Client {
                     case METHOD_GET: get(link, params); break;
                     case METHOD_POST: post(link, params); break;
                 }
+                return this;
             } catch (Exception ex) {
                 last_ex = ex;
-                continue;
+                SystemClock.sleep(1000);
             }
-            return this;
         }
         throw last_ex;
     }
