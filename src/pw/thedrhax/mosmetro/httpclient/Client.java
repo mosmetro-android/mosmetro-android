@@ -28,9 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Client {
-    private static final int METHOD_GET = 0;
-    private static final int METHOD_POST = 1;
-
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
@@ -77,41 +74,48 @@ public abstract class Client {
     public abstract Client post(String link, Map<String,String> params) throws Exception;
     public abstract InputStream getInputStream(String link) throws Exception;
 
-    public Client get(String link, Map<String,String> params, int retries) throws Exception {
-        return requestWithRetries(link, params, retries, METHOD_GET);
-    }
-    public Client post(String link, Map<String,String> params, int retries) throws Exception {
-        return requestWithRetries(link, params, retries, METHOD_POST);
-    }
-    public InputStream getInputStream(String link, int retries) throws Exception {
-        Exception last_ex = null;
-        for (int i = 0; i < retries; i++) {
-            try {
-                return getInputStream(link);
-            } catch (Exception ex) {
-                last_ex = ex;
-                SystemClock.sleep(1000);
+    // Retry methods
+    private abstract class RetryOnException<T> {
+        public T run(int retries) throws Exception {
+            Exception last_ex = null;
+            for (int i = 0; i < retries; i++) {
+                try {
+                    return body();
+                } catch (Exception ex) {
+                    last_ex = ex;
+                    SystemClock.sleep(1000);
+                }
             }
+            throw last_ex;
         }
-        throw last_ex;
+        public abstract T body() throws Exception;
     }
 
-    private Client requestWithRetries(String link, Map<String,String> params,
-                                      int retries, int method) throws Exception {
-        Exception last_ex = null;
-        for (int i = 0; i < retries; i++) {
-            try {
-                switch (method) {
-                    case METHOD_GET: get(link, params); break;
-                    case METHOD_POST: post(link, params); break;
-                }
-                return this;
-            } catch (Exception ex) {
-                last_ex = ex;
-                SystemClock.sleep(1000);
+    public Client get(final String link, final Map<String,String> params,
+                      int retries) throws Exception {
+        return new RetryOnException<Client>() {
+            @Override
+            public Client body() throws Exception {
+                return get(link, params);
             }
-        }
-        throw last_ex;
+        }.run(retries);
+    }
+    public Client post(final String link, final Map<String,String> params,
+                       int retries) throws Exception {
+        return new RetryOnException<Client>() {
+            @Override
+            public Client body() throws Exception {
+                return post(link, params);
+            }
+        }.run(retries);
+    }
+    public InputStream getInputStream(final String link, int retries) throws Exception {
+        return new RetryOnException<InputStream>() {
+            @Override
+            public InputStream body() throws Exception {
+                return getInputStream(link);
+            }
+        }.run(retries);
     }
 
     // Parse methods
@@ -131,7 +135,7 @@ public abstract class Client {
         String link = document.getElementsByTag("a").first().attr("href");
 
         if (link == null || link.isEmpty())
-            throw new Exception ("Link not found");
+            throw new Exception("Link not found");
 
         return link;
     }
@@ -147,7 +151,7 @@ public abstract class Client {
         }
 
         if (value == null || value.isEmpty())
-            throw new Exception ("Meta tag not found");
+            throw new Exception("Meta tag not found");
 
         return value;
     }
@@ -163,7 +167,7 @@ public abstract class Client {
         }
 
         if (link == null || link.isEmpty())
-            throw new Exception ("Meta redirect not found");
+            throw new Exception("Meta redirect not found");
 
         // Check protocol of the URL
         if (!(link.contains("http://") || link.contains("https://")))
