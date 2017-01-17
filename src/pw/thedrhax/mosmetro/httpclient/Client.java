@@ -39,7 +39,7 @@ public abstract class Client {
     protected int code = 200;
 
     protected Client() {
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
 
         String ua = System.getProperty("http.agent");
         setHeader(HEADER_USER_AGENT,
@@ -63,7 +63,7 @@ public abstract class Client {
     }
 
     public Client resetHeaders () {
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
         return this;
     }
 
@@ -76,7 +76,7 @@ public abstract class Client {
 
     // Retry methods
     private abstract class RetryOnException<T> {
-        public T run(int retries) throws Exception {
+        T run(int retries) throws Exception {
             Exception last_ex = null;
             for (int i = 0; i < retries; i++) {
                 try {
@@ -131,15 +131,6 @@ public abstract class Client {
         return code;
     }
 
-    public String parseLinkRedirect() throws Exception {
-        String link = document.getElementsByTag("a").first().attr("href");
-
-        if (link == null || link.isEmpty())
-            throw new Exception("Link not found");
-
-        return link;
-    }
-
     public String parseMetaContent (String name) throws Exception {
         String value = null;
 
@@ -157,16 +148,14 @@ public abstract class Client {
     }
 
     public String parseMetaRedirect() throws Exception {
-        String link = null;
-
         String attr = parseMetaContent("refresh");
-        if (attr.toLowerCase().contains("; url=")) {
-            link = attr.substring(attr.indexOf("=") + 1);
-        } else {
-            link = attr.substring(attr.indexOf(";") + 1);
-        }
+        String link = attr.substring(
+                attr.indexOf(
+                        attr.toLowerCase().contains("; url=") ? "=" : ";"
+                ) + 1
+        );
 
-        if (link == null || link.isEmpty())
+        if (link.isEmpty())
             throw new Exception("Meta redirect not found");
 
         // Check protocol of the URL
@@ -177,7 +166,7 @@ public abstract class Client {
     }
 
     public static Map<String,String> parseForm (Element form) {
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String,String> result = new HashMap<>();
 
         for (Element input : form.getElementsByTag("input")) {
             String value = input.attr("value");
@@ -191,22 +180,15 @@ public abstract class Client {
 
     // Convert methods
     protected static String requestToString (Map<String,String> params) {
-        if (params == null) return "";
-
         StringBuilder params_string = new StringBuilder();
 
-        for (Map.Entry<String,String> entry : params.entrySet()) {
-            if (params_string.length() == 0) {
-                params_string.append("?");
-            } else {
-                params_string.append("&");
-            }
-
-            params_string
-                    .append(entry.getKey())
-                    .append("=")
-                    .append(entry.getValue());
-        }
+        if (params != null)
+            for (Map.Entry<String,String> entry : params.entrySet())
+                params_string
+                        .append(params_string.length() == 0 ? "?" : "&")
+                        .append(entry.getKey())
+                        .append("=")
+                        .append(entry.getValue());
 
         return params_string.toString();
     }
