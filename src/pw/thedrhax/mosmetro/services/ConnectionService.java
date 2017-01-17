@@ -289,32 +289,32 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         running = true;
-
-        if (Provider.isSSIDSupported(SSID) || from_shortcut) {
-            provider = Provider.find(this, logger);
-            main();
-        }
-
+        if (Provider.isSSIDSupported(SSID) || from_shortcut) main();
         running = false;
     }
     
     private void main() {
         logger.date();
 
-        provider.setCallback(new Provider.ICallback() {
-            @Override
-            public void onProgressUpdate(int progress) {
-                notify_progress
-                        .setProgress(progress)
-                        .show();
-            }
-        });
+        notify_progress
+                .setTitle(String.format(getString(R.string.auth_connecting), SSID))
+                .setText(getString(R.string.auth_provider_check))
+                .setContinuous()
+                .show();
+
+        provider = Provider.find(this, logger)
+                .setCallback(new Provider.ICallback() {
+                    @Override
+                    public void onProgressUpdate(int progress) {
+                        notify_progress
+                                .setProgress(progress)
+                                .show();
+                    }
+                });
 
         notify_progress
-            .setTitle(String.format(getString(R.string.auth_connecting), SSID))
-            .setText(getString(R.string.auth_waiting))
-            .setContinuous()
-            .show();
+                .setText(getString(R.string.auth_waiting))
+                .show();
 
         // Try to connect
         notification.hide();
