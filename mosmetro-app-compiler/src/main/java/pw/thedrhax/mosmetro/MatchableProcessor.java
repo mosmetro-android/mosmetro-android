@@ -31,6 +31,7 @@ import static pw.thedrhax.mosmetro.MethodValidator.PROVIDER_CLASS_PARAMETER;
 
 @AutoService(Processor.class)
 public final class MatchableProcessor extends AbstractProcessor {
+    private static final String GENERATED_CLASS_NAME = "ProviderChooser";
     private static final ClassName MOSMETRO_V1_PROVIDER_CLASS_PARAMETER = ClassName.get("pw.thedrhax.mosmetro.authenticator.providers", "MosMetroV1");
 
     private Messager messager;
@@ -122,7 +123,7 @@ public final class MatchableProcessor extends AbstractProcessor {
      */
     private void makeFile(Map<String, AnnotatedMethod> matchableMap) throws IOException {
         // Build class 'ProviderChooser'.
-        TypeSpec.Builder builder = TypeSpec.classBuilder("ProviderChooser")
+        TypeSpec.Builder builder = TypeSpec.classBuilder(GENERATED_CLASS_NAME)
             .addJavadoc(
                 CodeBlock.of(
                     "This is a generated class for determining which {@link $1T} to use.<br>\n" +
@@ -140,7 +141,7 @@ public final class MatchableProcessor extends AbstractProcessor {
 
         // Build and save file to disk.
         TypeSpec typeSpec = builder.build();
-        JavaFile javaFile = JavaFile.builder("pw.thedrhax.mosmetro", typeSpec)
+        JavaFile javaFile = JavaFile.builder(PROVIDER_CLASS_PARAMETER.packageName(), typeSpec)
             .addFileComment("Generated code from Matchable Processor. Do not modify!")
             .build();
         javaFile.writeTo(processingEnv.getFiler());
