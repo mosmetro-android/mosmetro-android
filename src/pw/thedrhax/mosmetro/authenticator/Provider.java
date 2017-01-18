@@ -152,7 +152,8 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
         }
 
         // Only Unknown Provider without internet connection is possible here
-        logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+        if (client.getPageContent() != null)
+            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
         logger.log(String.format(
                 context.getString(R.string.error),
                 context.getString(R.string.auth_error_provider)
