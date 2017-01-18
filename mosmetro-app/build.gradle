@@ -56,6 +56,10 @@ android {
 
 
 dependencies {
+    // Internal dependency which generates Provider checking.
+    compile project(":mosmetro-app-annotation-api")
+    annotationProcessor project(":mosmetro-app-compiler")
+
     // Runtime dependencies.
     compile "com.android.support:support-annotations:${appcompat}"
     compile "com.squareup.okhttp3:okhttp:${okhttp}"
