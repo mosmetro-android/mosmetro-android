@@ -294,6 +294,8 @@ public class ConnectionService extends IntentService {
     private void main() {
         logger.date();
 
+        notification.hide();
+
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
             notify_progress.hide();
@@ -322,7 +324,6 @@ public class ConnectionService extends IntentService {
                 .show();
 
         // Try to connect
-        notification.hide();
         Provider.RESULT result = connect();
         notify_progress.hide();
 
