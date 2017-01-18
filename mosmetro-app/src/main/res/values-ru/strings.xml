@@ -121,6 +121,7 @@
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
     <string name="auth_request">Отправка запроса</string>
+    <string name="auth_provider_check">Определение провайдера…</string>
 
     <string name="auth_error_connection">доступ в интернет отсутствует</string>
     <string name="auth_error_redirect">перенаправление не получено</string>
