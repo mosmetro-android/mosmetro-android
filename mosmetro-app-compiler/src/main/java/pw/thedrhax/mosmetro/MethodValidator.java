@@ -19,7 +19,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 /** Simple class to validate the annotated method. */
 final class MethodValidator {
-    private static final String ANNOTATION = "@" + Matchable.class.getSimpleName();
+    static final String ANNOTATION = "@" + Matchable.class.getSimpleName();
 
     static final ClassName CLIENT_CLASS_PARAMETER = ClassName.get("pw.thedrhax.mosmetro.httpclient", "Client");
     static final ClassName PROVIDER_CLASS_PARAMETER = ClassName.get("pw.thedrhax.mosmetro.authenticator", "Provider");
@@ -27,7 +27,7 @@ final class MethodValidator {
     /** Determine if current method is valid for our needs. */
     static boolean isValidMethod(Messager messager, ExecutableElement executableElement) {
         // Check for public, static modifiers.
-        if (!isPublic(executableElement) && !isStatic(executableElement) && !hasNoModifier(executableElement)) {
+        if (!isPublic(executableElement) || !isStatic(executableElement) || hasNoModifier(executableElement)) {
             String message = String.format(
                 "Methods annotated with %s must be public and static.",
                 ANNOTATION
@@ -39,7 +39,7 @@ final class MethodValidator {
         // Check that the method has one and only one parameter pw.thedrhax.mosmetro.httpclient.Client.
         if (hasNoParameters(executableElement) || !hasOneParameter(executableElement) || !hasFirstClientParameter(executableElement)) {
             String message = String.format(
-                "Methods annotated with %1$s must have %2$s parameter 'client' because it is required by design.",
+                "Methods annotated with %1$s must have '%2$s' parameter 'client' because it is required by design.",
                 ANNOTATION,
                 CLIENT_CLASS_PARAMETER
             );
@@ -47,9 +47,20 @@ final class MethodValidator {
             return false;
         }
 
+        // Check that the method return type is boolean.
+        if (!isReturnTypeBoolean(executableElement)) {
+            String message = String.format(
+                "Methods annotated with %1$s must have return type of unboxed primitive boolean.",
+                ANNOTATION
+            );
+            messager.printMessage(ERROR, message, executableElement);
+            return false;
+        }
+
         // Check that method is included in the class which extends Provider in some way.
         if (!isInProviderDescendant(executableElement)) {
-            String message = String.format("Methods annotated with %1$s must extend %2$s.",
+            String message = String.format(
+                "Methods annotated with %1$s must extend %2$s.",
                 ANNOTATION,
                 PROVIDER_CLASS_PARAMETER
             );
@@ -89,6 +100,11 @@ final class MethodValidator {
             }
         }
         return hasClientParam;
+    }
+
+    private static boolean isReturnTypeBoolean(ExecutableElement executableElement) {
+        TypeKind kind = executableElement.getReturnType().getKind();
+        return kind == TypeKind.BOOLEAN;
     }
 
     private static boolean isInProviderDescendant(ExecutableElement executableElement) {
