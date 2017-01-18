@@ -26,6 +26,7 @@ import javax.lang.model.element.TypeElement;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
+import static pw.thedrhax.mosmetro.MethodValidator.ANNOTATION;
 import static pw.thedrhax.mosmetro.MethodValidator.CLIENT_CLASS_PARAMETER;
 import static pw.thedrhax.mosmetro.MethodValidator.PROVIDER_CLASS_PARAMETER;
 
@@ -89,7 +90,7 @@ public final class MatchableProcessor extends AbstractProcessor {
 
     /** Process annotated element. */
     private void processAnnotatedElement(Map<String, AnnotatedMethod> matchableMap, Element element) {
-        boolean hasError = false;
+        boolean hasError;
 
         // ExecutableElement represents a method, constructor, or initializer (static or instance)
         // of a class or interface, including annotation type elements.
@@ -97,18 +98,19 @@ public final class MatchableProcessor extends AbstractProcessor {
         ExecutableElement annotatedMethod = (ExecutableElement) element;
 
         // Check that this method is valid to process.
-        hasError |= !MethodValidator.isValidMethod(messager, annotatedMethod);
+        hasError = !MethodValidator.isValidMethod(messager, annotatedMethod);
 
         // Get the class name where this method is enclosed.
         String processedClass = element.getEnclosingElement().getSimpleName().toString();
 
         // Check if we have already processed this class before.
         // If we have already processed this class, then there is an error.
-        hasError |= matchableMap.get(processedClass) != null;
-
-        if (hasError) {
+        if (matchableMap.get(processedClass) != null) {
+            logError("Only one " + ANNOTATION + " method can be declared in the class.");
             return;
         }
+        if (hasError)
+            return;
 
         // Put the annotated method to the map.
         matchableMap.put(processedClass, AnnotatedMethod.create(annotatedMethod));
@@ -148,6 +150,10 @@ public final class MatchableProcessor extends AbstractProcessor {
     }
 
     private void logError(Exception e) {
-        messager.printMessage(ERROR, "Couldn't generate class with exception: ".concat(e.getMessage()));
+        logError("Couldn't generate class with exception: ".concat(e.getMessage()));
+    }
+
+    private void logError(String message) {
+        messager.printMessage(ERROR, message);
     }
 }
