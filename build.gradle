@@ -23,12 +23,20 @@ task clean(type: Delete) {
 }
 
 ext {
+    // Application deps.
     appcompat = '25.1.0'
     okhttp = '3.2.0'
     okio = '1.11.0'
     jsoup = '1.8.3'
     jsonsimple = '1.1.1'
 
+    // Annotation Processing Module deps.
+    autoservice = '1.0-rc2'
+    javapoet = '1.8.0'
+
+    // Testing deps.
     junit = '4.12'
+    truth = '0.29'
+    compiletesting = '0.10'
     testrunner = '0.5'
 }
