@@ -224,8 +224,6 @@ public class ConnectionService extends IntentService {
         int count = 0;
 
         do {
-            if (!waitForIP()) return Provider.RESULT.ERROR;
-
             if (count > 0) {
                 notify_progress
                         .setText(String.format("%s (%s)",
@@ -296,6 +294,15 @@ public class ConnectionService extends IntentService {
     private void main() {
         logger.date();
 
+        notification.hide();
+
+        // Wait for IP before detecting the Provider
+        if (!waitForIP()) {
+            notify_progress.hide();
+            notify(Provider.RESULT.ERROR);
+            return;
+        }
+
         notify_progress
                 .setTitle(String.format(getString(R.string.auth_connecting), SSID))
                 .setText(getString(R.string.auth_provider_check))
@@ -317,7 +324,6 @@ public class ConnectionService extends IntentService {
                 .show();
 
         // Try to connect
-        notification.hide();
         Provider.RESULT result = connect();
         notify_progress.hide();
 
