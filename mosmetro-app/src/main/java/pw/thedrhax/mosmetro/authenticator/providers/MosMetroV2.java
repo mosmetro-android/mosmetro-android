@@ -44,6 +44,7 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.Map;
 
+import pw.thedrhax.mosmetro.Matchable;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
@@ -329,7 +330,7 @@ public class MosMetroV2 extends Provider {
      *                  will execute one request to be analyzed by this method.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(Client client) {
+    @Matchable public static boolean match(Client client) {
         try {
             String redirect = client.parseMetaRedirect();
             return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
