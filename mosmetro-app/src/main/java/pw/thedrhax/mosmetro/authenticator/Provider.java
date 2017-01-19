@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -117,6 +118,11 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
 
     /**
      * Find Provider by sending predefined request to "wi-fi.ru" to get the redirect.
+     *
+     * The first request executed right after connecting to Wi-Fi is known to have
+     * direct access to the Internet. This *bug* of the network doesn't allow us to
+     * detect the Provider too quickly. This is why we use a retry loop in this method.
+     *
      * @param context   Android Context required to create the new instance.
      * @param logger    Logger to get debug messages from this method and the resulting Provider.
      * @return          New Provider instance.
@@ -124,23 +130,36 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     @NonNull public static Provider find(Context context, Logger logger) {
         Client client = new OkHttp().followRedirects(false);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
-        } catch (Exception ex) {
-            logger.log(Logger.LEVEL.DEBUG, ex);
-            logger.log(String.format(
-                    context.getString(R.string.error),
-                    context.getString(R.string.auth_error_redirect)
-            ));
-            return new Unknown(context).setLogger(logger);
+
+        logger.log(context.getString(R.string.auth_provider_check));
+
+        Provider result = null;
+        for (int i = 0; i < pref_retry_count; i++) {
+            try {
+                client.get("http://wi-fi.ru", null, pref_retry_count);
+            } catch (Exception ex) {
+                logger.log(Logger.LEVEL.DEBUG, ex);
+            }
+
+            result = find(context, client);
+
+            if (result instanceof Unknown && !generate_204()) {
+                SystemClock.sleep(1000);
+                continue;
+            }
+
+            return result.setLogger(logger);
         }
 
-        // If Provider is Unknown, write response body to log
-        Provider provider = find(context, client).setLogger(logger);
-        if (provider instanceof Unknown) {
+        // Only Unknown Provider without internet connection is possible here
+        if (client.getPageContent() != null)
             logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-        }
-        return provider;
+        logger.log(String.format(
+                context.getString(R.string.error),
+                context.getString(R.string.auth_error_provider)
+        ));
+
+        return (result != null ? result : new Unknown(context)).setLogger(logger);
     }
 
     /**
