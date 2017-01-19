@@ -26,14 +26,10 @@ import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
-import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
-import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -55,21 +51,6 @@ import pw.thedrhax.util.WifiUtils;
  */
 
 public abstract class Provider extends LinkedList<Task> implements Logger.ILogger<Provider> {
-    /**
-     * List of supported Providers
-     *
-     * Every Provider in this list must implement the
-     *  "public static boolean match(Client)"
-     * method to be detected by Provider.find().
-     * @see MosMetroV1
-     */
-    private static final List<Class<? extends Provider>> PROVIDERS =
-            new LinkedList<Class<? extends Provider>>() {{
-                add(MosMetroV1.class);
-                add(MosMetroV2.class);
-                add(Enforta.class);
-            }};
-
     /**
      * List of supported SSIDs
      */
@@ -96,24 +77,14 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
 
     /**
      * Find Provider using already received response from server.
-     * @param context   Android Context required to create the new instance.
-     * @param client    Client, that contains server's response.
-     * @return          New Provider instance.
      *
+     * @param context Android Context required to create the new instance.
+     * @param client  Client, that contains server's response.
+     * @return New Provider instance.
      * @see Client
      */
     @NonNull public static Provider find(Context context, Client client) {
-        for (Class<? extends Provider> provider_class : PROVIDERS) {
-            try {
-                if ((Boolean)provider_class
-                        .getMethod("match", Client.class)
-                        .invoke(null, client))
-                    return provider_class
-                            .getConstructor(Context.class)
-                            .newInstance(context);
-            } catch (Exception ignored) {}
-        }
-        return new Unknown(context);
+        return ProviderChooser.check(context, client);
     }
 
     /**

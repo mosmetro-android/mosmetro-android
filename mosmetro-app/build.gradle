@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId 'pw.thedrhax.mosmetro'
+        minSdkVersion 11
+        targetSdkVersion 25
+        versionCode 51
+        versionName "1.7.3"
+
+        // GitHub Pages
+        buildConfigField "String", "\$GITHUB", "\"https://thedrhax.github.io/mosmetro-android\""
+        buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
+        buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
+
+        // Default stat URL
+        buildConfigField "String", "API_URL_DEFAULT", "\"http://mosmetro.duckdns.org\""
+
+        // Relative URLs for stat server
+        buildConfigField "String", "API_REL_STATISTICS", "\"/api/v1/statistics.php\""
+        buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    if (project.hasProperty("RELEASE_STORE_FILE")) {
+        signingConfigs {
+            release {
+                storeFile new File(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            if (project.hasProperty("RELEASE_STORE_FILE")) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+
+dependencies {
+    // Internal dependency which generates Provider checking.
+    compile project(":mosmetro-app-annotation-api")
+    annotationProcessor project(":mosmetro-app-compiler")
+
+    // Runtime dependencies.
+    compile "com.android.support:support-annotations:${appcompat}"
+    compile "com.squareup.okhttp3:okhttp:${okhttp}"
+    compile "org.jsoup:jsoup:${jsoup}"
+    compile("com.googlecode.json-simple:json-simple:${jsonsimple}") {
+        exclude module: "junit"
+    }
+
+    // Test dependencies.
+    testCompile "junit:junit:${junit}"
+
+    // Needed because there is a conflict in "com.android.support.test:runner" package.
+    // Here we explicitly define the version for the "androidTest" sources build variant.
+    androidTestCompile "com.android.support:support-annotations:${appcompat}"
+    androidTestCompile "com.android.support.test:runner:${testrunner}"
+}

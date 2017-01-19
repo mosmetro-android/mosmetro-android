@@ -24,6 +24,7 @@ import org.jsoup.select.Elements;
 
 import java.util.HashMap;
 
+import pw.thedrhax.mosmetro.Matchable;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
@@ -196,7 +197,7 @@ public class MosMetroV1 extends Provider {
      *                  will execute one request to be analyzed by this method.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(Client client) {
+    @Matchable public static boolean match(Client client) {
         try {
             return client.parseMetaRedirect().contains("login.wi-fi.ru");
         } catch (Exception ex) {

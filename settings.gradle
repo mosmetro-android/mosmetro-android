@@ -1,0 +1,1 @@
+include ':mosmetro-app', ':mosmetro-app-compiler', ':mosmetro-app-annotation-api'
