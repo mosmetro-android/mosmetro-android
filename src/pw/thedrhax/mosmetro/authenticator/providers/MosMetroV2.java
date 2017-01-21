@@ -18,23 +18,11 @@
 
 package pw.thedrhax.mosmetro.authenticator.providers;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Base64;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -45,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.CaptchaActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -200,8 +189,19 @@ public class MosMetroV2 extends Provider {
                     }
 
                     // Asking user to enter the code
-                    String code = new CaptchaRunnable(captcha_url).getResult();
-                    if (code.isEmpty()) {
+                    context.startActivity(
+                            new Intent(context, CaptchaActivity.class).putExtra("url", captcha_url)
+                    );
+
+                    // Wait for answer
+                    CaptchaActivity.setResult(null);
+                    while (CaptchaActivity.getResult() == null && !stopped) {
+                        SystemClock.sleep(100);
+                    }
+
+                    // Check the answer
+                    String code = CaptchaActivity.getResult();
+                    if (code == null || code.isEmpty()) {
                         logger.log(String.format(
                                 context.getString(R.string.error),
                                 context.getString(R.string.auth_error_captcha))
@@ -335,121 +335,6 @@ public class MosMetroV2 extends Provider {
             return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
         } catch (Exception ex) {
             return false;
-        }
-    }
-
-    /**
-     * The CaptchaRunnable class is used to prompt user to enter the CAPTCHA.
-     * This operation must be executed on the UI thread and only on the Activity Context.
-     */
-    private class CaptchaRunnable implements Runnable {
-        /**
-         * Thread lock marker.
-         */
-        private boolean locked;
-
-        /**
-         * Result value of the CAPTCHA.
-         */
-        private String result = "";
-
-        /**
-         * URL of the CAPTCHA to solve.
-         */
-        private String url;
-
-        /**
-         * Lock current thread and wait for user to solve the CAPTCHA.
-         * @return Solved CAPTCHA value.
-         */
-        public String getResult() {
-            // Dialog can be created only on the Activity context
-            if (context instanceof Activity) {
-                locked = true;
-
-                ((Activity)context).runOnUiThread(this);
-
-                while (locked && !stopped) {
-                    SystemClock.sleep(100);
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * Main constructor
-         * @param url   URL of the CAPTCHA to solve
-         */
-        public CaptchaRunnable (String url) {
-            this.url = url;
-        }
-
-        @Override
-        public void run() {
-            final Dialog dialog = new Dialog(context);
-            dialog.setTitle(R.string.auth_captcha_dialog);
-            dialog.setContentView(R.layout.captcha_dialog);
-
-            final Button submit_button = (Button) dialog.findViewById(R.id.submit_button);
-
-            final EditText text_captcha = (EditText) dialog.findViewById(R.id.text_captcha);
-            text_captcha.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                    if (i == EditorInfo.IME_ACTION_DONE) {
-                        submit_button.performClick();
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-            final ImageView image_captcha = (ImageView) dialog.findViewById(R.id.image_captcha);
-            image_captcha.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    new AsyncTask<Void,Void,Bitmap>() {
-                        @Override
-                        protected Bitmap doInBackground(Void... voids) {
-                            try {
-                                return BitmapFactory.decodeStream(
-                                        client.getInputStream(url, pref_retry_count)
-                                );
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                logger.log(Logger.LEVEL.DEBUG, ex);
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Bitmap bitmap) {
-                            if (bitmap != null) image_captcha.setImageBitmap(bitmap);
-                        }
-                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
-            });
-            image_captcha.performClick();
-
-            submit_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    result = text_captcha.getText().toString();
-                    locked = false;
-                    dialog.hide();
-                }
-            });
-
-            dialog.setCanceledOnTouchOutside(true);
-            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialogInterface) {
-                    locked = false;
-                }
-            });
-
-            dialog.show();
         }
     }
 }
