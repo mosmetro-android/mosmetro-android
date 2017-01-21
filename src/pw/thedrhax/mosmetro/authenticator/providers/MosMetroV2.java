@@ -38,6 +38,7 @@ import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -196,6 +197,16 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 Element form = (Element) vars.get("captcha_form");
                 if (form == null) return true;
+
+                if (context instanceof ConnectionService)
+                    if (!settings.getBoolean("pref_captcha_dialog", true)) {
+                        logger.log(String.format(
+                                context.getString(R.string.error),
+                                context.getString(R.string.auth_error_captcha))
+                        );
+                        vars.put("result", RESULT.CAPTCHA);
+                        return false;
+                    }
 
                 // Parsing captcha URL
                 String captcha_url;

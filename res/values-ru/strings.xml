@@ -185,4 +185,6 @@
     <string name="receiver_auto_connect">Автоподключение</string>
     <string name="more_information">Больше информации</string>
     <string name="more_information_summary">Ссылки, сообщества, благодарности</string>
+    <string name="pref_captcha_dialog">Диалог ввода капчи</string>
+    <string name="pref_captcha_dialog_summary">Если включено, диалог ввода капчи будет открываться автоматически поверх других приложений.</string>
 </resources>

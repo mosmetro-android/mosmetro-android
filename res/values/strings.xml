@@ -201,4 +201,6 @@
     <string name="more_information">More information</string>
     <string name="more_information_summary">Links, communities, contibutors</string>
     <string name="auth_provider_check">Detecting the provider…</string>
+    <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
+    <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
 </resources>

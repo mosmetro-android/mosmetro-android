@@ -44,6 +44,12 @@
 
             <PreferenceCategory android:title="@string/pref_category_connection" />
 
+            <CheckBoxPreference
+                android:key="pref_captcha_dialog"
+                android:title="@string/pref_captcha_dialog"
+                android:summary="@string/pref_captcha_dialog_summary"
+                android:defaultValue="true" />
+
             <EditTextPreference
                 android:key="pref_retry_count"
                 android:inputType="number"
