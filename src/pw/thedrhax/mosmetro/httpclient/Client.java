@@ -69,6 +69,8 @@ public abstract class Client {
 
     public abstract Client setCookie(String url, String name, String value);
 
+    public abstract Client setTimeout(int ms);
+
     // IO methods
     public abstract Client get(String link, Map<String,String> params) throws Exception;
     public abstract Client post(String link, Map<String,String> params) throws Exception;

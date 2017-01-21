@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -128,6 +129,9 @@ public class OkHttp extends Client {
                         return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
                     }
                 })
+                .connectTimeout(1000, TimeUnit.MILLISECONDS)
+                .readTimeout(1000, TimeUnit.MILLISECONDS)
+                .writeTimeout(1000, TimeUnit.MILLISECONDS)
                 .build();
     }
 
@@ -137,6 +141,17 @@ public class OkHttp extends Client {
         List<Cookie> url_cookies = new ArrayList<Cookie>();
         url_cookies.add(Cookie.parse(httpUrl, name + "=" + value));
         client.cookieJar().saveFromResponse(httpUrl, url_cookies);
+        return this;
+    }
+
+    @Override
+    public Client setTimeout(int ms) {
+        client = client.newBuilder()
+                .connectTimeout(ms, TimeUnit.MILLISECONDS)
+                .readTimeout(ms, TimeUnit.MILLISECONDS)
+                .writeTimeout(ms, TimeUnit.MILLISECONDS)
+                .build();
+
         return this;
     }
 
