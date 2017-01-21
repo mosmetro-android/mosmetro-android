@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
@@ -41,6 +42,7 @@ public class DebugActivity extends Activity {
     // Logger
     private Logger logger;
     private boolean show_debug = false;
+    private boolean captcha = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -52,13 +54,15 @@ public class DebugActivity extends Activity {
         logger_init();
 
         // Check for log from ConnectionService
-        try {
+        if (getIntent() != null) {
             // Intent from the ConnectionService
             Bundle bundle = getIntent().getExtras();
-            logger.merge((Logger)bundle.getParcelable("logger"));
-            if (!getIntent().getBooleanExtra("captcha", false))
-                return;
-        } catch (NullPointerException ignored) {}
+            if (bundle != null) {
+                logger.merge((Logger)bundle.getParcelable("logger"));
+                captcha = getIntent().getBooleanExtra("captcha", false);
+                if (!captcha) return;
+            }
+        }
 
         button_connect(null);
     }
@@ -127,7 +131,7 @@ public class DebugActivity extends Activity {
      * Run manual connection in background thread
      */
 
-    private class AuthTask extends AsyncTask<Void, String, Void> {
+    private class AuthTask extends AsyncTask<Void, String, Provider.RESULT> {
         private Logger local_logger;
 
         public AuthTask() {
@@ -141,18 +145,31 @@ public class DebugActivity extends Activity {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Provider.RESULT doInBackground(Void... params) {
             local_logger.date();
             Provider provider = Provider.find(DebugActivity.this, local_logger);
-            provider.start();
+            Provider.RESULT result = provider.start();
             local_logger.date();
-            return null;
+            return result;
         }
 
         // Show log messages in the UI thread
         @Override
         protected void onProgressUpdate(String... values) {
             logger.log(Logger.LEVEL.valueOf(values[0]), values[1]);
+        }
+
+        @Override
+        protected void onPostExecute(Provider.RESULT result) {
+            // Start ConnectionService if this Activity is started for CAPTCHA
+            if (result == Provider.RESULT.CONNECTED || result == Provider.RESULT.ALREADY_CONNECTED)
+                if (captcha) {
+                    startService(
+                            new Intent(DebugActivity.this, ConnectionService.class)
+                                    .putExtra("force", true)
+                    );
+                    DebugActivity.this.finish();
+                }
         }
     }
 
