@@ -138,99 +138,122 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 Element form = client.getPageContent().getElementsByTag("form").first();
                 if (form != null && "captcha__container".equals(form.attr("class"))) {
-                    // Trying to bypass captcha using official backdoor
-                    logger.log(context.getString(R.string.auth_captcha_bypass));
-                    try {
-                        int code = new OkHttp()
-                                .resetHeaders()
-                                .setHeader(
-                                        new String(Base64.decode(
-                                                "VXNlci1BZ2VudA==", Base64.DEFAULT
-                                        )),
-                                        new String(Base64.decode(
-                                                "QXV0b01vc01ldHJvV2lmaS8xLjUuMCAo" +
-                                                        "TGludXg7IEFuZHJvaWQgNC40LjQ7IEEw" +
-                                                        "MTIzIEJ1aWxkL0tUVTg0UCk=", Base64.DEFAULT
-                                        ))
-                                )
-                                .get(
-                                        new String(Base64.decode(
-                                                "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25l" +
-                                                        "dGluZm8vYXV0aA==", Base64.DEFAULT
-                                        )), null, pref_retry_count)
-                                .getResponseCode();
+                    vars.put("captcha_form", form);
+                }
+                return true;
+            }
+        });
 
-                        if (code == 200 && isConnected()) {
-                            logger.log(context.getString(R.string.auth_captcha_bypass_success));
-                            vars.put("result", RESULT.CONNECTED);
-                            vars.put("captcha", "bypass");
-                            return false;
-                        } else {
-                            throw new Exception("Internet check failed");
-                        }
-                    } catch (Exception ex) {
-                        logger.log(Logger.LEVEL.DEBUG, ex);
-                        logger.log(context.getString(R.string.auth_captcha_bypass_fail));
-                    }
+        /**
+         * Try to bypass CAPTCHA using the official backdoor
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (vars.get("captcha_form") == null) return true;
+                logger.log(context.getString(R.string.auth_captcha_bypass));
+                try {
+                    int code = new OkHttp()
+                            .resetHeaders()
+                            .setHeader(
+                                    new String(Base64.decode(
+                                            "VXNlci1BZ2VudA==", Base64.DEFAULT
+                                    )),
+                                    new String(Base64.decode(
+                                            "QXV0b01vc01ldHJvV2lmaS8xLjUuMCAo" +
+                                                    "TGludXg7IEFuZHJvaWQgNC40LjQ7IEEw" +
+                                                    "MTIzIEJ1aWxkL0tUVTg0UCk=", Base64.DEFAULT
+                                    ))
+                            )
+                            .get(
+                                    new String(Base64.decode(
+                                            "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25l" +
+                                                    "dGluZm8vYXV0aA==", Base64.DEFAULT
+                                    )), null, pref_retry_count)
+                            .getResponseCode();
 
-                    // Parsing captcha URL
-                    String captcha_url;
-                    try {
-                        Element captcha_img = form.getElementsByTag("img").first();
-                        captcha_url = redirect + captcha_img.attr("src");
-                    } catch (Exception ex) {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
-                                context.getString(R.string.auth_error_captcha_image))
-                        );
-                        logger.log(Logger.LEVEL.DEBUG, ex);
-                        vars.put("result", RESULT.CAPTCHA);
+                    if (code == 200 && isConnected()) {
+                        logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                        vars.put("result", RESULT.CONNECTED);
+                        vars.put("captcha", "bypass");
                         return false;
+                    } else {
+                        throw new Exception("Internet check failed");
                     }
+                } catch (Exception ex) {
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                }
+                return true;
+            }
+        });
 
-                    // Asking user to enter the code
-                    context.startActivity(
-                            new Intent(context, CaptchaActivity.class).putExtra("url", captcha_url)
+        /**
+         * Asking user to solve the CAPTCHA and send the form
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                Element form = (Element) vars.get("captcha_form");
+                if (form == null) return true;
+
+                // Parsing captcha URL
+                String captcha_url;
+                try {
+                    Element captcha_img = form.getElementsByTag("img").first();
+                    captcha_url = redirect + captcha_img.attr("src");
+                } catch (Exception ex) {
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_captcha_image))
                     );
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    vars.put("result", RESULT.CAPTCHA);
+                    return false;
+                }
 
-                    // Wait for answer
-                    CaptchaActivity.setResult(null);
-                    while (CaptchaActivity.getResult() == null && !stopped) {
-                        SystemClock.sleep(100);
-                    }
+                // Asking user to enter the code
+                context.startActivity(
+                        new Intent(context, CaptchaActivity.class).putExtra("url", captcha_url)
+                );
 
-                    // Check the answer
-                    String code = CaptchaActivity.getResult();
-                    if (code == null || code.isEmpty()) {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
-                                context.getString(R.string.auth_error_captcha))
-                        );
-                        vars.put("result", RESULT.CAPTCHA);
-                        return false;
-                    }
+                // Wait for answer
+                CaptchaActivity.setResult(null);
+                while (CaptchaActivity.getResult() == null && !stopped) {
+                    SystemClock.sleep(100);
+                }
 
-                    logger.log(Logger.LEVEL.DEBUG, String.format(
-                            context.getString(R.string.auth_captcha_result), code
+                // Check the answer
+                String code = CaptchaActivity.getResult();
+                if (code == null || code.isEmpty()) {
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_captcha))
+                    );
+                    vars.put("result", RESULT.CAPTCHA);
+                    return false;
+                }
+
+                logger.log(Logger.LEVEL.DEBUG, String.format(
+                        context.getString(R.string.auth_captcha_result), code
+                ));
+                vars.put("captcha", "entered");
+
+                // Sending captcha form
+                logger.log(context.getString(R.string.auth_request));
+                Map<String,String> fields = Client.parseForm(form);
+                fields.put("_rucaptcha", code);
+
+                try {
+                    client.post(redirect + form.attr("action"), fields, pref_retry_count);
+                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+                } catch (Exception ex) {
+                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_server)
                     ));
-                    vars.put("captcha", "entered");
-
-                    // Sending captcha form
-                    logger.log(context.getString(R.string.auth_request));
-                    Map<String,String> fields = Client.parseForm(form);
-                    fields.put("_rucaptcha", code);
-
-                    try {
-                        client.post(redirect + form.attr("action"), fields, pref_retry_count);
-                        logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-                    } catch (Exception ex) {
-                        logger.log(Logger.LEVEL.DEBUG, ex);
-                        logger.log(String.format(
-                                context.getString(R.string.error),
-                                context.getString(R.string.auth_error_server)
-                        ));
-                        return false;
-                    }
+                    return false;
                 }
                 return true;
             }
