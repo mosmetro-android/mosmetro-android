@@ -57,4 +57,9 @@ public class DummyClient extends Client {
     public Client setCookie(String url, String name, String value) {
         return this;
     }
+
+    @Override
+    public Client setTimeout(int ms) {
+        return this;
+    }
 }
