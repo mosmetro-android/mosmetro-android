@@ -225,7 +225,9 @@ public class MosMetroV2 extends Provider {
 
                 // Asking user to enter the code
                 context.startActivity(
-                        new Intent(context, CaptchaActivity.class).putExtra("url", captcha_url)
+                        new Intent(context, CaptchaActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .putExtra("url", captcha_url)
                 );
 
                 // Wait for answer
