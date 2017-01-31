@@ -51,28 +51,33 @@ public class WifiUtils {
         return (text != null && !text.isEmpty()) ? text.replace("\"", "") : UNKNOWN_SSID;
     }
 
-    // Get SSID directly from WifiManager
-    public String getSSID() {
-        return clear(manager.getConnectionInfo().getSSID());
+    // Get WifiInfo from Intent or, if not available, from WifiManager
+    public WifiInfo getWifiInfo(Intent intent) {
+        if (intent != null && Build.VERSION.SDK_INT >= 14) {
+            WifiInfo result = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+            if (result != null) return result;
+        }
+        return manager.getConnectionInfo();
     }
 
     // Get SSID from Intent's EXTRA_WIFI_INFO (API > 14)
     public String getSSID(Intent intent) {
-        if (intent == null) return getSSID();
+        return clear(getWifiInfo(intent).getSSID());
+    }
 
-        // Get SSID from Intent
-        if (Build.VERSION.SDK_INT >= 14) {
-            WifiInfo info = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-            if (info != null)
-                return clear(info.getSSID());
-        }
-
-        return getSSID();
+    // Get SSID directly from WifiManager
+    public String getSSID() {
+        return getSSID(null);
     }
 
     // Get current IP from WifiManager
     public int getIP() {
         return manager.getConnectionInfo().getIpAddress();
+    }
+
+    // Get main Wi-Fi state
+    public boolean isEnabled() {
+        return manager.isWifiEnabled();
     }
 
     /*

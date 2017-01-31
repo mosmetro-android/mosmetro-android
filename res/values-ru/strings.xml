@@ -135,7 +135,6 @@
     </string>
     <string name="auth_error_auth_form">форма авторизации не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
-    <string name="auth_error_network_disconnected">соединение с сетью прервалось</string>
     <string name="auth_error_provider">провайдер не опознан</string>
     <string name="auth_error_provider_unsupported" formatted="false">
         провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют

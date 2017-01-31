@@ -22,17 +22,73 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 
-public class NetworkReceiver extends BroadcastReceiver {
-    public void onReceive(Context context, Intent intent) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+import pw.thedrhax.util.WifiUtils;
 
+/**
+ * This BroadcastReceiver filters and sends Intents to the ConnectionService.
+ *
+ * There are two types of Intents accepted by the ConnectionService:
+ *     1) Wi-Fi network is definitely connected (startService())
+ *     2) No Wi-Fi networks are connected (stopService())
+ *
+ * NetworkReceiver doesn't take care of:
+ *     1) Ignoring duplicated Intents
+ *     2) Determining if current SSID is supported by the Provider
+ *
+ * @see ConnectionService
+ * @author Dmitry Karikh <the.dr.hax@gmail.com>
+ */
+public class NetworkReceiver extends BroadcastReceiver {
+    private Context context;
+    private Intent intent;
+
+    public void onReceive(Context context, Intent intent) {
+        this.context = context;
+        this.intent = intent;
+
+        // Stop if automatic connection is disabled in settings
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!settings.getBoolean("pref_autoconnect", true))
+            return;
+
+        // If Wi-Fi is disabled, stop ConnectionService immediately
+        WifiUtils wifi = new WifiUtils(context);
+        if (!wifi.isEnabled()) {
+            stopService();
+            return;
+        }
+
+        // Listen to all Wi-Fi state changes and start ConnectionService if Wi-Fi is connected
+        // This .equals condition is used to allow addition of new Intents in future
+        if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+            WifiInfo info = wifi.getWifiInfo(intent);
+            if (info != null)
+                if (info.getSupplicantState() == SupplicantState.COMPLETED)
+                    startService();
+                else
+                    stopService();
+        }
+    }
+
+    /**
+     * Start ConnectionService and pass received Intent's content
+     */
+    private void startService() {
         Intent service = new Intent(context, ConnectionService.class);
         service.setAction(intent.getAction());
         service.putExtras(intent);
+        context.startService(service);
+    }
 
-        if (settings.getBoolean("pref_autoconnect", true))
-            context.startService(service);
+    /**
+     * Stop ConnectionService
+     */
+    private void stopService() {
+        context.startService(new Intent(context, ConnectionService.class).setAction("STOP"));
     }
 }

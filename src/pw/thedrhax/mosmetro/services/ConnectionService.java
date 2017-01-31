@@ -97,8 +97,6 @@ public class ConnectionService extends IntentService {
     }
 
     private void notify (Provider.RESULT result) {
-        if (!running) return;
-
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
@@ -191,14 +189,6 @@ public class ConnectionService extends IntentService {
         while (wifi.getIP() == 0 && running) {
             SystemClock.sleep(1000);
 
-            if (!wifi.isConnected(SSID)) {
-                logger.log(String.format(
-                        getString(R.string.error),
-                        getString(R.string.auth_error_network_disconnected)
-                ));
-                return false;
-            }
-
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
                 logger.log(String.format(
                         getString(R.string.error),
@@ -253,14 +243,6 @@ public class ConnectionService extends IntentService {
 
             result = provider.start();
 
-            if (!wifi.isConnected(SSID)) {
-                logger.log(String.format(
-                        getString(R.string.error),
-                        getString(R.string.auth_error_network_disconnected)
-                ));
-                result = Provider.RESULT.ERROR; break;
-            }
-
             if (result == Provider.RESULT.NOT_REGISTERED) break;
             if (result == Provider.RESULT.CAPTCHA) break;
         } while (++count < pref_retry_count && running && result == Provider.RESULT.ERROR);
@@ -271,6 +253,7 @@ public class ConnectionService extends IntentService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if ("STOP".equals(intent.getAction())) { // Stop by intent
+            running = false;
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -280,14 +263,19 @@ public class ConnectionService extends IntentService {
 
         if (!running) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
-                onStart(intent, startId);
+                if (Provider.isSSIDSupported(SSID) || from_shortcut) {
+                    onStart(intent, startId);
+                } else {
+                    running = false;
+                    stopSelf();
+                }
 
         return START_NOT_STICKY;
     }
 
     public void onHandleIntent(Intent intent) {
         running = true;
-        if (Provider.isSSIDSupported(SSID) || from_shortcut) main();
+        main();
         running = false;
     }
     
@@ -330,14 +318,14 @@ public class ConnectionService extends IntentService {
         logger.date();
 
         // Notify user if still connected to Wi-Fi
-        if (wifi.isConnected(SSID)) notify(result);
+        if (running) notify(result);
 
         if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
                 || result == Provider.RESULT.CONNECTED)) return;
 
         // Wait while internet connection is available
         int count = 0;
-        while (wifi.isConnected(SSID)) {
+        while (running) {
             SystemClock.sleep(1000);
 
             // Check internet connection each 10 seconds
