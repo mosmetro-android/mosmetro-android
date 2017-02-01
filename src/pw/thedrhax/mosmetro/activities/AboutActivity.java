@@ -64,6 +64,5 @@ public class AboutActivity extends Activity {
                 .beginTransaction()
                 .replace(android.R.id.content, settings)
                 .commit();
-        getFragmentManager().executePendingTransactions();
     }
 }
