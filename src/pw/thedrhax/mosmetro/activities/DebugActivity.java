@@ -57,7 +57,7 @@ public class DebugActivity extends Activity {
         if (getIntent() != null) {
             // Intent from the ConnectionService
             Bundle bundle = getIntent().getExtras();
-            if (bundle != null) {
+            if (bundle != null && bundle.containsKey("logger")) {
                 logger.merge((Logger)bundle.getParcelable("logger"));
                 captcha = getIntent().getBooleanExtra("captcha", false);
                 if (!captcha) return;
