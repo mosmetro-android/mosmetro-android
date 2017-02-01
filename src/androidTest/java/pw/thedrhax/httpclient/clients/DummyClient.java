@@ -21,6 +21,7 @@ package pw.thedrhax.httpclient.clients;
 import org.jsoup.Jsoup;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -61,5 +62,10 @@ public class DummyClient extends Client {
     @Override
     public Client setTimeout(int ms) {
         return this;
+    }
+
+    @Override
+    public Map<String, String> getCookies(String url) {
+        return new HashMap<>();
     }
 }

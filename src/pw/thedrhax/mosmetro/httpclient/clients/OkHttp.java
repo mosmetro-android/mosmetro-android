@@ -144,6 +144,17 @@ public class OkHttp extends Client {
         return this;
     }
 
+    public Map<String, String> getCookies(String url) {
+        HttpUrl httpUrl = HttpUrl.parse(url);
+        Map<String,String> result = new HashMap<>();
+        List<Cookie> url_cookies = client.cookieJar().loadForRequest(httpUrl);
+        if (url_cookies != null)
+            for (Cookie cookie : url_cookies) {
+                result.put(cookie.name(), cookie.value());
+            }
+        return result;
+    }
+
     @Override
     public Client setTimeout(int ms) {
         client = client.newBuilder()

@@ -68,6 +68,7 @@ public abstract class Client {
     }
 
     public abstract Client setCookie(String url, String name, String value);
+    public abstract Map<String,String> getCookies(String url);
 
     public abstract Client setTimeout(int ms);
 
