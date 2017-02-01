@@ -228,6 +228,7 @@ public class MosMetroV2 extends Provider {
                         new Intent(context, CaptchaActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .putExtra("url", captcha_url)
+                                .putExtra("aid", client.getCookies(redirect).get("aid"))
                 );
 
                 // Wait for answer

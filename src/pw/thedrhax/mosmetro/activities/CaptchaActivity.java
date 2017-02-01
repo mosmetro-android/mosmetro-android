@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Util;
 
@@ -56,10 +57,11 @@ public class CaptchaActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha_dialog);
 
+        final String url = getIntent().getStringExtra("url");
+        final Client client = new OkHttp().setCookie(url, "aid", getIntent().getStringExtra("aid"));
         final int pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
 
         final Button submit_button = (Button) findViewById(R.id.submit_button);
-
         final EditText text_captcha = (EditText) findViewById(R.id.text_captcha);
         text_captcha.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -81,10 +83,7 @@ public class CaptchaActivity extends Activity {
                     protected Bitmap doInBackground(Void... voids) {
                         try {
                             return BitmapFactory.decodeStream(
-                                    new OkHttp().getInputStream(
-                                            getIntent().getStringExtra("url"),
-                                            pref_retry_count
-                                    )
+                                    client.getInputStream(url, pref_retry_count)
                             );
                         } catch (Exception ignored) {}
                         return null;
