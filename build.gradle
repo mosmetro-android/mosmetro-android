@@ -105,7 +105,7 @@ repositories {
 
 dependencies {
     // Runtime dependencies.
-    compile 'com.android.support:support-annotations:25.1.0'
+    compile 'com.android.support:support-annotations:25.1.1'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'org.jsoup:jsoup:1.8.3'
     compile ('com.googlecode.json-simple:json-simple:1.1.1') {
@@ -117,6 +117,6 @@ dependencies {
 
     // Needed because there is a conflict in 'com.android.support.test:runner' package.
     // Here we explicitly define the version for the 'androidTest' sources build variant.
-    androidTestCompile 'com.android.support:support-annotations:25.1.0'
+    androidTestCompile 'com.android.support:support-annotations:25.1.1'
     androidTestCompile 'com.android.support.test:runner:0.5'
 }
