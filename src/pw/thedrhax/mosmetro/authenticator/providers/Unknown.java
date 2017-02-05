@@ -53,8 +53,7 @@ public class Unknown extends Provider {
                     logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                 } else {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_provider)
                     ));
                     vars.put("result", RESULT.NOT_SUPPORTED);

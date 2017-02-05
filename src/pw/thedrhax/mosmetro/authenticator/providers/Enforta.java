@@ -43,12 +43,8 @@ public class Enforta extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(String.format(
-                        context.getString(R.string.error),
-                        String.format(
-                                context.getString(R.string.auth_error_provider_unsupported),
-                                getName()
-                        )
+                logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_provider_unsupported, getName())
                 ));
                 vars.put("result", RESULT.NOT_SUPPORTED);
                 return false;

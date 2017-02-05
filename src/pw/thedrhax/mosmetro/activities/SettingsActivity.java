@@ -227,10 +227,7 @@ public class SettingsActivity extends Activity {
 
         // Add version name and code
         Preference app_name = fragment.findPreference("app_name");
-        app_name.setSummary(String.format(
-                getString(R.string.version),
-                Version.getFormattedVersion())
-        );
+        app_name.setSummary(getString(R.string.version, Version.getFormattedVersion()));
 
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =

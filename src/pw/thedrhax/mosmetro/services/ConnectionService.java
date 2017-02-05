@@ -190,22 +190,16 @@ public class ConnectionService extends IntentService {
             SystemClock.sleep(1000);
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
-                logger.log(String.format(
-                        getString(R.string.error),
-                        String.format(
-                                getString(R.string.ip_wait_result),
-                                " " + getString(R.string.not),
-                                pref_ip_wait
+                logger.log(getString(R.string.error,
+                        getString(R.string.ip_wait_result,
+                            " " + getString(R.string.not), pref_ip_wait
                         )
                 ));
                 return false;
             }
         }
 
-        logger.log(String.format(
-                getString(R.string.ip_wait_result),
-                "", count/2
-        ));
+        logger.log(getString(R.string.ip_wait_result, "", count/2));
         return true;
     }
 
@@ -218,11 +212,7 @@ public class ConnectionService extends IntentService {
                 notify_progress
                         .setText(String.format("%s (%s)",
                                 getString(R.string.notification_progress_waiting),
-                                String.format(
-                                        getString(R.string.try_out_of),
-                                        count + 1,
-                                        pref_retry_count
-                                )
+                                getString(R.string.try_out_of, count + 1, pref_retry_count)
                         ))
                         .setContinuous()
                         .show();
@@ -233,11 +223,7 @@ public class ConnectionService extends IntentService {
             notify_progress
                     .setText(String.format("%s (%s)",
                             getString(R.string.notification_progress_connecting),
-                            String.format(
-                                    getString(R.string.try_out_of),
-                                    count + 1,
-                                    pref_retry_count
-                            )
+                            getString(R.string.try_out_of, count + 1, pref_retry_count)
                     ))
                     .show();
 
@@ -292,7 +278,7 @@ public class ConnectionService extends IntentService {
         }
 
         notify_progress
-                .setTitle(String.format(getString(R.string.auth_connecting), SSID))
+                .setTitle(getString(R.string.auth_connecting, SSID))
                 .setText(getString(R.string.auth_provider_check))
                 .setContinuous()
                 .show();

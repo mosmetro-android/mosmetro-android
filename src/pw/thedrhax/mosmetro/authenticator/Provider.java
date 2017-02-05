@@ -154,8 +154,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
         // Only Unknown Provider without internet connection is possible here
         if (client.getPageContent() != null)
             logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-        logger.log(String.format(
-                context.getString(R.string.error),
+        logger.log(context.getString(R.string.error,
                 context.getString(R.string.auth_error_provider)
         ));
 
@@ -232,10 +231,8 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
     public RESULT start() {
         AndroidHacks.bindToWiFi(context);
 
-        logger.log(String.format(
-                context.getString(R.string.version), Version.getFormattedVersion()
-        ));
-        logger.log(String.format(context.getString(R.string.algorithm_name), getName()));
+        logger.log(context.getString(R.string.version, Version.getFormattedVersion()));
+        logger.log(context.getString(R.string.algorithm_name, getName()));
 
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);

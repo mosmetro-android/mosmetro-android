@@ -84,8 +84,7 @@ public class MosMetroV2 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (redirect.contains(".wi-fi.ru/identification")) {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_not_registered)
                     ));
                     vars.put("result", RESULT.NOT_REGISTERED);
@@ -111,8 +110,7 @@ public class MosMetroV2 extends Provider {
                     return true;
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_redirect)
                     ));
                     return false;
@@ -141,8 +139,7 @@ public class MosMetroV2 extends Provider {
                     return true;
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
                     ));
                     return false;
@@ -219,8 +216,7 @@ public class MosMetroV2 extends Provider {
 
                 if (context instanceof ConnectionService)
                     if (!settings.getBoolean("pref_captcha_dialog", true)) {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
+                        logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_captcha))
                         );
                         vars.put("result", RESULT.CAPTCHA);
@@ -233,8 +229,7 @@ public class MosMetroV2 extends Provider {
                     Element captcha_img = form.getElementsByTag("img").first();
                     captcha_url = redirect + captcha_img.attr("src");
                 } catch (Exception ex) {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha_image))
                     );
                     logger.log(Logger.LEVEL.DEBUG, ex);
@@ -259,8 +254,7 @@ public class MosMetroV2 extends Provider {
                 // Check the answer
                 String code = CaptchaActivity.getResult();
                 if (code == null || code.isEmpty()) {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha))
                     );
                     vars.put("result", RESULT.CAPTCHA);
@@ -282,8 +276,7 @@ public class MosMetroV2 extends Provider {
                     logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -314,8 +307,7 @@ public class MosMetroV2 extends Provider {
                 } catch (ProtocolException ignored) { // Too many follow-up requests
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -342,8 +334,7 @@ public class MosMetroV2 extends Provider {
                         vars.put("result", RESULT.CONNECTED);
                         return true;
                     } else {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
+                        logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_connection)
                         ));
                         return false;

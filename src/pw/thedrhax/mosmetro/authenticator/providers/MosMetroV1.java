@@ -82,8 +82,7 @@ public class MosMetroV1 extends Provider {
                     return true;
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
                     ));
                     return false;
@@ -101,8 +100,7 @@ public class MosMetroV1 extends Provider {
                 try {
                     Elements forms = client.getPageContent().getElementsByTag("form");
                     if (forms.size() > 1) {
-                        logger.log(String.format(
-                                context.getString(R.string.error),
+                        logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_not_registered)
                         ));
                         vars.put("result", RESULT.NOT_REGISTERED);
@@ -111,8 +109,7 @@ public class MosMetroV1 extends Provider {
                     vars.put("form", Client.parseForm(forms.first()));
                     return true;
                 } catch (Exception ex) {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_form)
                     ));
                     return false;
@@ -135,8 +132,7 @@ public class MosMetroV1 extends Provider {
                     return true;
                 } catch (Exception ex) {
                     logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -157,8 +153,7 @@ public class MosMetroV1 extends Provider {
                     vars.put("result", RESULT.CONNECTED);
                     return true;
                 } else {
-                    logger.log(String.format(
-                            context.getString(R.string.error),
+                    logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_connection)
                     ));
                     return false;

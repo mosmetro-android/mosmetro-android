@@ -102,9 +102,9 @@ public class DebugActivity extends Activity {
 
                 send_email.setType("text/plain");
                 send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
-                send_email.putExtra(Intent.EXTRA_SUBJECT, String.format(
-                        getString(R.string.report_email_subject), Version.getFormattedVersion()
-                ));
+                send_email.putExtra(Intent.EXTRA_SUBJECT,
+                        getString(R.string.report_email_subject, Version.getFormattedVersion())
+                );
                 send_email.putExtra(Intent.EXTRA_TEXT, logger.get(Logger.LEVEL.DEBUG));
 
                 startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
