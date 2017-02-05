@@ -29,7 +29,7 @@ Wi-Fi в метро [![Build Status](https://local.thedrhax.pw/jenkins/job/MosMe
 Вы можете записаться на тестирование [здесь](https://play.google.com/apps/testing/pw.thedrhax.mosmetro). Регистрация открыта для всех (просто нужно нажать на кнопку и бета версии начнут приходить вместо обычных). От тестировщиков ничего не требуется, но, если не трудно, сообщайте мне об ошибках на GitHub или отправляйте отчеты напрямую из приложения.
 
 ## Связь
-[![ВКонтакте](img/vk-box.png)](https://vk.com/wifi_v_metro)
+[![ВКонтакте](.github/img/vk-box.png)](https://vk.com/wifi_v_metro)
 
 Лицензия
 ---
