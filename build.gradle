@@ -1,13 +1,18 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath('fr.avianey.androidsvgdrawable:gradle-plugin:3.0.0') {
+            exclude group: 'xerces'
+        }
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'androidsvgdrawable'
 
 android {
     compileSdkVersion 25
@@ -68,7 +73,7 @@ android {
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
+            res.srcDirs = ['res', 'build/generated/res/main']
             assets.srcDirs = ['assets']
             java {
                 srcDir 'src'
@@ -81,6 +86,17 @@ android {
             abortOnError false
         }
     }
+}
+
+import fr.avianey.androidsvgdrawable.gradle.SvgDrawableTask
+task svgToDrawablePng(type: SvgDrawableTask) {
+    from = files('res-svg/drawable')
+    to = file('build/generated/res/main')
+    createMissingDirectories = true
+    overwriteMode = 'ifModified'
+    targetedDensities = ['ldpi', 'hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+    outputFormat = 'PNG'
+    outputType = 'drawable'
 }
 
 repositories {
