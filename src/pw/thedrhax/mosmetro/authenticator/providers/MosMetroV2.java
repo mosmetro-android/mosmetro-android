@@ -77,6 +77,25 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
+         * Checking if device is not registered
+         * redirect ~= auth.wi-fi.ru/identification?segment=...
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (redirect.contains(".wi-fi.ru/identification")) {
+                    logger.log(String.format(
+                            context.getString(R.string.error),
+                            context.getString(R.string.auth_error_not_registered)
+                    ));
+                    vars.put("result", RESULT.NOT_REGISTERED);
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        /**
          * Getting redirect
          * ⇒ GET http://auth.wi-fi.ru/?rand=... < redirect
          * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth
