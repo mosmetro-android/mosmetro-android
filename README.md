@@ -1,4 +1,6 @@
-# Wi-Fi в метро [![Build Status](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/badge/icon)](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/) [![Google Play](img/google-play.png)](https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro) [![ВКонтакте](img/vk-box.png)](https://vk.com/wifi_v_metro)
+Wi-Fi в метро [![Build Status](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/badge/icon)](https://local.thedrhax.pw/jenkins/job/MosMetro-Android/branch/master/)
+=====================
+[<img alt="Get it on Google Play" height="80" src="https://play.google.com/intl/en_us/badges/images/generic/ru_badge_web_generic.png">](https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro)
 
 Данное приложение предназначено для автоматической авторизации Android-устройств в сетях московского общественного транспорта. Поддерживаются версии Android 3.0 (SDK 11) и выше.
 
@@ -25,3 +27,22 @@
 ## Тестирование в Google Play
 
 Вы можете записаться на тестирование [здесь](https://play.google.com/apps/testing/pw.thedrhax.mosmetro). Регистрация открыта для всех (просто нужно нажать на кнопку и бета версии начнут приходить вместо обычных). От тестировщиков ничего не требуется, но, если не трудно, сообщайте мне об ошибках на GitHub или отправляйте отчеты напрямую из приложения.
+
+## Связь
+[![ВКонтакте](.github/img/vk-box.png)](https://vk.com/wifi_v_metro)
+
+Лицензия
+---
+
+    Copyright (C) 2017 Дмитрий Карих <the.dr.hax@gmail.com>
+    This file is part of Wi-Fi в метро.
+    Wi-Fi в метро is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
