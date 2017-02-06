@@ -186,7 +186,7 @@ public class MosMetroV2 extends Provider {
                                     new String(Base64.decode(
                                             "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25l" +
                                                     "dGluZm8vYXV0aA==", Base64.DEFAULT
-                                    )), null, pref_retry_count)
+                                    )), null)
                             .getResponseCode();
 
                     if (code == 200 && isConnected()) {
