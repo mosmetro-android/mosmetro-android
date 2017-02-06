@@ -309,6 +309,12 @@ public class ConnectionService extends IntentService {
         if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
                 || result == Provider.RESULT.CONNECTED)) return;
 
+        Intent broadcast = new Intent()
+                .putExtra("SSID", SSID)
+                .putExtra("PROVIDER", provider.getName());
+
+        sendBroadcast(broadcast.setAction("pw.thedrhax.mosmetro.event.CONNECTED"));
+
         // Wait while internet connection is available
         int count = 0;
         while (running) {
@@ -321,6 +327,8 @@ public class ConnectionService extends IntentService {
                     break;
             }
         }
+
+        sendBroadcast(broadcast.setAction("pw.thedrhax.mosmetro.event.DISCONNECTED"));
 
         notification.hide();
 
