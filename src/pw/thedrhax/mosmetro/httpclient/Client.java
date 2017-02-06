@@ -41,7 +41,7 @@ public abstract class Client {
     protected Client() {
         headers = new HashMap<>();
 
-        String ua = System.getProperty("http.agent");
+        String ua = System.getProperty("http.agent", "()");
         setHeader(HEADER_USER_AGENT,
                 "Mozilla/5.0 " + ua.substring(ua.indexOf("("), ua.indexOf(")") + 1) +
                 " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.85 Mobile Safari/537.36"
