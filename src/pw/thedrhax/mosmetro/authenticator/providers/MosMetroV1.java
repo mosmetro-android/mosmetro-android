@@ -41,7 +41,7 @@ import pw.thedrhax.util.Logger;
  */
 
 public class MosMetroV1 extends Provider {
-    private String redirect;
+    protected String redirect;
 
     public MosMetroV1(final Context context) {
         super(context);
@@ -50,6 +50,7 @@ public class MosMetroV1 extends Provider {
          * Checking Internet connection for a first time
          * ⇒ GET http://wi-fi.ru
          * ⇐ Meta-redirect: http://login.wi-fi.ru/am/UI/Login?... > redirect
+         * Note: Do not change id of this Task! (see MosMetroV2)
          */
         add(new Task() {
             @Override

@@ -122,7 +122,7 @@
         Here you can enter it without watching ads.
         \nClick on the image to update it.
     </string>
-    <string name="auth_captcha_bypass">CAPTCHA requested. Trying to bypass…</string>
+    <string name="auth_captcha_bypass_backdoor">CAPTCHA requested. Trying to bypass…</string>
     <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
     <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
     <string name="auth_auth_page">Getting login page</string>
@@ -202,4 +202,5 @@
     <string name="auth_provider_check">Detecting the provider…</string>
     <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
     <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
+    <string name="auth_captcha_bypass_MosMetroV1">Trying to use old algorithm MosMetroV1 to bypass the CAPTCHA</string>
 </resources>
