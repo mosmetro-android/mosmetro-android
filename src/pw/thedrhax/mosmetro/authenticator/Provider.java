@@ -265,8 +265,13 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 params.put("success", connected ? "true" : "false");
                 params.put("ssid", new WifiUtils(context).getSSID());
                 params.put("provider", getName());
-                if (vars.get("captcha") != null)
+                if (vars.get("captcha") != null) {
                     params.put("captcha", (String) vars.get("captcha"));
+                    if (vars.get("captcha_code") != null) {
+                        params.put("captcha_image", (String) vars.get("captcha_image"));
+                        params.put("captcha_code", (String) vars.get("captcha_code"));
+                    }
+                }
 
                 try {
                     new OkHttp().post(STATISTICS_URL, params);

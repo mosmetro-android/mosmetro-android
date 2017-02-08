@@ -246,7 +246,7 @@ public class MosMetroV2 extends Provider {
          */
         add(new Task() {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
+            public boolean run(final HashMap<String, Object> vars) {
                 Element form = (Element) vars.get("captcha_form");
                 if (form == null) return true;
 
@@ -274,11 +274,11 @@ public class MosMetroV2 extends Provider {
                 }
 
                 // Register result receiver
-                final String[] result = new String[1];
                 BroadcastReceiver receiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
-                        result[0] = intent.getStringExtra("value");
+                        vars.put("captcha_image", intent.getStringExtra("image"));
+                        vars.put("captcha_code", intent.getStringExtra("value"));
                     }
                 };
                 context.registerReceiver(
@@ -294,7 +294,7 @@ public class MosMetroV2 extends Provider {
                 );
 
                 // Wait for answer
-                while (result[0] == null && !stopped) {
+                while (vars.get("captcha_code") == null && !stopped) {
                     SystemClock.sleep(100);
                 }
 
@@ -306,7 +306,7 @@ public class MosMetroV2 extends Provider {
                     );
 
                 // Check the answer
-                String code = result[0];
+                String code = (String) vars.get("captcha_code");
                 if (code == null || code.isEmpty()) {
                     logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha))

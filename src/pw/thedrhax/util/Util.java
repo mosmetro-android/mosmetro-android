@@ -19,7 +19,11 @@
 package pw.thedrhax.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
 
 public final class Util {
     private Util() {}
@@ -35,5 +39,15 @@ public final class Util {
             );
         } catch (NumberFormatException ignored) {}
         return result;
+    }
+
+    public static String bitmapToBase64(Bitmap bitmap) {
+        if (bitmap == null) return null;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+
+        byte[] bytes = baos.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 }

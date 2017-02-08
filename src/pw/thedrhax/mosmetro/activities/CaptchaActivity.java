@@ -38,6 +38,8 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Util;
 
 public class CaptchaActivity extends Activity {
+    private Bitmap image = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +79,8 @@ public class CaptchaActivity extends Activity {
 
                     @Override
                     protected void onPostExecute(Bitmap bitmap) {
-                        if (bitmap != null) image_captcha.setImageBitmap(bitmap);
+                        image = bitmap;
+                        if (image != null) image_captcha.setImageBitmap(image);
                     }
                 }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
@@ -87,9 +90,9 @@ public class CaptchaActivity extends Activity {
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendBroadcast(
-                        new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
-                                .putExtra("value", text_captcha.getText().toString())
+                sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
+                        .putExtra("value", text_captcha.getText().toString())
+                        .putExtra("image", Util.bitmapToBase64(image))
                 );
                 finish();
             }
