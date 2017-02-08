@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -37,21 +38,6 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Util;
 
 public class CaptchaActivity extends Activity {
-    public static final Object result_sync = new Object();
-    public static String result = null;
-
-    public static String getResult() {
-        synchronized (result_sync) {
-            return result;
-        }
-    }
-
-    public static void setResult(String value) {
-        synchronized (result_sync) {
-            result = value;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +87,10 @@ public class CaptchaActivity extends Activity {
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(text_captcha.getText().toString());
+                sendBroadcast(
+                        new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
+                                .putExtra("value", text_captcha.getText().toString())
+                );
                 finish();
             }
         });
@@ -116,6 +105,8 @@ public class CaptchaActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (getResult() == null) setResult("");
+        sendBroadcast(
+                new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT").putExtra("value", "")
+        );
     }
 }

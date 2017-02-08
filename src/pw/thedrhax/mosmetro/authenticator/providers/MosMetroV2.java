@@ -19,8 +19,10 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Base64;
@@ -271,6 +273,18 @@ public class MosMetroV2 extends Provider {
                     return false;
                 }
 
+                // Register result receiver
+                final String[] result = new String[1];
+                BroadcastReceiver receiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        result[0] = intent.getStringExtra("value");
+                    }
+                };
+                context.registerReceiver(
+                        receiver, new IntentFilter("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
+                );
+
                 // Asking user to enter the code
                 context.startActivity(
                         new Intent(context, CaptchaActivity.class)
@@ -280,13 +294,15 @@ public class MosMetroV2 extends Provider {
                 );
 
                 // Wait for answer
-                CaptchaActivity.setResult(null);
-                while (CaptchaActivity.getResult() == null && !stopped) {
+                while (result[0] == null && !stopped) {
                     SystemClock.sleep(100);
                 }
 
+                // Unregister receiver
+                context.unregisterReceiver(receiver);
+
                 // Check the answer
-                String code = CaptchaActivity.getResult();
+                String code = result[0];
                 if (code == null || code.isEmpty()) {
                     logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha))
