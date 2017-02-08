@@ -97,6 +97,13 @@ public class CaptchaActivity extends Activity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if ("STOP".equals(intent.getAction()))
+            finish();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         finish();

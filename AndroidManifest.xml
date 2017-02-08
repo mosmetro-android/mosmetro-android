@@ -78,7 +78,7 @@
             android:name=".activities.CaptchaActivity"
             android:label="@string/auth_captcha_dialog"
             android:theme="@style/AppBaseTheme.Dialog"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"/>

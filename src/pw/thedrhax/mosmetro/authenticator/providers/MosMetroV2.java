@@ -298,8 +298,12 @@ public class MosMetroV2 extends Provider {
                     SystemClock.sleep(100);
                 }
 
-                // Unregister receiver
+                // Unregister receiver and close the Activity
                 context.unregisterReceiver(receiver);
+                if (stopped)
+                    context.startActivity(
+                            new Intent(context, CaptchaActivity.class).setAction("STOP")
+                    );
 
                 // Check the answer
                 String code = result[0];
