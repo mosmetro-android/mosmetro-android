@@ -46,7 +46,7 @@ public class CachedRetriever {
             cache_storage = new JSONArray();
         }
 
-        client = new OkHttp();
+        client = new OkHttp().setTimeout(5000);
     }
 
     public CachedRetriever setClient (Client client) {
