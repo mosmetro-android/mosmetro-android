@@ -309,11 +309,10 @@ public class ConnectionService extends IntentService {
         if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
                 || result == Provider.RESULT.CONNECTED)) return;
 
-        Intent broadcast = new Intent()
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
                 .putExtra("SSID", SSID)
-                .putExtra("PROVIDER", provider.getName());
-
-        sendBroadcast(broadcast.setAction("pw.thedrhax.mosmetro.event.CONNECTED"));
+                .putExtra("PROVIDER", provider.getName())
+        );
 
         // Wait while internet connection is available
         int count = 0;
@@ -328,8 +327,6 @@ public class ConnectionService extends IntentService {
             }
         }
 
-        sendBroadcast(broadcast.setAction("pw.thedrhax.mosmetro.event.DISCONNECTED"));
-
         notification.hide();
 
         // Try to reconnect the Wi-Fi network
@@ -343,5 +340,6 @@ public class ConnectionService extends IntentService {
         if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
     }
 }
