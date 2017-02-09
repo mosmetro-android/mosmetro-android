@@ -19,14 +19,8 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.util.Base64;
 
 import org.json.simple.JSONObject;
@@ -38,14 +32,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.CaptchaActivity;
+import pw.thedrhax.mosmetro.authenticator.CaptchaRequest;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.WifiUtils;
 
 /**
@@ -267,56 +259,13 @@ public class MosMetroV2 extends Provider {
                     return false;
                 }
 
-                Intent captcha_activity = new Intent(context, CaptchaActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("url", captcha_url)
-                        .putExtra("aid", client.getCookies(redirect).get("aid"));
-
-                Notification captcha_notify = new Notification(context)
-                        .setTitle(context.getString(R.string.notification_captcha))
-                        .setText(context.getString(R.string.notification_captcha_summary))
-                        .setIcon(R.drawable.ic_notification_register)
-                        .setIntent(captcha_activity)
-                        .setId(1)
-                        .setDeleteIntent(PendingIntent.getService(
-                                context, 0,
-                                new Intent(context, ConnectionService.class).setAction("STOP"),
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        ));
-
-                boolean auto_activity = context instanceof Activity
-                        || settings.getBoolean("pref_captcha_dialog", true);
-
-                // Asking user to enter the code
-                if (auto_activity)
-                    context.startActivity(captcha_activity);
-                else
-                    captcha_notify.show();
-
-                // Register result receiver
-                BroadcastReceiver receiver = new BroadcastReceiver() {
+                // Asking user to enter the CAPTCHA
+                vars.putAll(new CaptchaRequest() {
                     @Override
-                    public void onReceive(Context context, Intent intent) {
-                        vars.put("captcha_image", intent.getStringExtra("image"));
-                        vars.put("captcha_code", intent.getStringExtra("value"));
+                    public boolean stop() {
+                        return stopped;
                     }
-                };
-                context.getApplicationContext().registerReceiver(
-                        receiver, new IntentFilter("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
-                );
-
-                // Wait for answer
-                while (vars.get("captcha_code") == null && !stopped) {
-                    SystemClock.sleep(100);
-                }
-
-                // Unregister receiver, close the Activity and remove the Notification
-                context.getApplicationContext().unregisterReceiver(receiver);
-                if (stopped && auto_activity)
-                    context.startActivity(
-                        new Intent(context, CaptchaActivity.class).setAction("STOP")
-                    );
-                captcha_notify.hide();
+                }.getResult(context, captcha_url, client.getCookies(redirect).get("aid")));
 
                 // Check the answer
                 String code = (String) vars.get("captcha_code");
