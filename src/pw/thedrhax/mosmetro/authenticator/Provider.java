@@ -220,7 +220,6 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
 
     public enum RESULT {
         CONNECTED, ALREADY_CONNECTED,           // Success
-        CAPTCHA,                                // User action required
         NOT_REGISTERED, ERROR, NOT_SUPPORTED,   // Error
         INTERRUPTED                             // Stopped
     }
