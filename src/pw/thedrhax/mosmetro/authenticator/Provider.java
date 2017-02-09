@@ -266,7 +266,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 params.put("provider", getName());
                 if (vars.get("captcha") != null) {
                     params.put("captcha", (String) vars.get("captcha"));
-                    if (vars.get("captcha_code") != null) {
+                    if ("entered".equals(vars.get("captcha"))) {
                         params.put("captcha_image", (String) vars.get("captcha_image"));
                         params.put("captcha_code", (String) vars.get("captcha_code"));
                     }
