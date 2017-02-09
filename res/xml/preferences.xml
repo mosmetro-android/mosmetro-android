@@ -92,12 +92,6 @@
                     android:defaultValue="true" />
 
             <CheckBoxPreference
-                    android:key="pref_notify_success_log"
-                    android:title="@string/pref_notify_success_log"
-                    android:summary="@string/pref_notify_success_log_summary"
-                    android:defaultValue="false" />
-
-            <CheckBoxPreference
                     android:key="pref_notify_success_lock"
                     android:title="@string/pref_notify_success_lock"
                     android:summary="@string/pref_notify_success_lock_summary"

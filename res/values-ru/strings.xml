@@ -52,10 +52,6 @@
     <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
     <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
     <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
-    <string name="pref_notify_success_log">Лог успешного подключения</string>
-    <string name="pref_notify_success_log_summary">
-        Показывать лог успешного подключения при нажатии на соответствующее уведомление
-    </string>
     <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
     <string name="pref_notify_success_lock_summary">
         Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
@@ -145,7 +141,6 @@
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
-    <string name="notification_success_settings">Нажмите, чтобы открыть настройки уведомлений</string>
     <string name="notification_not_registered">Устройство не зарегистрировано</string>
     <string name="notification_not_registered_register">Нажмите, чтобы перейти к регистрации</string>
     <string name="notification_error">Не удалось подключиться</string>

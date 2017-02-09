@@ -54,10 +54,6 @@
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="pref_notify_fail_summary">Notify on failure</string>
     <string name="pref_notify_progress_summary">Show connection progress (Android 4.0+)</string>
-    <string name="pref_notify_success_log">Successful connection log</string>
-    <string name="pref_notify_success_log_summary">
-        Show successful connection log when corresponding notification is clicked
-    </string>
     <string name="pref_notify_success_lock">Locked notification</string>
     <string name="pref_notify_success_lock_summary">
         Lock successful connection notification (notification will remain while Wi-Fi is connected)
@@ -152,7 +148,6 @@
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>
-    <string name="notification_success_settings">Click to open notification preferences</string>
     <string name="notification_not_registered">Device is not registered</string>
     <string name="notification_not_registered_register">Click to proceed with registration</string>
     <string name="notification_error">Unable to connect</string>

@@ -29,7 +29,6 @@ import android.preference.PreferenceManager;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
-import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
@@ -102,19 +101,9 @@ public class ConnectionService extends IntentService {
             case ALREADY_CONNECTED:
                 notification
                         .setTitle(getString(R.string.notification_success))
-                        .setIcon(R.drawable.ic_notification_success);
-
-                if (settings.getBoolean("pref_notify_success_log", false)) {
-                    notification
-                            .setText(getString(R.string.notification_success_log))
-                            .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger));
-                } else {
-                    notification
-                            .setText(getString(R.string.notification_success_settings))
-                            .setIntent(new Intent(this, SettingsActivity.class));
-                }
-
-                notification
+                        .setIcon(R.drawable.ic_notification_success)
+                        .setText(getString(R.string.notification_success_log))
+                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setCancellable(from_shortcut || !pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
