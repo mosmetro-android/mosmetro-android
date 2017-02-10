@@ -182,7 +182,7 @@ public class DebugActivity extends Activity {
             task = new AuthTask();
 
         if (task.getStatus() != AsyncTask.Status.RUNNING)
-            task.execute();
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     // Handle debug log checkbox
