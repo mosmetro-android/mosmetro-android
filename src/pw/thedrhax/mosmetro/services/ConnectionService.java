@@ -233,20 +233,15 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         running = true;
-        main();
-        running = false;
-    }
-    
-    private void main() {
-        logger.date();
 
+        logger.date();
         notification.hide();
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
             notify_progress.hide();
             notify(Provider.RESULT.ERROR);
-            return;
+            running = false; return;
         }
 
         notify_progress
@@ -272,14 +267,15 @@ public class ConnectionService extends IntentService {
         // Try to connect
         Provider.RESULT result = connect();
         notify_progress.hide();
-
         logger.date();
 
         // Notify user if still connected to Wi-Fi
         if (running) notify(result);
 
         if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
-                || result == Provider.RESULT.CONNECTED)) return;
+                || result == Provider.RESULT.CONNECTED)) {
+            running = false;  return;
+        }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
                 .putExtra("SSID", SSID)
@@ -302,8 +298,10 @@ public class ConnectionService extends IntentService {
         notification.hide();
 
         // Try to reconnect the Wi-Fi network
-        if (settings.getBoolean("pref_wifi_reconnect", false))
-            wifi.reconnect(SSID);
+        if (settings.getBoolean("pref_wifi_reconnect", false)) wifi.reconnect(SSID);
+
+        // If Service is not being killed, continue the main loop
+        if (running) onHandleIntent(intent);
 	}
 	
 	@Override
