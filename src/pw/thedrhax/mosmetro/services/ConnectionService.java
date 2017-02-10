@@ -295,6 +295,8 @@ public class ConnectionService extends IntentService {
             }
         }
 
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
+
         notification.hide();
 
         // Try to reconnect the Wi-Fi network
