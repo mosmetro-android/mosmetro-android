@@ -133,7 +133,8 @@ public class MosMetroV2 extends Provider {
                     Uri redirect_uri = Uri.parse(redirect);
                     redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
 
-                    client.get(redirect + "/auth", null, pref_retry_count);
+                    boolean force = settings.getBoolean("pref_mosmetro_captcha_force", false);
+                    client.get(redirect + (force ? "/auto_auth" : "/auth"), null, pref_retry_count);
                     logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (Exception ex) {
@@ -155,6 +156,7 @@ public class MosMetroV2 extends Provider {
                 Element form = client.getPageContent().getElementsByTag("form").first();
                 if (form != null && "captcha__container".equals(form.attr("class"))) {
                     vars.put("captcha_form", form);
+                    logger.log(context.getString(R.string.auth_captcha_requested));
                 }
                 return true;
             }
@@ -166,7 +168,11 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (vars.get("captcha_form") == null) return true;
+                if (!settings.getBoolean("pref_mosmetro_captcha_bypass_backdoor", true))
+                    return true;
+                else if (vars.get("captcha_form") == null)
+                    return true;
+
                 logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
                 try {
                     int code = new OkHttp()
@@ -211,7 +217,10 @@ public class MosMetroV2 extends Provider {
             @SuppressLint("HardwareIds")
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (vars.get("captcha_form") == null) return true;
+                if (!settings.getBoolean("pref_mosmetro_captcha_bypass_mosmetrov1", true))
+                    return true;
+                else if (vars.get("captcha_form") == null)
+                    return true;
 
                 MosMetroV1 mosmetro = new MosMetroV1(context);
                 mosmetro.remove(0); // Remove initial internet check

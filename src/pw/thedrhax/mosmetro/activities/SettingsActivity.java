@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -228,6 +229,39 @@ public class SettingsActivity extends Activity {
         // Add version name and code
         Preference app_name = fragment.findPreference("app_name");
         app_name.setSummary(getString(R.string.version, Version.getFormattedVersion()));
+        app_name.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            private int count = 0;
+
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                boolean enabled = settings.getBoolean("pref_category_advanced", false);
+
+                if (count == 4) {
+                    settings.edit()
+                            .putBoolean("pref_category_advanced", !enabled)
+                            .apply();
+
+                    if (!enabled)
+                        Toast.makeText(
+                                SettingsActivity.this,
+                                R.string.pref_category_advanced_enabled,
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                    startActivity(new Intent(SettingsActivity.this, SettingsActivity.class));
+                    SettingsActivity.this.finish();
+                } else {
+                    count++;
+                }
+
+                return true;
+            }
+        });
+
+        // Hide advanced preferences
+        PreferenceCategory main = (PreferenceCategory) fragment.findPreference("pref_category_main");
+        if (!settings.getBoolean("pref_category_advanced", false))
+            main.removePreference(fragment.findPreference("pref_category_advanced"));
 
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =

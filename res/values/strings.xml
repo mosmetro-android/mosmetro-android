@@ -118,7 +118,7 @@
         Here you can enter it without watching ads.
         \nClick on the image to update it.
     </string>
-    <string name="auth_captcha_bypass_backdoor">CAPTCHA requested. Trying to bypass…</string>
+    <string name="auth_captcha_requested">CAPTCHA requested</string>
     <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
     <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
     <string name="auth_auth_page">Getting login page</string>
@@ -197,6 +197,20 @@
     <string name="auth_provider_check">Detecting the provider…</string>
     <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
     <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
-    <string name="auth_captcha_bypass_MosMetroV1">Trying to use old algorithm MosMetroV1 to bypass the CAPTCHA</string>
+    <string name="auth_captcha_bypass_MosMetroV1">Trying to bypass CAPTCHA using the old algorithm MosMetroV1…</string>
     <string name="stop">Stop</string>
+    <string name="auth_captcha_bypass_backdoor">Trying to bypass CAPTCHA using the official backdoor…</string>
+    <string name="pref_mosmetro_captcha_bypass_backdoor">CAPTCHA bypass (backdoor)</string>
+    <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Allow to use the official backdoor to bypass the CAPTCHA. Turn it off in case of random freezes.</string>
+    <string name="pref_mosmetro_captcha_bypass_mosmetrov1">CAPTCHA bypass (MosMetroV1)</string>
+    <string name="pref_mosmetro_captcha_bypass_mosmetrov1_summary">Allow to use the MosMetroV1 algorithm to bypass the CAPTCHA.</string>
+    <string name="pref_mosmetro_captcha_force">Force the CAPTCHA request</string>
+    <string name="pref_mosmetro_captcha_force_summary">This option will force the algorithm to think that CAPTCHA is always requested by server.</string>
+    <string name="pref_category_advanced">Advanced preferences</string>
+    <string name="pref_category_advanced_enabled">Advanced preferences have been activated ;)</string>
+    <string name="pref_category_advanced_summary">This category contains useful, yet dangerous preferences. Be careful!</string>
+    <string name="captcha">CAPTCHA</string>
+    <string name="pref_mosmetro_captcha_collect">Collect solved CAPTCHAs</string>
+    <string name="pref_mosmetro_captcha_collect_summary">Allow this app to send manually solved CAPTCHAs to my server.</string>
+    <string name="pref_category_statistics">Statistics</string>
 </resources>

@@ -110,7 +110,7 @@
         Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
         \nНажмите на изображение, чтобы обновить его.
     </string>
-    <string name="auth_captcha_bypass_backdoor">Требуется ввод капчи. Пытаюсь обойти…</string>
+    <string name="auth_captcha_requested">Требуется ввод капчи</string>
     <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
     <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
@@ -181,6 +181,20 @@
     <string name="more_information_summary">Ссылки, сообщества, благодарности</string>
     <string name="pref_captcha_dialog">Диалог ввода капчи</string>
     <string name="pref_captcha_dialog_summary">Если включено, диалог ввода капчи будет открываться автоматически поверх других приложений.</string>
-    <string name="auth_captcha_bypass_MosMetroV1">Пытаюсь воспользоваться старым алгоритмом MosMetroV1 для того, чтобы отключить капчу</string>
+    <string name="auth_captcha_bypass_MosMetroV1">Пытаюсь обойти капчу с помощью старого алгоритма MosMetroV1…</string>
     <string name="stop">Остановить</string>
+    <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
+    <string name="pref_mosmetro_captcha_bypass_backdoor">Обход капчи (бэкдор)</string>
+    <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Разрешить использование официального бэкдора для обхода капчи. Отключите эту функцию, если вы сталкиваетесь со случайными зависаниями.</string>
+    <string name="pref_mosmetro_captcha_bypass_mosmetrov1">Обход капчи (MosMetroV1)</string>
+    <string name="pref_mosmetro_captcha_bypass_mosmetrov1_summary">Разрешить использование старого алгоритма MosMetroV1 для обхода капчи.</string>
+    <string name="pref_mosmetro_captcha_force">Всегда запрашивать капчу</string>
+    <string name="pref_mosmetro_captcha_force_summary">Эта настройка заставит алгоритм думать, что сервер всегда запрашивает ввод капчи.</string>
+    <string name="pref_category_advanced">Расширенные настройки</string>
+    <string name="pref_category_advanced_enabled">Расширенные настройки активированы ;)</string>
+    <string name="pref_category_advanced_summary">В этой категории находятся всякие полезные, но и опасные настройки. Осторожно!</string>
+    <string name="captcha">Капча</string>
+    <string name="pref_mosmetro_captcha_collect">Собирать решённые капчи</string>
+    <string name="pref_mosmetro_captcha_collect_summary">Разрешить этому приложению отправлять решённые капчи на мой сервер.</string>
+    <string name="pref_category_statistics">Статистика</string>
 </resources>
