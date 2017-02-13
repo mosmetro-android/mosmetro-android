@@ -159,7 +159,7 @@ public class DebugActivity extends Activity {
         if (service_running)
             service.setAction("STOP");
         else
-            service.putExtra("force", true);
+            service.putExtra("debug", true);
         startService(service);
     }
 

@@ -102,49 +102,51 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                notification
-                        .setTitle(getString(R.string.notification_success))
-                        .setIcon(R.drawable.ic_notification_success)
-                        .setText(getString(R.string.notification_success_log))
-                        .setCancellable(from_shortcut || !pref_notify_success_lock)
-                        .setEnabled(settings.getBoolean("pref_notify_success", true))
-                        .show();
+                if (settings.getBoolean("pref_notify_success", true)) {
+                    notification
+                            .setTitle(getString(R.string.notification_success))
+                            .setIcon(R.drawable.ic_notification_success)
+                            .setText(getString(R.string.notification_success_log))
+                            .setCancellable(from_shortcut || !pref_notify_success_lock)
+                            .show();
 
-                notification.setCancellable(true);
-
+                    notification.setCancellable(true);
+                }
                 return;
 
             case NOT_REGISTERED:
-                notification
-                        .setTitle(getString(R.string.notification_not_registered))
-                        .setText(getString(R.string.notification_not_registered_register))
-                        .setIcon(R.drawable.ic_notification_register)
-                        .setIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://wi-fi.ru")))
-                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
-                        .setId(2)
-                        .show();
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    notification
+                            .setTitle(getString(R.string.notification_not_registered))
+                            .setText(getString(R.string.notification_not_registered_register))
+                            .setIcon(R.drawable.ic_notification_register)
+                            .setIntent(new Intent(Intent.ACTION_VIEW)
+                                    .setData(Uri.parse("http://wi-fi.ru")))
+                            .setId(2)
+                            .show();
 
-                notification.setId(0); // Reset ID to default
-
+                    notification.setId(0); // Reset ID to default
+                }
                 return;
 
             case ERROR:
-                notification
-                        .setTitle(getString(R.string.notification_error))
-                        .setText(getString(R.string.notification_error_log))
-                        .setIcon(R.drawable.ic_notification_error)
-                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
-                        .show();
-
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    notification
+                            .setTitle(getString(R.string.notification_error))
+                            .setText(getString(R.string.notification_error_log))
+                            .setIcon(R.drawable.ic_notification_error)
+                            .show();
+                }
                 return;
 
             case NOT_SUPPORTED:
-                notification
-                        .setTitle(getString(R.string.notification_unsupported))
-                        .setText(getString(R.string.notification_error_log))
-                        .setIcon(R.drawable.ic_notification_register)
-                        .setEnabled(settings.getBoolean("pref_notify_fail", true))
-                        .show();
+                if (settings.getBoolean("pref_notify_fail", true)) {
+                    notification
+                            .setTitle(getString(R.string.notification_unsupported))
+                            .setText(getString(R.string.notification_error_log))
+                            .setIcon(R.drawable.ic_notification_register)
+                            .show();
+                }
         }
     }
 
@@ -216,7 +218,13 @@ public class ConnectionService extends IntentService {
             return START_NOT_STICKY;
         }
 
-        from_shortcut = intent.hasExtra("force") && intent.getBooleanExtra("force", false);
+        if (intent.getBooleanExtra("debug", false)) {
+            from_shortcut = true;
+            notify_progress.setEnabled(false);
+            notification.setEnabled(false);
+        } else {
+            from_shortcut = intent.getBooleanExtra("force", false);
+        }
         SSID = wifi.getSSID(intent);
 
         if (!running) // Ignore if service is already running
