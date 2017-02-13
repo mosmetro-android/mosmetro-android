@@ -59,8 +59,8 @@ public class ConnectionService extends IntentService {
     public ConnectionService () {
 		super("ConnectionService");
 	}
-	
-	@Override
+
+    @Override
     public void onCreate() {
 		super.onCreate();
 
@@ -85,14 +85,17 @@ public class ConnectionService extends IntentService {
         notify_progress = new Notification(this)
                 .setIcon(R.drawable.ic_notification_connecting)
                 .setId(1)
-                .setEnabled(settings.getBoolean("pref_notify_progress", true) && (Build.VERSION.SDK_INT >= 14))
+                .setEnabled(settings.getBoolean("pref_notify_progress", true)
+                            && Build.VERSION.SDK_INT >= 14)
+                .setIntent(new Intent(this, DebugActivity.class).setAction("SHOW_LOG"))
                 .setDeleteIntent(delete_intent);
 
         notification = new Notification(this)
                 .setId(0)
+                .setIntent(new Intent(this, DebugActivity.class).setAction("SHOW_LOG"))
                 .setDeleteIntent(delete_intent);
 
-        logger = new Logger();
+        logger = Logger.getLogger();
     }
 
     private void notify (Provider.RESULT result) {
@@ -103,7 +106,6 @@ public class ConnectionService extends IntentService {
                         .setTitle(getString(R.string.notification_success))
                         .setIcon(R.drawable.ic_notification_success)
                         .setText(getString(R.string.notification_success_log))
-                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setCancellable(from_shortcut || !pref_notify_success_lock)
                         .setEnabled(settings.getBoolean("pref_notify_success", true))
                         .show();
@@ -131,7 +133,6 @@ public class ConnectionService extends IntentService {
                         .setTitle(getString(R.string.notification_error))
                         .setText(getString(R.string.notification_error_log))
                         .setIcon(R.drawable.ic_notification_error)
-                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
 
@@ -142,7 +143,6 @@ public class ConnectionService extends IntentService {
                         .setTitle(getString(R.string.notification_unsupported))
                         .setText(getString(R.string.notification_error_log))
                         .setIcon(R.drawable.ic_notification_register)
-                        .setIntent(new Intent(this, DebugActivity.class).putExtra("logger", logger))
                         .setEnabled(settings.getBoolean("pref_notify_fail", true))
                         .show();
         }
@@ -232,6 +232,9 @@ public class ConnectionService extends IntentService {
     }
 
     public void onHandleIntent(Intent intent) {
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                .putExtra("RUNNING", true)
+        );
         running = true;
 
         logger.date();
@@ -267,14 +270,22 @@ public class ConnectionService extends IntentService {
         // Try to connect
         Provider.RESULT result = connect();
         notify_progress.hide();
-        logger.date();
 
-        // Notify user if still connected to Wi-Fi
-        if (running) notify(result);
+        // Notify user if not interrupted
+        if (running) {
+            logger.date();
+            notify(result);
+        } else {
+            return;
+        }
 
-        if (from_shortcut || !(result == Provider.RESULT.ALREADY_CONNECTED
-                || result == Provider.RESULT.CONNECTED)) {
-            running = false;  return;
+        // Stop the service if connection were unsuccessful or started from shortcut
+        switch (result) {
+            case CONNECTED:
+            case ALREADY_CONNECTED:
+                if (!from_shortcut) break;
+            default:
+                running = false; return;
         }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
@@ -296,7 +307,6 @@ public class ConnectionService extends IntentService {
         }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
-
         notification.hide();
 
         // Try to reconnect the Wi-Fi network
@@ -305,13 +315,19 @@ public class ConnectionService extends IntentService {
         // If Service is not being killed, continue the main loop
         if (running) onHandleIntent(intent);
 	}
-	
-	@Override
+
+    public static boolean isRunning() {
+        return running;
+    }
+
+    @Override
     public void onDestroy() {
         SSID = WifiUtils.UNKNOWN_SSID;
         if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                .putExtra("RUNNING", false)
+        );
     }
 }

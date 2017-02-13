@@ -18,8 +18,9 @@
 
 package pw.thedrhax.util;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -27,23 +28,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Logger implements Parcelable {
-    public enum LEVEL {
-        INFO,
-        DEBUG,
-    }
+public class Logger {
+    public enum LEVEL {INFO, DEBUG}
     private Map<LEVEL,StringBuilder> logs;
 
-    public Logger () {
-        logs = new HashMap<LEVEL, StringBuilder>();
+    private static Logger instance;
+
+    public static synchronized Logger getLogger() {
+        if (instance == null) {
+            instance = new Logger();
+        }
+        return instance;
+    }
+
+    private Logger () {
+        logs = new HashMap<>();
         for (LEVEL level : LEVEL.values()) {
             logs.put(level, new StringBuilder());
         }
-    }
-
-    public interface ILogger<T> {
-        T setLogger(Logger logger);
-        Logger getLogger();
     }
 
     /*
@@ -52,6 +54,8 @@ public class Logger implements Parcelable {
 
     public void log (LEVEL level, String message) {
         logs.get(level).append(message).append("\n");
+        for (Callback callback : callbacks.values())
+            callback.call(level, message);
     }
 
     public void log (LEVEL level, Throwable ex) {
@@ -68,14 +72,14 @@ public class Logger implements Parcelable {
      * Logger Utils
      */
 
-    public void merge (Logger logger) {
-        for (LEVEL level : LEVEL.values()) {
-            log(level, logger.get(level));
-        }
-    }
-
     public void date() {
         log(DateFormat.getDateTimeInstance().format(new Date()));
+    }
+
+    public void wipe() {
+        for (LEVEL level : LEVEL.values()) {
+            logs.put(level, new StringBuilder());
+        }
     }
 
     /*
@@ -86,35 +90,88 @@ public class Logger implements Parcelable {
         return logs.get(level).toString();
     }
 
-    /*
-     * Implementation of Parcelable
+    /**
+     * Callback interface
+     *
+     * This abstract class will receive messages from another thread
+     * and forward them safely to the current thread, so it can be
+     * used with the Android UI.
      */
+    public static abstract class Callback {
 
-    public static Parcelable.Creator CREATOR = new Parcelable.Creator<Logger>() {
-        @Override
-        public Logger[] newArray(int size) {
-            return new Logger[size];
+        /**
+         * Handler object used to forward messages between threads
+         */
+        private Handler handler;
+
+        protected Callback() {
+            handler = new Handler(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(Message msg) {
+                    log(
+                            LEVEL.valueOf(msg.getData().getString("level")),
+                            msg.getData().getString("message")
+                    );
+                    return true;
+                }
+            });
         }
 
-        @Override
-        public Logger createFromParcel(Parcel source) {
-            Logger logger = new Logger();
-            for (LEVEL level : LEVEL.values()) {
-                logger.log(level, source.readString());
-            }
-            return logger;
-        }
-    };
+        /**
+         * This method is being called from another thread
+         * @param level One of values stored in LEVEL enum
+         * @param message Text of the message being forwarded
+         */
+        void call(LEVEL level, String message) {
+            Bundle data = new Bundle();
+            data.putString("level", level.name());
+            data.putString("message", message);
 
-    @Override
-    public int describeContents() {
-        return 0;
+            Message msg = new Message();
+            msg.setData(data);
+
+            handler.sendMessage(msg);
+        }
+
+        /**
+         * This method must be implemented by all sub classes
+         * to be able to receive the forwarded messages.
+         * @param level One of values stored in LEVEL enum
+         * @param message Text of the message being forwarded
+         */
+        public abstract void log(LEVEL level, String message);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        for (LEVEL level : LEVEL.values()) {
-            dest.writeString(get(level));
-        }
+    /**
+     * Map of registered Callback objects
+     */
+    private Map<Object,Callback> callbacks = new HashMap<>();
+
+    /**
+     * Register the Callback object in the Logger
+     * @param key Any object used to identify the Callback
+     * @param callback Callback object to be registered
+     * @return Current Logger's instance
+     */
+    public Logger registerCallback(Object key, Callback callback) {
+        callbacks.put(key, callback); return this;
+    }
+
+    /**
+     * Unregister the Callback object
+     * @param key Any object used to identify the Callback
+     * @return Current Logger's instance
+     */
+    public Logger unregisterCallback(Object key) {
+        callbacks.remove(key); return this;
+    }
+
+    /**
+     * Get the registered Callback by it's key object
+     * @param key Any object used to identify the Callback
+     * @return Callback object identified by this key
+     */
+    public Callback getCallback(Object key) {
+        return callbacks.get(key);
     }
 }

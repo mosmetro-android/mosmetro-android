@@ -198,4 +198,5 @@
     <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
     <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
     <string name="auth_captcha_bypass_MosMetroV1">Trying to use old algorithm MosMetroV1 to bypass the CAPTCHA</string>
+    <string name="stop">Stop</string>
 </resources>

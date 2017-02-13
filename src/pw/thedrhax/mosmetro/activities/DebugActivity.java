@@ -19,18 +19,20 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
@@ -38,11 +40,17 @@ import pw.thedrhax.util.Version;
 public class DebugActivity extends Activity {
     // UI Elements
     private TextView text_messages;
+    private Button button_connect;
     
     // Logger
     private Logger logger;
     private boolean show_debug = false;
-    private boolean captcha = false;
+
+    // Status variables
+    private boolean service_running = false;
+
+    // Receivers
+    private BroadcastReceiver service_state;
 
     /** Called when the activity is first created. */
     @Override
@@ -50,35 +58,53 @@ public class DebugActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.debug_activity);
 
+        button_connect = (Button) findViewById(R.id.button_connect);
+        service_state = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                service_running = intent.getBooleanExtra("RUNNING", false);
+                button_connect.setText(service_running ?
+                        getString(R.string.stop) : getString(R.string.retry)
+                );
+            }
+        };
+        registerReceiver(service_state,
+                new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService")
+        );
+
+        // Get initial ConnectionService state (not very accurate)
+        if (ConnectionService.isRunning()) {
+            service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
+        }
+
         text_messages = (TextView)findViewById(R.id.text_messages);
-        logger_init();
+        logger = Logger.getLogger().registerCallback(this, new Logger.Callback() {
+            @Override
+            public void log(Logger.LEVEL level, String message) {
+                if (level != Logger.LEVEL.INFO || show_debug)
+                    if (level != Logger.LEVEL.DEBUG || !show_debug)
+                        return;
+                text_messages.append(message + "\n");
+            }
+        });
+        text_messages.setText("");
 
         // Check for log from ConnectionService
-        if (getIntent() != null) {
-            // Intent from the ConnectionService
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null && bundle.containsKey("logger")) {
-                logger.merge((Logger)bundle.getParcelable("logger"));
-                captcha = getIntent().getBooleanExtra("captcha", false);
-                if (!captcha) return;
+        if (getIntent() != null && "SHOW_LOG".equals(getIntent().getAction())) {
+            for (Logger.LEVEL level : Logger.LEVEL.values()) {
+                logger.getCallback(this).log(level, logger.get(level));
             }
+            return;
         }
 
         button_connect(null);
     }
 
-    private void logger_init() {
-        text_messages.setText("");
-
-        logger = new Logger() {
-            @Override
-            public void log(LEVEL level, String message) {
-                super.log(level, message);
-
-                if ((level == LEVEL.INFO && !show_debug) || (level == LEVEL.DEBUG && show_debug))
-                    text_messages.append(message + "\n");
-            }
-        };
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        logger.unregisterCallback(this);
+        unregisterReceiver(service_state);
     }
 
     // ActionBar Menu
@@ -115,7 +141,8 @@ public class DebugActivity extends Activity {
                 return true;
 
             case R.id.action_clear:
-                logger_init();
+                logger.wipe();
+                text_messages.setText("");
                 return true;
 
             default:
@@ -127,62 +154,13 @@ public class DebugActivity extends Activity {
         startActivity(new Intent(this, ShortcutActivity.class));
     }
 
-    /*
-     * Run manual connection in background thread
-     */
-
-    private class AuthTask extends AsyncTask<Void, String, Provider.RESULT> {
-        private Logger local_logger;
-
-        public AuthTask() {
-            local_logger = new Logger() {
-                @Override
-                public void log(LEVEL level, String message) {
-                    super.log(level, message);
-                    publishProgress(level.toString(), message);
-                }
-            };
-        }
-
-        @Override
-        protected Provider.RESULT doInBackground(Void... params) {
-            local_logger.date();
-            Provider provider = Provider.find(DebugActivity.this, local_logger);
-            Provider.RESULT result = provider.start();
-            local_logger.date();
-            return result;
-        }
-
-        // Show log messages in the UI thread
-        @Override
-        protected void onProgressUpdate(String... values) {
-            logger.log(Logger.LEVEL.valueOf(values[0]), values[1]);
-        }
-
-        @Override
-        protected void onPostExecute(Provider.RESULT result) {
-            // Start ConnectionService if this Activity is started for CAPTCHA
-            if (result == Provider.RESULT.CONNECTED || result == Provider.RESULT.ALREADY_CONNECTED)
-                if (captcha) {
-                    startService(
-                            new Intent(DebugActivity.this, ConnectionService.class)
-                                    .putExtra("force", true)
-                    );
-                    DebugActivity.this.finish();
-                }
-        }
-    }
-
-    // Current instance of AuthTask is stored here
-    private AuthTask task;
-
-    // Handle manual connection button
-    public void button_connect (View view) {
-        if ((task == null) || (AsyncTask.Status.FINISHED == task.getStatus()))
-            task = new AuthTask();
-
-        if (task.getStatus() != AsyncTask.Status.RUNNING)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    public void button_connect (final View view) {
+        Intent service = new Intent(this, ConnectionService.class);
+        if (service_running)
+            service.setAction("STOP");
+        else
+            service.putExtra("force", true);
+        startService(service);
     }
 
     // Handle debug log checkbox

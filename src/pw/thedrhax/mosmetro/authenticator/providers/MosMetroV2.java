@@ -214,7 +214,6 @@ public class MosMetroV2 extends Provider {
                 if (vars.get("captcha_form") == null) return true;
 
                 MosMetroV1 mosmetro = new MosMetroV1(context);
-                mosmetro.setLogger(getLogger());
                 mosmetro.remove(0); // Remove initial internet check
                 mosmetro.redirect = String.format(
                         "http://login.wi-fi.ru/am/UI/Login" +

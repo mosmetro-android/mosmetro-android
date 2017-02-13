@@ -51,10 +51,9 @@ import pw.thedrhax.util.WifiUtils;
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see LinkedList
  * @see Task
- * @see pw.thedrhax.util.Logger.ILogger
  */
 
-public abstract class Provider extends LinkedList<Task> implements Logger.ILogger<Provider> {
+public abstract class Provider extends LinkedList<Task> {
     /**
      * List of supported Providers
      *
@@ -93,6 +92,11 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      * Default Client used for all network operations
      */
     protected Client client;
+
+    /**
+     * Logger object to output messages and errors from the Provider
+     */
+    protected Logger logger;
 
     /**
      * Find Provider using already received response from server.
@@ -148,7 +152,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 continue;
             }
 
-            return result.setLogger(logger);
+            return result;
         }
 
         // Only Unknown Provider without internet connection is possible here
@@ -158,7 +162,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
                 context.getString(R.string.auth_error_provider)
         ));
 
-        return (result != null ? result : new Unknown(context)).setLogger(logger);
+        return result != null ? result : new Unknown(context);
     }
 
     /**
@@ -184,6 +188,7 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         this.client = new OkHttp();
+        this.logger = Logger.getLogger();
     }
 
     /**
@@ -325,21 +330,5 @@ public abstract class Provider extends LinkedList<Task> implements Logger.ILogge
      */
     public Provider setCallback(ICallback callback) {
         this.callback = callback; return this;
-    }
-
-    /*
-     * Logger.ILogger implementation
-     */
-
-    protected Logger logger = new Logger();
-
-    @Override
-    public Provider setLogger(Logger logger) {
-        this.logger = logger; return this;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
     }
 }
