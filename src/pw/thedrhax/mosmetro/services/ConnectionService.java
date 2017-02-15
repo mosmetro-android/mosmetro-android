@@ -242,7 +242,9 @@ public class ConnectionService extends IntentService {
     }
 
     public void onHandleIntent(Intent intent) {
-        new Notification(this).setId(777).foreground();
+        if (!from_shortcut && settings.getBoolean("pref_notify_foreground", true)) {
+            new Notification(this).setId(777).foreground();
+        }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
@@ -334,7 +336,9 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        onDestroy();
+        if (!settings.getBoolean("pref_notify_foreground", true)) {
+            onDestroy();
+        }
     }
 
     @Override

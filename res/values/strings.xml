@@ -213,4 +213,6 @@
     <string name="pref_mosmetro_captcha_collect">Collect solved CAPTCHAs</string>
     <string name="pref_mosmetro_captcha_collect_summary">Allow this app to send manually solved CAPTCHAs to my server.</string>
     <string name="pref_category_statistics">Statistics</string>
+    <string name="pref_notify_foreground">Foreground process</string>
+    <string name="pref_notify_foreground_summary">Bind background process to notification to protect it from being killed. If you disable this option, background process will be killed even if you simply open and close the app window.</string>
 </resources>

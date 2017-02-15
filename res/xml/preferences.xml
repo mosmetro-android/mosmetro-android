@@ -79,6 +79,12 @@
                 android:summary="@string/pref_category_notifications_summary">
 
             <CheckBoxPreference
+                    android:key="pref_notify_foreground"
+                    android:title="@string/pref_notify_foreground"
+                    android:summary="@string/pref_notify_foreground_summary"
+                    android:defaultValue="true" />
+
+            <CheckBoxPreference
                     android:key="pref_notify_news"
                     android:title="@string/pref_notify_news"
                     android:summary="@string/pref_notify_news_summary"

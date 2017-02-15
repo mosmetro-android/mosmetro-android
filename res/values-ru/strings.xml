@@ -197,4 +197,6 @@
     <string name="pref_mosmetro_captcha_collect">Собирать решённые капчи</string>
     <string name="pref_mosmetro_captcha_collect_summary">Разрешить этому приложению отправлять решённые капчи на мой сервер.</string>
     <string name="pref_category_statistics">Статистика</string>
+    <string name="pref_notify_foreground">Приоритетный процесс</string>
+    <string name="pref_notify_foreground_summary">Привязать фоновый процесс к уведомлению, чтобы предотвратить его уничтожение. Если вы выключите эту функцию, фоновый процесс будет убит, даже если вы просто откроете и закроете главное окно приложения.</string>
 </resources>
