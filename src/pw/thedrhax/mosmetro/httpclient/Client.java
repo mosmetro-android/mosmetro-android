@@ -33,6 +33,8 @@ public abstract class Client {
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
 
+    public static final int DEFAULT_TIMEOUT = 3000;
+
     protected Document document;
     protected Map<String,String> headers;
     protected String raw_document;

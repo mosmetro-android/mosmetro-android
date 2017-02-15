@@ -129,9 +129,9 @@ public class OkHttp extends Client {
                         return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
                     }
                 })
-                .connectTimeout(1000, TimeUnit.MILLISECONDS)
-                .readTimeout(1000, TimeUnit.MILLISECONDS)
-                .writeTimeout(1000, TimeUnit.MILLISECONDS)
+                .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
+                .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build();
     }
 

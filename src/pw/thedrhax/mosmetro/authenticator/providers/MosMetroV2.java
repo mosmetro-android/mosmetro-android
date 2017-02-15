@@ -176,6 +176,7 @@ public class MosMetroV2 extends Provider {
                 logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
                 try {
                     int code = new OkHttp()
+                            .setTimeout(1000)
                             .resetHeaders()
                             .setHeader(
                                     new String(Base64.decode(
