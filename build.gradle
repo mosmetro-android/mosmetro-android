@@ -22,7 +22,7 @@ android {
         applicationId 'pw.thedrhax.mosmetro'
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 53
+        versionCode 54
         versionName "1.7.3"
 
         // GitHub Pages
