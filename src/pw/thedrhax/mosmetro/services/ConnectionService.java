@@ -330,6 +330,7 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onDestroy() {
+    	running = false;
         SSID = WifiUtils.UNKNOWN_SSID;
         if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
