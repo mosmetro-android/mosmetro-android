@@ -212,6 +212,8 @@ public class ConnectionService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) return START_NOT_STICKY;
+
         if ("STOP".equals(intent.getAction())) { // Stop by intent
             running = false;
             stopSelf();
