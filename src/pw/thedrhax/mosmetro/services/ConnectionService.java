@@ -243,7 +243,6 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         new Notification(this).setId(777).foreground();
-        startService(new Intent(this, HideForegroundService.class).putExtra("ID", 777));
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
