@@ -333,6 +333,11 @@ public class ConnectionService extends IntentService {
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        onDestroy();
+    }
+
+    @Override
     public void onDestroy() {
         stopForeground(true);
     	running = false;
