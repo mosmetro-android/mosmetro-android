@@ -72,11 +72,6 @@ public class DebugActivity extends Activity {
                 new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService")
         );
 
-        // Get initial ConnectionService state (not very accurate)
-        if (ConnectionService.isRunning()) {
-            service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
-        }
-
         text_messages = (TextView)findViewById(R.id.text_messages);
         logger = Logger.getLogger().registerCallback(this, new Logger.Callback() {
             @Override
@@ -89,15 +84,17 @@ public class DebugActivity extends Activity {
         });
         text_messages.setText("");
 
-        // Check for log from ConnectionService
-        if (getIntent() != null && "SHOW_LOG".equals(getIntent().getAction())) {
+        // Get initial ConnectionService state (not very accurate)
+        if (ConnectionService.isRunning()) {
+            // If service is running, show logs
+            service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
             for (Logger.LEVEL level : Logger.LEVEL.values()) {
                 logger.getCallback(this).log(level, logger.get(level));
             }
-            return;
+        } else {
+            // If service is not running, connect manually
+            button_connect(null);
         }
-
-        button_connect(null);
     }
 
     @Override

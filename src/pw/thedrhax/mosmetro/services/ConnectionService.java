@@ -87,12 +87,12 @@ public class ConnectionService extends IntentService {
                 .setId(1)
                 .setEnabled(settings.getBoolean("pref_notify_progress", true)
                             && Build.VERSION.SDK_INT >= 14)
-                .setIntent(new Intent(this, DebugActivity.class).setAction("SHOW_LOG"))
+                .setIntent(new Intent(this, DebugActivity.class))
                 .setDeleteIntent(delete_intent);
 
         notification = new Notification(this)
                 .setId(0)
-                .setIntent(new Intent(this, DebugActivity.class).setAction("SHOW_LOG"))
+                .setIntent(new Intent(this, DebugActivity.class))
                 .setDeleteIntent(delete_intent);
 
         logger = Logger.getLogger();
