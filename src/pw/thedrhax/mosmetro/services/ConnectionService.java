@@ -242,6 +242,9 @@ public class ConnectionService extends IntentService {
     }
 
     public void onHandleIntent(Intent intent) {
+        new Notification(this).setId(777).foreground();
+        startService(new Intent(this, HideForegroundService.class).putExtra("ID", 777));
+
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
         );
@@ -332,6 +335,7 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onDestroy() {
+        stopForeground(true);
     	running = false;
         SSID = WifiUtils.UNKNOWN_SSID;
         if (provider != null) provider.stop();

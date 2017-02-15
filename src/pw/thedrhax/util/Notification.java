@@ -20,6 +20,7 @@ package pw.thedrhax.util;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -101,9 +102,7 @@ public class Notification {
         this.enabled = enabled; return this;
     }
 
-    public void show() {
-        if (!enabled) return;
-
+    public android.app.Notification getNotification() {
         android.app.Notification notification;
         if (Build.VERSION.SDK_INT >= 16) {
             notification = builder.build();
@@ -111,7 +110,17 @@ public class Notification {
             notification = builder.getNotification();
         }
         if (!cancellable) notification.flags |= android.app.Notification.FLAG_NO_CLEAR;
-        nm.notify(id, notification);
+        return notification;
+    }
+
+    public void show() {
+        if (enabled)
+            nm.notify(id, getNotification());
+    }
+
+    public void foreground() {
+        if (enabled && context instanceof Service)
+            ((Service) context).startForeground(id, getNotification());
     }
 
     public void hide() {

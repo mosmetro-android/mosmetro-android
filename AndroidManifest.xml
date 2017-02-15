@@ -88,6 +88,8 @@
 
         <service android:name=".services.ConnectionService"/>
 
+        <service android:name=".services.HideForegroundService"/>
+
         <receiver android:name=".services.NetworkReceiver">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE"/>
