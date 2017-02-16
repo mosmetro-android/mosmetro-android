@@ -30,39 +30,28 @@ import java.util.Map;
 
 public class Logger {
     public enum LEVEL {INFO, DEBUG}
-    private Map<LEVEL,StringBuilder> logs;
 
-    private static Logger instance;
-
-    public static synchronized Logger getLogger() {
-        if (instance == null) {
-            instance = new Logger();
-        }
-        return instance;
-    }
-
-    private Logger () {
-        logs = new HashMap<>();
+    private static Map<LEVEL,StringBuilder> logs = new HashMap<LEVEL,StringBuilder>() {{
         for (LEVEL level : LEVEL.values()) {
-            logs.put(level, new StringBuilder());
+            put(level, new StringBuilder());
         }
-    }
+    }};
 
     /*
      * Inputs
      */
 
-    public void log (LEVEL level, String message) {
+    public static void log (LEVEL level, String message) {
         logs.get(level).append(message).append("\n");
         for (Callback callback : callbacks.values())
             callback.call(level, message);
     }
 
-    public void log (LEVEL level, Throwable ex) {
+    public static void log (LEVEL level, Throwable ex) {
         log(level, Log.getStackTraceString(ex));
     }
 
-    public void log (String message) {
+    public static void log (String message) {
         for (LEVEL level : LEVEL.values()) {
             log(level, message);
         }
@@ -72,11 +61,11 @@ public class Logger {
      * Logger Utils
      */
 
-    public void date() {
+    public static void date() {
         log(DateFormat.getDateTimeInstance().format(new Date()));
     }
 
-    public void wipe() {
+    public static void wipe() {
         for (LEVEL level : LEVEL.values()) {
             logs.put(level, new StringBuilder());
         }
@@ -86,7 +75,7 @@ public class Logger {
      * Outputs
      */
 
-    public String get (LEVEL level) {
+    public static String read(LEVEL level) {
         return logs.get(level).toString();
     }
 
@@ -145,25 +134,23 @@ public class Logger {
     /**
      * Map of registered Callback objects
      */
-    private Map<Object,Callback> callbacks = new HashMap<>();
+    private static Map<Object,Callback> callbacks = new HashMap<>();
 
     /**
      * Register the Callback object in the Logger
      * @param key Any object used to identify the Callback
      * @param callback Callback object to be registered
-     * @return Current Logger's instance
      */
-    public Logger registerCallback(Object key, Callback callback) {
-        callbacks.put(key, callback); return this;
+    public static void registerCallback(Object key, Callback callback) {
+        callbacks.put(key, callback);
     }
 
     /**
      * Unregister the Callback object
      * @param key Any object used to identify the Callback
-     * @return Current Logger's instance
      */
-    public Logger unregisterCallback(Object key) {
-        callbacks.remove(key); return this;
+    public static void unregisterCallback(Object key) {
+        callbacks.remove(key);
     }
 
     /**
@@ -171,7 +158,7 @@ public class Logger {
      * @param key Any object used to identify the Callback
      * @return Callback object identified by this key
      */
-    public Callback getCallback(Object key) {
+    public static Callback getCallback(Object key) {
         return callbacks.get(key);
     }
 }

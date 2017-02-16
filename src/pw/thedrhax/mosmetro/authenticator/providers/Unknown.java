@@ -25,6 +25,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.util.Logger;
 
 /**
  * The Unknown class is used to tell user that this provider is not
@@ -47,13 +48,13 @@ public class Unknown extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_checking_connection));
+                Logger.log(context.getString(R.string.auth_checking_connection));
 
                 if (isConnected()) {
-                    logger.log(context.getString(R.string.auth_already_connected));
+                    Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                 } else {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_provider)
                     ));
                     vars.put("result", RESULT.NOT_SUPPORTED);

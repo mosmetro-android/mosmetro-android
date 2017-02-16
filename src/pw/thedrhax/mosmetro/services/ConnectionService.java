@@ -53,7 +53,6 @@ public class ConnectionService extends IntentService {
     private Notification notification;
 
     // Authenticator
-    private Logger logger;
     private Provider provider;
 
     public ConnectionService () {
@@ -94,8 +93,6 @@ public class ConnectionService extends IntentService {
                 .setId(0)
                 .setIntent(new Intent(this, DebugActivity.class))
                 .setDeleteIntent(delete_intent);
-
-        logger = Logger.getLogger();
     }
 
     private void notify (Provider.RESULT result) {
@@ -155,7 +152,7 @@ public class ConnectionService extends IntentService {
 
         int count = 0;
 
-        logger.log(getString(R.string.ip_wait));
+        Logger.log(getString(R.string.ip_wait));
         notify_progress
                 .setText(getString(R.string.ip_wait))
                 .setContinuous()
@@ -165,7 +162,7 @@ public class ConnectionService extends IntentService {
             SystemClock.sleep(1000);
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
-                logger.log(getString(R.string.error,
+                Logger.log(getString(R.string.error,
                         getString(R.string.ip_wait_result,
                             " " + getString(R.string.not), pref_ip_wait
                         )
@@ -174,7 +171,7 @@ public class ConnectionService extends IntentService {
             }
         }
 
-        logger.log(getString(R.string.ip_wait_result, "", count/2));
+        Logger.log(getString(R.string.ip_wait_result, "", count/2));
         return true;
     }
 
@@ -251,7 +248,7 @@ public class ConnectionService extends IntentService {
         );
         running = true;
 
-        logger.date();
+        Logger.date();
         notification.hide();
 
         // Wait for IP before detecting the Provider
@@ -267,7 +264,7 @@ public class ConnectionService extends IntentService {
                 .setContinuous()
                 .show();
 
-        provider = Provider.find(this, logger)
+        provider = Provider.find(this)
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
@@ -287,7 +284,7 @@ public class ConnectionService extends IntentService {
 
         // Notify user if not interrupted
         if (running) {
-            logger.date();
+            Logger.date();
             notify(result);
         } else {
             return;

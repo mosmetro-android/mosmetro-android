@@ -94,11 +94,6 @@ public abstract class Provider extends LinkedList<Task> {
     protected Client client;
 
     /**
-     * Logger object to output messages and errors from the Provider
-     */
-    protected Logger logger;
-
-    /**
      * Find Provider using already received response from server.
      * @param context   Android Context required to create the new instance.
      * @param client    Client, that contains server's response.
@@ -128,21 +123,20 @@ public abstract class Provider extends LinkedList<Task> {
      * detect the Provider too quickly. This is why we use a retry loop in this method.
      *
      * @param context   Android Context required to create the new instance.
-     * @param logger    Logger to get debug messages from this method and the resulting Provider.
      * @return          New Provider instance.
      */
-    @NonNull public static Provider find(Context context, Logger logger) {
+    @NonNull public static Provider find(Context context) {
         Client client = new OkHttp().followRedirects(false);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
 
-        logger.log(context.getString(R.string.auth_provider_check));
+        Logger.log(context.getString(R.string.auth_provider_check));
 
         Provider result = null;
         for (int i = 0; i < pref_retry_count; i++) {
             try {
                 client.get("http://wi-fi.ru", null, pref_retry_count);
             } catch (Exception ex) {
-                logger.log(Logger.LEVEL.DEBUG, ex);
+                Logger.log(Logger.LEVEL.DEBUG, ex);
             }
 
             result = find(context, client);
@@ -157,8 +151,8 @@ public abstract class Provider extends LinkedList<Task> {
 
         // Only Unknown Provider without internet connection is possible here
         if (client.getPageContent() != null)
-            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-        logger.log(context.getString(R.string.error,
+            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+        Logger.log(context.getString(R.string.error,
                 context.getString(R.string.auth_error_provider)
         ));
 
@@ -188,7 +182,6 @@ public abstract class Provider extends LinkedList<Task> {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         this.client = new OkHttp();
-        this.logger = Logger.getLogger();
     }
 
     /**
@@ -235,8 +228,8 @@ public abstract class Provider extends LinkedList<Task> {
     public RESULT start() {
         AndroidHacks.bindToWiFi(context);
 
-        logger.log(context.getString(R.string.version, Version.getFormattedVersion()));
-        logger.log(context.getString(R.string.algorithm_name, getName()));
+        Logger.log(context.getString(R.string.version, Version.getFormattedVersion()));
+        Logger.log(context.getString(R.string.algorithm_name, getName()));
 
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);

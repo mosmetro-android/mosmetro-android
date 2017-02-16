@@ -55,10 +55,10 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_checking_connection));
+                Logger.log(context.getString(R.string.auth_checking_connection));
 
                 if (isConnected()) {
-                    logger.log(context.getString(R.string.auth_already_connected));
+                    Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                     return false;
                 } else {
@@ -75,15 +75,15 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_auth_page));
+                Logger.log(context.getString(R.string.auth_auth_page));
 
                 try {
                     client.get(redirect, null, pref_retry_count);
-                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
                     ));
                     return false;
@@ -101,7 +101,7 @@ public class MosMetroV1 extends Provider {
                 try {
                     Elements forms = client.getPageContent().getElementsByTag("form");
                     if (forms.size() > 1) {
-                        logger.log(context.getString(R.string.error,
+                        Logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_not_registered)
                         ));
                         vars.put("result", RESULT.NOT_REGISTERED);
@@ -110,7 +110,7 @@ public class MosMetroV1 extends Provider {
                     vars.put("form", Client.parseForm(forms.first()));
                     return true;
                 } catch (Exception ex) {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_form)
                     ));
                     return false;
@@ -125,15 +125,15 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_auth_form));
+                Logger.log(context.getString(R.string.auth_auth_form));
 
                 try {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
                     client.post(redirect, form, pref_retry_count);
                     return true;
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -147,14 +147,14 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_checking_connection));
+                Logger.log(context.getString(R.string.auth_checking_connection));
 
                 if (isConnected()) {
-                    logger.log(context.getString(R.string.auth_connected));
+                    Logger.log(context.getString(R.string.auth_connected));
                     vars.put("result", RESULT.CONNECTED);
                     return true;
                 } else {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_connection)
                     ));
                     return false;
@@ -169,14 +169,14 @@ public class MosMetroV1 extends Provider {
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ex) {
-            logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
         try {
             redirect = client.parseMetaRedirect();
-            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
-            logger.log(Logger.LEVEL.DEBUG, redirect);
+            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+            Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
             return super.isConnected();

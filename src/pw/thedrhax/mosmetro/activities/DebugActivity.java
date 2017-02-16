@@ -43,7 +43,6 @@ public class DebugActivity extends Activity {
     private Button button_connect;
     
     // Logger
-    private Logger logger;
     private boolean show_debug = false;
 
     // Status variables
@@ -73,7 +72,7 @@ public class DebugActivity extends Activity {
         );
 
         text_messages = (TextView)findViewById(R.id.text_messages);
-        logger = Logger.getLogger().registerCallback(this, new Logger.Callback() {
+        Logger.registerCallback(this, new Logger.Callback() {
             @Override
             public void log(Logger.LEVEL level, String message) {
                 if (level != Logger.LEVEL.INFO || show_debug)
@@ -89,7 +88,7 @@ public class DebugActivity extends Activity {
             // If service is running, show logs
             service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
             for (Logger.LEVEL level : Logger.LEVEL.values()) {
-                logger.getCallback(this).log(level, logger.get(level));
+                Logger.getCallback(this).log(level, Logger.read(level));
             }
         } else {
             // If service is not running, connect manually
@@ -100,7 +99,7 @@ public class DebugActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        logger.unregisterCallback(this);
+        Logger.unregisterCallback(this);
         unregisterReceiver(service_state);
     }
 
@@ -128,7 +127,7 @@ public class DebugActivity extends Activity {
                 send_email.putExtra(Intent.EXTRA_SUBJECT,
                         getString(R.string.report_email_subject, Version.getFormattedVersion())
                 );
-                send_email.putExtra(Intent.EXTRA_TEXT, logger.get(Logger.LEVEL.DEBUG));
+                send_email.putExtra(Intent.EXTRA_TEXT, Logger.read(Logger.LEVEL.DEBUG));
 
                 startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
                 return true;
@@ -138,7 +137,7 @@ public class DebugActivity extends Activity {
                 return true;
 
             case R.id.action_clear:
-                logger.wipe();
+                Logger.wipe();
                 text_messages.setText("");
                 return true;
 
@@ -164,6 +163,6 @@ public class DebugActivity extends Activity {
     public void show_debug_log (View view) {
         show_debug = ((CheckBox)view).isChecked();
         text_messages.setText("");
-        text_messages.append(logger.get(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO));
+        text_messages.append(Logger.read(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO));
     }
 }

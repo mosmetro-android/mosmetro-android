@@ -63,10 +63,10 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_checking_connection));
+                Logger.log(context.getString(R.string.auth_checking_connection));
 
                 if (isConnected()) {
-                    logger.log(context.getString(R.string.auth_already_connected));
+                    Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                     return false;
                 } else {
@@ -83,7 +83,7 @@ public class MosMetroV2 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (redirect.contains(".wi-fi.ru/identification")) {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_not_registered)
                     ));
                     vars.put("result", RESULT.NOT_REGISTERED);
@@ -101,15 +101,15 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_redirect));
+                Logger.log(context.getString(R.string.auth_redirect));
 
                 try {
                     client.get(redirect, null, pref_retry_count);
-                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_redirect)
                     ));
                     return false;
@@ -127,7 +127,7 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_auth_page));
+                Logger.log(context.getString(R.string.auth_auth_page));
 
                 try {
                     Uri redirect_uri = Uri.parse(redirect);
@@ -135,11 +135,11 @@ public class MosMetroV2 extends Provider {
 
                     boolean force = settings.getBoolean("pref_mosmetro_captcha_force", false);
                     client.get(redirect + (force ? "/auto_auth" : "/auth"), null, pref_retry_count);
-                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
                     ));
                     return false;
@@ -156,7 +156,7 @@ public class MosMetroV2 extends Provider {
                 Element form = client.getPageContent().getElementsByTag("form").first();
                 if (form != null && "captcha__container".equals(form.attr("class"))) {
                     vars.put("captcha_form", form);
-                    logger.log(context.getString(R.string.auth_captcha_requested));
+                    Logger.log(context.getString(R.string.auth_captcha_requested));
                 }
                 return true;
             }
@@ -173,7 +173,7 @@ public class MosMetroV2 extends Provider {
                 else if (vars.get("captcha_form") == null)
                     return true;
 
-                logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
+                Logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
                 try {
                     int code = new OkHttp()
                             .setTimeout(1000)
@@ -196,7 +196,7 @@ public class MosMetroV2 extends Provider {
                             .getResponseCode();
 
                     if (code == 200 && isConnected()) {
-                        logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                        Logger.log(context.getString(R.string.auth_captcha_bypass_success));
                         vars.put("result", RESULT.CONNECTED);
                         vars.put("captcha", "backdoor");
                         return false;
@@ -204,8 +204,8 @@ public class MosMetroV2 extends Provider {
                         throw new Exception("Internet check failed");
                     }
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                 }
                 return true;
             }
@@ -231,15 +231,15 @@ public class MosMetroV2 extends Provider {
                         new WifiUtils(context).getWifiInfo(null).getMacAddress()
                 );
 
-                logger.log(context.getString(R.string.auth_captcha_bypass_MosMetroV1));
+                Logger.log(context.getString(R.string.auth_captcha_bypass_MosMetroV1));
                 RESULT result = mosmetro.start();
                 if (result == RESULT.CONNECTED) {
-                    logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                    Logger.log(context.getString(R.string.auth_captcha_bypass_success));
                     vars.put("result", result);
                     vars.put("captcha", mosmetro.getName());
                     return false;
                 } else {
-                    logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                     return true;
                 }
             }
@@ -260,10 +260,10 @@ public class MosMetroV2 extends Provider {
                     Element captcha_img = form.getElementsByTag("img").first();
                     captcha_url = redirect + captcha_img.attr("src");
                 } catch (Exception ex) {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha_image))
                     );
-                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
                     vars.put("result", RESULT.ERROR);
                     return false;
                 }
@@ -279,29 +279,29 @@ public class MosMetroV2 extends Provider {
                 // Check the answer
                 String code = (String) vars.get("captcha_code");
                 if (code == null || code.isEmpty()) {
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha))
                     );
                     vars.put("result", RESULT.ERROR);
                     return false;
                 }
 
-                logger.log(Logger.LEVEL.DEBUG, String.format(
+                Logger.log(Logger.LEVEL.DEBUG, String.format(
                         context.getString(R.string.auth_captcha_result), code
                 ));
                 vars.put("captcha", "entered");
 
                 // Sending captcha form
-                logger.log(context.getString(R.string.auth_request));
+                Logger.log(context.getString(R.string.auth_request));
                 Map<String,String> fields = Client.parseForm(form);
                 fields.put("_rucaptcha", code);
 
                 try {
                     client.post(redirect + form.attr("action"), fields, pref_retry_count);
-                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -320,7 +320,7 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_auth_form));
+                Logger.log(context.getString(R.string.auth_auth_form));
 
                 try {
                     String csrf_token = client.parseMetaContent("csrf-token");
@@ -328,11 +328,11 @@ public class MosMetroV2 extends Provider {
                     client.setCookie(redirect, "afVideoPassed", "0");
 
                     client.post(redirect + "/auth/init?segment=metro", null, pref_retry_count);
-                    logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                 } catch (ProtocolException ignored) { // Too many follow-up requests
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
-                    logger.log(context.getString(R.string.error,
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
@@ -348,24 +348,24 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.auth_checking_connection));
+                Logger.log(context.getString(R.string.auth_checking_connection));
 
                 try {
                     JSONObject response = (JSONObject)new JSONParser().parse(client.getPage());
                     boolean status = (Boolean)response.get("result");
 
                     if (status && isConnected()) {
-                        logger.log(context.getString(R.string.auth_connected));
+                        Logger.log(context.getString(R.string.auth_connected));
                         vars.put("result", RESULT.CONNECTED);
                         return true;
                     } else {
-                        logger.log(context.getString(R.string.error,
+                        Logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_connection)
                         ));
                         return false;
                     }
                 } catch (Exception ex) {
-                    logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
                     return false;
                 }
             }
@@ -378,14 +378,14 @@ public class MosMetroV2 extends Provider {
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ex) {
-            logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
         try {
             redirect = client.parseMetaRedirect();
-            logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
-            logger.log(Logger.LEVEL.DEBUG, redirect);
+            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+            Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (Exception ex) {
             // Redirect not found => connected
             return super.isConnected();

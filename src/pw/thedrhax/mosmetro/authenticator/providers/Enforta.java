@@ -26,6 +26,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.util.Logger;
 
 /**
  * This class only detects the Enforta provider. The algorithm is not implemented yet.
@@ -43,7 +44,7 @@ public class Enforta extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                logger.log(context.getString(R.string.error,
+                Logger.log(context.getString(R.string.error,
                         context.getString(R.string.auth_error_provider_unsupported, getName())
                 ));
                 vars.put("result", RESULT.NOT_SUPPORTED);
