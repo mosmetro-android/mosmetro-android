@@ -31,7 +31,7 @@ import java.util.Map;
 public class Logger {
     public enum LEVEL {INFO, DEBUG}
 
-    private static Map<LEVEL,StringBuilder> logs = new HashMap<LEVEL,StringBuilder>() {{
+    private static final Map<LEVEL,StringBuilder> logs = new HashMap<LEVEL,StringBuilder>() {{
         for (LEVEL level : LEVEL.values()) {
             put(level, new StringBuilder());
         }
@@ -42,7 +42,9 @@ public class Logger {
      */
 
     public static void log (LEVEL level, String message) {
-        logs.get(level).append(message).append("\n");
+        synchronized (logs) {
+            logs.get(level).append(message).append("\n");
+        }
         for (Callback callback : callbacks.values())
             callback.call(level, message);
     }
@@ -66,8 +68,10 @@ public class Logger {
     }
 
     public static void wipe() {
-        for (LEVEL level : LEVEL.values()) {
-            logs.put(level, new StringBuilder());
+        synchronized (logs) {
+            for (LEVEL level : LEVEL.values()) {
+                logs.put(level, new StringBuilder());
+            }
         }
     }
 
