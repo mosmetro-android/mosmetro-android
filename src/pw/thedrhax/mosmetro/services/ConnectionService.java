@@ -239,6 +239,8 @@ public class ConnectionService extends IntentService {
     }
 
     public void onHandleIntent(Intent intent) {
+        if (running) return;
+
         if (!from_shortcut && settings.getBoolean("pref_notify_foreground", true)) {
             new Notification(this).setId(777).foreground();
         }
