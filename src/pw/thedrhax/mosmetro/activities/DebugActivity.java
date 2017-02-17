@@ -83,13 +83,15 @@ public class DebugActivity extends Activity {
         });
         text_messages.setText("");
 
+        // Load all logs
+        for (Logger.LEVEL level : Logger.LEVEL.values()) {
+            Logger.getCallback(this).log(level, Logger.read(level));
+        }
+
         // Get initial ConnectionService state (not very accurate)
         if (ConnectionService.isRunning()) {
-            // If service is running, show logs
+            // If service is running, change the button
             service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
-            for (Logger.LEVEL level : Logger.LEVEL.values()) {
-                Logger.getCallback(this).log(level, Logger.read(level));
-            }
         } else {
             // If service is not running, connect manually
             button_connect(null);
