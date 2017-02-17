@@ -212,7 +212,7 @@ public class ConnectionService extends IntentService {
         if (intent == null) return START_NOT_STICKY;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
-            running = false;
+            setRunning(false);
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -231,7 +231,7 @@ public class ConnectionService extends IntentService {
                 if (Provider.isSSIDSupported(SSID) || from_shortcut) {
                     onStart(intent, startId);
                 } else {
-                    running = false;
+                    setRunning(false);
                     stopSelf();
                 }
 
@@ -246,7 +246,7 @@ public class ConnectionService extends IntentService {
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
         );
-        running = true;
+        setRunning(true);
 
         Logger.date();
         notification.hide();
@@ -255,7 +255,8 @@ public class ConnectionService extends IntentService {
         if (!waitForIP()) {
             notify_progress.hide();
             notify(Provider.RESULT.ERROR);
-            running = false; return;
+            setRunning(false);
+            return;
         }
 
         notify_progress
@@ -296,7 +297,7 @@ public class ConnectionService extends IntentService {
             case ALREADY_CONNECTED:
                 if (!from_shortcut) break;
             default:
-                running = false; return;
+                setRunning(false); return;
         }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
@@ -331,6 +332,10 @@ public class ConnectionService extends IntentService {
         return running;
     }
 
+    private static synchronized void setRunning(boolean running) {
+        ConnectionService.running = running;
+    }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         if (!settings.getBoolean("pref_notify_foreground", true)) {
@@ -341,7 +346,7 @@ public class ConnectionService extends IntentService {
     @Override
     public void onDestroy() {
         stopForeground(true);
-    	running = false;
+    	setRunning(false);
         SSID = WifiUtils.UNKNOWN_SSID;
         if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
