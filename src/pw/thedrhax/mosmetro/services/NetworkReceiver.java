@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
@@ -67,11 +66,16 @@ public class NetworkReceiver extends BroadcastReceiver {
         // This .equals condition is used to allow addition of new Intents in future
         if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
             WifiInfo info = wifi.getWifiInfo(intent);
-            if (info != null)
-                if (info.getSupplicantState() == SupplicantState.COMPLETED)
-                    startService();
-                else
-                    stopService();
+            if (info != null && info.getSupplicantState() != null)
+                switch (info.getSupplicantState()) {
+                    case COMPLETED:
+                    case ASSOCIATED: // This appears randomly between multiple CONNECTED states
+                        startService(); break;
+                    case DISCONNECTED:
+                        stopService(); break;
+                    default:
+                        break;
+                }
         }
     }
 
