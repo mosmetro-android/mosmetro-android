@@ -243,9 +243,11 @@ public class ConnectionService extends IntentService {
             new Notification(this).setId(777).foreground();
         }
 
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                .putExtra("RUNNING", true)
-        );
+        if (!isRunning()) {
+            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                    .putExtra("RUNNING", true)
+            );
+        }
         setRunning(true);
 
         Logger.date();
@@ -345,14 +347,16 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onDestroy() {
+        if (isRunning()) {
+            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                    .putExtra("RUNNING", false)
+            );
+        }
         stopForeground(true);
     	setRunning(false);
         SSID = WifiUtils.UNKNOWN_SSID;
         if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                .putExtra("RUNNING", false)
-        );
     }
 }
