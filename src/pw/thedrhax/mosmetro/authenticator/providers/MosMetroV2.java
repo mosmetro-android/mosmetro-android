@@ -385,7 +385,14 @@ public class MosMetroV2 extends Provider {
         try {
             redirect = client.parseMetaRedirect();
             Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
-            Logger.log(Logger.LEVEL.DEBUG, redirect);
+            if (redirect == null) {
+                Logger.log(Logger.LEVEL.DEBUG, context.getString(R.string.error,
+                        context.getString(R.string.auth_error_redirect)
+                ));
+                redirect = "http://auth.wi-fi.ru/auth";
+            } else {
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
+            }
         } catch (Exception ex) {
             // Redirect not found => connected
             return super.isConnected();
