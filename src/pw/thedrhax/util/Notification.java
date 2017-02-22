@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 
 public class Notification {
@@ -73,10 +72,7 @@ public class Notification {
     }
 
     public Notification setIcon (int icon) {
-        builder = builder
-                .setSmallIcon(icon)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), icon));
-
+        builder = builder.setSmallIcon(icon);
         return this;
     }
 
