@@ -89,6 +89,7 @@ public abstract class CaptchaRequest {
         if (stop() && auto_activity)
             context.startActivity(
                     new Intent(context, CaptchaActivity.class).setAction("STOP")
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             );
         captcha_notify.hide();
 
