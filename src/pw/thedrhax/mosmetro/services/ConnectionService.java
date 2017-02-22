@@ -27,15 +27,20 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
+import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notification;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
+    private static final ReentrantLock lock = new ReentrantLock();
     private static boolean running = false;
     private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
@@ -212,8 +217,7 @@ public class ConnectionService extends IntentService {
         if (intent == null) return START_NOT_STICKY;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
-            setRunning(false);
-            stopSelf();
+            stop();
             return START_NOT_STICKY;
         }
 
@@ -231,14 +235,45 @@ public class ConnectionService extends IntentService {
                 if (Provider.isSSIDSupported(SSID) || from_shortcut) {
                     onStart(intent, startId);
                 } else {
-                    setRunning(false);
-                    stopSelf();
+                    stop();
                 }
 
         return START_NOT_STICKY;
     }
 
+    /**
+     * Force stop method
+     *
+     * 1. Sets running to false to notify main()
+     * 2. Waits for main() to finish (to acquire lock to this thread)
+     * 3. Releases the lock
+     * 4. Starts to destroy the ConnectionService
+     *
+     * Called if:
+     * - Intent with "STOP" action is received
+     * - Provider detected that current SSID is unsupported
+     *
+     * In case of main() exited by itself, Service is being destroyed automatically
+     */
+    private void stop() {
+        running = false;
+        if (lock.isLocked()) {
+            lock.lock();
+            lock.unlock();
+        }
+        stopSelf();
+    }
+
     public void onHandleIntent(Intent intent) {
+        if (lock.tryLock()) {
+            running = true;
+            main();
+            running = false;
+            lock.unlock();
+        }
+    }
+
+    private void main() {
         if (!from_shortcut && settings.getBoolean("pref_notify_foreground", true)) {
             new Notification(this).setId(777).foreground();
         }
@@ -246,7 +281,6 @@ public class ConnectionService extends IntentService {
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
         );
-        setRunning(true);
 
         Logger.date();
         notification.hide();
@@ -255,7 +289,6 @@ public class ConnectionService extends IntentService {
         if (!waitForIP()) {
             notify_progress.hide();
             notify(Provider.RESULT.ERROR);
-            setRunning(false);
             return;
         }
 
@@ -266,6 +299,12 @@ public class ConnectionService extends IntentService {
                 .show();
 
         provider = Provider.find(this)
+                .setStopCondition(new Task() {
+                    @Override
+                    public boolean run(HashMap<String, Object> vars) {
+                        return !running;
+                    }
+                })
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
@@ -297,7 +336,7 @@ public class ConnectionService extends IntentService {
             case ALREADY_CONNECTED:
                 if (!from_shortcut) break;
             default:
-                setRunning(false); return;
+                return;
         }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
@@ -325,15 +364,11 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) wifi.reconnect(SSID);
 
         // If Service is not being killed, continue the main loop
-        if (running) onHandleIntent(intent);
+        if (running) main();
 	}
 
     public static boolean isRunning() {
         return running;
-    }
-
-    private static synchronized void setRunning(boolean running) {
-        ConnectionService.running = running;
     }
 
     @Override
@@ -346,9 +381,6 @@ public class ConnectionService extends IntentService {
     @Override
     public void onDestroy() {
         stopForeground(true);
-    	setRunning(false);
-        SSID = WifiUtils.UNKNOWN_SSID;
-        if (provider != null) provider.stop();
         if (!from_shortcut) notification.hide();
         notify_progress.hide();
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")

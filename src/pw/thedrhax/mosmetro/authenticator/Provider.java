@@ -234,7 +234,7 @@ public abstract class Provider extends LinkedList<Task> {
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
         for (Task task : this) {
-            if (stopped) return RESULT.INTERRUPTED;
+            if (isStopped()) return RESULT.INTERRUPTED;
             callback.onProgressUpdate((indexOf(task) + 1) * 100 / size());
             if (!task.run(vars)) break;
         }
@@ -286,16 +286,31 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * This variable is being checked before every Task to be executed.
+     * Task used to get stop condition from other classes.
+     * Can be set by setStopCondition(Task).
      */
-    protected boolean stopped = false;
+    private Task stopCondition = new Task() {
+        @Override
+        public boolean run(HashMap<String, Object> vars) {
+            return false;
+        }
+    };
 
     /**
-     * Stop the connection sequence from another thread
+     * Overrides the current stop condition used in Provider
+     * @param condition Task, that returns true if Provider must finish.
      * @return Saved instance of this Provider.
      */
-    public Provider stop() {
-        stopped = true; return this;
+    public Provider setStopCondition(Task condition) {
+        this.stopCondition = condition; return this;
+    }
+
+    /**
+     * Method used to check if Provider must finish as soon as possible.
+     * @return true is Provider must stop, otherwise false.
+     */
+    protected boolean isStopped() {
+        return stopCondition.run(null);
     }
 
     /**

@@ -272,7 +272,7 @@ public class MosMetroV2 extends Provider {
                 vars.putAll(new CaptchaRequest() {
                     @Override
                     public boolean stop() {
-                        return stopped;
+                        return isStopped();
                     }
                 }.getResult(context, captcha_url, client.getCookies(redirect).get("aid")));
 
