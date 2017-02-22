@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center">
@@ -44,7 +43,7 @@
         android:id="@+id/text_captcha"
         android:inputType="textVisiblePassword"
         android:maxLines="1"
-        android:imeOptions="actionDone"
+        android:imeOptions="flagNoExtractUi"
         android:layout_below="@+id/textView2"
         android:layout_toRightOf="@+id/image_captcha"
         android:layout_marginTop="10dp"
