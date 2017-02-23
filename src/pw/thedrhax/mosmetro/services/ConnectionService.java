@@ -87,7 +87,12 @@ public class ConnectionService extends IntentService {
             public Notify locked(boolean locked) {
                 // Show STOP action only if notification is locked
                 if (locked) {
-                    notify.addAction(R.drawable.ic_launcher, getString(R.string.stop), stop_intent);
+                    if (notify.mActions.size() == 0)
+                        notify.addAction(
+                                R.drawable.ic_launcher,
+                                getString(R.string.stop),
+                                stop_intent
+                        );
                 } else {
                     while (notify.mActions.size() > 0) notify.mActions.remove(0);
                 }
