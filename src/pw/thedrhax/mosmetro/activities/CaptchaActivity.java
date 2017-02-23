@@ -46,7 +46,8 @@ public class CaptchaActivity extends Activity {
         setContentView(R.layout.captcha_dialog);
 
         final String url = getIntent().getStringExtra("url");
-        final Client client = new OkHttp().setCookie(url, "aid", getIntent().getStringExtra("aid"));
+        final Client client = new OkHttp(this)
+                .setCookie(url, "aid", getIntent().getStringExtra("aid"));
         final int pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
 
         final Button submit_button = (Button) findViewById(R.id.submit_button);

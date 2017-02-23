@@ -126,7 +126,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return          New Provider instance.
      */
     @NonNull public static Provider find(Context context) {
-        Client client = new OkHttp().followRedirects(false);
+        Client client = new OkHttp(context).followRedirects(false);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
 
         Logger.log(context.getString(R.string.auth_provider_check));
@@ -181,7 +181,7 @@ public abstract class Provider extends LinkedList<Task> {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        this.client = new OkHttp();
+        this.client = new OkHttp(context);
     }
 
     /**
@@ -190,7 +190,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public static boolean generate_204() {
-        Client client = new OkHttp();
+        Client client = new OkHttp().setTimeout(3000);
         try {
             client.get("http://google.ru/generate_204", null);
         } catch (Exception ex) {
@@ -272,7 +272,7 @@ public abstract class Provider extends LinkedList<Task> {
                 }
 
                 try {
-                    new OkHttp().post(STATISTICS_URL, params);
+                    new OkHttp(context).post(STATISTICS_URL, params);
                 } catch (Exception ignored) {}
 
                 if (settings.getBoolean("pref_notify_news", true))

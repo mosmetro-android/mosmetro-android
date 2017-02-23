@@ -18,6 +18,8 @@
 
 package pw.thedrhax.mosmetro.httpclient.clients;
 
+import android.content.Context;
+
 import org.jsoup.Jsoup;
 
 import java.io.InputStream;
@@ -47,6 +49,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.util.Util;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
@@ -129,10 +132,13 @@ public class OkHttp extends Client {
                         return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
                     }
                 })
-                .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
-                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
-                .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build();
+    }
+
+    public OkHttp(Context context) {
+        this();
+        int timeout = Util.getIntPreference(context, "pref_timeout", 0);
+        if (timeout != 0) setTimeout(timeout);
     }
 
     @Override

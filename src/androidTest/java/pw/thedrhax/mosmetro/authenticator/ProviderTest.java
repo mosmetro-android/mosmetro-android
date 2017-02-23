@@ -77,7 +77,7 @@ public class ProviderTest extends TestCase {
         );
 
         assertEquals("Empty client",
-                Provider.find(context, new OkHttp()).getClass(),
+                Provider.find(context, new OkHttp(context)).getClass(),
 
                 Unknown.class
         );

@@ -65,7 +65,7 @@
     <string name="pref_ip_wait">Waiting for IP address</string>
     <string name="pref_ip_wait_summary">
         Number of seconds to wait for IP address assignment.
-        If 0 is set, application will wait until device disconnects from the netwok (default: 30).
+        If 0 is set, application will wait until device disconnects from the network (default: 30).
     </string>
 
     <string name="pref_updater_enabled">Check automatically</string>
@@ -211,4 +211,6 @@
     <string name="pref_category_statistics">Statistics</string>
     <string name="pref_notify_foreground">Foreground process</string>
     <string name="pref_notify_foreground_summary">Bind background process to notification to protect it from being killed. If you disable this option, background process will be killed even if you simply open and close the app window.</string>
+    <string name="pref_timeout">Connection timeout</string>
+    <string name="pref_timeout_summary">Number of milliseconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 0).</string>
 </resources>

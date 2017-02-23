@@ -175,7 +175,7 @@ public class MosMetroV2 extends Provider {
 
                 Logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
                 try {
-                    int code = new OkHttp()
+                    int code = new OkHttp(context)
                             .setTimeout(1000)
                             .resetHeaders()
                             .setHeader(
@@ -374,7 +374,7 @@ public class MosMetroV2 extends Provider {
 
     @Override
     public boolean isConnected() {
-        Client client = new OkHttp().followRedirects(false);
+        Client client = new OkHttp(context).followRedirects(false);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (Exception ex) {

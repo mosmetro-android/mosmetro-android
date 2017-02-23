@@ -72,6 +72,13 @@
                 android:summary="@string/pref_ip_wait_summary"
                 android:defaultValue="30" />
 
+            <EditTextPreference
+                android:key="pref_timeout"
+                android:inputType="number"
+                android:title="@string/pref_timeout"
+                android:summary="@string/pref_timeout_summary"
+                android:defaultValue="30" />
+
         </PreferenceScreen>
 
         <PreferenceScreen
