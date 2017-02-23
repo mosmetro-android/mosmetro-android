@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -35,7 +34,7 @@ import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.Notification;
+import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.WifiUtils;
 
@@ -51,11 +50,9 @@ public class ConnectionService extends IntentService {
     private int pref_retry_count;
     private int pref_retry_delay;
     private int pref_ip_wait;
-    private boolean pref_notify_success_lock;
 
     // Notifications
-    private Notification notify_progress;
-    private Notification notification;
+    private Notify notify;
 
     // Authenticator
     private Provider provider;
@@ -78,76 +75,87 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
-        pref_notify_success_lock = settings.getBoolean("pref_notify_success_lock", true);
 
-        PendingIntent delete_intent = PendingIntent.getService(
+        final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
                 new Intent(this, ConnectionService.class).setAction("STOP"),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        notify_progress = new Notification(this)
-                .setIcon(R.drawable.ic_notification_connecting)
-                .setId(1)
-                .setEnabled(settings.getBoolean("pref_notify_progress", true)
-                            && Build.VERSION.SDK_INT >= 14)
-                .setIntent(new Intent(this, DebugActivity.class))
-                .setDeleteIntent(delete_intent);
+        notify = new Notify(this) {
+            @Override
+            public Notify locked(boolean locked) {
+                // Show STOP action only if notification is locked
+                if (locked) {
+                    notify.addAction(R.drawable.ic_launcher, getString(R.string.stop), stop_intent);
+                } else {
+                    while (notify.mActions.size() > 0) notify.mActions.remove(0);
+                }
+                return super.locked(locked);
+            }
+        };
 
-        notification = new Notification(this)
-                .setId(0)
-                .setIntent(new Intent(this, DebugActivity.class))
-                .setDeleteIntent(delete_intent);
+        notify.id(1)
+                .onClick(PendingIntent.getActivity(this, 1,
+                        new Intent(this, DebugActivity.class),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                ))
+                .onDelete(stop_intent)
+                .locked(settings.getBoolean("pref_notify_foreground", true));
     }
 
     private void notify (Provider.RESULT result) {
+        notify.hideProgress();
+
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                if (settings.getBoolean("pref_notify_success", true)) {
-                    notification
-                            .setTitle(getString(R.string.notification_success))
-                            .setIcon(R.drawable.ic_notification_success)
-                            .setText(getString(R.string.notification_success_log))
-                            .setCancellable(from_shortcut || !pref_notify_success_lock)
-                            .show();
-
-                    notification.setCancellable(true);
+                if (settings.getBoolean("pref_notify_success_lock", true)) {
+                    notify.locked(true);
                 }
+
+                notify.title(getString(R.string.notification_success))
+                        .text(getString(R.string.notification_success_log))
+                        .icon(R.drawable.ic_notification_success)
+                        .show()
+                        .locked(settings.getBoolean("pref_notify_foreground", true));
                 return;
 
             case NOT_REGISTERED:
                 if (settings.getBoolean("pref_notify_fail", true)) {
-                    notification
-                            .setTitle(getString(R.string.notification_not_registered))
-                            .setText(getString(R.string.notification_not_registered_register))
-                            .setIcon(R.drawable.ic_notification_register)
-                            .setIntent(new Intent(Intent.ACTION_VIEW)
-                                    .setData(Uri.parse("http://wi-fi.ru")))
-                            .setId(2)
-                            .show();
-
-                    notification.setId(0); // Reset ID to default
+                    notify.title(getString(R.string.notification_not_registered))
+                            .text(getString(R.string.notification_not_registered_register))
+                            .icon(R.drawable.ic_notification_register)
+                            .onClick(PendingIntent.getActivity(this, 0,
+                                    new Intent(Intent.ACTION_VIEW)
+                                            .setData(Uri.parse("http://wi-fi.ru")),
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            ))
+                            .id(2).show().id(1);
+                } else {
+                    notify.hide();
                 }
                 return;
 
             case ERROR:
                 if (settings.getBoolean("pref_notify_fail", true)) {
-                    notification
-                            .setTitle(getString(R.string.notification_error))
-                            .setText(getString(R.string.notification_error_log))
-                            .setIcon(R.drawable.ic_notification_error)
+                    notify.title(getString(R.string.notification_error))
+                            .text(getString(R.string.notification_error_log))
+                            .icon(R.drawable.ic_notification_error)
                             .show();
+                } else {
+                    notify.hide();
                 }
                 return;
 
             case NOT_SUPPORTED:
                 if (settings.getBoolean("pref_notify_fail", true)) {
-                    notification
-                            .setTitle(getString(R.string.notification_unsupported))
-                            .setText(getString(R.string.notification_error_log))
-                            .setIcon(R.drawable.ic_notification_register)
+                    notify.title(getString(R.string.notification_unsupported))
+                            .text(getString(R.string.notification_error_log))
+                            .icon(R.drawable.ic_notification_register)
                             .show();
+                } else {
+                    notify.hide();
                 }
         }
     }
@@ -158,9 +166,8 @@ public class ConnectionService extends IntentService {
         int count = 0;
 
         Logger.log(getString(R.string.ip_wait));
-        notify_progress
-                .setText(getString(R.string.ip_wait))
-                .setContinuous()
+        notify.title(getString(R.string.ip_wait))
+                .progress(0, true)
                 .show();
 
         while (wifi.getIP() == 0 && running) {
@@ -186,19 +193,17 @@ public class ConnectionService extends IntentService {
 
         do {
             if (count > 0) {
-                notify_progress
-                        .setText(String.format("%s (%s)",
+                notify.text(String.format("%s (%s)",
                                 getString(R.string.notification_progress_waiting),
                                 getString(R.string.try_out_of, count + 1, pref_retry_count)
                         ))
-                        .setContinuous()
+                        .progress(0, true)
                         .show();
 
                 SystemClock.sleep(pref_retry_delay * 1000);
             }
 
-            notify_progress
-                    .setText(String.format("%s (%s)",
+            notify.text(String.format("%s (%s)",
                             getString(R.string.notification_progress_connecting),
                             getString(R.string.try_out_of, count + 1, pref_retry_count)
                     ))
@@ -223,8 +228,7 @@ public class ConnectionService extends IntentService {
 
         if (intent.getBooleanExtra("debug", false)) {
             from_shortcut = true;
-            notify_progress.setEnabled(false);
-            notification.setEnabled(false);
+            notify.enabled(false);
         } else {
             from_shortcut = intent.getBooleanExtra("force", false);
         }
@@ -274,28 +278,22 @@ public class ConnectionService extends IntentService {
     }
 
     private void main() {
-        if (!from_shortcut && settings.getBoolean("pref_notify_foreground", true)) {
-            new Notification(this).setId(777).foreground();
-        }
-
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", true)
         );
 
         Logger.date();
-        notification.hide();
+        notify.icon(R.drawable.ic_notification_connecting);
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
-            notify_progress.hide();
             notify(Provider.RESULT.ERROR);
             return;
         }
 
-        notify_progress
-                .setTitle(getString(R.string.auth_connecting, SSID))
-                .setText(getString(R.string.auth_provider_check))
-                .setContinuous()
+        notify.title(getString(R.string.auth_connecting, SSID))
+                .text(getString(R.string.auth_provider_check))
+                .progress(0, true)
                 .show();
 
         provider = Provider.find(this)
@@ -308,25 +306,21 @@ public class ConnectionService extends IntentService {
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
-                        notify_progress
-                                .setProgress(progress)
-                                .show();
+                        notify.progress(progress).show();
                     }
                 });
 
-        notify_progress
-                .setText(getString(R.string.auth_waiting))
-                .show();
+        notify.text(getString(R.string.auth_waiting)).show();
 
         // Try to connect
         Provider.RESULT result = connect();
-        notify_progress.hide();
 
         // Notify user if not interrupted
         if (running) {
             Logger.date();
             notify(result);
         } else {
+            notify.hide();
             return;
         }
 
@@ -358,7 +352,7 @@ public class ConnectionService extends IntentService {
         }
 
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
-        notification.hide();
+        notify.hide();
 
         // Try to reconnect the Wi-Fi network
         if (settings.getBoolean("pref_wifi_reconnect", false)) wifi.reconnect(SSID);
@@ -380,9 +374,11 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
-        if (!from_shortcut) notification.hide();
-        notify_progress.hide();
+        notify.hide();
+        if (from_shortcut) {
+            // TODO: Do not start connection in DebugActivity after click on this notification
+            notify.cancelOnClick(true).locked(false).show();
+        }
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                 .putExtra("RUNNING", false)
         );

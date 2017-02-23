@@ -18,6 +18,7 @@
 
 package pw.thedrhax.mosmetro.updater;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +33,7 @@ import org.json.simple.parser.ParseException;
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
-import pw.thedrhax.util.Notification;
+import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
 
 public class NewsChecker {
@@ -73,13 +74,15 @@ public class NewsChecker {
         if (settings.getLong("pref_notify_news_id", 0) >= id)
             return;
 
-        new Notification(context)
-                .setCancellable(true)
-                .setId(255)
-                .setIcon(R.drawable.ic_notification_message)
-                .setIntent(new Intent(Intent.ACTION_VIEW).setData(url))
-                .setTitle(title)
-                .setText(message)
+        new Notify(context).id(255)
+                .icon(R.drawable.ic_notification_message)
+                .onClick(PendingIntent.getActivity(context, 255,
+                        new Intent(Intent.ACTION_VIEW).setData(url),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                ))
+                .title(title)
+                .text(message)
+                .cancelOnClick(true)
                 .show();
 
         settings.edit()

@@ -33,7 +33,7 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.CaptchaActivity;
 import pw.thedrhax.mosmetro.services.ConnectionService;
-import pw.thedrhax.util.Notification;
+import pw.thedrhax.util.Notify;
 
 public abstract class CaptchaRequest {
     public abstract boolean stop();
@@ -46,14 +46,15 @@ public abstract class CaptchaRequest {
                 .putExtra("url", url)
                 .putExtra("aid", aid);
 
-        Notification captcha_notify = new Notification(context)
-                .setTitle(context.getString(R.string.notification_captcha))
-                .setText(context.getString(R.string.notification_captcha_summary))
-                .setIcon(R.drawable.ic_notification_register)
-                .setIntent(captcha_activity)
-                .setId(1)
-                .setDeleteIntent(PendingIntent.getService(
-                        context, 0,
+        Notify captcha_notify = new Notify(context).id(2)
+                .title(context.getString(R.string.notification_captcha))
+                .text(context.getString(R.string.notification_captcha_summary))
+                .icon(R.drawable.ic_notification_register)
+                .onClick(PendingIntent.getActivity(
+                        context, 254, captcha_activity, PendingIntent.FLAG_UPDATE_CURRENT
+                ))
+                .onDelete(PendingIntent.getService(
+                        context, 253,
                         new Intent(context, ConnectionService.class).setAction("STOP"),
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ));

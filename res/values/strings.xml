@@ -48,12 +48,8 @@
     <string name="pref_internet_check">Connection monitoring</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
 
-    <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_fail">Connection failure</string>
-    <string name="pref_notify_progress">Connection process</string>
-    <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="pref_notify_fail_summary">Notify on failure</string>
-    <string name="pref_notify_progress_summary">Show connection progress (Android 4.0+)</string>
     <string name="pref_notify_success_lock">Locked notification</string>
     <string name="pref_notify_success_lock_summary">
         Lock successful connection notification (notification will remain while Wi-Fi is connected)

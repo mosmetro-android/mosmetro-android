@@ -46,12 +46,8 @@
     <string name="pref_internet_check">Мониторинг соединения</string>
     <string name="pref_internet_check_summary">Проверять соединение с интернетом каждые 10 секунд и перезапускать подключение при ошибке.</string>
 
-    <string name="pref_notify_success">Успешное подключение</string>
     <string name="pref_notify_fail">Неудачное подключение</string>
-    <string name="pref_notify_progress">Процесс подключения</string>
-    <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
     <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
-    <string name="pref_notify_progress_summary">Показывать процесс подключения (Android 4.0+)</string>
     <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
     <string name="pref_notify_success_lock_summary">
         Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)
