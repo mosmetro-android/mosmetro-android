@@ -50,7 +50,7 @@ import pw.thedrhax.util.WifiUtils;
  */
 
 public class MosMetroV2 extends Provider {
-    private String redirect;
+    private String redirect = "http://auth.wi-fi.ru/";
 
     public MosMetroV2(final Context context) {
         super(context);
