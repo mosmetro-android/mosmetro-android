@@ -38,7 +38,7 @@ public final class Util {
                             .getString(name, Integer.valueOf(def_value).toString())
             );
         } catch (NumberFormatException ignored) {}
-        return result;
+        return (result > 0 ? result : - result);
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {
