@@ -76,7 +76,7 @@ public abstract class Provider extends LinkedList<Task> {
             "MosMetro_Free",
             "AURA",
             "MosGorTrans_Free",
-            "MT_FREE",
+            "MT_FREE", "MT_FREE_",
             "Air_WiFi_Free"
     };
 
