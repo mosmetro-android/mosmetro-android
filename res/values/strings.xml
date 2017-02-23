@@ -214,4 +214,5 @@
     <string name="pref_timeout">Connection timeout</string>
     <string name="pref_timeout_summary">Number of milliseconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 0).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
+    <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
 </resources>

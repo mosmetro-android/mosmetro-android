@@ -22,7 +22,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -32,6 +31,7 @@ import org.json.simple.parser.ParseException;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
@@ -56,14 +56,13 @@ public class NewsChecker {
         }
 
         long id, max_version;
-        String title, message;
-        Uri url;
+        String title, message, url;
         try {
             id = Integer.parseInt((String)data.get("id"));
             max_version = Integer.parseInt((String)data.get("max_version"));
             title = (String)data.get("title");
             message = (String)data.get("message");
-            url = Uri.parse((String)data.get("url"));
+            url = (String)data.get("url");
         } catch (Exception ex) {
             return;
         }
@@ -77,7 +76,8 @@ public class NewsChecker {
         new Notify(context).id(255)
                 .icon(R.drawable.ic_notification_message)
                 .onClick(PendingIntent.getActivity(context, 255,
-                        new Intent(Intent.ACTION_VIEW).setData(url),
+                        new Intent(context, SafeViewActivity.class)
+                                .putExtra("data", url),
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ))
                 .title(title)

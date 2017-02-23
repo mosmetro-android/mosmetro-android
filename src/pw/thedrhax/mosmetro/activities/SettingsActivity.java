@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -74,9 +73,9 @@ public class SettingsActivity extends Activity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 switch (i) {
                     case 0: // Yandex.Money
-                        Intent yandex = new Intent(Intent.ACTION_VIEW);
-                        yandex.setData(Uri.parse(getString(R.string.donate_yandex_data)));
-                        startActivity(yandex);
+                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                .putExtra("data", getString(R.string.donate_yandex_data))
+                        );
                         break;
 
                     case 1: // WebMoney
@@ -95,21 +94,21 @@ public class SettingsActivity extends Activity {
                         break;
 
                     case 2: // GitHub
-                        Intent github = new Intent(Intent.ACTION_VIEW);
-                        github.setData(Uri.parse(getString(R.string.developer_github_repo_link)));
-                        startActivity(github);
+                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                .putExtra("data", getString(R.string.developer_github_repo_link))
+                        );
                         break;
 
                     case 3: // VK
-                        Intent vk = new Intent(Intent.ACTION_VIEW);
-                        vk.setData(Uri.parse(getString(R.string.developer_vkontakte_link)));
-                        startActivity(vk);
+                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                .putExtra("data", getString(R.string.developer_vkontakte_link))
+                        );
                         break;
 
                     case 4: // Google Play
-                        Intent google = new Intent(Intent.ACTION_VIEW);
-                        google.setData(Uri.parse(getString(R.string.developer_google_play_link)));
-                        startActivity(google);
+                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                .putExtra("data", getString(R.string.developer_google_play_link))
+                        );
                         break;
                 }
             }

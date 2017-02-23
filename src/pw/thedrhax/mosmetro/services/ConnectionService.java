@@ -22,7 +22,6 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -31,6 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
+import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.util.Logger;
@@ -132,8 +132,8 @@ public class ConnectionService extends IntentService {
                             .text(getString(R.string.notification_not_registered_register))
                             .icon(R.drawable.ic_notification_register)
                             .onClick(PendingIntent.getActivity(this, 0,
-                                    new Intent(Intent.ACTION_VIEW)
-                                            .setData(Uri.parse("http://wi-fi.ru")),
+                                    new Intent(this, SafeViewActivity.class)
+                                            .putExtra("data", "http://wi-fi.ru"),
                                     PendingIntent.FLAG_UPDATE_CURRENT
                             ))
                             .id(2).show().id(1);

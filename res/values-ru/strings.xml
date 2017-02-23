@@ -198,4 +198,5 @@
     <string name="pref_timeout">Таймаут соединения</string>
     <string name="pref_timeout_summary">Количество миллисекунд, в течение которого приложение ожидает ответа от сервера. Если установлен 0, приложеие будет ждать до тех пор пока не будет поймана одна из ошибок (по умолчанию: 0).</string>
     <string name="toast_unsupported_function">Похоже эта функция не поддерживается вашим устройством :(</string>
+    <string name="toast_view_exception">Похоже, у вас не установлено ни одного браузера</string>
 </resources>

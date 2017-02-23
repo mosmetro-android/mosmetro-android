@@ -61,6 +61,18 @@
         </activity>
 
         <activity
+            android:name=".activities.SafeViewActivity"
+            android:autoRemoveFromRecents="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            tools:ignore="UnusedAttribute">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.SafeViewActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.ShortcutActivity"
             android:label="@string/manual_connection_shortcut"
             android:theme="@style/AppBaseTheme.Dialog">

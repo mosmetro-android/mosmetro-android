@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
@@ -36,6 +35,7 @@ import java.util.List;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Version;
 
@@ -211,7 +211,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     .putInt("pref_updater_build", version)
                     .apply();
 
-            context.startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)));
+            context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
         }
     }
 }
