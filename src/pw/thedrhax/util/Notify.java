@@ -23,7 +23,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 public class Notify extends NotificationCompat.Builder {
     private Context context;
@@ -85,10 +85,6 @@ public class Notify extends NotificationCompat.Builder {
 
     public Notify locked(boolean locked) {
         this.locked = locked; return this;
-    }
-
-    public boolean isLocked() {
-        return locked;
     }
 
     public Notify cancelOnClick(boolean cancel) {
