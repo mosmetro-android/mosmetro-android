@@ -18,15 +18,20 @@
 
 package pw.thedrhax.util;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.widget.Toast;
 
 import pw.thedrhax.mosmetro.BuildConfig;
+import pw.thedrhax.mosmetro.R;
 
 public final class PermissionUtils {
     private final Context context;
@@ -35,31 +40,53 @@ public final class PermissionUtils {
     public PermissionUtils(@NonNull Context context) {
         this.context = context;
         this.pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            REQUEST_IGNORE_BATTERY_OPTIMIZATIONS = new Intent()
+                    .setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:" + context.getPackageName()));
+
+            IGNORE_BATTERY_OPTIMIZATION_SETTINGS = new Intent()
+                    .setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+        }
     }
 
     /**
      * Battery saving permissions.
      */
 
+    private Intent REQUEST_IGNORE_BATTERY_OPTIMIZATIONS;
+    private Intent IGNORE_BATTERY_OPTIMIZATION_SETTINGS;
+
+    @RequiresApi(23)
     public boolean isBatterySavingIgnored() {
-        if (Build.VERSION.SDK_INT >= 23)
-            return pm.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID);
-        else
-            return true;
+        return pm.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID);
     }
 
+    @RequiresApi(23)
     public void requestBatterySavingIgnore() {
-        if (Build.VERSION.SDK_INT >= 23)
-            context.startActivity(new Intent()
-                    .setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                    .setData(Uri.parse("package:" + context.getPackageName()))
-            );
+        try {
+            context.startActivity(REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        } catch (ActivityNotFoundException ex) {
+            batterySavingException();
+        }
     }
 
+    @RequiresApi(23)
     public void openBatterySavingSettings() {
-        if (Build.VERSION.SDK_INT >= 23)
-            context.startActivity(new Intent()
-                    .setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-            );
+        try {
+            context.startActivity(IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+        } catch (ActivityNotFoundException ex) {
+            batterySavingException();
+        }
+    }
+
+    private void batterySavingException() {
+        Toast.makeText(context, R.string.toast_unsupported_function, Toast.LENGTH_LONG).show();
+        PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean("pref_battery_saving_ignore", true)
+                .apply();
     }
 }

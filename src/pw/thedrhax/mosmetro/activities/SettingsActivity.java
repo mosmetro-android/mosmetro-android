@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -34,6 +35,7 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -179,6 +181,7 @@ public class SettingsActivity extends Activity {
                     .onPreferenceClick(null);
     }
 
+    @RequiresApi(23)
     private void energy_saving_setup() {
         final PermissionUtils pu = new PermissionUtils(this);
 
@@ -294,6 +297,7 @@ public class SettingsActivity extends Activity {
                 .onPreferenceChange(foreground, foreground.isChecked());
 
         update_checker_setup();
-        energy_saving_setup();
+        if (Build.VERSION.SDK_INT >= 23)
+            energy_saving_setup();
     }
 }
