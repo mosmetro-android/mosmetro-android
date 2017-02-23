@@ -50,6 +50,10 @@ public class DebugActivity extends Activity {
 
     // Receivers
     private BroadcastReceiver service_state;
+    private IntentFilter service_filter;
+
+    // Callbacks
+    private Logger.Callback logger_callback;
 
     /** Called when the activity is first created. */
     @Override
@@ -67,12 +71,10 @@ public class DebugActivity extends Activity {
                 );
             }
         };
-        registerReceiver(service_state,
-                new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService")
-        );
+        service_filter = new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService");
 
         text_messages = (TextView)findViewById(R.id.text_messages);
-        Logger.registerCallback(this, new Logger.Callback() {
+        logger_callback = new Logger.Callback() {
             @Override
             public void log(Logger.LEVEL level, String message) {
                 if (level != Logger.LEVEL.INFO || show_debug)
@@ -80,7 +82,21 @@ public class DebugActivity extends Activity {
                         return;
                 text_messages.append(message + "\n");
             }
-        });
+        };
+    }
+
+    @Override
+    protected void onPause() {
+        super.onResume();
+        unregisterReceiver(service_state);
+        Logger.unregisterCallback(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(service_state, service_filter);
+        Logger.registerCallback(this, logger_callback);
         text_messages.setText("");
 
         // Load all logs
@@ -96,13 +112,6 @@ public class DebugActivity extends Activity {
             // If service is not running, connect manually
             button_connect(null);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Logger.unregisterCallback(this);
-        unregisterReceiver(service_state);
     }
 
     // ActionBar Menu
