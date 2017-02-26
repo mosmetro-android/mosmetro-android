@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -39,10 +40,13 @@ import pw.thedrhax.util.Version;
 public class NewsChecker {
     private final Context context;
     private final SharedPreferences settings;
+    private final boolean pref_colored_icons;
 
     public NewsChecker(@NonNull Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.pref_colored_icons = (Build.VERSION.SDK_INT <= 20)
+                || settings.getBoolean("pref_notify_alternative", false);
     }
 
     public void check() {
@@ -74,7 +78,9 @@ public class NewsChecker {
             return;
 
         new Notify(context).id(255)
-                .icon(R.drawable.ic_notification_message)
+                .icon(pref_colored_icons ?
+                        R.drawable.ic_notification_message_colored :
+                        R.drawable.ic_notification_message)
                 .onClick(PendingIntent.getActivity(context, 255,
                         new Intent(context, SafeViewActivity.class)
                                 .putExtra("data", url),

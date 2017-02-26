@@ -22,6 +22,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -50,6 +51,7 @@ public class ConnectionService extends IntentService {
     private int pref_retry_count;
     private int pref_retry_delay;
     private int pref_ip_wait;
+    private boolean pref_colored_icons;
 
     // Notifications
     private Notify notify;
@@ -75,6 +77,7 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
+        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) || settings.getBoolean("pref_notify_alternative", false);
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
@@ -121,7 +124,9 @@ public class ConnectionService extends IntentService {
 
                 notify.title(getString(R.string.notification_success))
                         .text(getString(R.string.notification_success_log))
-                        .icon(R.drawable.ic_notification_success)
+                        .icon(pref_colored_icons ?
+                                R.drawable.ic_notification_success_colored :
+                                R.drawable.ic_notification_success)
                         .show()
                         .locked(settings.getBoolean("pref_notify_foreground", true));
                 return;
@@ -130,7 +135,9 @@ public class ConnectionService extends IntentService {
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     notify.title(getString(R.string.notification_not_registered))
                             .text(getString(R.string.notification_not_registered_register))
-                            .icon(R.drawable.ic_notification_register)
+                            .icon(pref_colored_icons ?
+                                    R.drawable.ic_notification_register_colored :
+                                    R.drawable.ic_notification_register)
                             .onClick(PendingIntent.getActivity(this, 0,
                                     new Intent(this, SafeViewActivity.class)
                                             .putExtra("data", "http://wi-fi.ru"),
@@ -146,7 +153,9 @@ public class ConnectionService extends IntentService {
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     notify.title(getString(R.string.notification_error))
                             .text(getString(R.string.notification_error_log))
-                            .icon(R.drawable.ic_notification_error)
+                            .icon(pref_colored_icons ?
+                                    R.drawable.ic_notification_error_colored :
+                                    R.drawable.ic_notification_error)
                             .show();
                 } else {
                     notify.hide();
@@ -157,7 +166,9 @@ public class ConnectionService extends IntentService {
                 if (settings.getBoolean("pref_notify_fail", true)) {
                     notify.title(getString(R.string.notification_unsupported))
                             .text(getString(R.string.notification_error_log))
-                            .icon(R.drawable.ic_notification_register)
+                            .icon(pref_colored_icons ?
+                                    R.drawable.ic_notification_register_colored :
+                                    R.drawable.ic_notification_register)
                             .show();
                 } else {
                     notify.hide();
@@ -288,7 +299,9 @@ public class ConnectionService extends IntentService {
         );
 
         Logger.date();
-        notify.icon(R.drawable.ic_notification_connecting);
+        notify.icon(pref_colored_icons ?
+                R.drawable.ic_notification_connecting_colored :
+                R.drawable.ic_notification_connecting);
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {

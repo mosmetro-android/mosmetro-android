@@ -28,7 +28,7 @@
         android:padding="8dp" />
 
     <ImageView
-        android:src="@drawable/ic_notification_error"
+        android:src="@drawable/ic_notification_error_colored"
         android:id="@+id/image_captcha"
         android:layout_height="64dp"
         android:layout_width="96dp"

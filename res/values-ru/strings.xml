@@ -48,6 +48,10 @@
 
     <string name="pref_notify_fail">Неудачное подключение</string>
     <string name="pref_notify_fail_summary">Уведомлять при возникновении ошибки</string>
+    <string name="pref_notify_alternative">Альтернативные иконки</string>
+    <string name="pref_notify_alternative_summary">
+        Использовать цветные иконки уведомлений на Android 5.0+ (поддерживается не всегда)
+    </string>
     <string name="pref_notify_success_lock">Неудаляемое уведомление</string>
     <string name="pref_notify_success_lock_summary">
         Сделать уведомление об успехе неудаляемым (уведомление будет отображаться, пока подключена сеть Wi-Fi)

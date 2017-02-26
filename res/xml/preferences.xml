@@ -95,21 +95,28 @@
                 android:key="pref_notify_success_lock"
                 android:title="@string/pref_notify_success_lock"
                 android:summary="@string/pref_notify_success_lock_summary"
+                android:icon="@drawable/ic_notification_success_colored"
                 android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_notify_news"
                     android:title="@string/pref_notify_news"
                     android:summary="@string/pref_notify_news_summary"
-                    android:icon="@drawable/ic_notification_message"
+                    android:icon="@drawable/ic_notification_message_colored"
                     android:defaultValue="true" />
 
             <CheckBoxPreference
                     android:key="pref_notify_fail"
                     android:title="@string/pref_notify_fail"
                     android:summary="@string/pref_notify_fail_summary"
-                    android:icon="@drawable/ic_notification_error"
+                    android:icon="@drawable/ic_notification_error_colored"
                     android:defaultValue="true" />
+
+            <CheckBoxPreference
+                android:key="pref_notify_alternative"
+                android:title="@string/pref_notify_alternative"
+                android:summary="@string/pref_notify_alternative_summary"
+                android:defaultValue="false" />
 
         </PreferenceScreen>
 
@@ -146,6 +153,12 @@
                 android:title="@string/pref_mosmetro_captcha_collect"
                 android:summary="@string/pref_mosmetro_captcha_collect_summary"
                 android:defaultValue="true" />
+
+            <CheckBoxPreference
+                    android:key="pref_notify_alternative"
+                    android:title="@string/pref_notify_alternative"
+                    android:summary="@string/pref_notify_alternative_summary"
+                    android:defaultValue="false" />
 
         </PreferenceScreen>
 
