@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.httpclient;
 
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,7 +36,7 @@ public abstract class Client {
 
     protected Document document;
     protected Map<String,String> headers;
-    protected String raw_document;
+    protected String raw_document = "";
     protected int code = 200;
 
     protected Client() {
@@ -126,7 +127,7 @@ public abstract class Client {
         return document;
     }
 
-    public String getPage() {
+    @NonNull public String getPage() {
         return raw_document;
     }
 
