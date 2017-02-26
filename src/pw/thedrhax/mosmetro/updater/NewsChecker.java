@@ -62,8 +62,8 @@ public class NewsChecker {
         long id, max_version;
         String title, message, url;
         try {
-            id = Integer.parseInt((String)data.get("id"));
-            max_version = Integer.parseInt((String)data.get("max_version"));
+            id = (Long)data.get("id");
+            max_version = (Long)data.get("max_version");
             title = (String)data.get("title");
             message = (String)data.get("message");
             url = (String)data.get("url");
