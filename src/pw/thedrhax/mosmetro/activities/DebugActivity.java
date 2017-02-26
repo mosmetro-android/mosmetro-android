@@ -83,6 +83,10 @@ public class DebugActivity extends Activity {
                 text_messages.append(message + "\n");
             }
         };
+
+        if (!ConnectionService.isRunning()) {
+            button_connect(null);
+        }
     }
 
     @Override
@@ -105,13 +109,9 @@ public class DebugActivity extends Activity {
         }
 
         // Get initial ConnectionService state (not very accurate)
-        if (ConnectionService.isRunning()) {
-            // If service is running, change the button
-            service_state.onReceive(this, new Intent().putExtra("RUNNING", true));
-        } else {
-            // If service is not running, connect manually
-            button_connect(null);
-        }
+        service_state.onReceive(this,
+                new Intent().putExtra("RUNNING", ConnectionService.isRunning())
+        );
     }
 
     // ActionBar Menu
