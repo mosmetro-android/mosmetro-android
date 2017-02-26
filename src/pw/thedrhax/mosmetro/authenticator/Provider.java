@@ -20,7 +20,6 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -126,37 +125,29 @@ public abstract class Provider extends LinkedList<Task> {
      * @return          New Provider instance.
      */
     @NonNull public static Provider find(Context context) {
-        Client client = new OkHttp(context).followRedirects(false);
-        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-
         Logger.log(context.getString(R.string.auth_provider_check));
 
-        Provider result = null;
-        for (int i = 0; i < pref_retry_count; i++) {
-            try {
-                client.get("http://wi-fi.ru", null, pref_retry_count);
-            } catch (Exception ex) {
-                Logger.log(Logger.LEVEL.DEBUG, ex);
-            }
-
-            result = find(context, client);
-
-            if (result instanceof Unknown && !generate_204()) {
-                SystemClock.sleep(1000);
-                continue;
-            }
-
-            return result;
+        Client client = new OkHttp(context).followRedirects(false);
+        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
+        try {
+            client.get("http://wi-fi.ru", null, pref_retry_count);
+        } catch (Exception ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(context.getString(R.string.error,
+                    context.getString(R.string.auth_error_redirect)
+            ));
         }
 
-        // Only Unknown Provider without internet connection is possible here
-        if (client.getPageContent() != null)
-            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
-        Logger.log(context.getString(R.string.error,
-                context.getString(R.string.auth_error_provider)
-        ));
+        Provider result = Provider.find(context, client);
 
-        return result != null ? result : new Unknown(context);
+        if (result instanceof Unknown && !generate_204()) {
+            Logger.log(Logger.LEVEL.DEBUG, client.getPage());
+            Logger.log(context.getString(R.string.error,
+                    context.getString(R.string.auth_error_provider)
+            ));
+        }
+
+        return result;
     }
 
     /**
