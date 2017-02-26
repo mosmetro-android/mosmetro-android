@@ -50,7 +50,6 @@
 
     <string name="pref_notify_fail">Connection failure</string>
     <string name="pref_notify_fail_summary">Notify on failure</string>
-    <string name="pref_notify_progress_summary">Show connection progress (Android 4.0+)</string>
     <string name="pref_notify_alternative">Alternative icons</string>
     <string name="pref_notify_alternative_summary">
         Use color icons for notifications on Android 5.0+ (not always supported)
@@ -220,4 +219,6 @@
     <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 0).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
     <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
+    <string name="preparing_to_send_log">Preparing to send E-mail</string>
+    <string name="please_wait">Please wait…</string>
 </resources>

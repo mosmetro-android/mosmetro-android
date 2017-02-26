@@ -35,7 +35,6 @@ import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.Version;
 
 public class DebugActivity extends Activity {
     // UI Elements
@@ -131,16 +130,7 @@ public class DebugActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                Intent send_email = new Intent(Intent.ACTION_SEND);
-
-                send_email.setType("text/plain");
-                send_email.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.report_email_address)});
-                send_email.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.report_email_subject, Version.getFormattedVersion())
-                );
-                send_email.putExtra(Intent.EXTRA_TEXT, Logger.read(Logger.LEVEL.DEBUG));
-
-                startActivity(Intent.createChooser(send_email, getString(R.string.report_choose_client)));
+                startActivity(new Intent(this, SendLogActivity.class));
                 return true;
 
             case android.R.id.home:

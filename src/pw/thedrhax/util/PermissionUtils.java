@@ -18,9 +18,12 @@
 
 package pw.thedrhax.util;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
@@ -34,10 +37,10 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 
 public final class PermissionUtils {
-    private final Context context;
+    private final Activity context;
     private final PowerManager pm;
 
-    public PermissionUtils(@NonNull Context context) {
+    public PermissionUtils(@NonNull Activity context) {
         this.context = context;
         this.pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
@@ -88,5 +91,23 @@ public final class PermissionUtils {
                 .edit()
                 .putBoolean("pref_battery_saving_ignore", true)
                 .apply();
+    }
+
+    /**
+     * External storage permissions
+     */
+
+    @RequiresApi(23)
+    public boolean isExternalStorageAvailable() {
+        return context.checkSelfPermission(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @RequiresApi(23)
+    public void requestExternalStoragePermission(int request_id) {
+        context.requestPermissions(
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, request_id
+        );
     }
 }
