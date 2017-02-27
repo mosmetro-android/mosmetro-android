@@ -50,7 +50,7 @@ public class SendLogActivity extends Activity {
 
     private Uri logToFile() throws IOException {
         String name = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + File.separator + "pw.thedrhax.mosmetro.log";
+                + File.separator + "pw.thedrhax.mosmetro.txt";
         File log = new File(name);
 
         FileWriter writer = new FileWriter(log);
