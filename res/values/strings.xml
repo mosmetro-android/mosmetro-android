@@ -52,7 +52,7 @@
     <string name="pref_notify_fail_summary">Notify on failure</string>
     <string name="pref_notify_alternative">Alternative icons</string>
     <string name="pref_notify_alternative_summary">
-        Use color icons for notifications on Android 5.0+ (not always supported)
+        Use white icons on Android older than 5.0 and colored icons on Android 5.0 and newer (not always supported).
     </string>
     <string name="pref_notify_success_lock">Locked notification</string>
     <string name="pref_notify_success_lock_summary">
