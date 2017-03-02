@@ -75,8 +75,8 @@ public class Notify extends NotificationCompat.Builder {
         setProgress(0, 0, false); return this;
     }
 
-    public Notify addAction(int icon, CharSequence title, PendingIntent intent) {
-        super.addAction(icon, title, intent); return this;
+    public Notify addAction(CharSequence title, PendingIntent intent) {
+        super.addAction(0, title, intent); return this;
     }
 
     public Notify enabled(boolean enabled) {
