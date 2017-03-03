@@ -221,4 +221,5 @@
     <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
     <string name="preparing_to_send_log">Preparing to send E-mail</string>
     <string name="please_wait">Please wait…</string>
+    <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
 </resources>

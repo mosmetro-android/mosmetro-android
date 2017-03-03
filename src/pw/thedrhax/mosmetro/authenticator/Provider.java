@@ -142,6 +142,8 @@ public abstract class Provider extends LinkedList<Task> {
             Logger.log(context.getString(R.string.error,
                     context.getString(R.string.auth_error_provider)
             ));
+            Logger.log(context.getString(R.string.auth_provider_assume));
+            return new MosMetroV2(context);
         }
 
         return result;

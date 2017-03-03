@@ -205,4 +205,5 @@
     <string name="toast_view_exception">Похоже, у вас не установлено ни одного браузера</string>
     <string name="please_wait">Пожалуйста, подождите…</string>
     <string name="preparing_to_send_log">Подготовка к отправке письма</string>
+    <string name="auth_provider_assume">Пытаюсь подключиться с помощью MosMetroV2…</string>
 </resources>
