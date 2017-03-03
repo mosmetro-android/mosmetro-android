@@ -20,30 +20,24 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
-import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
-import pw.thedrhax.util.WifiUtils;
 
 /**
  * Base class for all providers.
