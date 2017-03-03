@@ -22,6 +22,7 @@ import android.content.Context;
 
 import org.jsoup.Jsoup;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -40,6 +41,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
@@ -53,6 +55,7 @@ import pw.thedrhax.util.Util;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
+    private Call last_call = null;
 
     private SSLSocketFactory trustAllCerts() {
         // Create a trust manager that does not validate certificate chains
@@ -182,19 +185,22 @@ public class OkHttp extends Client {
         return this;
     }
 
-    @Override
-    public Client get(String link, Map<String, String> params) throws Exception {
-        Request.Builder builder = new Request.Builder()
-                .url(link + requestToString(params))
-                .get();
-
+    private Response call(Request.Builder builder) throws IOException {
+        // Populate headers
         for (String name : headers.keySet()) {
             builder.addHeader(name, getHeader(name));
         }
 
-        setHeader(HEADER_REFERER, link);
-        parseDocument(client.newCall(builder.build()).execute());
+        last_call = client.newCall(builder.build());
+        return last_call.execute();
+    }
 
+    @Override
+    public Client get(String link, Map<String, String> params) throws Exception {
+        parseDocument(call(
+                new Request.Builder().url(link + requestToString(params)).get()
+        ));
+        setHeader(HEADER_REFERER, link);
         return this;
     }
 
@@ -208,34 +214,32 @@ public class OkHttp extends Client {
             }
         }
 
-        Request.Builder builder = new Request.Builder()
-                .url(link)
-                .post(body.build());
-
-        for (String name : headers.keySet()) {
-            builder.addHeader(name, getHeader(name));
-        }
-
+        parseDocument(call(
+                new Request.Builder().url(link).post(body.build())
+        ));
         setHeader(HEADER_REFERER, link);
-        parseDocument(client.newCall(builder.build()).execute());
-
         return this;
     }
 
     @Override
     public InputStream getInputStream(String link) throws Exception {
-        Request.Builder builder = new Request.Builder().url(link).get();
+        Response response = call(
+                new Request.Builder().url(link).get()
+        );
 
-        for (String name : headers.keySet()) {
-            builder.addHeader(name, getHeader(name));
+        if (response.code() != 200) {
+            response.body().close();
+            throw new Exception("Empty response: " + code);
         }
 
-        Response response = client.newCall(builder.build()).execute();
-
-        if (response.code() != 200)
-            throw new Exception("Empty response: " + code);
-
         return response.body().byteStream();
+    }
+
+    @Override
+    public void stop() {
+        if (last_call != null) {
+            last_call.cancel();
+        }
     }
 
     private void parseDocument (Response response) throws Exception {

@@ -122,6 +122,9 @@ public abstract class Client {
         }.run(retries);
     }
 
+    // Cancel current request
+    public abstract void stop();
+
     // Parse methods
     public Document getPageContent() {
         return document;
