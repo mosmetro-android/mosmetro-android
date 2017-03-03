@@ -234,7 +234,7 @@ public class ConnectionService extends IntentService {
         if (intent == null) return START_NOT_STICKY;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
-            stop();
+            running = false;
             return START_NOT_STICKY;
         }
 
@@ -251,33 +251,10 @@ public class ConnectionService extends IntentService {
                 if (Provider.isSSIDSupported(SSID) || from_shortcut) {
                     onStart(intent, startId);
                 } else {
-                    stop();
+                    running = false;
                 }
 
         return START_NOT_STICKY;
-    }
-
-    /**
-     * Force stop method
-     *
-     * 1. Sets running to false to notify main()
-     * 2. Waits for main() to finish (to acquire lock to this thread)
-     * 3. Releases the lock
-     * 4. Starts to destroy the ConnectionService
-     *
-     * Called if:
-     * - Intent with "STOP" action is received
-     * - Provider detected that current SSID is unsupported
-     *
-     * In case of main() exited by itself, Service is being destroyed automatically
-     */
-    private void stop() {
-        running = false;
-        if (lock.isLocked()) {
-            lock.lock();
-            lock.unlock();
-        }
-        stopSelf();
     }
 
     public void onHandleIntent(Intent intent) {
@@ -286,6 +263,15 @@ public class ConnectionService extends IntentService {
             main();
             running = false;
             lock.unlock();
+
+            notify.hide();
+            if (from_shortcut) {
+                // TODO: Do not start connection in DebugActivity after click on this notification
+                notify.cancelOnClick(true).locked(false).show();
+            }
+            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                    .putExtra("RUNNING", false)
+            );
         }
     }
 
@@ -382,19 +368,7 @@ public class ConnectionService extends IntentService {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         if (!settings.getBoolean("pref_notify_foreground", true)) {
-            onDestroy();
+            running = false;
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        notify.hide();
-        if (from_shortcut) {
-            // TODO: Do not start connection in DebugActivity after click on this notification
-            notify.cancelOnClick(true).locked(false).show();
-        }
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                .putExtra("RUNNING", false)
-        );
     }
 }
