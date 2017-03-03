@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -230,49 +231,7 @@ public abstract class Provider extends LinkedList<Task> {
             if (!task.run(vars)) break;
         }
 
-        /**
-         * Submit statistics
-         */
-        new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                boolean connected;
-
-                switch ((RESULT) vars.get("result")) {
-                    case CONNECTED: connected = true; break;
-                    case ALREADY_CONNECTED: connected = false; break;
-                    default: return false;
-                }
-
-                String STATISTICS_URL = new CachedRetriever(context).get(
-                        BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
-                ) + BuildConfig.API_REL_STATISTICS;
-
-                Map<String,String> params = new HashMap<>();
-                params.put("version", Version.getFormattedVersion());
-                params.put("success", connected ? "true" : "false");
-                params.put("ssid", new WifiUtils(context).getSSID());
-                params.put("provider", getName());
-                if (vars.get("captcha") != null) {
-                    params.put("captcha", (String) vars.get("captcha"));
-                    if ("entered".equals(vars.get("captcha"))
-                            && settings.getBoolean("pref_mosmetro_captcha_collect", true)) {
-                        params.put("captcha_image", (String) vars.get("captcha_image"));
-                        params.put("captcha_code", (String) vars.get("captcha_code"));
-                    }
-                }
-
-                try {
-                    new OkHttp(context).post(STATISTICS_URL, params);
-                } catch (Exception ignored) {}
-
-                if (settings.getBoolean("pref_notify_news", true))
-                    new NewsChecker(context).check();
-
-                return false;
-            }
-        }.run(vars);
-
+        new StatisticsTask(this).run(vars);
         return (RESULT)vars.get("result");
     }
 

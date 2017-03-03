@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -37,7 +38,7 @@ import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
 
-public class NewsChecker {
+public class NewsChecker extends AsyncTask<Void,Void,Void> {
     private final Context context;
     private final SharedPreferences settings;
     private final boolean pref_colored_icons;
@@ -49,14 +50,15 @@ public class NewsChecker {
                 || settings.getBoolean("pref_notify_alternative", false);
     }
 
-    public void check() {
+    @Override
+    protected Void doInBackground(Void... params) {
         String content = new CachedRetriever(context).get(BuildConfig.NEWS_URL, 30*60, "{}");
 
         JSONObject data;
         try {
             data = (JSONObject) new JSONParser().parse(content);
         } catch (ParseException ex) {
-            return;
+            return null;
         }
 
         long id, max_version;
@@ -68,14 +70,14 @@ public class NewsChecker {
             message = (String)data.get("message");
             url = (String)data.get("url");
         } catch (Exception ex) {
-            return;
+            return null;
         }
 
         if (max_version < Version.getVersionCode())
-            return;
+            return null;
 
         if (settings.getLong("pref_notify_news_id", 0) >= id)
-            return;
+            return null;
 
         new Notify(context).id(255)
                 .icon(pref_colored_icons ?
@@ -94,5 +96,7 @@ public class NewsChecker {
         settings.edit()
                 .putLong("pref_notify_news_id", id)
                 .apply();
+
+        return null;
     }
 }
