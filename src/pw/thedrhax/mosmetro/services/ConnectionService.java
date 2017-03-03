@@ -26,14 +26,13 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Util;
@@ -41,7 +40,7 @@ import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
     private static final ReentrantLock lock = new ReentrantLock();
-    private static boolean running = false;
+    private static final Listener<Boolean> running = new Listener<>(false);
     private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
 
@@ -182,7 +181,7 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
-        while (wifi.getIP() == 0 && running) {
+        while (wifi.getIP() == 0 && running.get()) {
             SystemClock.sleep(1000);
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
@@ -224,7 +223,7 @@ public class ConnectionService extends IntentService {
             result = provider.start();
 
             if (result == Provider.RESULT.NOT_REGISTERED) break;
-        } while (++count < pref_retry_count && running && result == Provider.RESULT.ERROR);
+        } while (++count < pref_retry_count && running.get() && result == Provider.RESULT.ERROR);
 
         return result;
     }
@@ -234,7 +233,7 @@ public class ConnectionService extends IntentService {
         if (intent == null) return START_NOT_STICKY;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
-            running = false;
+            running.set(false);
             return START_NOT_STICKY;
         }
 
@@ -246,12 +245,12 @@ public class ConnectionService extends IntentService {
         }
         SSID = wifi.getSSID(intent);
 
-        if (!running) // Ignore if service is already running
+        if (!running.get()) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
                 if (Provider.isSSIDSupported(SSID) || from_shortcut) {
                     onStart(intent, startId);
                 } else {
-                    running = false;
+                    running.set(false);
                 }
 
         return START_NOT_STICKY;
@@ -259,9 +258,9 @@ public class ConnectionService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         if (lock.tryLock()) {
-            running = true;
+            running.set(true);
             main();
-            running = false;
+            running.set(false);
             lock.unlock();
 
             notify.hide();
@@ -296,13 +295,8 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
-        provider = Provider.find(this)
-                .setStopCondition(new Task() {
-                    @Override
-                    public boolean run(HashMap<String, Object> vars) {
-                        return !running;
-                    }
-                })
+        provider = Provider.find(this, running)
+                .setRunningListener(running)
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
@@ -316,7 +310,7 @@ public class ConnectionService extends IntentService {
         Provider.RESULT result = connect();
 
         // Notify user if not interrupted
-        if (running) {
+        if (running.get()) {
             Logger.date();
             notify(result);
         } else {
@@ -340,7 +334,7 @@ public class ConnectionService extends IntentService {
 
         // Wait while internet connection is available
         int count = 0;
-        while (running) {
+        while (running.get()) {
             SystemClock.sleep(1000);
 
             // Check internet connection each 10 seconds
@@ -358,17 +352,17 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) wifi.reconnect(SSID);
 
         // If Service is not being killed, continue the main loop
-        if (running) main();
+        if (running.get()) main();
 	}
 
     public static boolean isRunning() {
-        return running;
+        return running.get();
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         if (!settings.getBoolean("pref_notify_foreground", true)) {
-            running = false;
+            running.set(false);
         }
     }
 }

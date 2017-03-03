@@ -224,6 +224,7 @@ public class MosMetroV2 extends Provider {
                     return true;
 
                 MosMetroV1 mosmetro = new MosMetroV1(context);
+                mosmetro.setRunningListener(running);
                 mosmetro.remove(0); // Remove initial internet check
                 mosmetro.redirect = String.format(
                         "http://login.wi-fi.ru/am/UI/Login" +
@@ -269,12 +270,11 @@ public class MosMetroV2 extends Provider {
                 }
 
                 // Asking user to enter the CAPTCHA
-                vars.putAll(new CaptchaRequest() {
-                    @Override
-                    public boolean stop() {
-                        return isStopped();
-                    }
-                }.getResult(context, captcha_url, client.getCookies(redirect).get("aid")));
+                vars.putAll(
+                        new CaptchaRequest().setRunningListener(running).getResult(
+                                context, captcha_url, client.getCookies(redirect).get("aid")
+                        )
+                );
 
                 // Check the answer
                 String code = (String) vars.get("captcha_code");

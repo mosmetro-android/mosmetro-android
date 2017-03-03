@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import pw.thedrhax.util.Listener;
+
 public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_USER_AGENT = "User-Agent";
@@ -87,7 +89,11 @@ public abstract class Client {
                     return body();
                 } catch (Exception ex) {
                     last_ex = ex;
-                    SystemClock.sleep(1000);
+                    if (running.get()) {
+                        SystemClock.sleep(1000);
+                    } else {
+                        break;
+                    }
                 }
             }
             throw last_ex;
@@ -198,5 +204,18 @@ public abstract class Client {
                         .append(entry.getValue());
 
         return params_string.toString();
+    }
+
+    private final Listener<Boolean> running = new Listener<Boolean>(true) {
+        @Override
+        public void onChange(Boolean new_value) {
+            if (!new_value) {
+                stop();
+            }
+        }
+    };
+
+    public Client setRunningListener(Listener<Boolean> master) {
+        running.subscribe(master); return this;
     }
 }

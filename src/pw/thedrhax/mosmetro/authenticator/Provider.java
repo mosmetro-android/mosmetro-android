@@ -36,6 +36,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 
@@ -117,12 +118,13 @@ public abstract class Provider extends LinkedList<Task> {
      * detect the Provider too quickly. This is why we use a retry loop in this method.
      *
      * @param context   Android Context required to create the new instance.
+     * @param running   Listener used to interrupt this method.
      * @return          New Provider instance.
      */
-    @NonNull public static Provider find(Context context) {
+    @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
 
-        Client client = new OkHttp(context).followRedirects(false);
+        Client client = new OkHttp(context).followRedirects(false).setRunningListener(running);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
@@ -167,7 +169,7 @@ public abstract class Provider extends LinkedList<Task> {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        this.client = new OkHttp(context);
+        this.client = new OkHttp(context).setRunningListener(running);
     }
 
     /**
@@ -230,23 +232,16 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * Task used to get stop condition from other classes.
-     * Can be set by setStopCondition(Task).
+     * Listener used to stop Provider immediately after
+     * variable is changed by another thread
      */
-    private Task stopCondition = new Task() {
-        @Override
-        public boolean run(HashMap<String, Object> vars) {
-            return false;
-        }
-    };
+    protected final Listener<Boolean> running = new Listener<>(true);
 
     /**
-     * Overrides the current stop condition used in Provider
-     * @param condition Task, that returns true if Provider must finish.
-     * @return Saved instance of this Provider.
+     * Subscribe to another Listener to implement cascade notifications
      */
-    public Provider setStopCondition(Task condition) {
-        this.stopCondition = condition; return this;
+    public Provider setRunningListener(Listener<Boolean> master) {
+        running.subscribe(master); return this;
     }
 
     /**
@@ -254,7 +249,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return true is Provider must stop, otherwise false.
      */
     protected boolean isStopped() {
-        return stopCondition.run(null);
+        return !running.get();
     }
 
     /**

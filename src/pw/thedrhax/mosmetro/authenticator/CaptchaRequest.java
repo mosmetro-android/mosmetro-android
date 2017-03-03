@@ -33,10 +33,15 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.CaptchaActivity;
 import pw.thedrhax.mosmetro.services.ConnectionService;
+import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Notify;
 
-public abstract class CaptchaRequest {
-    public abstract boolean stop();
+public class CaptchaRequest {
+    private final Listener<Boolean> running = new Listener<>(true);
+
+    public CaptchaRequest setRunningListener(Listener<Boolean> master) {
+        running.subscribe(master); return this;
+    }
 
     public Map<String,String> getResult(Context context, String url, String aid) {
         final Map<String,String> result = new HashMap<>();
@@ -81,13 +86,13 @@ public abstract class CaptchaRequest {
         );
 
         // Wait for answer
-        while (result.get("captcha_code") == null && !stop()) {
+        while (result.get("captcha_code") == null && running.get()) {
             SystemClock.sleep(100);
         }
 
         // Unregister receiver, close the Activity and remove the Notification
         context.getApplicationContext().unregisterReceiver(receiver);
-        if (stop() && auto_activity)
+        if (!running.get() && auto_activity)
             context.startActivity(
                     new Intent(context, CaptchaActivity.class).setAction("STOP")
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
