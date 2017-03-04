@@ -186,7 +186,7 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
-        while (wifi.getIP() == 0 && running.get()) {
+        while (wifi.getIP() == 0) {
             SystemClock.sleep(1000);
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
@@ -197,6 +197,8 @@ public class ConnectionService extends IntentService {
                 ));
                 return false;
             }
+
+            if (!running.get()) return false;
         }
 
         Logger.log(getString(R.string.ip_wait_result, "", count/2));
@@ -292,7 +294,8 @@ public class ConnectionService extends IntentService {
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
-            notify(Provider.RESULT.ERROR);
+            if (running.get())
+                notify(Provider.RESULT.ERROR);
             return;
         }
 
