@@ -223,6 +223,7 @@ public class ConnectionService extends IntentService {
             result = provider.start();
 
             if (result == Provider.RESULT.NOT_REGISTERED) break;
+            if (from_shortcut) break;
         } while (++count < pref_retry_count && running.get() && result == Provider.RESULT.ERROR);
 
         return result;
