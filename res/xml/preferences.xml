@@ -112,6 +112,13 @@
                     android:icon="@drawable/ic_notification_error_colored"
                     android:defaultValue="true" />
 
+            <EditTextPreference
+                android:key="pref_notify_priority"
+                android:inputType="numberSigned"
+                android:title="@string/pref_notify_priority"
+                android:summary="@string/pref_notify_priority_summary"
+                android:defaultValue="0" />
+
             <CheckBoxPreference
                 android:key="pref_notify_alternative"
                 android:title="@string/pref_notify_alternative"

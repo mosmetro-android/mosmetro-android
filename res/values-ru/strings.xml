@@ -206,4 +206,6 @@
     <string name="please_wait">Пожалуйста, подождите…</string>
     <string name="preparing_to_send_log">Подготовка к отправке письма</string>
     <string name="auth_provider_assume">Пытаюсь подключиться с помощью MosMetroV2…</string>
+    <string name="pref_notify_priority">Приоритет уведомлений</string>
+    <string name="pref_notify_priority_summary">Значение между -2 и 2, влияющее на приоритет всех уведомлений. (по умолчанию: 0)</string>
 </resources>

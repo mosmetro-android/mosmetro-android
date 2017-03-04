@@ -37,6 +37,8 @@ public class Notify extends NotificationCompat.Builder {
         super(context);
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
 
     public Notify title(String title) {
@@ -57,6 +59,12 @@ public class Notify extends NotificationCompat.Builder {
 
     public Notify id(int id) {
         this.id = id; return this;
+    }
+
+    public Notify priority(int priority) {
+        if (priority < -2) priority = -2;
+        if (priority > 2) priority = 2;
+        setPriority(priority); return this;
     }
 
     public Notify icon(int icon) {
