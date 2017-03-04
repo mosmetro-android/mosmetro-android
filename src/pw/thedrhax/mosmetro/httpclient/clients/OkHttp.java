@@ -140,7 +140,7 @@ public class OkHttp extends Client {
 
     public OkHttp(Context context) {
         this();
-        int timeout = Util.getIntPreference(context, "pref_timeout", 0);
+        int timeout = Util.getIntPreference(context, "pref_timeout", 5);
         if (timeout != 0) setTimeout(timeout * 1000);
     }
 

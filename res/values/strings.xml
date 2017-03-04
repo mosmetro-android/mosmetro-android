@@ -216,7 +216,7 @@
     <string name="pref_notify_foreground">Foreground process</string>
     <string name="pref_notify_foreground_summary">Bind background process to notification to protect it from being killed. If you disable this option, background process will be killed even if you simply open and close the app window.</string>
     <string name="pref_timeout">Connection timeout</string>
-    <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 0).</string>
+    <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 5).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
     <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
     <string name="preparing_to_send_log">Preparing to send E-mail</string>

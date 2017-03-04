@@ -77,7 +77,7 @@
                 android:inputType="number"
                 android:title="@string/pref_timeout"
                 android:summary="@string/pref_timeout_summary"
-                android:defaultValue="0" />
+                android:defaultValue="5" />
 
         </PreferenceScreen>
 
