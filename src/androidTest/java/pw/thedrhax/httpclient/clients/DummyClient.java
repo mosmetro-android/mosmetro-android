@@ -65,6 +65,11 @@ public class DummyClient extends Client {
     }
 
     @Override
+    public void stop() {
+
+    }
+
+    @Override
     public Map<String, String> getCookies(String url) {
         return new HashMap<>();
     }
