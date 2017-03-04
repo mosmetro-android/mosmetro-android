@@ -6,4 +6,5 @@
         <item name="android:colorAccent">#ff6e40</item>
     </style>
     <style name="AppBaseTheme.Dialog" parent="@android:style/Theme.Material.Light.Dialog" />
+        <item name="android:colorAccent">#ff6e40</item>
 </resources>
