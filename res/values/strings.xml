@@ -224,4 +224,6 @@
     <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
     <string name="pref_notify_priority">Notification priority</string>
     <string name="pref_notify_priority_summary">A value between -2 and 2 that affects the priority of all notifications. (default: 0)</string>
+    <string name="pref_notify_success">Connected successfully</string>
+    <string name="pref_notify_success_summary">Notify on successful connection</string>
 </resources>

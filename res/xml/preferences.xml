@@ -92,10 +92,16 @@
                     android:defaultValue="true" />
 
             <CheckBoxPreference
+                android:key="pref_notify_success"
+                android:title="@string/pref_notify_success"
+                android:summary="@string/pref_notify_success_summary"
+                android:icon="@drawable/ic_notification_success_colored"
+                android:defaultValue="true" />
+
+            <CheckBoxPreference
                 android:key="pref_notify_success_lock"
                 android:title="@string/pref_notify_success_lock"
                 android:summary="@string/pref_notify_success_lock_summary"
-                android:icon="@drawable/ic_notification_success_colored"
                 android:defaultValue="true" />
 
             <CheckBoxPreference

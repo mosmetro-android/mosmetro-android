@@ -283,11 +283,14 @@ public class SettingsActivity extends Activity {
         // Link pref_notify_foreground and pref_notify_success_lock
         final CheckBoxPreference foreground = (CheckBoxPreference)
                 fragment.findPreference("pref_notify_foreground");
+        final CheckBoxPreference success = (CheckBoxPreference)
+                fragment.findPreference("pref_notify_success");
         final CheckBoxPreference success_lock = (CheckBoxPreference)
                 fragment.findPreference("pref_notify_success_lock");
         foreground.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+                success.setEnabled(!((Boolean) newValue));
                 success_lock.setEnabled(!((Boolean) newValue));
                 return true;
             }

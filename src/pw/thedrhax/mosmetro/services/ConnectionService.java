@@ -113,6 +113,11 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
+                if (!settings.getBoolean("pref_notify_success", true)) {
+                    notify.hide();
+                    return;
+                }
+
                 if (settings.getBoolean("pref_notify_success_lock", true)) {
                     notify.locked(true);
                 }
