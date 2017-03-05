@@ -44,6 +44,25 @@ public class ConnectionService extends IntentService {
     private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Show back button in menu
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     // Preferences
     private WifiUtils wifi;
     private SharedPreferences settings;
