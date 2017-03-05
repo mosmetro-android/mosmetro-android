@@ -8,4 +8,7 @@
     <style name="AppBaseTheme.Dialog" parent="@android:style/Theme.Material.Light.Dialog">
         <item name="android:colorAccent">@color/colorAccent</item>
     </style>
+    <style name="TextAppearance.StatusBar.EventContent">
+        <item name="android:textColor">@color/textColor</item>
+    </style>        
 </resources>

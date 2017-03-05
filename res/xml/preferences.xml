@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
+    <SwitchPreference
         android:key="pref_autoconnect"
         android:title="@string/pref_autoconnect"
         android:summary="@string/pref_autoconnect_summary"
@@ -85,7 +85,7 @@
                 android:title="@string/pref_category_notifications"
                 android:summary="@string/pref_category_notifications_summary">
 
-            <CheckBoxPreference
+            <SwitchPreference
                     android:key="pref_notify_foreground"
                     android:title="@string/pref_notify_foreground"
                     android:summary="@string/pref_notify_foreground_summary"
