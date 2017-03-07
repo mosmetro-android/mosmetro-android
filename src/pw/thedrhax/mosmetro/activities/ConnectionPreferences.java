@@ -21,6 +21,8 @@ package pw.thedrhax.mosmetro.activities;
 import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import pw.thedrhax.mosmetro.R;
 
@@ -46,4 +48,24 @@ public class ConnectionPreferences extends Activity {
                 .commit();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Show back button in menu
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
