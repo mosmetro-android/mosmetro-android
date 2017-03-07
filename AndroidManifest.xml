@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="pw.thedrhax.mosmetro"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    package="pw.thedrhax.mosmetro"
     android:installLocation="auto">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 
     <application
         android:allowBackup="true"
@@ -19,13 +18,16 @@
         android:label="@string/app_name"
         android:theme="@style/AppBaseTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <!-- Main Activities -->
+
         <activity
             android:name=".activities.DebugActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/manual_connection">
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.DebugActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.DebugActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -34,28 +36,8 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".activities.NotificationPreferences"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/pref_category_notifications">
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.NotificationPreferences"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".activities.ConnectionPreferences"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/pref_category_connection">
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionPreferences"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -64,10 +46,34 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/about">
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.AboutActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.AboutActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Preference Activities -->
+
+        <activity
+            android:name=".activities.NotificationPreferences"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/pref_category_notifications">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.NotificationPreferences" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.ConnectionPreferences"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/pref_category_connection">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionPreferences" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Utility Activities -->
 
         <activity
             android:name=".activities.ConnectionServiceActivity"
@@ -76,8 +82,8 @@
             android:theme="@android:style/Theme.NoDisplay"
             tools:ignore="UnusedAttribute">
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -88,51 +94,56 @@
             android:theme="@android:style/Theme.NoDisplay"
             tools:ignore="UnusedAttribute">
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.SafeViewActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.SafeViewActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".activities.SendLogActivity"
-            android:label="@string/preparing_to_send_log"
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
+            android:label="@string/preparing_to_send_log"
             android:theme="@style/AppBaseTheme.Dialog"
-            tools:ignore="UnusedAttribute">
-        </activity>
+            tools:ignore="UnusedAttribute" />
+
+        <!-- Dialogs -->
 
         <activity
-            android:name=".activities.ShortcutActivity"
+            android:name=".activities.ShortcutDialog"
             android:label="@string/manual_connection_shortcut"
             android:theme="@style/AppBaseTheme.Dialog">
             <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".activities.CaptchaActivity"
+            android:name=".activities.CaptchaDialog"
+            android:excludeFromRecents="true"
             android:label="@string/auth_captcha_dialog"
-            android:theme="@style/AppBaseTheme.Dialog"
             android:launchMode="singleTop"
-            android:excludeFromRecents="true">
+            android:theme="@style/AppBaseTheme.Dialog">
             <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <service android:name=".services.ConnectionService"/>
+        <!-- Services -->
+
+        <service android:name=".services.ConnectionService" />
+
+        <!-- Receivers -->
 
         <receiver android:name=".services.NetworkReceiver">
             <intent-filter>
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 
@@ -140,11 +151,12 @@
             android:name=".widgets.ToggleWidget"
             android:label="@string/receiver_auto_connect">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/toggle_widget"/>
+                android:resource="@xml/toggle_widget" />
         </receiver>
+
     </application>
 </manifest>

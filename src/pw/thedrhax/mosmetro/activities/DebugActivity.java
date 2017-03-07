@@ -148,7 +148,7 @@ public class DebugActivity extends Activity {
     }
 
     public void button_shortcut (View view) {
-        startActivity(new Intent(this, ShortcutActivity.class));
+        startActivity(new Intent(this, ShortcutDialog.class));
     }
 
     public void button_connect (final View view) {

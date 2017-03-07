@@ -37,7 +37,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Util;
 
-public class CaptchaActivity extends Activity {
+public class CaptchaDialog extends Activity {
     private Bitmap image = null;
 
     @Override

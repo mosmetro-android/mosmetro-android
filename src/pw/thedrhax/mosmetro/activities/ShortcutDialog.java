@@ -28,7 +28,7 @@ import android.widget.CheckBox;
 
 import pw.thedrhax.mosmetro.R;
 
-public class ShortcutActivity extends Activity {
+public class ShortcutDialog extends Activity {
     private CheckBox check_background;
     private CheckBox check_force;
 

@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.CaptchaActivity;
+import pw.thedrhax.mosmetro.activities.CaptchaDialog;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Notify;
@@ -46,7 +46,7 @@ public class CaptchaRequest {
     public Map<String,String> getResult(Context context, String url, String aid) {
         final Map<String,String> result = new HashMap<>();
 
-        Intent captcha_activity = new Intent(context, CaptchaActivity.class)
+        Intent captcha_activity = new Intent(context, CaptchaDialog.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra("url", url)
                 .putExtra("aid", aid);
@@ -94,7 +94,7 @@ public class CaptchaRequest {
         context.getApplicationContext().unregisterReceiver(receiver);
         if (!running.get() && auto_activity)
             context.startActivity(
-                    new Intent(context, CaptchaActivity.class).setAction("STOP")
+                    new Intent(context, CaptchaDialog.class).setAction("STOP")
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             );
         captcha_notify.hide();
