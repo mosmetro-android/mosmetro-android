@@ -133,8 +133,7 @@ public class MosMetroV2 extends Provider {
                     Uri redirect_uri = Uri.parse(redirect);
                     redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
 
-                    boolean force = settings.getBoolean("pref_mosmetro_captcha_force", false);
-                    client.get(redirect + (force ? "/auto_auth" : "/auth"), null, pref_retry_count);
+                    client.get(redirect + "/auth", null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (Exception ex) {

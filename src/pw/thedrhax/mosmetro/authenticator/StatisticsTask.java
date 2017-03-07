@@ -54,8 +54,7 @@ class StatisticsTask implements Task {
         params.put("p", p.getName());
         if (vars.get("captcha") != null) {
             params.put("captcha", (String) vars.get("captcha"));
-            if ("entered".equals(vars.get("captcha"))
-                    && p.settings.getBoolean("pref_mosmetro_captcha_collect", true)) {
+            if ("entered".equals(vars.get("captcha"))) {
                 params.put("captcha_image", (String) vars.get("captcha_image"));
                 params.put("captcha_code", (String) vars.get("captcha_code"));
             }

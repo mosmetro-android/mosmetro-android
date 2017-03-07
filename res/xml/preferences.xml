@@ -29,42 +29,6 @@
             <intent android:action="pw.thedrhax.mosmetro.activities.NotificationPreferences" />
         </Preference>
 
-        <PreferenceScreen
-            android:key="pref_category_advanced"
-            android:title="@string/pref_category_advanced"
-            android:summary="@string/pref_category_advanced_summary"
-            android:shouldDisableView="true">
-
-            <PreferenceCategory android:title="@string/captcha" />
-
-            <CheckBoxPreference
-                android:key="pref_mosmetro_captcha_bypass_backdoor"
-                android:title="@string/pref_mosmetro_captcha_bypass_backdoor"
-                android:summary="@string/pref_mosmetro_captcha_bypass_backdoor_summary"
-                android:defaultValue="true" />
-
-            <CheckBoxPreference
-                android:key="pref_mosmetro_captcha_bypass_mosmetrov1"
-                android:title="@string/pref_mosmetro_captcha_bypass_mosmetrov1"
-                android:summary="@string/pref_mosmetro_captcha_bypass_mosmetrov1_summary"
-                android:defaultValue="true" />
-
-            <CheckBoxPreference
-                android:key="pref_mosmetro_captcha_force"
-                android:title="@string/pref_mosmetro_captcha_force"
-                android:summary="@string/pref_mosmetro_captcha_force_summary"
-                android:defaultValue="false" />
-
-            <PreferenceCategory android:title="@string/pref_category_statistics" />
-
-            <CheckBoxPreference
-                android:key="pref_mosmetro_captcha_collect"
-                android:title="@string/pref_mosmetro_captcha_collect"
-                android:summary="@string/pref_mosmetro_captcha_collect_summary"
-                android:defaultValue="true" />
-
-        </PreferenceScreen>
-
     </PreferenceCategory>
 
     <PreferenceCategory
