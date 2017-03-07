@@ -51,6 +51,7 @@ public class ConnectionService extends IntentService {
     private int pref_retry_delay;
     private int pref_ip_wait;
     private boolean pref_colored_icons;
+    private boolean pref_notify_foreground;
 
     // Notifications
     private Notify notify;
@@ -77,6 +78,7 @@ public class ConnectionService extends IntentService {
         pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) ^ settings.getBoolean("pref_notify_alternative", false);
+        pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
@@ -104,7 +106,7 @@ public class ConnectionService extends IntentService {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ))
                 .onDelete(stop_intent)
-                .locked(settings.getBoolean("pref_notify_foreground", true));
+                .locked(pref_notify_foreground);
     }
 
     private void notify (Provider.RESULT result) {
@@ -113,7 +115,7 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                if (!settings.getBoolean("pref_notify_foreground", true) &&
+                if (!pref_notify_foreground &&
                         !settings.getBoolean("pref_notify_success", true)) {
                     notify.hide();
                     return;
@@ -128,53 +130,50 @@ public class ConnectionService extends IntentService {
                         .icon(pref_colored_icons ?
                                 R.drawable.ic_notification_success_colored :
                                 R.drawable.ic_notification_success)
-                        .show()
-                        .locked(settings.getBoolean("pref_notify_foreground", true));
-                return;
+                        .show();
+                break;
 
             case NOT_REGISTERED:
-                if (settings.getBoolean("pref_notify_fail", true)) {
-                    notify.title(getString(R.string.notification_not_registered))
-                            .text(getString(R.string.notification_not_registered_register))
-                            .icon(pref_colored_icons ?
-                                    R.drawable.ic_notification_register_colored :
-                                    R.drawable.ic_notification_register)
-                            .onClick(PendingIntent.getActivity(this, 0,
-                                    new Intent(this, SafeViewActivity.class)
-                                            .putExtra("data", "http://wi-fi.ru"),
-                                    PendingIntent.FLAG_UPDATE_CURRENT
-                            ))
-                            .id(2).show().id(1);
-                } else {
-                    notify.hide();
-                }
-                return;
+                notify.hide()
+                        .title(getString(R.string.notification_not_registered))
+                        .text(getString(R.string.notification_not_registered_register))
+                        .icon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
+                        .onClick(PendingIntent.getActivity(this, 0,
+                                new Intent(this, SafeViewActivity.class)
+                                        .putExtra("data", "http://wi-fi.ru"),
+                                PendingIntent.FLAG_UPDATE_CURRENT))
+                        .enabled(settings.getBoolean("pref_notify_fail", true))
+                        .id(2).locked(false).show();
+                break;
 
             case ERROR:
-                if (settings.getBoolean("pref_notify_fail", true)) {
-                    notify.title(getString(R.string.notification_error))
-                            .text(getString(R.string.notification_error_log))
-                            .icon(pref_colored_icons ?
-                                    R.drawable.ic_notification_error_colored :
-                                    R.drawable.ic_notification_error)
-                            .show();
-                } else {
-                    notify.hide();
-                }
-                return;
+                notify.hide()
+                        .title(getString(R.string.notification_error))
+                        .text(getString(R.string.notification_error_log))
+                        .icon(pref_colored_icons ?
+                                R.drawable.ic_notification_error_colored :
+                                R.drawable.ic_notification_error)
+                        .enabled(settings.getBoolean("pref_notify_fail", true))
+                        .id(2).locked(false).show();
+                break;
 
             case NOT_SUPPORTED:
-                if (settings.getBoolean("pref_notify_fail", true)) {
-                    notify.title(getString(R.string.notification_unsupported))
-                            .text(getString(R.string.notification_error_log))
-                            .icon(pref_colored_icons ?
-                                    R.drawable.ic_notification_register_colored :
-                                    R.drawable.ic_notification_register)
-                            .show();
-                } else {
-                    notify.hide();
-                }
+                notify.hide()
+                        .title(getString(R.string.notification_unsupported))
+                        .text(getString(R.string.notification_error_log))
+                        .icon(pref_colored_icons ?
+                                R.drawable.ic_notification_register_colored :
+                                R.drawable.ic_notification_register)
+                        .enabled(settings.getBoolean("pref_notify_fail", true))
+                        .id(2).locked(false).show();
         }
+
+        notify // return to defaults
+                .id(1)
+                .locked(pref_notify_foreground)
+                .enabled(!from_shortcut);
     }
 
     private boolean waitForIP() {
