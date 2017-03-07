@@ -76,7 +76,7 @@ public class ConnectionService extends IntentService {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
-        pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 30);
+        pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) ^ settings.getBoolean("pref_notify_alternative", false);
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
 
