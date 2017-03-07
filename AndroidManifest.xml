@@ -50,6 +50,16 @@
         </activity>
 
         <activity
+            android:name=".activities.ConnectionPreferences"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/pref_category_connection">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.ConnectionPreferences"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/about">

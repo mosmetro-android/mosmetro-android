@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_category_wifi" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_wifi_reconnect"
+        android:summary="@string/pref_wifi_reconnect_summary"
+        android:title="@string/pref_wifi_reconnect" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_wifi_bind"
+        android:summary="@string/pref_wifi_bind_summary"
+        android:title="@string/pref_wifi_bind" />
+
+    <PreferenceCategory android:title="@string/pref_category_internet" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_internet_check"
+        android:summary="@string/pref_internet_check_summary"
+        android:title="@string/pref_internet_check" />
+
+    <PreferenceCategory android:title="@string/pref_category_connection" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_captcha_dialog"
+        android:summary="@string/pref_captcha_dialog_summary"
+        android:title="@string/pref_captcha_dialog" />
+
+    <EditTextPreference
+        android:defaultValue="3"
+        android:inputType="number"
+        android:key="pref_retry_count"
+        android:summary="@string/pref_retry_count_summary"
+        android:title="@string/pref_retry_count" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="pref_retry_delay"
+        android:summary="@string/pref_retry_delay_summary"
+        android:title="@string/pref_retry_delay" />
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="pref_ip_wait"
+        android:summary="@string/pref_ip_wait_summary"
+        android:title="@string/pref_ip_wait" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="pref_timeout"
+        android:summary="@string/pref_timeout_summary"
+        android:title="@string/pref_timeout" />
+
+</PreferenceScreen>
