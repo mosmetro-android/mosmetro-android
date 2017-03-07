@@ -144,7 +144,6 @@ public class ConnectionService extends IntentService {
                                 new Intent(this, SafeViewActivity.class)
                                         .putExtra("data", "http://wi-fi.ru"),
                                 PendingIntent.FLAG_UPDATE_CURRENT))
-                        .enabled(settings.getBoolean("pref_notify_fail", false))
                         .id(2).locked(false).show();
                 break;
 
