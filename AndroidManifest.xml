@@ -40,6 +40,16 @@
         </activity>
 
         <activity
+            android:name=".activities.NotificationPreferences"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/pref_category_notifications">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.NotificationPreferences"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/about">

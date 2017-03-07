@@ -81,57 +81,11 @@
 
         </PreferenceScreen>
 
-        <PreferenceScreen
-                android:title="@string/pref_category_notifications"
-                android:summary="@string/pref_category_notifications_summary">
-
-            <CheckBoxPreference
-                    android:key="pref_notify_foreground"
-                    android:title="@string/pref_notify_foreground"
-                    android:summary="@string/pref_notify_foreground_summary"
-                    android:defaultValue="true" />
-
-            <CheckBoxPreference
-                android:key="pref_notify_success"
-                android:title="@string/pref_notify_success"
-                android:summary="@string/pref_notify_success_summary"
-                android:icon="@drawable/ic_notification_success_colored"
-                android:defaultValue="true" />
-
-            <CheckBoxPreference
-                android:key="pref_notify_success_lock"
-                android:title="@string/pref_notify_success_lock"
-                android:summary="@string/pref_notify_success_lock_summary"
-                android:defaultValue="true" />
-
-            <CheckBoxPreference
-                    android:key="pref_notify_news"
-                    android:title="@string/pref_notify_news"
-                    android:summary="@string/pref_notify_news_summary"
-                    android:icon="@drawable/ic_notification_message_colored"
-                    android:defaultValue="true" />
-
-            <CheckBoxPreference
-                    android:key="pref_notify_fail"
-                    android:title="@string/pref_notify_fail"
-                    android:summary="@string/pref_notify_fail_summary"
-                    android:icon="@drawable/ic_notification_error_colored"
-                    android:defaultValue="false" />
-
-            <EditTextPreference
-                android:key="pref_notify_priority"
-                android:inputType="numberSigned"
-                android:title="@string/pref_notify_priority"
-                android:summary="@string/pref_notify_priority_summary"
-                android:defaultValue="0" />
-
-            <CheckBoxPreference
-                android:key="pref_notify_alternative"
-                android:title="@string/pref_notify_alternative"
-                android:summary="@string/pref_notify_alternative_summary"
-                android:defaultValue="false" />
-
-        </PreferenceScreen>
+        <Preference
+            android:title="@string/pref_category_notifications"
+            android:summary="@string/pref_category_notifications_summary">
+            <intent android:action="pw.thedrhax.mosmetro.activities.NotificationPreferences" />
+        </Preference>
 
         <PreferenceScreen
             android:key="pref_category_advanced"
