@@ -116,7 +116,7 @@
                     android:title="@string/pref_notify_fail"
                     android:summary="@string/pref_notify_fail_summary"
                     android:icon="@drawable/ic_notification_error_colored"
-                    android:defaultValue="true" />
+                    android:defaultValue="false" />
 
             <EditTextPreference
                 android:key="pref_notify_priority"
