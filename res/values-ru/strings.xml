@@ -188,11 +188,7 @@
     <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Разрешить использование официального бэкдора для обхода капчи. Отключите эту функцию, если вы сталкиваетесь со случайными зависаниями.</string>
     <string name="pref_mosmetro_captcha_bypass_mosmetrov1">Обход капчи (MosMetroV1)</string>
     <string name="pref_mosmetro_captcha_bypass_mosmetrov1_summary">Разрешить использование старого алгоритма MosMetroV1 для обхода капчи.</string>
-    <string name="pref_category_advanced">Расширенные настройки</string>
-    <string name="pref_category_advanced_enabled">Расширенные настройки активированы ;)</string>
-    <string name="pref_category_advanced_summary">В этой категории находятся всякие полезные, но и опасные настройки. Осторожно!</string>
     <string name="captcha">Капча</string>
-    <string name="pref_category_statistics">Статистика</string>
     <string name="pref_notify_foreground">Приоритетный процесс</string>
     <string name="pref_notify_foreground_summary">Привязать фоновый процесс к уведомлению, чтобы предотвратить его уничтожение. Если вы выключите эту функцию, фоновый процесс будет убит, даже если вы просто откроете и закроете главное окно приложения.</string>
     <string name="pref_timeout">Таймаут соединения</string>
