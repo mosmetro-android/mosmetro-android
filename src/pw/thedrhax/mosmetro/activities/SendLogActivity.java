@@ -67,7 +67,7 @@ public class SendLogActivity extends Activity {
             );
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            Logger.log(getString(R.string.error, "failed to save log to file"));
+            Logger.log(getString(R.string.error, getString(R.string.error_log_file)));
             email.putExtra(Intent.EXTRA_TEXT,
                     Logger.read(Logger.LEVEL.DEBUG)
             );
