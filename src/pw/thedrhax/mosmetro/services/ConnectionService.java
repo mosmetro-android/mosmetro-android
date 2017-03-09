@@ -298,6 +298,8 @@ public class ConnectionService extends IntentService {
             return;
         }
 
+        new Notify(this).id(2).hide(); // hide error notification
+
         notify.title(getString(R.string.auth_connecting, SSID))
                 .text(getString(R.string.auth_provider_check))
                 .progress(0, true)
