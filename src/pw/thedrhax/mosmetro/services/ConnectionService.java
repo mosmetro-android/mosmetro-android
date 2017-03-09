@@ -249,9 +249,12 @@ public class ConnectionService extends IntentService {
             Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
             notify.enabled(false);
-        } else {
+        } else if (intent.getBooleanExtra("force", false)) {
             Logger.log(this, "Started from shortcut");
-            from_shortcut = intent.getBooleanExtra("force", false);
+            from_shortcut = true;
+        } else {
+            Logger.log(this, "Started by system");
+            from_shortcut = false;
         }
         SSID = wifi.getSSID(intent);
 
