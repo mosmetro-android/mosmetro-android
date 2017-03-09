@@ -26,6 +26,7 @@ import android.util.Log;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Logger {
@@ -57,6 +58,14 @@ public class Logger {
         for (LEVEL level : LEVEL.values()) {
             log(level, message);
         }
+    }
+
+    public static void log (Object obj, String message) {
+        log(LEVEL.DEBUG, String.format(Locale.ENGLISH, "%s (%d) | %s",
+                obj.getClass().getSimpleName(),
+                System.identityHashCode(obj),
+                message
+        ));
     }
 
     /*

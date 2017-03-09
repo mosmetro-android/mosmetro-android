@@ -240,31 +240,36 @@ public class ConnectionService extends IntentService {
         if (intent == null) return START_NOT_STICKY;
 
         if ("STOP".equals(intent.getAction())) { // Stop by intent
+            Logger.log(this, "Stopping by Intent");
             running.set(false);
             return START_NOT_STICKY;
         }
 
         if (intent.getBooleanExtra("debug", false)) {
+            Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
             notify.enabled(false);
         } else {
+            Logger.log(this, "Started from shortcut");
             from_shortcut = intent.getBooleanExtra("force", false);
         }
         SSID = wifi.getSSID(intent);
 
         if (!running.get()) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
-                if (Provider.isSSIDSupported(SSID) || from_shortcut) {
+                if (Provider.isSSIDSupported(SSID) || from_shortcut)
                     onStart(intent, startId);
-                } else {
-                    running.set(false);
-                }
 
         return START_NOT_STICKY;
     }
 
     public void onHandleIntent(Intent intent) {
         if (lock.tryLock()) {
+            Logger.log(this, "Broadcast | ConnectionService (RUNNING = true)");
+            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
+                    .putExtra("RUNNING", true)
+            );
+
             running.set(true);
             main();
             running.set(false);
@@ -275,18 +280,20 @@ public class ConnectionService extends IntentService {
                 // TODO: Do not start connection in DebugActivity after click on this notification
                 notify.cancelOnClick(true).locked(false).show();
             }
+
+            Logger.log(this, "Broadcast | ConnectionService (RUNNING = false)");
             sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                     .putExtra("RUNNING", false)
             );
+        } else {
+            Logger.log(this, "Already running");
         }
     }
 
     private void main() {
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                .putExtra("RUNNING", true)
-        );
-
         Logger.date();
+        Logger.log(getString(R.string.auth_connecting, SSID));
+
         notify.icon(pref_colored_icons ?
                 R.drawable.ic_notification_connecting_colored :
                 R.drawable.ic_notification_connecting);
@@ -334,9 +341,11 @@ public class ConnectionService extends IntentService {
             case ALREADY_CONNECTED:
                 if (!from_shortcut) break;
             default:
+                Logger.log(this, "Stopping by result (" + result.name() + ")");
                 return;
         }
 
+        Logger.log(this, "Broadcast | CONNECTED");
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
                 .putExtra("SSID", SSID)
                 .putExtra("PROVIDER", provider.getName())
@@ -349,20 +358,28 @@ public class ConnectionService extends IntentService {
 
             // Check internet connection each 10 seconds
             if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
+                Logger.log(this, "Checking internet connection");
                 count = 0;
                 if (!provider.isConnected())
                     break;
             }
         }
 
+        Logger.log(this, "Broadcast | DISCONNECTED");
         sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
         notify.hide();
 
         // Try to reconnect the Wi-Fi network
-        if (settings.getBoolean("pref_wifi_reconnect", false)) wifi.reconnect(SSID);
+        if (settings.getBoolean("pref_wifi_reconnect", false)) {
+            Logger.log(this, "Reconnecting to Wi-Fi");
+            wifi.reconnect(SSID);
+        }
 
         // If Service is not being killed, continue the main loop
-        if (running.get()) main();
+        if (running.get()) {
+            Logger.log(this, "Still alive!");
+            main();
+        }
 	}
 
     public static boolean isRunning() {
@@ -371,7 +388,9 @@ public class ConnectionService extends IntentService {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        Logger.log(this, "onTaskRemoved()");
         if (!settings.getBoolean("pref_notify_foreground", true)) {
+            Logger.log("Stopping because of task removal");
             running.set(false);
         }
     }
