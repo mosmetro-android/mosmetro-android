@@ -38,16 +38,28 @@ public class Logger {
         }
     }};
 
+    private static long last_timestamp = 0;
+
+    private static String timestamp() {
+        long diff = System.currentTimeMillis() - last_timestamp;
+        last_timestamp = System.currentTimeMillis();
+        return diff > 9999 ? "[+>10s]" : String.format(Locale.ENGLISH, "[+%04d]", diff);
+    }
+
     /*
      * Inputs
      */
 
     public static void log (LEVEL level, String message) {
+        if (level == LEVEL.DEBUG) {
+            message = timestamp() + " " + message;
+        }
         synchronized (logs) {
             logs.get(level).append(message).append("\n");
         }
-        for (Callback callback : callbacks.values())
+        for (Callback callback : callbacks.values()) {
             callback.call(level, message);
+        }
     }
 
     public static void log (LEVEL level, Throwable ex) {
