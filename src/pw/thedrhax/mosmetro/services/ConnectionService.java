@@ -32,6 +32,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -279,6 +280,7 @@ public class ConnectionService extends IntentService {
             Logger.log(getString(R.string.auth_connecting, SSID));
             Logger.log(getString(R.string.algorithm_name, provider.getName()));
 
+            AndroidHacks.bindToWiFi(this);
             running.set(true);
             main();
             running.set(false);

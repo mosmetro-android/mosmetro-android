@@ -34,7 +34,6 @@ import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
@@ -215,8 +214,6 @@ public abstract class Provider extends LinkedList<Task> {
      * Start the connection sequence defined in child classes.
      */
     public RESULT start() {
-        AndroidHacks.bindToWiFi(context);
-
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
         for (Task task : this) {
