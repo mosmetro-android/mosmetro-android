@@ -48,6 +48,11 @@ import pw.thedrhax.util.Util;
 
 public abstract class Provider extends LinkedList<Task> {
     /**
+     * URL used to detect if Captive Portal is present in the current network.
+     */
+    private static final String GENERATE_204_URL = "https://google.com/generate_204";
+
+    /**
      * List of supported Providers
      *
      * Every Provider in this list must implement the
@@ -109,7 +114,7 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * Find Provider by sending predefined request to "wi-fi.ru" to get the redirect.
+     * Find Provider by sending predefined request to get the redirect.
      *
      * The first request executed right after connecting to Wi-Fi is known to have
      * direct access to the Internet. This *bug* of the network doesn't allow us to
@@ -125,7 +130,7 @@ public abstract class Provider extends LinkedList<Task> {
         Client client = new OkHttp(context).followRedirects(false).setRunningListener(running);
         int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
+            client.get(GENERATE_204_URL, null, pref_retry_count);
         } catch (Exception ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             Logger.log(context.getString(R.string.error,
@@ -135,7 +140,7 @@ public abstract class Provider extends LinkedList<Task> {
 
         Provider result = Provider.find(context, client);
 
-        if (result instanceof Unknown && !generate_204()) {
+        if (result instanceof Unknown && client.getResponseCode() != 204) {
             Logger.log(Logger.LEVEL.DEBUG, client.getPage());
             Logger.log(context.getString(R.string.error,
                     context.getString(R.string.auth_error_provider)
@@ -180,12 +185,9 @@ public abstract class Provider extends LinkedList<Task> {
     public static boolean generate_204() {
         Client client = new OkHttp().setTimeout(3000);
         try {
-            client.get("http://google.ru/generate_204", null);
-        } catch (Exception ex) {
-            if (client.getResponseCode() == 204)
-                return true;
-        }
-        return false;
+            client.get(GENERATE_204_URL, null);
+        } catch (Exception ignored) {}
+        return client.getResponseCode() == 204;
     }
 
     /**

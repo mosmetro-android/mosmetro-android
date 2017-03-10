@@ -249,10 +249,10 @@ public class OkHttp extends Client {
         body.close();
 
         if (raw_document == null || raw_document.isEmpty()) {
-            if (code == 200) {
-                return;
+            if (code >= 400) {
+                throw new Exception("Error: " + code);
             } else {
-                throw new Exception("Empty response: " + code);
+                return;
             }
         }
 
