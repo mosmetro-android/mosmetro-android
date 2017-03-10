@@ -264,7 +264,7 @@ public class ConnectionService extends IntentService {
         }
         SSID = wifi.getSSID(intent);
 
-        if (!running.get()) // Ignore if service is already running
+        if (!running.get() && !lock.isLocked()) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
                 if (Provider.isSSIDSupported(SSID) || from_shortcut)
                     onStart(intent, startId);
