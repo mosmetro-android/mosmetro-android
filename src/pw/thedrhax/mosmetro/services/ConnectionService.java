@@ -278,7 +278,6 @@ public class ConnectionService extends IntentService {
             Logger.date();
             Logger.log(getString(R.string.version, Version.getFormattedVersion()));
             Logger.log(getString(R.string.auth_connecting, SSID));
-            Logger.log(getString(R.string.algorithm_name, provider.getName()));
 
             AndroidHacks.bindToWiFi(this);
             running.set(true);
@@ -332,6 +331,7 @@ public class ConnectionService extends IntentService {
         notify.text(getString(R.string.auth_waiting)).show();
 
         // Try to connect
+        Logger.log(getString(R.string.algorithm_name, provider.getName()));
         Provider.RESULT result = connect();
 
         // Notify user if not interrupted
