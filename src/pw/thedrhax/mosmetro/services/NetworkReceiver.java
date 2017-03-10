@@ -26,6 +26,8 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 
+import java.util.Locale;
+
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.WifiUtils;
 
@@ -51,12 +53,14 @@ public class NetworkReceiver extends BroadcastReceiver {
         this.context = context;
         this.intent = intent;
 
+        // Stop if Intent is empty
+        if (intent == null || intent.getAction() == null)
+            return;
+
         // Stop if automatic connection is disabled in settings
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         if (!settings.getBoolean("pref_autoconnect", true))
             return;
-
-        Logger.log(this, "Intent: " + intent.getAction());
 
         // If Wi-Fi is disabled, stop ConnectionService immediately
         WifiUtils wifi = new WifiUtils(context);
@@ -66,24 +70,33 @@ public class NetworkReceiver extends BroadcastReceiver {
             return;
         }
 
-        // Listen to all Wi-Fi state changes and start ConnectionService if Wi-Fi is connected
-        // This .equals condition is used to allow addition of new Intents in future
-        if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
-            SupplicantState state = wifi.getWifiInfo(intent).getSupplicantState();
-            if (state == null) return;
+        switch (intent.getAction()) {
+            /**
+             * Listen to all Wi-Fi state changes and start ConnectionService if Wi-Fi is connected
+             * Also check SupplicantState for better results
+             */
+            case WifiManager.NETWORK_STATE_CHANGED_ACTION:
+                SupplicantState state = wifi.getWifiInfo(intent).getSupplicantState();
+                if (state == null) break;
 
-            Logger.log(this, "SupplicantState: " + state.name());
-            switch (state) {
-                case COMPLETED:
-                case ASSOCIATED: // This appears randomly between multiple CONNECTED states
-                    startService();
-                    break;
-                case DISCONNECTED:
-                    stopService();
-                    break;
-                default:
-                    break;
-            }
+                Logger.log(this, String.format(Locale.ENGLISH, "Intent: %s (%s)",
+                        intent.getAction(), state.name()
+                ));
+
+                switch (state) {
+                    case COMPLETED:
+                    case ASSOCIATED: // This appears randomly between multiple CONNECTED states
+                        startService();
+                        break;
+                    case DISCONNECTED:
+                        stopService();
+                        break;
+                }
+
+                break;
+
+            default:
+                Logger.log(this, "Unknown Intent: " + intent.getAction());
         }
     }
 
@@ -91,7 +104,6 @@ public class NetworkReceiver extends BroadcastReceiver {
      * Start ConnectionService and pass received Intent's content
      */
     private void startService() {
-        Logger.log(this, "Starting ConnectionService");
         Intent service = new Intent(context, ConnectionService.class);
         service.setAction(intent.getAction());
         service.putExtras(intent);
@@ -102,7 +114,6 @@ public class NetworkReceiver extends BroadcastReceiver {
      * Stop ConnectionService
      */
     private void stopService() {
-        Logger.log(this, "Stopping ConnectionService");
         context.startService(new Intent(context, ConnectionService.class).setAction("STOP"));
     }
 }
