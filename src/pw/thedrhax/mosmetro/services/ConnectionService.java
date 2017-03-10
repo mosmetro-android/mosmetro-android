@@ -45,6 +45,7 @@ public class ConnectionService extends IntentService {
     private static final Listener<Boolean> running = new Listener<>(false);
     private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
+    private boolean from_debug = false;
 
     // Preferences
     private WifiUtils wifi;
@@ -156,7 +157,7 @@ public class ConnectionService extends IntentService {
                         .icon(pref_colored_icons ?
                                 R.drawable.ic_notification_error_colored :
                                 R.drawable.ic_notification_error)
-                        .enabled(settings.getBoolean("pref_notify_fail", false))
+                        .enabled(!from_debug && settings.getBoolean("pref_notify_fail", false))
                         .id(2).locked(false).show();
                 break;
 
@@ -167,7 +168,7 @@ public class ConnectionService extends IntentService {
                         .icon(pref_colored_icons ?
                                 R.drawable.ic_notification_register_colored :
                                 R.drawable.ic_notification_register)
-                        .enabled(settings.getBoolean("pref_notify_fail", false))
+                        .enabled(!from_debug && settings.getBoolean("pref_notify_fail", false))
                         .id(2).locked(false).show();
         }
 
@@ -250,12 +251,15 @@ public class ConnectionService extends IntentService {
         if (intent.getBooleanExtra("debug", false)) {
             Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
+            from_debug = true;
             notify.enabled(false);
         } else if (intent.getBooleanExtra("force", false)) {
             Logger.log(this, "Started from shortcut");
             from_shortcut = true;
+            from_debug = false;
         } else {
             Logger.log(this, "Started by system");
+            from_shortcut = false;
             from_shortcut = false;
         }
         SSID = wifi.getSSID(intent);
