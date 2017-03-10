@@ -35,10 +35,9 @@ import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.AndroidHacks;
-import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Listener;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
-import pw.thedrhax.util.Version;
 
 /**
  * Base class for all providers.
@@ -217,9 +216,6 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public RESULT start() {
         AndroidHacks.bindToWiFi(context);
-
-        Logger.log(context.getString(R.string.version, Version.getFormattedVersion()));
-        Logger.log(context.getString(R.string.algorithm_name, getName()));
 
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);

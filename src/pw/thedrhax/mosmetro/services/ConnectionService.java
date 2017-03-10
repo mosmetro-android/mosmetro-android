@@ -36,6 +36,7 @@ import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Util;
+import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
@@ -273,6 +274,11 @@ public class ConnectionService extends IntentService {
                     .putExtra("RUNNING", true)
             );
 
+            Logger.date();
+            Logger.log(getString(R.string.version, Version.getFormattedVersion()));
+            Logger.log(getString(R.string.auth_connecting, SSID));
+            Logger.log(getString(R.string.algorithm_name, provider.getName()));
+
             running.set(true);
             main();
             running.set(false);
@@ -294,9 +300,6 @@ public class ConnectionService extends IntentService {
     }
 
     private void main() {
-        Logger.date();
-        Logger.log(getString(R.string.auth_connecting, SSID));
-
         notify.icon(pref_colored_icons ?
                 R.drawable.ic_notification_connecting_colored :
                 R.drawable.ic_notification_connecting);
@@ -331,10 +334,8 @@ public class ConnectionService extends IntentService {
 
         // Notify user if not interrupted
         if (running.get()) {
-            Logger.date();
             notify(result);
         } else {
-            notify.hide();
             return;
         }
 
