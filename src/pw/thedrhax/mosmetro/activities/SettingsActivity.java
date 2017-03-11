@@ -31,7 +31,6 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
@@ -78,12 +77,12 @@ public class SettingsActivity extends Activity {
                         );
                         break;
 
-                    case 1: // WebMoney
+                    case 1: // Bitcoin
                         ClipboardManager clipboard = (ClipboardManager)
                                 getSystemService(Context.CLIPBOARD_SERVICE);
 
                         ClipData clip = ClipData.newPlainText("",
-                                getString(R.string.donate_webmoney_data)
+                                getString(R.string.donate_bitcoin_data)
                         );
                         clipboard.setPrimaryClip(clip);
 
