@@ -257,10 +257,12 @@ public class ConnectionService extends IntentService {
             Logger.log(this, "Started from shortcut");
             from_shortcut = true;
             from_debug = false;
+            notify.enabled(true);
         } else {
             Logger.log(this, "Started by system");
             from_shortcut = false;
             from_shortcut = false;
+            notify.enabled(true);
         }
         SSID = wifi.getSSID(intent);
 
