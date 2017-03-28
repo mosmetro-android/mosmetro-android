@@ -88,6 +88,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                     case ASSOCIATED: // This appears randomly between multiple CONNECTED states
                         startService();
                         break;
+                    case SCANNING: // Some devices do not report DISCONNECTED state so...
                     case DISCONNECTED:
                         stopService();
                         break;
