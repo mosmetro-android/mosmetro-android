@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppBaseTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">#e51c23</item>
-        <item name="android:colorPrimaryDark">#d01716</item>
-        <item name="android:colorAccent">#ff6e40</item>
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
     </style>
     <style name="AppBaseTheme.Dialog" parent="@android:style/Theme.Material.Light.Dialog" />
 </resources>
