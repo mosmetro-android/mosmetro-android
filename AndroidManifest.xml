@@ -19,6 +19,8 @@
         android:theme="@style/AppBaseTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
+	<meta-data android:name="android.max_aspect" android:value="2.1" />
+
         <!-- Main Activities -->
 
         <activity
