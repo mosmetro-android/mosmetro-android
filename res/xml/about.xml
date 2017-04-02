@@ -81,5 +81,15 @@
             </intent>
 
         </PreferenceScreen>
+
+        <PreferenceScreen
+            android:title="@string/contributor_Igor_Dyatlov"
+            android:summary="@string/contributor_Igor_Dyatlov_summary">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.SafeViewActivity">
+                <extra android:name="data" android:value="@string/contributor_Igor_Dyatlov_link" />
+            </intent>
+
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>
