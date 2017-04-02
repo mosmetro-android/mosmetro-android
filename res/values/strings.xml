@@ -170,6 +170,9 @@
     <string name="contributor_Alexander_Krotov" translatable="false">Alexander Krotov</string>
     <string name="contributor_Alexander_Krotov_summary">First Pull-request, Gradle migration, English translation</string>
     <string name="contributor_Alexander_Krotov_link" translatable="false">https://github.com/ilabdsf</string>
+    <string name="contributor_Igor_Dyatlov" translatable="false">Igor Dyatlov</string>
+    <string name="contributor_Igor_Dyatlov_summary">Graphic design, logo</string>
+    <string name="contributor_Igor_Dyatlov_link" translatable="false">https://github.com/igor-dyatlov</string>
 
     <string name="action_donate">Support the project (optional)</string>
     <string name="action_donate_cond">Support</string>
