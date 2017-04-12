@@ -219,4 +219,5 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
+    <string name="error_image">failed to download an image</string>
 </resources>

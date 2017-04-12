@@ -35,6 +35,7 @@ import android.widget.TextView;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 public class CaptchaDialog extends Activity {
@@ -74,7 +75,12 @@ public class CaptchaDialog extends Activity {
                             return BitmapFactory.decodeStream(
                                     client.getInputStream(url, pref_retry_count)
                             );
-                        } catch (Exception ignored) {}
+                        } catch (Exception ex) {
+                            Logger.log(getString(
+                                    R.string.error, getString(R.string.error_image)
+                            ));
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
+                        }
                         return null;
                     }
 
