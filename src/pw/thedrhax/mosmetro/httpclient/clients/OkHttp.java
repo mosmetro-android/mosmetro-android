@@ -226,8 +226,9 @@ public class OkHttp extends Client {
         Response response = call(
                 new Request.Builder().url(link).get()
         );
+        code = response.code();
 
-        if (response.code() != 200) {
+        if (code != 200) {
             response.body().close();
             throw new Exception("Empty response: " + code);
         }
