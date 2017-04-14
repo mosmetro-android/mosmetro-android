@@ -108,7 +108,6 @@
     <string name="auth_captcha_dialog_summary">
         Компания МаксимаТелеком требует вводить этот код время от времени для входа в систему.
         Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
-        \nНажмите на изображение, чтобы обновить его.
     </string>
     <string name="auth_captcha_requested">Требуется ввод капчи</string>
     <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>

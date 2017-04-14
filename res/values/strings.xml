@@ -116,7 +116,6 @@
     <string name="auth_captcha_dialog_summary">
         MaximaTelecom asks to enter this code from time to time to login.
         Here you can enter it without watching ads.
-        \nClick on the image to update it.
     </string>
     <string name="auth_captcha_requested">CAPTCHA requested</string>
     <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>

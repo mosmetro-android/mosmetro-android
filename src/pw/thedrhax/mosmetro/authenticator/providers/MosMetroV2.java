@@ -20,6 +20,8 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
 
@@ -268,11 +270,24 @@ public class MosMetroV2 extends Provider {
                     return false;
                 }
 
+                // Download CAPTCHA
+                Bitmap captcha;
+                try {
+                    captcha = BitmapFactory.decodeStream(
+                            client.getInputStream(captcha_url, pref_retry_count)
+                    );
+                } catch (Exception ex) {
+                    Logger.log(context.getString(
+                            R.string.error, context.getString(R.string.error_image)
+                    ));
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    vars.put("result", RESULT.ERROR);
+                    return false;
+                }
+
                 // Asking user to enter the CAPTCHA
                 vars.putAll(
-                        new CaptchaRequest().setRunningListener(running).getResult(
-                                context, captcha_url, client.getCookies(redirect).get("aid")
-                        )
+                        new CaptchaRequest().setRunningListener(running).getResult(context, captcha)
                 );
 
                 // Check the answer

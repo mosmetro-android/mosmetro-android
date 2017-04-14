@@ -20,10 +20,12 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public final class Util {
     private Util() {}
@@ -42,12 +44,18 @@ public final class Util {
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {
-        if (bitmap == null) return null;
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
 
         byte[] bytes = baos.toByteArray();
+        try {
+            baos.close();
+        } catch (IOException ignored) {}
         return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    public static Bitmap base64ToBitmap(String base64) {
+        byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }

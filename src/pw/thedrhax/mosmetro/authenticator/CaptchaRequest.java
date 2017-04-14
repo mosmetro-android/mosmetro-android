@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -35,6 +36,7 @@ import pw.thedrhax.mosmetro.activities.CaptchaDialog;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Notify;
+import pw.thedrhax.util.Util;
 
 public class CaptchaRequest {
     private final Listener<Boolean> running = new Listener<>(true);
@@ -43,13 +45,12 @@ public class CaptchaRequest {
         running.subscribe(master); return this;
     }
 
-    public Map<String,String> getResult(Context context, String url, String aid) {
+    public Map<String,String> getResult(Context context, Bitmap image) {
         final Map<String,String> result = new HashMap<>();
 
         Intent captcha_activity = new Intent(context, CaptchaDialog.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("url", url)
-                .putExtra("aid", aid);
+                .putExtra("image", Util.bitmapToBase64(image));
 
         Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))

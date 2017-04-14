@@ -21,8 +21,6 @@ package pw.thedrhax.mosmetro.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,23 +31,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 public class CaptchaDialog extends Activity {
-    private Bitmap image = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha_dialog);
-
-        final String url = getIntent().getStringExtra("url");
-        final Client client = new OkHttp(this)
-                .setCookie(url, "aid", getIntent().getStringExtra("aid"));
-        final int pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
 
         final Button submit_button = (Button) findViewById(R.id.submit_button);
         final EditText text_captcha = (EditText) findViewById(R.id.text_captcha);
@@ -65,41 +53,15 @@ public class CaptchaDialog extends Activity {
         });
 
         final ImageView image_captcha = (ImageView) findViewById(R.id.image_captcha);
-        image_captcha.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AsyncTask<Void,Void,Bitmap>() {
-                    @Override
-                    protected Bitmap doInBackground(Void... voids) {
-                        try {
-                            return BitmapFactory.decodeStream(
-                                    client.getInputStream(url, pref_retry_count)
-                            );
-                        } catch (Exception ex) {
-                            Logger.log(getString(
-                                    R.string.error, getString(R.string.error_image)
-                            ));
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Bitmap bitmap) {
-                        image = bitmap;
-                        if (image != null) image_captcha.setImageBitmap(image);
-                    }
-                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        });
-        image_captcha.performClick();
+        Bitmap image = Util.base64ToBitmap(getIntent().getStringExtra("image"));
+        image_captcha.setImageBitmap(image);
 
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
                         .putExtra("value", text_captcha.getText().toString())
-                        .putExtra("image", Util.bitmapToBase64(image))
+                        .putExtra("image", getIntent().getStringExtra("image"))
                 );
                 finish();
             }
