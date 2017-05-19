@@ -45,16 +45,15 @@ public final class AndroidHacks {
 
         for (Network network : cm.getAllNetworks()) {
             NetworkInfo info = cm.getNetworkInfo(network);
-            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI)
-                if (info.getState() == NetworkInfo.State.CONNECTED) {
-                    if (Build.VERSION.SDK_INT < 23)
-                        try {
-                            ConnectivityManager.setProcessDefaultNetwork(network);
-                        } catch (IllegalStateException ignored) {}
-                    else
-                        cm.bindProcessToNetwork(network);
-                    break;
-                }
+            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI) {
+                if (Build.VERSION.SDK_INT < 23)
+                    try {
+                        ConnectivityManager.setProcessDefaultNetwork(network);
+                    } catch (IllegalStateException ignored) {}
+                else
+                    cm.bindProcessToNetwork(network);
+                break;
+            }
         }
     }
 }
