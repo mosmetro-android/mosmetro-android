@@ -285,7 +285,6 @@ public class ConnectionService extends IntentService {
             Logger.log(getString(R.string.version, Version.getFormattedVersion()));
             Logger.log(getString(R.string.auth_connecting, SSID));
 
-            AndroidHacks.bindToWiFi(this);
             running.set(true);
             main();
             running.set(false);
@@ -307,6 +306,8 @@ public class ConnectionService extends IntentService {
     }
 
     private void main() {
+        AndroidHacks.bindToWiFi(this);
+
         notify.icon(pref_colored_icons ?
                 R.drawable.ic_notification_connecting_colored :
                 R.drawable.ic_notification_connecting);
