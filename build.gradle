@@ -22,8 +22,8 @@ android {
         applicationId 'pw.thedrhax.mosmetro'
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 57
-        versionName "1.7.5"
+        versionCode 58
+        versionName "1.7.6"
 
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://thedrhax.github.io/mosmetro-android\""
