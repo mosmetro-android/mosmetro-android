@@ -51,6 +51,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 public class OkHttp extends Client {
@@ -124,6 +125,10 @@ public class OkHttp extends Client {
                                 url_cookies.remove(old_cookie);
                             }
                             url_cookies.add(cookie);
+                            Logger.log(Logger.LEVEL.DEBUG, String.format(
+                                    "CookieJar | Add: %s = %s",
+                                    cookie.name(), cookie.value()
+                            ));
                         }
                         this.cookies.put(host, url_cookies);
                     }
