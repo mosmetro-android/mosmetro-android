@@ -104,7 +104,7 @@ public class OkHttp extends Client {
                 .sslSocketFactory(trustAllCerts())
                 // Store cookies for this session
                 .cookieJar(new CookieJar() {
-                    private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<HttpUrl, List<Cookie>>();
+                    private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
 
                     private HttpUrl getHost (HttpUrl url) {
                         return HttpUrl.parse("http://" + url.host());
@@ -116,7 +116,7 @@ public class OkHttp extends Client {
                         List<Cookie> url_cookies = loadForRequest(host);
                         // TODO: You can do better, come on!
                         for (Cookie cookie : cookies) {
-                            List<Cookie> for_deletion = new ArrayList<Cookie>();
+                            List<Cookie> for_deletion = new ArrayList<>();
                             for (Cookie old_cookie : url_cookies) {
                                 if (cookie.name().equals(old_cookie.name()))
                                     for_deletion.add(old_cookie);
@@ -152,7 +152,7 @@ public class OkHttp extends Client {
     @Override
     public Client setCookie(String url, String name, String value) {
         HttpUrl httpUrl = HttpUrl.parse(url);
-        List<Cookie> url_cookies = new ArrayList<Cookie>();
+        List<Cookie> url_cookies = new ArrayList<>();
         url_cookies.add(Cookie.parse(httpUrl, name + "=" + value));
         client.cookieJar().saveFromResponse(httpUrl, url_cookies);
         return this;
