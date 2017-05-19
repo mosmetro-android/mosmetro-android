@@ -40,7 +40,7 @@
     <string name="pref_wifi_reconnect_summary">
         Пытаться восстановить соединение с сетью Wi-Fi автоматически при потере сигнала или сбросе соединения.
     </string>
-    <string name="pref_wifi_bind">Привязка процесса к сети</string>
+    <string name="pref_wifi_bind">\"Привязка процесса к сети (Android 5.0+)\"</string>
     <string name="pref_wifi_bind_summary">Предотвращает утечку трафика через мобильную сеть, но может вызвать проблемы с VPN.</string>
 
     <string name="pref_internet_check">Мониторинг соединения</string>
