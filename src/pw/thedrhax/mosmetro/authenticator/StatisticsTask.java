@@ -51,7 +51,7 @@ class StatisticsTask implements Task {
         params.put("version", Version.getFormattedVersion());
         params.put("success", connected ? "true" : "false");
         params.put("ssid", new WifiUtils(p.context).getSSID());
-        params.put("p", p.getName());
+        params.put("provider", p.getName());
         if (vars.get("captcha") != null) {
             params.put("captcha", (String) vars.get("captcha"));
             if ("entered".equals(vars.get("captcha"))) {
