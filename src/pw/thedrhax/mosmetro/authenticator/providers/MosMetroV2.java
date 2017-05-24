@@ -148,7 +148,7 @@ public class MosMetroV2 extends Provider {
         /**
          * Asking user to solve the CAPTCHA and send the form
          */
-        add(new Task() {
+        Task captcha_task = new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 Element form = client.getPageContent().getElementsByTag("form").first();
@@ -223,7 +223,8 @@ public class MosMetroV2 extends Provider {
                 }
                 return true;
             }
-        });
+        };
+        add(captcha_task);
 
         /**
          * Sending login form
@@ -255,6 +256,11 @@ public class MosMetroV2 extends Provider {
                 return true;
             }
         });
+
+        /**
+         * Expect delayed CAPTCHA request on Moscow Central Circle
+         */
+        add(captcha_task);
 
         /**
          * Checking Internet connection
