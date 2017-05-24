@@ -273,9 +273,8 @@ public class MosMetroV2 extends Provider {
 
                 try {
                     JSONObject response = (JSONObject)new JSONParser().parse(client.getPage());
-                    boolean status = (Boolean)response.get("result");
 
-                    if (status && isConnected()) {
+                    if ((Boolean)response.get("result")) {
                         Logger.log(context.getString(R.string.auth_connected));
                         vars.put("result", RESULT.CONNECTED);
                         return true;
