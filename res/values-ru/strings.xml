@@ -110,8 +110,6 @@
         Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
     </string>
     <string name="auth_captcha_requested">Требуется ввод капчи</string>
-    <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
-    <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
     <string name="auth_connected">Соединение успешно установлено :3</string>
@@ -181,9 +179,7 @@
     <string name="more_information_summary">Ссылки, сообщества, благодарности</string>
     <string name="pref_captcha_dialog">Диалог ввода капчи</string>
     <string name="pref_captcha_dialog_summary">Если включено, диалог ввода капчи будет открываться автоматически поверх других приложений.</string>
-    <string name="auth_captcha_bypass_MosMetroV1">Пытаюсь обойти капчу с помощью старого алгоритма MosMetroV1…</string>
     <string name="stop">Остановить</string>
-    <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
     <string name="pref_mosmetro_captcha_bypass_backdoor">Обход капчи (бэкдор)</string>
     <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Разрешить использование официального бэкдора для обхода капчи. Отключите эту функцию, если вы сталкиваетесь со случайными зависаниями.</string>
     <string name="pref_mosmetro_captcha_bypass_mosmetrov1">Обход капчи (MosMetroV1)</string>

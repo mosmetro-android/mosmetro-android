@@ -18,12 +18,10 @@
 
 package pw.thedrhax.mosmetro.authenticator.providers;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Base64;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -40,7 +38,6 @@ import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.WifiUtils;
 
 /**
  * The MosMetroV2 class supports the actual version of the MosMetro algorithm.
@@ -149,112 +146,16 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
-         * Handle CAPTCHA request
+         * Asking user to solve the CAPTCHA and send the form
          */
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 Element form = client.getPageContent().getElementsByTag("form").first();
-                if (form != null && "captcha__container".equals(form.attr("class"))) {
-                    vars.put("captcha_form", form);
-                    Logger.log(context.getString(R.string.auth_captcha_requested));
-                }
-                return true;
-            }
-        });
-
-        /**
-         * Try to bypass CAPTCHA using the official backdoor
-         */
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (!settings.getBoolean("pref_mosmetro_captcha_bypass_backdoor", true))
-                    return true;
-                else if (vars.get("captcha_form") == null)
-                    return true;
-
-                Logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
-                try {
-                    int code = new OkHttp(context)
-                            .setTimeout(1000)
-                            .resetHeaders()
-                            .setHeader(
-                                    new String(Base64.decode(
-                                            "VXNlci1BZ2VudA==", Base64.DEFAULT
-                                    )),
-                                    new String(Base64.decode(
-                                            "QXV0b01vc01ldHJvV2lmaS8xLjUuMCAo" +
-                                                    "TGludXg7IEFuZHJvaWQgNC40LjQ7IEEw" +
-                                                    "MTIzIEJ1aWxkL0tUVTg0UCk=", Base64.DEFAULT
-                                    ))
-                            )
-                            .get(
-                                    new String(Base64.decode(
-                                            "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25l" +
-                                                    "dGluZm8vYXV0aA==", Base64.DEFAULT
-                                    )), null)
-                            .getResponseCode();
-
-                    if (code == 200 && isConnected()) {
-                        Logger.log(context.getString(R.string.auth_captcha_bypass_success));
-                        vars.put("result", RESULT.CONNECTED);
-                        vars.put("captcha", "backdoor");
-                        return false;
-                    } else {
-                        throw new Exception("Internet check failed");
-                    }
-                } catch (Exception ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
-                }
-                return true;
-            }
-        });
-
-        /**
-         * Trying to bypass CAPTCHA via the MosMetroV1
-         */
-        add(new Task() {
-            @SuppressLint("HardwareIds")
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (!settings.getBoolean("pref_mosmetro_captcha_bypass_mosmetrov1", true))
-                    return true;
-                else if (vars.get("captcha_form") == null)
-                    return true;
-
-                MosMetroV1 mosmetro = new MosMetroV1(context);
-                mosmetro.setRunningListener(running);
-                mosmetro.remove(0); // Remove initial internet check
-                mosmetro.redirect = String.format(
-                        "http://login.wi-fi.ru/am/UI/Login" +
-                                "?org=mac&service=test&client_mac=%s&ForceAuth=false",
-                        new WifiUtils(context).getWifiInfo(null).getMacAddress()
-                );
-
-                Logger.log(context.getString(R.string.auth_captcha_bypass_MosMetroV1));
-                RESULT result = mosmetro.start();
-                if (result == RESULT.CONNECTED) {
-                    Logger.log(context.getString(R.string.auth_captcha_bypass_success));
-                    vars.put("result", result);
-                    vars.put("captcha", mosmetro.getName());
-                    return false;
-                } else {
-                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                if (form == null || !"captcha__container".equals(form.attr("class"))) {
                     return true;
                 }
-            }
-        });
-
-        /**
-         * Asking user to solve the CAPTCHA and send the form
-         */
-        add(new Task() {
-            @Override
-            public boolean run(final HashMap<String, Object> vars) {
-                Element form = (Element) vars.get("captcha_form");
-                if (form == null) return true;
+                Logger.log(context.getString(R.string.auth_captcha_requested));
 
                 // Parsing captcha URL
                 String captcha_url;

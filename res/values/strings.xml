@@ -118,8 +118,6 @@
         Here you can enter it without watching ads.
     </string>
     <string name="auth_captcha_requested">CAPTCHA requested</string>
-    <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
-    <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
     <string name="auth_connected">Connection established :3</string>
@@ -199,9 +197,7 @@
     <string name="auth_provider_check">Detecting the provider…</string>
     <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
     <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
-    <string name="auth_captcha_bypass_MosMetroV1">Trying to bypass CAPTCHA using the old algorithm MosMetroV1…</string>
     <string name="stop">Stop</string>
-    <string name="auth_captcha_bypass_backdoor">Trying to bypass CAPTCHA using the official backdoor…</string>
     <string name="pref_mosmetro_captcha_bypass_backdoor">CAPTCHA bypass (backdoor)</string>
     <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Allow to use the official backdoor to bypass the CAPTCHA. Turn it off in case of random freezes.</string>
     <string name="pref_mosmetro_captcha_bypass_mosmetrov1">CAPTCHA bypass (MosMetroV1)</string>
