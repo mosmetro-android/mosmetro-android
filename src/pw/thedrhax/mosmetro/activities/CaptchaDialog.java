@@ -38,6 +38,7 @@ public class CaptchaDialog extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha_dialog);
+        setFinishOnTouchOutside(false);
 
         final Button submit_button = (Button) findViewById(R.id.submit_button);
         final EditText text_captcha = (EditText) findViewById(R.id.text_captcha);
