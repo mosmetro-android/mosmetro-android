@@ -198,11 +198,6 @@
     <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
     <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
     <string name="stop">Stop</string>
-    <string name="pref_mosmetro_captcha_bypass_backdoor">CAPTCHA bypass (backdoor)</string>
-    <string name="pref_mosmetro_captcha_bypass_backdoor_summary">Allow to use the official backdoor to bypass the CAPTCHA. Turn it off in case of random freezes.</string>
-    <string name="pref_mosmetro_captcha_bypass_mosmetrov1">CAPTCHA bypass (MosMetroV1)</string>
-    <string name="pref_mosmetro_captcha_bypass_mosmetrov1_summary">Allow to use the MosMetroV1 algorithm to bypass the CAPTCHA.</string>
-    <string name="captcha">CAPTCHA</string>
     <string name="pref_notify_foreground">Foreground process</string>
     <string name="pref_notify_foreground_summary">Bind background process to notification to protect it from being killed. If you disable this option, background process will be killed even if you simply open and close the app window.</string>
     <string name="pref_timeout">Connection timeout</string>
