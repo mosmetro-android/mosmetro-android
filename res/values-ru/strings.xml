@@ -195,4 +195,5 @@
     <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
     <string name="error_log_file">не удалось записать лог в файл</string>
     <string name="error_image">не удалось загрузить изображение</string>
+    <string name="auth_captcha_dialog_toggle">Открывать это окно автоматически</string>
 </resources>

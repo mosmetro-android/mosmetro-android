@@ -21,13 +21,16 @@ package pw.thedrhax.mosmetro.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +44,18 @@ public class CaptchaDialog extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha_dialog);
         setFinishOnTouchOutside(false);
+
+        final CheckBox pref_captcha_dialog = (CheckBox) findViewById(R.id.pref_captcha_dialog);
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        pref_captcha_dialog.setChecked(settings.getBoolean("pref_captcha_dialog", true));
+        pref_captcha_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                settings.edit()
+                        .putBoolean("pref_captcha_dialog", ((CheckBox)v).isChecked())
+                        .apply();
+            }
+        });
 
         final Button submit_button = (Button) findViewById(R.id.submit_button);
         final EditText text_captcha = (EditText) findViewById(R.id.text_captcha);
