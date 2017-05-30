@@ -183,20 +183,11 @@ public abstract class Provider extends LinkedList<Task> {
      * This implementation uses generate_204 method, that is default for Android.
      * @return True if internet access is available; otherwise, false is returned.
      */
-    public static boolean generate_204() {
-        Client client = new OkHttp().setTimeout(3000);
+    public boolean isConnected() {
         try {
             client.get(GENERATE_204_URL, null);
         } catch (Exception ignored) {}
         return client.getResponseCode() == 204;
-    }
-
-    /**
-     * Checks network connection state for a specific provider.
-     * @return True if internet access is available; otherwise, false is returned.
-     */
-    public boolean isConnected() {
-        return generate_204();
     }
 
     /**

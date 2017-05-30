@@ -19,6 +19,10 @@
 package pw.thedrhax.mosmetro.httpclient.clients;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Network;
+import android.os.Build;
+import android.preference.PreferenceManager;
 
 import org.jsoup.Jsoup;
 
@@ -53,6 +57,7 @@ import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
+import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
@@ -147,6 +152,14 @@ public class OkHttp extends Client {
         this();
         int timeout = Util.getIntPreference(context, "pref_timeout", 5);
         if (timeout != 0) setTimeout(timeout * 1000);
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!settings.getBoolean("pref_wifi_bind", false) && Build.VERSION.SDK_INT >= 21) {
+            Network network = new WifiUtils(context).getNetwork();
+            if (network != null) {
+                client = client.newBuilder().socketFactory(network.getSocketFactory()).build();
+            }
+        }
     }
 
     @Override

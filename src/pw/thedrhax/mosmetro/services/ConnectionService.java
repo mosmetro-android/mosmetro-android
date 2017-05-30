@@ -32,7 +32,6 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -306,8 +305,6 @@ public class ConnectionService extends IntentService {
     }
 
     private void main() {
-        AndroidHacks.bindToWiFi(this);
-
         notify.icon(pref_colored_icons ?
                 R.drawable.ic_notification_connecting_colored :
                 R.drawable.ic_notification_connecting);
