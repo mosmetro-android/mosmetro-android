@@ -186,6 +186,12 @@ public class MosMetroV2 extends Provider {
                     return false;
                 }
 
+                if (captcha == null) {
+                    Logger.log(this, "CAPTCHA is null!");
+                    vars.put("result", RESULT.ERROR);
+                    return false;
+                }
+
                 // Asking user to enter the CAPTCHA
                 vars.putAll(
                         new CaptchaRequest().setRunningListener(running).getResult(context, captcha)
