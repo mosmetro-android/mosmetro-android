@@ -43,8 +43,10 @@ public class Listener<T> {
     public final synchronized void set(T new_value) {
         value = new_value;
         onChange(new_value);
-        for (Listener<T> callback : callbacks) {
-            callback.set(new_value);
+        synchronized (callbacks) {
+            for (Listener<T> callback : callbacks) {
+                callback.set(new_value);
+            }
         }
     }
 
@@ -53,7 +55,9 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
-        master.callbacks.add(this);
+        synchronized (master.callbacks) {
+            master.callbacks.add(this);
+        }
         this.value = master.value;
     }
 
