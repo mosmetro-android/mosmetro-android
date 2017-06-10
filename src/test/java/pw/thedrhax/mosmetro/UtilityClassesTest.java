@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 
@@ -39,6 +40,11 @@ public class UtilityClassesTest {
             if (!Modifier.isStatic(method.getModifiers()))
                 if (method.getDeclaringClass().equals(clazz))
                     Assert.fail("There exists a non-static method: " + method);
+    }
+
+    @Test
+    public void checkUtilityClass_AndroidHacks() throws Exception {
+        assertUtilityClassWellDefined(AndroidHacks.class);
     }
 
     @Test

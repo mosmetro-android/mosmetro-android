@@ -20,25 +20,19 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 public class WifiUtils {
     public static final String UNKNOWN_SSID = "<unknown ssid>";
 
-    private final WifiManager wm;
-    private final ConnectivityManager cm;
+    private final WifiManager manager;
 
     public WifiUtils(@NonNull Context context) {
-        this.wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        this.manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
     /*
@@ -47,7 +41,7 @@ public class WifiUtils {
 
     // Wi-Fi connectivity conditions
     public boolean isConnected(String SSID) {
-        if (!wm.isWifiEnabled()) return false;
+        if (!manager.isWifiEnabled()) return false;
         if (!getSSID().equalsIgnoreCase(SSID)) return false;
         return true;
     }
@@ -63,7 +57,7 @@ public class WifiUtils {
             WifiInfo result = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
             if (result != null) return result;
         }
-        return wm.getConnectionInfo();
+        return manager.getConnectionInfo();
     }
 
     // Get SSID from Intent's EXTRA_WIFI_INFO (API > 14)
@@ -78,25 +72,12 @@ public class WifiUtils {
 
     // Get current IP from WifiManager
     public int getIP() {
-        return wm.getConnectionInfo().getIpAddress();
+        return manager.getConnectionInfo().getIpAddress();
     }
 
     // Get main Wi-Fi state
     public boolean isEnabled() {
-        return wm.isWifiEnabled();
-    }
-
-    // Get Network associated with Wi-Fi
-    @RequiresApi(21)
-    public Network getNetwork() {
-        for (Network network : cm.getAllNetworks()) {
-            NetworkInfo info = cm.getNetworkInfo(network);
-            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI) {
-                return network;
-            }
-        }
-        Logger.log(this, "Wi-Fi network not found");
-        return null;
+        return manager.isWifiEnabled();
     }
 
     /*
@@ -106,10 +87,10 @@ public class WifiUtils {
     // Reconnect to SSID (only if already configured)
     public void reconnect(String SSID) {
         try {
-            for (WifiConfiguration network : wm.getConfiguredNetworks()) {
+            for (WifiConfiguration network : manager.getConfiguredNetworks()) {
                 if (clear(network.SSID).equals(SSID)) {
-                    wm.enableNetwork(network.networkId, true);
-                    wm.reassociate();
+                    manager.enableNetwork(network.networkId, true);
+                    manager.reassociate();
                 }
             }
         } catch (NullPointerException ignored) {}
