@@ -171,7 +171,7 @@
     <string name="contributor_Igor_Dyatlov_summary">Graphic design, logo</string>
     <string name="contributor_Igor_Dyatlov_link" translatable="false">https://github.com/igor-dyatlov</string>
 
-    <string name="action_donate">Support the project (optional)</string>
+    <string name="action_donate">Support the project (doesn't affect the functionality)</string>
     <string name="action_donate_cond">Support</string>
 
     <string-array name="donate_options">
