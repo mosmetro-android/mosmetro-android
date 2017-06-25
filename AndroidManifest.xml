@@ -131,6 +131,7 @@
             android:excludeFromRecents="true"
             android:label="@string/auth_captcha_dialog"
             android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppBaseTheme.Dialog">
             <intent-filter>
                 <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
