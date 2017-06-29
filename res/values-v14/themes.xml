@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
+    <style name="AppBaseTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+    </style>
+    <style name="ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
     <style name="AppBaseTheme.Dialog" parent="@android:style/Theme.Holo.Light.Dialog" />
 </resources>
