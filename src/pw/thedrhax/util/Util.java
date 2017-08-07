@@ -58,4 +58,14 @@ public final class Util {
         byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
+
+    public static String convertCyrillicSymbols(String s) {
+        s = s.replaceAll("а", "a");
+        s = s.replaceAll("б", "b");
+        s = s.replaceAll("с", "c");
+        s = s.replaceAll("д", "d");
+        s = s.replaceAll("е", "e");
+        s = s.replaceAll("ф", "f");
+        return s;
+    }
 }

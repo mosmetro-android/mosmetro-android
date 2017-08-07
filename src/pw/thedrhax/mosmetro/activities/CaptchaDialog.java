@@ -77,7 +77,7 @@ public class CaptchaDialog extends Activity {
             @Override
             public void onClick(View view) {
                 sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
-                        .putExtra("value", text_captcha.getText().toString())
+                        .putExtra("value", Util.convertCyrillicSymbols(text_captcha.getText().toString()))
                         .putExtra("image", getIntent().getStringExtra("image"))
                 );
                 finish();
