@@ -24,6 +24,8 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -68,6 +70,22 @@ public class CaptchaDialog extends Activity {
                 return false;
             }
         });
+        text_captcha.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                text_captcha.removeTextChangedListener(this);
+                int pos = text_captcha.getSelectionEnd();
+                text_captcha.setText(Util.convertCyrillicSymbols(text_captcha.getText().toString()));
+                text_captcha.setSelection(pos);
+                text_captcha.addTextChangedListener(this);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         final ImageView image_captcha = (ImageView) findViewById(R.id.image_captcha);
         Bitmap image = Util.base64ToBitmap(getIntent().getStringExtra("image"));
@@ -77,7 +95,7 @@ public class CaptchaDialog extends Activity {
             @Override
             public void onClick(View view) {
                 sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
-                        .putExtra("value", Util.convertCyrillicSymbols(text_captcha.getText().toString()))
+                        .putExtra("value", text_captcha.getText().toString())
                         .putExtra("image", getIntent().getStringExtra("image"))
                 );
                 finish();
