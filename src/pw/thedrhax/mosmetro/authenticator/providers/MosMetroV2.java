@@ -29,10 +29,12 @@ import org.jsoup.nodes.Element;
 
 import java.net.ProtocolException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.CaptchaRequest;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognition;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -149,85 +151,118 @@ public class MosMetroV2 extends Provider {
          * Asking user to solve the CAPTCHA and send the form
          */
         Task captcha_task = new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                Element form = client.getPageContent().getElementsByTag("form").first();
-                if (form == null || !"captcha__container".equals(form.attr("class"))) {
-                    return true;
-                }
-                Logger.log(context.getString(R.string.auth_captcha_requested));
+            private Element getForm() {
+                return client.getPageContent().getElementsByTag("form").first();
+            }
 
-                // Parsing captcha URL
-                String captcha_url;
-                try {
-                    Element captcha_img = form.getElementsByTag("img").first();
-                    captcha_url = redirect + captcha_img.attr("src");
-                } catch (Exception ex) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_captcha_image))
-                    );
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                }
+            private boolean isCaptchaRequested() {
+                Element form = getForm();
+                return form != null && "captcha__container".equals(form.attr("class"));
+            }
 
-                // Download CAPTCHA
-                Bitmap captcha;
-                try {
-                    captcha = BitmapFactory.decodeStream(
-                            client.getInputStream(captcha_url, pref_retry_count)
-                    );
-                } catch (Exception ex) {
-                    Logger.log(context.getString(
-                            R.string.error, context.getString(R.string.error_image)
-                    ));
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                }
-
-                if (captcha == null) {
-                    Logger.log(this, "CAPTCHA is null!");
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                }
-
-                // Asking user to enter the CAPTCHA
-                vars.putAll(
-                        new CaptchaRequest().setRunningListener(running).getResult(context, captcha)
-                );
-
-                // Check the answer
-                String code = (String) vars.get("captcha_code");
-                if (code == null || code.isEmpty()) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_captcha))
-                    );
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                }
-
-                Logger.log(Logger.LEVEL.DEBUG, String.format(
-                        context.getString(R.string.auth_captcha_result), code
-                ));
-                vars.put("captcha", "entered");
-
-                // Sending captcha form
+            private boolean submit(String code) {
                 Logger.log(context.getString(R.string.auth_request));
-                Map<String,String> fields = Client.parseForm(form);
+
+                Map<String,String> fields = Client.parseForm(getForm());
                 fields.put("_rucaptcha", code);
 
                 try {
-                    client.post(redirect + form.attr("action"), fields, pref_retry_count);
+                    client.post(redirect + getForm().attr("action"), fields, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
                 } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
+                }
+
+                return !isCaptchaRequested();
+            }
+
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (!isCaptchaRequested()) return true;
+                Logger.log(context.getString(R.string.auth_captcha_requested));
+
+                // Parsing captcha URL
+                String captcha_url;
+                try {
+                    Element captcha_img = getForm().getElementsByTag("img").first();
+                    captcha_url = redirect + captcha_img.attr("src");
+                } catch (Exception ex) {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_captcha_image)
+                    ));
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    vars.put("result", RESULT.ERROR);
                     return false;
                 }
-                return true;
+
+                // Try to recognize CAPTCHA within pref_retry_count attempts
+                Bitmap captcha = null;
+                CaptchaRecognition cr = new CaptchaRecognition(context);
+                for (int i = 0; i < pref_retry_count + 1; i++) {
+                    // Download CAPTCHA
+                    try {
+                        captcha = BitmapFactory.decodeStream(
+                                client.getInputStream(captcha_url, pref_retry_count)
+                        );
+
+                        if (captcha == null)
+                            throw new Exception("CAPTCHA is null!");
+                    } catch (Exception ex) {
+                        continue;
+                    }
+
+                    if (i == pref_retry_count) break; // Leave the last unsolved CAPTCHA to user
+
+                    String code = cr.recognize(captcha); // neural magic
+                    if (submit(code)) {
+                        cr.close();
+                        Logger.log(this, String.format(Locale.ENGLISH,
+                                "CAPTCHA solved: tries=%d, code=%s", i+1, code
+                        ));
+                        Logger.log(Logger.LEVEL.INFO,
+                                context.getString(R.string.auth_captcha_recognized)
+                        );
+                        vars.put("captcha", "recognized");
+                        return true;
+                    }
+                }
+                cr.close();
+
+                if (captcha == null) {
+                    Logger.log(context.getString(
+                            R.string.error, context.getString(R.string.error_image)
+                    ));
+                    vars.put("result", RESULT.ERROR);
+                    return false;
+                }
+
+                // Asking user to enter the CAPTCHA
+                vars.putAll(
+                        new CaptchaRequest()
+                                .setRunningListener(running)
+                                .getResult(context, captcha)
+                );
+
+                // Check the answer
+                String code = (String) vars.get("captcha_code");
+                if (code == null || code.isEmpty()) {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_captcha)
+                    ));
+                    vars.put("result", RESULT.ERROR);
+                    return false;
+                } else {
+                    Logger.log(Logger.LEVEL.DEBUG, String.format(
+                            context.getString(R.string.auth_captcha_result), code
+                    ));
+                    vars.put("captcha", "entered");
+                }
+
+                // Send code to server and proceed
+                return submit(code);
             }
         };
         add(captcha_task);

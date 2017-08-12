@@ -196,4 +196,5 @@
     <string name="error_log_file">не удалось записать лог в файл</string>
     <string name="error_image">не удалось загрузить изображение</string>
     <string name="auth_captcha_dialog_toggle">Открывать это окно автоматически</string>
+    <string name="auth_captcha_recognized">Капча успешно распознана! :)</string>
 </resources>
