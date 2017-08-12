@@ -1,1 +1,1 @@
-/home/thedrhax/Android/Projects/mosmetro-android/assets/frozen_graph_ler=0.02.pb
+../../../assets/frozen_graph_ler=0.02.pb
