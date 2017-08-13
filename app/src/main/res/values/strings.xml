@@ -215,4 +215,5 @@
     <string name="error_image">failed to download an image</string>
     <string name="auth_captcha_dialog_toggle">Open this dialog automatically</string>
     <string name="auth_captcha_recognized">CAPTCHA solved successfully! :)</string>
+    <string name="auth_captcha_recognition_failed">CAPTCHA recognition failed (no answer received)</string>
 </resources>

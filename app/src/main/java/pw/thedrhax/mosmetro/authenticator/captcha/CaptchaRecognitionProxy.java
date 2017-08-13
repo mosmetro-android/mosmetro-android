@@ -53,7 +53,8 @@ public class CaptchaRecognitionProxy {
         );
 
         // Wait for answer
-        while (!isStopped() && reply[0] == null) {
+        int timeout = 20; // 2 seconds
+        while (!isStopped() && reply[0] == null && timeout-- != 0) {
             SystemClock.sleep(100);
         }
 

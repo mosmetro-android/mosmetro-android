@@ -223,6 +223,11 @@ public class MosMetroV2 extends Provider {
                         continue;
                     }
 
+                    if (code == null) {
+                        Logger.log(context.getString(R.string.auth_captcha_recognition_failed));
+                        continue;
+                    }
+
                     if (i == pref_retry_count) break; // Leave the last unsolved CAPTCHA to user
 
                     if (submit(code)) {

@@ -197,4 +197,5 @@
     <string name="error_image">не удалось загрузить изображение</string>
     <string name="auth_captcha_dialog_toggle">Открывать это окно автоматически</string>
     <string name="auth_captcha_recognized">Капча успешно распознана! :)</string>
+    <string name="auth_captcha_recognition_failed">Не удалось распознать капчу (модуль не ответил)</string>
 </resources>
