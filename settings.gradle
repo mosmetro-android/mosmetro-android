@@ -1,1 +1,1 @@
-include ':app', ':module_captcha_recognition'
+include ':app'

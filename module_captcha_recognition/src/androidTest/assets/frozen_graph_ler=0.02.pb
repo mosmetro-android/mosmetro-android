@@ -1,1 +1,0 @@
-../../main/assets/frozen_graph_ler=0.02.pb
