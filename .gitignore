@@ -5,4 +5,4 @@ local.properties
 gradle
 gradlew
 gradlew.bat
-mosmetro-android.iml
+*.iml
