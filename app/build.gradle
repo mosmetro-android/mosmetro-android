@@ -1,0 +1,107 @@
+apply plugin: 'com.android.application'
+apply plugin: 'androidsvgdrawable'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId 'pw.thedrhax.mosmetro'
+        minSdkVersion 11
+        targetSdkVersion 25
+        versionCode 61
+        versionName "1.7.7"
+
+        // GitHub Pages
+        buildConfigField "String", "\$GITHUB", "\"https://thedrhax.github.io/mosmetro-android\""
+        buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
+        buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
+
+        // Default stat URL
+        buildConfigField "String", "API_URL_DEFAULT", "\"https://mosmetro.duckdns.org\""
+
+        // Relative URLs for stat server
+        buildConfigField "String", "API_REL_STATISTICS", "\"/api/v1/statistics.php\""
+        buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+        signingConfigs {
+            release {
+                storeFile new File(keystoreProperties['RELEASE_STORE_FILE'])
+                storePassword keystoreProperties['RELEASE_STORE_PASSWORD']
+                keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
+                keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    sourceSets {
+        // Test sources.
+        test.java.srcDir 'src/test/java'
+        androidTest.java.srcDir 'src/androidTest/java'
+
+        main {
+            res.srcDirs = ['src/main/res', 'build/generated/res/main']
+            jniLibs.srcDirs = ['libs']
+            java {
+                srcDir 'src'
+                exclude 'androidTest/**'
+                exclude 'test/**'
+            }
+        }
+
+        lintOptions {
+            abortOnError false
+        }
+    }
+}
+
+import fr.avianey.androidsvgdrawable.gradle.SvgDrawableTask
+task svgToDrawablePng(type: SvgDrawableTask) {
+    from = files('src/main/res-svg/drawable')
+    to = file('build/generated/res/main')
+    createMissingDirectories = true
+    overwriteMode = 'ifModified'
+    targetedDensities = ['ldpi', 'hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+    outputFormat = 'PNG'
+    outputType = 'drawable'
+}
+
+dependencies {
+    // Runtime dependencies.
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:support-annotations:25.2.0'
+    compile 'com.android.support:support-compat:25.2.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+        exclude module: 'junit'
+    }
+
+    // Test dependencies.
+    testCompile 'junit:junit:4.12'
+
+    // Needed because there is a conflict in 'com.android.support.test:runner' package.
+    // Here we explicitly define the version for the 'androidTest' sources build variant.
+    androidTestCompile 'com.android.support:support-annotations:25.2.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+}
