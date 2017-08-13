@@ -45,12 +45,13 @@ public class CaptchaRequest {
         running.subscribe(master); return this;
     }
 
-    public Map<String,String> getResult(Context context, Bitmap image) {
+    public Map<String,String> getResult(Context context, Bitmap image, String code) {
         final Map<String,String> result = new HashMap<>();
 
         Intent captcha_activity = new Intent(context, CaptchaDialog.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("image", Util.bitmapToBase64(image));
+                .putExtra("image", Util.bitmapToBase64(image))
+                .putExtra("code", code);
 
         Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))

@@ -200,6 +200,7 @@ public class MosMetroV2 extends Provider {
 
                 // Try to recognize CAPTCHA within pref_retry_count attempts
                 Bitmap captcha = null;
+                String code = null;
                 CaptchaRecognition cr = new CaptchaRecognition(context);
                 for (int i = 0; i < pref_retry_count + 1; i++) {
                     // Download CAPTCHA
@@ -214,9 +215,10 @@ public class MosMetroV2 extends Provider {
                         continue;
                     }
 
+                    code = cr.recognize(captcha); // neural magic
+
                     if (i == pref_retry_count) break; // Leave the last unsolved CAPTCHA to user
 
-                    String code = cr.recognize(captcha); // neural magic
                     if (submit(code)) {
                         cr.close();
                         Logger.log(this, String.format(Locale.ENGLISH,
@@ -243,11 +245,11 @@ public class MosMetroV2 extends Provider {
                 vars.putAll(
                         new CaptchaRequest()
                                 .setRunningListener(running)
-                                .getResult(context, captcha)
+                                .getResult(context, captcha, code)
                 );
 
                 // Check the answer
-                String code = (String) vars.get("captcha_code");
+                code = (String) vars.get("captcha_code");
                 if (code == null || code.isEmpty()) {
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_captcha)

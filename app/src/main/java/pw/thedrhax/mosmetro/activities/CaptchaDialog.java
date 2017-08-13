@@ -86,6 +86,8 @@ public class CaptchaDialog extends Activity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+        text_captcha.setText(getIntent().getStringExtra("code"));
+        text_captcha.setSelection(0, 4);
 
         final ImageView image_captcha = (ImageView) findViewById(R.id.image_captcha);
         Bitmap image = Util.base64ToBitmap(getIntent().getStringExtra("image"));
