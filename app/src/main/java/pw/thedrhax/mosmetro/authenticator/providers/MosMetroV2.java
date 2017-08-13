@@ -33,7 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognition;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
 import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
@@ -201,8 +201,9 @@ public class MosMetroV2 extends Provider {
                 // Try to recognize CAPTCHA within pref_retry_count attempts
                 Bitmap captcha = null;
                 String code = null;
-                CaptchaRecognition cr = new CaptchaRecognition(context);
-                for (int i = 0; i < pref_retry_count + 1; i++) {
+                CaptchaRecognitionProxy cr = new CaptchaRecognitionProxy(context)
+                        .setRunningListener(running);
+                for (int i = 0; i < pref_retry_count + 1 && running.get(); i++) {
                     // Download CAPTCHA
                     try {
                         captcha = BitmapFactory.decodeStream(
@@ -215,12 +216,16 @@ public class MosMetroV2 extends Provider {
                         continue;
                     }
 
-                    code = cr.recognize(captcha); // neural magic
+                    try {
+                        code = cr.recognize(captcha); // neural magic
+                    } catch (Exception ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        continue;
+                    }
 
                     if (i == pref_retry_count) break; // Leave the last unsolved CAPTCHA to user
 
                     if (submit(code)) {
-                        cr.close();
                         Logger.log(this, String.format(Locale.ENGLISH,
                                 "CAPTCHA solved: tries=%d, code=%s", i+1, code
                         ));
@@ -231,7 +236,6 @@ public class MosMetroV2 extends Provider {
                         return true;
                     }
                 }
-                cr.close();
 
                 if (captcha == null) {
                     Logger.log(context.getString(
@@ -240,6 +244,8 @@ public class MosMetroV2 extends Provider {
                     vars.put("result", RESULT.ERROR);
                     return false;
                 }
+
+                if (isStopped()) return false;
 
                 // Asking user to enter the CAPTCHA
                 vars.putAll(

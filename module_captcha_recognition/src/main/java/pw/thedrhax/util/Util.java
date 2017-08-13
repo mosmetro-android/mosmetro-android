@@ -18,34 +18,15 @@
 
 package pw.thedrhax.util;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.test.InstrumentationRegistry;
+import android.util.Base64;
 
-import org.junit.Test;
+public final class Util {
+    private Util() {}
 
-import static org.junit.Assert.*;
-
-/**
- * A collection of the Util class tests
- * @author Dmitry Karikh <the.dr.hax@gmail.com>
- */
-public class UtilTest {
-    private Context context = InstrumentationRegistry.getContext();
-
-    @Test
-    public void getIntPreference() throws Exception {
-        assertEquals(123, Util.getIntPreference(context, "none", 123));
-    }
-
-    @Test
-    public void convertCyrillicSymbols() throws Exception {
-        assertEquals("abcdef", Util.convertCyrillicSymbols("абсдеф"));
-    }
-
-    @Test
-    public void wellDefinedClass() throws Exception {
-        UtilityClasses.assertUtilityClassWellDefined(Util.class);
+    public static Bitmap base64ToBitmap(String base64) {
+        byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }

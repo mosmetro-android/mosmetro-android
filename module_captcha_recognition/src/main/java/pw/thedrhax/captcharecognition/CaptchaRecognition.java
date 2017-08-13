@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.authenticator.captcha;
+package pw.thedrhax.captcharecognition;
 
 import android.content.Context;
 import android.graphics.Bitmap;

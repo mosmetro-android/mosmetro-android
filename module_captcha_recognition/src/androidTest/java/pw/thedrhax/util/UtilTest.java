@@ -18,31 +18,13 @@
 
 package pw.thedrhax.util;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.test.InstrumentationRegistry;
-
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * A collection of the Util class tests
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  */
 public class UtilTest {
-    private Context context = InstrumentationRegistry.getContext();
-
-    @Test
-    public void getIntPreference() throws Exception {
-        assertEquals(123, Util.getIntPreference(context, "none", 123));
-    }
-
-    @Test
-    public void convertCyrillicSymbols() throws Exception {
-        assertEquals("abcdef", Util.convertCyrillicSymbols("абсдеф"));
-    }
 
     @Test
     public void wellDefinedClass() throws Exception {

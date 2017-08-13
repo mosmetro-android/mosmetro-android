@@ -16,21 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.authenticator.captcha;
+package pw.thedrhax.captcharecognition;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * A collection of the CaptchaRecognition class tests
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
- * @see pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognition
  */
 public class CaptchaRecognitionTest {
     private static final String ASSETS_PATH = "example_captcha";
@@ -47,7 +45,7 @@ public class CaptchaRecognitionTest {
             );
             String code = filename.split(".png")[0];
 
-            assertEquals(code, code, cr.recognize(bitmap));
+            Assert.assertEquals(code, code, cr.recognize(bitmap));
         }
 
         cr.close();
