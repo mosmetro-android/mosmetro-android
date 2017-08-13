@@ -216,6 +216,11 @@ public class MosMetroV2 extends Provider {
                         continue;
                     }
 
+                    if (!cr.isModuleAvailable()) {
+                        Logger.log(Logger.LEVEL.DEBUG, "CAPTCHA recognition module is not installed");
+                        break;
+                    }
+
                     try {
                         code = cr.recognize(captcha); // neural magic
                     } catch (Exception ex) {

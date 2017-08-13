@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
 
@@ -29,10 +30,24 @@ import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Util;
 
 public class CaptchaRecognitionProxy {
+    private static final String REMOTE_PACKAGE = "pw.thedrhax.captcharecognition";
+    private static final String ACTION_RECOGNIZE = REMOTE_PACKAGE + ".RECOGNIZE";
+    private static final String ACTION_RESULT = REMOTE_PACKAGE + ".RESULT";
+
     private Context context = null;
 
     public CaptchaRecognitionProxy(Context context) {
         this.context = context;
+    }
+
+    public boolean isModuleAvailable() {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(REMOTE_PACKAGE, PackageManager.GET_SERVICES);
+        } catch (PackageManager.NameNotFoundException ex) {
+            return false;
+        }
+        return true;
     }
 
     public String recognize(final Bitmap bitmap) throws Exception {
@@ -44,11 +59,10 @@ public class CaptchaRecognitionProxy {
                 reply[0] = intent.getStringExtra("code");
             }
         };
-        context.registerReceiver(receiver, new IntentFilter("pw.thedrhax.captcharecognition.RESULT"));
+        context.registerReceiver(receiver, new IntentFilter(ACTION_RESULT));
 
         context.startService(
-                new Intent("pw.thedrhax.captcharecognition.RECOGNIZE")
-                        .setPackage("pw.thedrhax.captcharecognition")
+                new Intent(ACTION_RECOGNIZE).setPackage(REMOTE_PACKAGE)
                         .putExtra("bitmap_base64", Util.bitmapToBase64(bitmap))
         );
 
