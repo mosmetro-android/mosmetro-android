@@ -32,6 +32,17 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="pref_category_extensions"
+        android:title="@string/pref_category_extensions">
+
+        <Preference
+            android:key="pref_extension_captcha_recognition"
+            android:title="@string/ext_captcha_recognition_title"
+            android:summary="@string/ext_captcha_recognition_description" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/pref_category_updater">
 
         <CheckBoxPreference

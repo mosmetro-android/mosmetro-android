@@ -106,8 +106,11 @@
     <string name="auth_captcha_result">Капча введена: %s</string>
     <string name="auth_captcha_dialog">Введите код с картинки</string>
     <string name="auth_captcha_dialog_summary">
-        Компания МаксимаТелеком требует вводить этот код время от времени для входа в систему.
-        Здесь вы можете ввести его, не нарвавшись при этом на рекламу.
+        Для подключения к этой сети нужно ввести код с картинки.
+        \n\nПриложение может делать это самостоятельно, если вы установите модуль \"Распознавание капчи\". Ссылки для скачивания расширения доступны в главном меню ;)
+    </string>
+    <string name="auth_captcha_dialog_summary_with_ext">
+        Похоже, что модуль не смог правильно распознать текст за несколько попыток. Ниже представлен предложенный вариант решения капчи. Исправьте его, если нужно, и отправьте.
     </string>
     <string name="auth_captcha_requested">Требуется ввод капчи</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
@@ -198,4 +201,9 @@
     <string name="auth_captcha_dialog_toggle">Открывать это окно автоматически</string>
     <string name="auth_captcha_recognized">Капча успешно распознана! :)</string>
     <string name="auth_captcha_recognition_failed">Не удалось распознать капчу (модуль не ответил)</string>
+    <string name="ext_captcha_recognition_title">Распознавание капчи</string>
+    <string name="ext_captcha_recognition_summary">Данный модуль не входит в состав приложения из-за большого объёма (~40 МБ). Вы можете установить его из следующих источников:</string>
+    <string name="direct_link">Прямая ссылка</string>
+    <string name="pref_category_extensions">Расширения</string>
+    <string name="ext_captcha_recognition_description">Данный модуль будет автоматически вводить код с картинки во время подключения</string>
 </resources>

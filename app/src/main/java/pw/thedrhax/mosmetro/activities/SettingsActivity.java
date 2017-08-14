@@ -177,6 +177,37 @@ public class SettingsActivity extends Activity {
             pref_updater_check
                     .getOnPreferenceClickListener()
                     .onPreferenceClick(null);
+
+        // Extension: Captcha Recognition
+        Preference ext_captcha =
+                fragment.findPreference("pref_extension_captcha_recognition");
+        ext_captcha.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new AlertDialog.Builder(SettingsActivity.this)
+                        .setTitle(R.string.ext_captcha_recognition_title)
+                        .setMessage(R.string.ext_captcha_recognition_summary)
+                        .setPositiveButton(R.string.google_play, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                        .putExtra("data", getString(R.string.ext_captcha_recognition_link_google_play))
+                                );
+                            }
+                        })
+                        .setNegativeButton(R.string.direct_link, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                        .putExtra("data", getString(R.string.ext_captcha_recognition_link_direct))
+                                );
+                            }
+                        })
+                        .show();
+
+                return false;
+            }
+        });
     }
 
     @RequiresApi(23)

@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
 import pw.thedrhax.util.Util;
 
 public class CaptchaDialog extends Activity {
@@ -45,6 +46,12 @@ public class CaptchaDialog extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.captcha_dialog);
         setFinishOnTouchOutside(false);
+
+        // Set another text if captcha recognition module is installed
+        if (new CaptchaRecognitionProxy(this).isModuleAvailable()) {
+            final TextView text_summary = (TextView) findViewById(R.id.text_summary);
+            text_summary.setText(R.string.auth_captcha_dialog_summary_with_ext);
+        }
 
         final CheckBox pref_captcha_dialog = (CheckBox) findViewById(R.id.pref_captcha_dialog);
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
