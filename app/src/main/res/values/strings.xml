@@ -90,8 +90,8 @@
     <string name="developer_site">Developer website</string>
     <string name="developer_site_link" translatable="false">https://thedrhax.pw</string>
     <string name="developer_github_repo">GitHub repository</string>
-    <string name="developer_github_repo_summary" translatable="false">TheDrHax/mosmetro-android</string>
-    <string name="developer_github_repo_link" translatable="false">https://github.com/TheDrHax/mosmetro-android</string>
+    <string name="developer_github_repo_summary" translatable="false">mosmetro-android</string>
+    <string name="developer_github_repo_link" translatable="false">https://github.com/mosmetro-android</string>
     <string name="developer_google_play">Google Play application webpage</string>
     <string name="developer_google_play_link" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
     <string name="developer_vkontakte">VK community</string>
