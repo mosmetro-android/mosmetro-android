@@ -26,6 +26,7 @@
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
     <string name="about">About</string>
+    <string name="reply">Reply</string>
 
     <string name="pref_category_main">Main preferences</string>
     <string name="pref_category_connection">Connection preferences</string>

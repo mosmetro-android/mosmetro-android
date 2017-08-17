@@ -25,8 +25,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.RemoteInput;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,14 +50,16 @@ public class CaptchaRequest {
     }
 
     public Map<String,String> getResult(Context context, Bitmap image, String code) {
+        final String image_base64 = Util.bitmapToBase64(image);
         final Map<String,String> result = new HashMap<>();
+        result.put("captcha_image", image_base64);
 
         Intent captcha_activity = new Intent(context, CaptchaDialog.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("image", Util.bitmapToBase64(image))
+                .putExtra("image", image_base64)
                 .putExtra("code", code);
 
-        Notify captcha_notify = new Notify(context).id(2)
+        final Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))
                 .text(context.getString(R.string.notification_captcha_summary))
                 .icon(R.drawable.ic_notification_register)
@@ -65,6 +71,27 @@ public class CaptchaRequest {
                         new Intent(context, ConnectionService.class).setAction("STOP"),
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ));
+
+        // Reply directly from notifications
+        if (Build.VERSION.SDK_INT >= 24) {
+            final RemoteInput input = new RemoteInput.Builder("key_captcha_reply")
+                    .setLabel(context.getString(R.string.reply))
+                    .build();
+
+            NotificationCompat.Action action = new NotificationCompat.Action.Builder(
+                    R.drawable.ic_notification_register,
+                    context.getString(R.string.reply),
+                    PendingIntent.getBroadcast(
+                            context, 252,
+                            new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
+                                    .putExtra("from_notification", true),
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+            ).addRemoteInput(input).build();
+
+            captcha_notify.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(image));
+            captcha_notify.addAction(action);
+        }
 
         boolean auto_activity = context instanceof Activity || PreferenceManager
                 .getDefaultSharedPreferences(context).getBoolean("pref_captcha_dialog", true);
@@ -79,8 +106,12 @@ public class CaptchaRequest {
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                result.put("captcha_image", intent.getStringExtra("image"));
-                result.put("captcha_code", intent.getStringExtra("value"));
+                Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+                if (remoteInput != null) { // reply from notification
+                    result.put("captcha_code", remoteInput.getString("key_captcha_reply"));
+                } else { // reply from dialog
+                    result.put("captcha_code", intent.getStringExtra("value"));
+                }
             }
         };
         context.getApplicationContext().registerReceiver(
