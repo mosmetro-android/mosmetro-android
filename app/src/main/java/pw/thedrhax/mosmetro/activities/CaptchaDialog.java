@@ -28,6 +28,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -44,8 +45,10 @@ public class CaptchaDialog extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_LEFT_ICON);
         setContentView(R.layout.captcha_dialog);
         setFinishOnTouchOutside(false);
+        setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.ic_launcher);
 
         // Set another text if captcha recognition module is installed
         if (new CaptchaRecognitionProxy(this).isModuleAvailable()) {
