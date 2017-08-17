@@ -91,8 +91,11 @@ public class CaptchaRequest {
                     )
             ).addRemoteInput(input).build();
 
-            captcha_notify.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(image));
-            captcha_notify.addAction(action);
+            captcha_notify
+                    .text("")
+                    .onClick(null)
+                    .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(image))
+                    .addAction(action);
         }
 
         boolean auto_activity = settings.getBoolean("pref_captcha_dialog", true);
