@@ -60,6 +60,7 @@ public final class Util {
     }
 
     public static String convertCyrillicSymbols(String s) {
+        s = s.toLowerCase();
         s = s.replaceAll("а", "a");
         s = s.replaceAll("б", "b");
         s = s.replaceAll("с", "c");
