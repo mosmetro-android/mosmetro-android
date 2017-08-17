@@ -90,7 +90,7 @@ public class DebugActivity extends Activity {
 
     @Override
     protected void onPause() {
-        super.onResume();
+        super.onPause();
         unregisterReceiver(service_state);
         Logger.unregisterCallback(this);
     }
