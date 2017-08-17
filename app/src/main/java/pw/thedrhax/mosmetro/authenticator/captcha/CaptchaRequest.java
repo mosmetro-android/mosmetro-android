@@ -112,7 +112,9 @@ public class CaptchaRequest {
             public void onReceive(Context context, Intent intent) {
                 Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
                 if (remoteInput != null) { // reply from notification
-                    result.put("captcha_code", remoteInput.getString("key_captcha_reply"));
+                    result.put("captcha_code",
+                            Util.convertCyrillicSymbols(remoteInput.getString("key_captcha_reply"))
+                    );
                 } else { // reply from dialog
                     result.put("captcha_code", intent.getStringExtra("value"));
                 }
