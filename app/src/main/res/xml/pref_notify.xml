@@ -47,4 +47,10 @@
         android:summary="@string/pref_notify_alternative_summary"
         android:defaultValue="false" />
 
+    <CheckBoxPreference
+        android:key="pref_notify_reply"
+        android:title="@string/pref_notify_reply"
+        android:summary="@string/pref_notify_reply_summary"
+        android:defaultValue="false" />
+
 </PreferenceScreen>

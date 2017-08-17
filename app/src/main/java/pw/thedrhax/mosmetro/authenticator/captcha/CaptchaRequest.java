@@ -18,12 +18,12 @@
 
 package pw.thedrhax.mosmetro.authenticator.captcha;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +50,8 @@ public class CaptchaRequest {
     }
 
     public Map<String,String> getResult(Context context, Bitmap image, String code) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+
         final String image_base64 = Util.bitmapToBase64(image);
         final Map<String,String> result = new HashMap<>();
         result.put("captcha_image", image_base64);
@@ -73,7 +75,7 @@ public class CaptchaRequest {
                 ));
 
         // Reply directly from notifications
-        if (Build.VERSION.SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= 24 && settings.getBoolean("pref_notify_reply", false)) {
             final RemoteInput input = new RemoteInput.Builder("key_captcha_reply")
                     .setLabel(context.getString(R.string.reply))
                     .build();
@@ -93,8 +95,7 @@ public class CaptchaRequest {
             captcha_notify.addAction(action);
         }
 
-        boolean auto_activity = context instanceof Activity || PreferenceManager
-                .getDefaultSharedPreferences(context).getBoolean("pref_captcha_dialog", true);
+        boolean auto_activity = settings.getBoolean("pref_captcha_dialog", true);
 
         // Asking user to enter the code
         if (auto_activity)
