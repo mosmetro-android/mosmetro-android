@@ -48,8 +48,12 @@ public class CaptchaRequest {
     public static final int STATUS_ENTERED = 2;
 
     private final Listener<Boolean> running = new Listener<>(true);
+
     private final Context context;
+    private final SharedPreferences settings;
+
     private final boolean from_debug;
+    private final boolean pref_colored_icons;
 
     public CaptchaRequest(Context context) {
         this.context = context;
@@ -59,6 +63,9 @@ public class CaptchaRequest {
         } else {
             from_debug = false;
         }
+
+        settings = PreferenceManager.getDefaultSharedPreferences(context);
+        pref_colored_icons = (Build.VERSION.SDK_INT <= 20) ^ settings.getBoolean("pref_notify_alternative", false);
     }
 
     public CaptchaRequest setRunningListener(Listener<Boolean> master) {
@@ -66,8 +73,6 @@ public class CaptchaRequest {
     }
 
     public Map<String,String> getResult(Bitmap image, String code) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-
         final String image_base64 = Util.bitmapToBase64(image);
         final int[] status = new int[]{0};
         final Map<String,String> result = new HashMap<>();
@@ -86,15 +91,15 @@ public class CaptchaRequest {
         final Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))
                 .text(context.getString(R.string.notification_captcha_summary))
-                .icon(R.drawable.ic_notification_register)
+                .icon(pref_colored_icons ?
+                        R.drawable.ic_notification_register_colored :
+                        R.drawable.ic_notification_register)
                 .onClick(PendingIntent.getActivity(
-                        context, 254, captcha_activity, PendingIntent.FLAG_UPDATE_CURRENT
-                ))
+                        context, 254, captcha_activity, PendingIntent.FLAG_UPDATE_CURRENT))
                 .onDelete(PendingIntent.getService(
                         context, 253,
                         new Intent(context, ConnectionService.class).setAction("STOP"),
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                ));
+                        PendingIntent.FLAG_UPDATE_CURRENT));
 
         // Reply directly from notifications
         if (Build.VERSION.SDK_INT >= 24 && settings.getBoolean("pref_notify_reply", false)) {
@@ -103,7 +108,9 @@ public class CaptchaRequest {
                     .build();
 
             NotificationCompat.Action action = new NotificationCompat.Action.Builder(
-                    R.drawable.ic_notification_register,
+                    pref_colored_icons ?
+                            R.drawable.ic_notification_register_colored :
+                            R.drawable.ic_notification_register,
                     context.getString(R.string.reply),
                     PendingIntent.getBroadcast(
                             context, 252,
