@@ -261,7 +261,7 @@ public class ConnectionService extends IntentService {
         } else {
             Logger.log(this, "Started by system");
             from_shortcut = false;
-            from_shortcut = false;
+            from_debug = false;
             notify.enabled(true);
         }
         SSID = wifi.getSSID(intent);
