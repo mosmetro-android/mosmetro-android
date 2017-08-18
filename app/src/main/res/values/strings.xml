@@ -98,6 +98,8 @@
     <string name="developer_vkontakte">VK community</string>
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
+    <string name="developer_telegram">Telegram group</string>
+    <string name="developer_telegram_link" translatable="false">https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q</string>
 
     <string name="manual_connection">Manual connection</string>
     <string name="manual_connection_summary">You can connect here if this application is ignoring Wi-Fi state</string>
