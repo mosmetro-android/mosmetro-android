@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.util.Util;
 
 public class CaptchaDialog extends Activity {
@@ -104,15 +105,20 @@ public class CaptchaDialog extends Activity {
         }
 
         final ImageView image_captcha = (ImageView) findViewById(R.id.image_captcha);
-        Bitmap image = Util.base64ToBitmap(getIntent().getStringExtra("image"));
-        image_captcha.setImageBitmap(image);
+        String image_base64 = getIntent().getStringExtra("image");
+        if (image_base64 != null) {
+            Bitmap image = Util.base64ToBitmap(image_base64);
+            image_captcha.setImageBitmap(image);
+        } else {
+            finish();
+        }
 
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
                         .putExtra("value", text_captcha.getText().toString())
-                        .putExtra("image", getIntent().getStringExtra("image"))
+                        .putExtra("status", CaptchaRequest.STATUS_ENTERED)
                 );
                 finish();
             }
@@ -131,14 +137,15 @@ public class CaptchaDialog extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        finish();
+        if (getIntent().getBooleanExtra("finish_on_pause", false))
+            finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sendBroadcast(
-                new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT").putExtra("value", "")
+        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
+                .putExtra("status", CaptchaRequest.STATUS_CLOSED)
         );
     }
 }

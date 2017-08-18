@@ -128,7 +128,6 @@
 
         <activity
             android:name=".activities.CaptchaDialog"
-            android:excludeFromRecents="true"
             android:label="@string/auth_captcha_dialog"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"

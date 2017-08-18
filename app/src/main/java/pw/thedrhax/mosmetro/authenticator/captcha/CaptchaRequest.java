@@ -43,6 +43,10 @@ import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Util;
 
 public class CaptchaRequest {
+    private static final int STATUS_NONE = 0;
+    public static final int STATUS_CLOSED = 1;
+    public static final int STATUS_ENTERED = 2;
+
     private final Listener<Boolean> running = new Listener<>(true);
     private final Context context;
     private final boolean from_debug;
@@ -65,13 +69,19 @@ public class CaptchaRequest {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         final String image_base64 = Util.bitmapToBase64(image);
+        final int[] status = new int[]{0};
         final Map<String,String> result = new HashMap<>();
         result.put("captcha_image", image_base64);
 
-        Intent captcha_activity = new Intent(context, CaptchaDialog.class)
+        final Intent captcha_activity = new Intent(context, CaptchaDialog.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra("image", image_base64)
                 .putExtra("code", code);
+
+        if (!from_debug)
+            captcha_activity
+                    .addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                    .putExtra("finish_on_pause", true);
 
         final Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))
@@ -98,7 +108,7 @@ public class CaptchaRequest {
                     PendingIntent.getBroadcast(
                             context, 252,
                             new Intent("pw.thedrhax.mosmetro.event.CAPTCHA_RESULT")
-                                    .putExtra("from_notification", true),
+                                    .putExtra("status", CaptchaRequest.STATUS_ENTERED),
                             PendingIntent.FLAG_UPDATE_CURRENT
                     )
             ).addRemoteInput(input).build();
@@ -130,6 +140,7 @@ public class CaptchaRequest {
                 } else { // reply from dialog
                     result.put("captcha_code", intent.getStringExtra("value"));
                 }
+                status[0] = intent.getIntExtra("status", STATUS_NONE);
             }
         };
         context.getApplicationContext().registerReceiver(
@@ -137,7 +148,13 @@ public class CaptchaRequest {
         );
 
         // Wait for answer
-        while (result.get("captcha_code") == null && running.get()) {
+        while (status[0] != STATUS_ENTERED && running.get()) {
+            if (status[0] == STATUS_CLOSED) {
+                if (!from_debug)
+                    captcha_notify.show();
+                else
+                    break;
+            }
             SystemClock.sleep(100);
         }
 
