@@ -44,12 +44,24 @@ import pw.thedrhax.util.Util;
 
 public class CaptchaRequest {
     private final Listener<Boolean> running = new Listener<>(true);
+    private final Context context;
+    private final boolean from_debug;
+
+    public CaptchaRequest(Context context) {
+        this.context = context;
+
+        if (context instanceof ConnectionService) {
+            from_debug = ((ConnectionService)context).isFromDebug();
+        } else {
+            from_debug = false;
+        }
+    }
 
     public CaptchaRequest setRunningListener(Listener<Boolean> master) {
         running.subscribe(master); return this;
     }
 
-    public Map<String,String> getResult(Context context, Bitmap image, String code) {
+    public Map<String,String> getResult(Bitmap image, String code) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         final String image_base64 = Util.bitmapToBase64(image);
@@ -98,7 +110,7 @@ public class CaptchaRequest {
                     .addAction(action);
         }
 
-        boolean auto_activity = settings.getBoolean("pref_captcha_dialog", true);
+        boolean auto_activity = from_debug || settings.getBoolean("pref_captcha_dialog", true);
 
         // Asking user to enter the code
         if (auto_activity)

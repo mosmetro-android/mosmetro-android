@@ -51,7 +51,6 @@ public class ConnectionService extends IntentService {
     private WifiUtils wifi;
     private SharedPreferences settings;
     private int pref_retry_count;
-    private int pref_retry_delay;
     private int pref_ip_wait;
     private boolean pref_colored_icons;
     private boolean pref_notify_foreground;
@@ -78,7 +77,6 @@ public class ConnectionService extends IntentService {
         };
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
-        pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
         pref_colored_icons = (Build.VERSION.SDK_INT <= 20) ^ settings.getBoolean("pref_notify_alternative", false);
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
@@ -110,6 +108,10 @@ public class ConnectionService extends IntentService {
                 ))
                 .onDelete(stop_intent)
                 .locked(pref_notify_foreground);
+    }
+
+    public boolean isFromDebug() {
+        return from_debug;
     }
 
     private void notify (Provider.RESULT result) {
@@ -220,7 +222,7 @@ public class ConnectionService extends IntentService {
                         .progress(0, true)
                         .show();
 
-                SystemClock.sleep(pref_retry_delay * 1000);
+                SystemClock.sleep(Util.getIntPreference(this, "pref_retry_delay", 5) * 1000);
             }
 
             notify.text(String.format("%s (%s)",

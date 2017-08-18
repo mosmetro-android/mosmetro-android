@@ -259,9 +259,9 @@ public class MosMetroV2 extends Provider {
 
                 // Asking user to enter the CAPTCHA
                 vars.putAll(
-                        new CaptchaRequest()
+                        new CaptchaRequest(context)
                                 .setRunningListener(running)
-                                .getResult(context, captcha, code)
+                                .getResult(captcha, code)
                 );
 
                 // Check the answer
