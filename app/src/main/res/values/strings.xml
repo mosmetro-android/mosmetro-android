@@ -220,11 +220,12 @@
     <string name="auth_captcha_dialog_summary_with_ext">Looks like recognition module couldn\'t solve the CAPTCHA within given attempts. You can correct the proposed solution below and send it to server.</string>
     <string name="google_play" translatable="false">Google Play</string>
     <string name="direct_link">Direct link</string>
-    <string name="ext_captcha_recognition_summary">This module is pretty huge (~40 MB), so it isn\'t bundled with the app. You can download it from these sources:</string>
+    <string name="ext_captcha_recognition_summary">This module will automatically solve CAPTCHA during connection. It is pretty huge (~40 MB), so it isn\'t bundled with the app. You can download it from these sources:</string>
     <string name="ext_captcha_recognition_title">Captcha recognition</string>
     <string name="ext_captcha_recognition_link_google_play" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.captcharecognition</string>
     <string name="ext_captcha_recognition_link_direct" translatable="false">https://mosmetro.duckdns.org/api/v1/download.php?module=captcha_recognition</string>
-    <string name="ext_captcha_recognition_description">This module will automatically solve the CAPTCHA during connection</string>
+    <string name="ext_installed">Installed</string>
+    <string name="ext_not_installed">Not installed</string>
     <string name="pref_category_extensions">Extensions</string>
     <string name="pref_notify_reply">Inline reply</string>
     <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>

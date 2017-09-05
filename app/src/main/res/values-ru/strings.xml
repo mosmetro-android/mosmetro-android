@@ -203,10 +203,11 @@
     <string name="auth_captcha_recognized">Капча успешно распознана! :)</string>
     <string name="auth_captcha_recognition_failed">Не удалось распознать капчу (модуль не ответил)</string>
     <string name="ext_captcha_recognition_title">Распознавание капчи</string>
-    <string name="ext_captcha_recognition_summary">Данный модуль не входит в состав приложения из-за большого объёма (~40 МБ). Вы можете установить его из следующих источников:</string>
+    <string name="ext_captcha_recognition_summary">Данный модуль будет автоматически вводить код с картинки во время подключения. Модуль не входит в состав приложения из-за большого объёма (~40 МБ). Вы можете установить его из следующих источников:</string>
+    <string name="ext_installed">Установлено</string>
+    <string name="ext_not_installed">Не установлено</string>
     <string name="direct_link">Прямая ссылка</string>
     <string name="pref_category_extensions">Расширения</string>
-    <string name="ext_captcha_recognition_description">Данный модуль будет автоматически вводить код с картинки во время подключения</string>
     <string name="pref_notify_reply">Ответ через уведомление</string>
     <string name="pref_notify_reply_summary">Позволяет отвечать на некоторые запросы приложения (например, капча) прямо через уведомление. Требуется Android 7.0+.</string>
 </resources>

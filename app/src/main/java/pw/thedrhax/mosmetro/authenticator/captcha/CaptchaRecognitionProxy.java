@@ -30,7 +30,7 @@ import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Util;
 
 public class CaptchaRecognitionProxy {
-    private static final String REMOTE_PACKAGE = "pw.thedrhax.captcharecognition";
+    public static final String REMOTE_PACKAGE = "pw.thedrhax.captcharecognition";
     private static final String ACTION_RECOGNIZE = REMOTE_PACKAGE + ".RECOGNIZE";
     private static final String ACTION_RESULT = REMOTE_PACKAGE + ".RESULT";
 

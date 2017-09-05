@@ -37,8 +37,7 @@
 
         <Preference
             android:key="pref_extension_captcha_recognition"
-            android:title="@string/ext_captcha_recognition_title"
-            android:summary="@string/ext_captcha_recognition_description" />
+            android:title="@string/ext_captcha_recognition_title" />
 
     </PreferenceCategory>
 
