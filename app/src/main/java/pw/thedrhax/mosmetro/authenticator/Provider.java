@@ -50,7 +50,8 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * URL used to detect if Captive Portal is present in the current network.
      */
-    private static final String GENERATE_204_URL = "http://google.ru/generate_204";
+    private static final String GENERATE_204_HTTP = "http://google.ru/generate_204";
+    private static final String GENERATE_204_HTTPS = "https://google.com/generate_204";
 
     /**
      * List of supported Providers
@@ -95,17 +96,17 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Find Provider using already received response from server.
      * @param context   Android Context required to create the new instance.
-     * @param client    Client, that contains server's response.
+     * @param response    Client, that contains server's response.
      * @return          New Provider instance.
      *
      * @see Client
      */
-    @NonNull public static Provider find(Context context, Client client) {
+    @NonNull public static Provider find(Context context, Client response) {
         for (Class<? extends Provider> provider_class : PROVIDERS) {
             try {
                 if ((Boolean)provider_class
                         .getMethod("match", Client.class)
-                        .invoke(null, client))
+                        .invoke(null, response))
                     return provider_class
                             .getConstructor(Context.class)
                             .newInstance(context);
@@ -117,10 +118,6 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Find Provider by sending predefined request to get the redirect.
      *
-     * The first request executed right after connecting to Wi-Fi is known to have
-     * direct access to the Internet. This *bug* of the network doesn't allow us to
-     * detect the Provider too quickly. This is why we use a retry loop in this method.
-     *
      * @param context   Android Context required to create the new instance.
      * @param running   Listener used to interrupt this method.
      * @return          New Provider instance.
@@ -128,16 +125,14 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
 
-        Client client = new OkHttp(context).followRedirects(false).setRunningListener(running);
-        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        try {
-            client.get(GENERATE_204_URL, null, pref_retry_count);
-        } catch (Exception ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            Logger.log(context.getString(R.string.error,
-                    context.getString(R.string.auth_error_redirect)
-            ));
-        }
+        Client client = new OkHttp(context)
+                .followRedirects(false)
+                .setRunningListener(running);
+
+        generate_204(client);
+        Logger.log(Logger.LEVEL.DEBUG,
+                "Provider: generate_204() = " + client.getResponseCode()
+        );
 
         Provider result = Provider.find(context, client);
 
@@ -183,14 +178,19 @@ public abstract class Provider extends LinkedList<Task> {
      * This implementation uses generate_204 method, that is default for Android.
      * @return True if internet access is available; otherwise, false is returned.
      */
-    public static boolean generate_204(Listener<Boolean> running) {
-        Client client = new OkHttp()
-                .setTimeout(3000)
-                .setRunningListener(running);
+    public static boolean generate_204(Client client) {
+        try {
+            client.get(GENERATE_204_HTTP, null);
+        } catch (Exception ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+        }
+        if (client.getResponseCode() != 204) return false;
 
         try {
-            client.get(GENERATE_204_URL, null);
-        } catch (Exception ignored) {}
+            client.get(GENERATE_204_HTTPS, null);
+        } catch (Exception ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+        }
         return client.getResponseCode() == 204;
     }
 
@@ -199,7 +199,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return generate_204(running);
+        return generate_204(client);
     }
 
     /**
