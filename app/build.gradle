@@ -13,7 +13,7 @@ android {
         versionName "1.8.0"
 
         // GitHub Pages
-        buildConfigField "String", "\$GITHUB", "\"https://thedrhax.github.io/mosmetro-android\""
+        buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
         buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
 
