@@ -69,7 +69,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         // Generate base URL
         String UPDATE_INFO_URL = retriever.get(
-                BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
+                BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT, CachedRetriever.Type.URL
         ) + BuildConfig.API_REL_BRANCHES;
 
         // Clear branch cache
@@ -78,7 +78,8 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         // Retrieve info from server
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
                 "{\"" + settings.getString("pref_updater_branch", "play") + "\":" +
-                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"0\",\"message\":\"none\"}}"
+                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"0\",\"message\":\"none\"}}",
+                CachedRetriever.Type.JSON
         );
 
         // Parse server answer

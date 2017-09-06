@@ -64,7 +64,8 @@ class StatisticsTask implements Task {
             @Override
             protected Void doInBackground(Void... none) {
                 String STATISTICS_URL = new CachedRetriever(p.context).get(
-                        BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT
+                        BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT,
+                        CachedRetriever.Type.URL
                 ) + BuildConfig.API_REL_STATISTICS;
 
                 try {

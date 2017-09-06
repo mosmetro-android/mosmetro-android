@@ -21,6 +21,7 @@ package pw.thedrhax.mosmetro.httpclient;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Patterns;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -31,11 +32,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.util.Logger;
 
 public class CachedRetriever {
     private SharedPreferences settings;
     private JSONArray cache_storage;
     private Client client;
+
+    public enum Type {
+        URL, JSON
+    }
 
     public CachedRetriever (Context context) {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -94,7 +100,7 @@ public class CachedRetriever {
         settings.edit().putString("CachedRetriever", cache_storage.toString()).apply();
     }
 
-    public String get (String url, int ttl, String default_value) {
+    public String get (String url, int ttl, String default_value, Type type) {
         JSONObject cached_url = findCachedUrl(url);
         String result = null;
 
@@ -110,19 +116,33 @@ public class CachedRetriever {
             if (client.get(url, null).getResponseCode() != 200)
                 throw new Exception("Response Code != 200");
 
-            // Write new content to cache
             result = client.getPage().trim();
+
+            // Validate answer
+            if (type == Type.URL && !Patterns.WEB_URL.matcher(result).matches()) {
+                throw new Exception("Invalid URL: " + result);
+            }
+            if (type == Type.JSON) {
+                new JSONParser().parse(result); // throws ParseException
+            }
+
+            // Write new content to cache
             writeCachedUrl(url, result);
         } catch (Exception ex) {
+            Logger.log(this, ex.toString());
+
             // Get expired cache if can't retrieve content
-            if (cached_url != null)
+            if (cached_url != null) {
                 result = cached_url.get("content").toString();
+            } else {
+                result = null;
+            }
         }
 
         return result != null ? result : default_value;
     }
 
-    public String get (String url, String default_value) {
-        return get(url, 24*60*60, default_value);
+    public String get (String url, String default_value, Type type) {
+        return get(url, 24*60*60, default_value, type);
     }
 }

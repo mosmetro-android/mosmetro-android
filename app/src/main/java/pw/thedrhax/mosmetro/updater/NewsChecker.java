@@ -52,7 +52,9 @@ public class NewsChecker extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        String content = new CachedRetriever(context).get(BuildConfig.NEWS_URL, 30*60, "{}");
+        String content = new CachedRetriever(context).get(
+                BuildConfig.NEWS_URL, 30*60, "{}", CachedRetriever.Type.JSON
+        );
 
         JSONObject data;
         try {
