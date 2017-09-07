@@ -211,4 +211,7 @@
     <string name="pref_notify_reply">Ответ через уведомление</string>
     <string name="pref_notify_reply_summary">Позволяет отвечать на некоторые запросы приложения (например, капча) прямо через уведомление. Требуется Android 7.0+.</string>
     <string name="developer_telegram">Группа Telegram</string>
+    <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
+    <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
+    <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
 </resources>

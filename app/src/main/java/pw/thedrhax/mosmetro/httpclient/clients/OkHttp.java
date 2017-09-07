@@ -262,7 +262,7 @@ public class OkHttp extends Client {
             }
         }
 
-        document = Jsoup.parse(raw_document);
+        document = Jsoup.parse(raw_document, response.request().url().toString());
 
         // Clean-up useless tags: <script>, <style>
         document.getElementsByTag("script").remove();

@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Base64;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,10 +34,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
+import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
@@ -151,23 +152,20 @@ public class MosMetroV2 extends Provider {
          * Asking user to solve the CAPTCHA and send the form
          */
         Task captcha_task = new Task() {
-            private Element getForm() {
-                return client.getPageContent().getElementsByTag("form").first();
-            }
+            private Element form = null;
 
             private boolean isCaptchaRequested() {
-                Element form = getForm();
-                return form != null && "captcha__container".equals(form.attr("class"));
+                return client.getPageContent().location().contains("auto_auth");
             }
 
             private boolean submit(String code) {
                 Logger.log(context.getString(R.string.auth_request));
 
-                Map<String,String> fields = Client.parseForm(getForm());
+                Map<String,String> fields = Client.parseForm(form);
                 fields.put("_rucaptcha", code);
 
                 try {
-                    client.post(redirect + getForm().attr("action"), fields, pref_retry_count);
+                    client.post(redirect + form.attr("action"), fields, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().toString());
                 } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -179,15 +177,80 @@ public class MosMetroV2 extends Provider {
                 return !isCaptchaRequested();
             }
 
+            private boolean bypass_backdoor() throws Exception {
+                Logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
+
+                Client tmp_client = new OkHttp(context)
+                        .setTimeout(1000)
+                        .resetHeaders()
+                        .setHeader(Client.HEADER_USER_AGENT,
+                                new String(Base64.decode(
+                                        "QXV0b01vc01ldHJvV2lmaS8xLjUuMyAoTGlud" +
+                                        "Xg7IEFuZHJvaWQgNC40LjQ7IEEwMTIzIEJ1aW" +
+                                        "xkL0tUVTg0UCk=",
+                                        Base64.DEFAULT
+                                ))
+                        )
+                        .setHeader(Client.HEADER_REFERER,
+                                new String(Base64.decode(
+                                        "aHR0cDovL25ldGNoZWNrLndpLWZpLnJ1Lw==",
+                                        Base64.DEFAULT
+                                ))
+                        );
+
+                try {
+                    tmp_client.get(
+                            new String(Base64.decode(
+                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vYXV0aA==",
+                                    Base64.DEFAULT
+                            )), null
+                    );
+                } catch (Exception ignored) {}
+
+                if (tmp_client.getResponseCode() == 401) {
+                    tmp_client.get(
+                            new String(Base64.decode(
+                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vcmVnCg==",
+                                    Base64.DEFAULT
+                            )), null
+                    );
+
+                    tmp_client.get(
+                            new String(Base64.decode(
+                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vYXV0aA==",
+                                    Base64.DEFAULT
+                            )), null
+                    );
+                }
+
+                return tmp_client.getResponseCode() == 200 && isConnected();
+            }
+
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
                 Logger.log(context.getString(R.string.auth_captcha_requested));
 
+                try {
+                    if (bypass_backdoor()) {
+                        Logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                        vars.put("result", RESULT.CONNECTED);
+                        vars.put("captcha", "backdoor");
+                        return false;
+                    }
+                } catch (Exception ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                }
+
+                // Parsing CAPTCHA form
+                form = client.getPageContent().getElementsByTag("form").first();
+                if (form == null) return true;
+
                 // Parsing captcha URL
                 String captcha_url;
                 try {
-                    Element captcha_img = getForm().getElementsByTag("img").first();
+                    Element captcha_img = form.getElementsByTag("img").first();
                     captcha_url = redirect + captcha_img.attr("src");
                 } catch (Exception ex) {
                     Logger.log(context.getString(R.string.error,

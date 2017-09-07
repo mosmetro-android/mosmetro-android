@@ -231,4 +231,7 @@
     <string name="pref_category_extensions">Extensions</string>
     <string name="pref_notify_reply">Inline reply</string>
     <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
+    <string name="auth_captcha_bypass_backdoor">Trying to bypass CAPTCHA using the official backdoor…</string>
+    <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
+    <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
 </resources>
