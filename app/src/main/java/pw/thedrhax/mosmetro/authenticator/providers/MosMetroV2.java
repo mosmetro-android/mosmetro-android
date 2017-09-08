@@ -205,7 +205,9 @@ public class MosMetroV2 extends Provider {
                                     Base64.DEFAULT
                             )), null
                     );
-                } catch (Exception ignored) {}
+                } catch (Exception ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                }
 
                 if (tmp_client.getResponseCode() == 401) {
                     tmp_client.get(
