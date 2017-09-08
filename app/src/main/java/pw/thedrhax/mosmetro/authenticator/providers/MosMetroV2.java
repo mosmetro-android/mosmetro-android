@@ -231,21 +231,26 @@ public class MosMetroV2 extends Provider {
                 if (!isCaptchaRequested()) return true;
                 Logger.log(context.getString(R.string.auth_captcha_requested));
 
-                try {
-                    if (bypass_backdoor()) {
-                        Logger.log(context.getString(R.string.auth_captcha_bypass_success));
-                        vars.put("result", RESULT.CONNECTED);
-                        vars.put("captcha", "backdoor");
-                        return false;
-                    }
-                } catch (Exception ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
-                }
-
                 // Parsing CAPTCHA form
                 form = client.getPageContent().getElementsByTag("form").first();
-                if (form == null) return true;
+
+                if (form == null) { // No CAPTCHA form found => level 2 block
+                    try {
+                        if (bypass_backdoor()) {
+                            Logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                            vars.put("result", RESULT.CONNECTED);
+                            vars.put("captcha", "backdoor");
+                            return false;
+                        } else {
+                            throw new Exception("Server didn't accept the backdoor");
+                        }
+                    } catch (Exception ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                        vars.put("result", RESULT.ERROR);
+                        return false;
+                    }
+                }
 
                 // Parsing captcha URL
                 String captcha_url;
