@@ -219,7 +219,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                             context.getString(R.string.app_name), version_name
                     ),
                     String.format(Locale.ENGLISH, "MosMetro-%s.apk", version_name),
-                    "application/vnd.android.package-archive"
+                    Downloader.TYPE_APK
             );
 
             settings.edit().putInt("pref_updater_build", version).apply();

@@ -182,7 +182,9 @@ public class SettingsActivity extends Activity {
             pref_updater_check
                     .getOnPreferenceClickListener()
                     .onPreferenceClick(null);
+    }
 
+    private void modules_setup() {
         // Extension: Captcha Recognition
         final boolean module_installed = new CaptchaRecognitionProxy(this).isModuleAvailable();
         Preference ext_captcha = fragment.findPreference("pref_extension_captcha_recognition");
@@ -206,9 +208,11 @@ public class SettingsActivity extends Activity {
                             .setNegativeButton(R.string.direct_link, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(
-                                            new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                                    .putExtra("data", getString(R.string.ext_captcha_recognition_link_direct))
+                                    downloader.get(
+                                            getString(R.string.ext_captcha_recognition_link_direct),
+                                            getString(R.string.ext_captcha_recognition_title),
+                                            "module-captcha-recognition.apk",
+                                            Downloader.TYPE_APK
                                     );
                                 }
                             })
@@ -292,6 +296,7 @@ public class SettingsActivity extends Activity {
             }
         });
 
+        modules_setup();
         update_checker_setup();
         if (Build.VERSION.SDK_INT >= 23)
             energy_saving_setup();
