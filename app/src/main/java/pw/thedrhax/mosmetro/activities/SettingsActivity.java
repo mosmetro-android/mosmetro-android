@@ -46,12 +46,15 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Downloader;
 import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
     private SharedPreferences settings;
+
+    protected Downloader downloader;
 
     public static class SettingsFragment extends PreferenceFragment {
         @Override
@@ -143,7 +146,7 @@ public class SettingsActivity extends Activity {
                         .putString("pref_updater_branch", (String)newValue)
                         .apply();
 
-                new UpdateCheckTask(SettingsActivity.this).execute(false);
+                new UpdateCheckTask(SettingsActivity.this, downloader).execute(false);
                 return true;
             }
         });
@@ -153,7 +156,7 @@ public class SettingsActivity extends Activity {
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new UpdateCheckTask(SettingsActivity.this) {
+                new UpdateCheckTask(SettingsActivity.this, downloader) {
                     @Override
                     public void result(List<Branch> branches) {
                         if (branches == null) return;
@@ -268,6 +271,7 @@ public class SettingsActivity extends Activity {
         getFragmentManager().executePendingTransactions();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+        downloader = new Downloader(this);
 
         // Add version name and code
         Preference app_name = fragment.findPreference("app_name");
@@ -291,5 +295,11 @@ public class SettingsActivity extends Activity {
         update_checker_setup();
         if (Build.VERSION.SDK_INT >= 23)
             energy_saving_setup();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        downloader.stop();
     }
 }

@@ -21,7 +21,6 @@ package pw.thedrhax.mosmetro.updater;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -32,17 +31,19 @@ import org.json.simple.parser.ParseException;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
+import pw.thedrhax.util.Downloader;
 import pw.thedrhax.util.Version;
 
 public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
+    private Downloader downloader;
 
     // Info from the server
     private List<Branch> branches;
@@ -53,9 +54,10 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     private boolean check_ignored = false;
     private boolean force_check = false;
 
-    public UpdateCheckTask (Context context) {
+    public UpdateCheckTask (Context context, Downloader downloader) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.downloader = downloader;
     }
 
     private boolean hasUpdate() {
@@ -208,11 +210,19 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         public void download() {
-            settings.edit()
-                    .putInt("pref_updater_build", version)
-                    .apply();
+            final String version_name = String.format(Locale.ENGLISH, "%s-%s%d",
+                    name, by_build ? "#" : "v", version
+            );
 
-            context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
+            downloader.get(url,
+                    String.format(Locale.ENGLISH, "%s (%s)",
+                            context.getString(R.string.app_name), version_name
+                    ),
+                    String.format(Locale.ENGLISH, "MosMetro-%s.apk", version_name),
+                    "application/vnd.android.package-archive"
+            );
+
+            settings.edit().putInt("pref_updater_build", version).apply();
         }
     }
 }
