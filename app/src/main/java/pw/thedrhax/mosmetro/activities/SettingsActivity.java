@@ -190,7 +190,7 @@ public class SettingsActivity extends Activity {
         ext_captcha.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (module_installed) {
+                if (!module_installed) {
                     new AlertDialog.Builder(SettingsActivity.this)
                             .setTitle(R.string.ext_captcha_recognition_title)
                             .setMessage(R.string.ext_captcha_recognition_summary)
