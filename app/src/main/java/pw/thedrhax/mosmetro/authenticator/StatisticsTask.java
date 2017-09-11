@@ -47,10 +47,12 @@ class StatisticsTask implements Task {
             default: return false;
         }
 
+        WifiUtils wifi = new WifiUtils(p.context);
+
         final Map<String,String> params = new HashMap<>();
         params.put("version", Version.getFormattedVersion());
         params.put("success", connected ? "true" : "false");
-        params.put("ssid", new WifiUtils(p.context).getSSID());
+        params.put("ssid", wifi.getSSID());
         params.put("provider", p.getName());
         if (vars.get("captcha") != null) {
             params.put("captcha", (String) vars.get("captcha"));
@@ -59,6 +61,8 @@ class StatisticsTask implements Task {
                 params.put("captcha_code", (String) vars.get("captcha_code"));
             }
         }
+        params.put("bssid", wifi.getWifiInfo(null).getBSSID());
+        params.put("segment", (String)vars.get("segment"));
 
         new AsyncTask<Void,Void,Void>() {
             @Override

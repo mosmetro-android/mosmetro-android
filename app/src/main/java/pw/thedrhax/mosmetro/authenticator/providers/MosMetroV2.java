@@ -60,7 +60,7 @@ public class MosMetroV2 extends Provider {
         /**
          * Checking Internet connection for a first time
          * ⇒ GET http://wi-fi.ru
-         * ⇐ Meta-redirect: http://auth.wi-fi.ru/?rand=... > redirect
+         * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect
          */
         add(new Task() {
             @Override
@@ -72,6 +72,9 @@ public class MosMetroV2 extends Provider {
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                     return false;
                 } else {
+                    if (redirect.contains("segment")) {
+                        vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                    }
                     return true;
                 }
             }
