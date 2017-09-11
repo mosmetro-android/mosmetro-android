@@ -7,6 +7,8 @@
 
 # Okio
 -dontwarn okio.**
+-dontwarn javax.annotation.Nullable
+-dontwarn javax.annotation.ParametersAreNonnullByDefault
 
 # Providers methods which are accessed via reflection.
 -keepclassmembers class * extends pw.thedrhax.mosmetro.authenticator.Provider {
