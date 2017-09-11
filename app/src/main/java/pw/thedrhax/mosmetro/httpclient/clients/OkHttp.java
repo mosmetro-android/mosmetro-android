@@ -24,8 +24,6 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -35,9 +33,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -51,6 +47,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.TLSSocketFactory;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -58,41 +55,13 @@ public class OkHttp extends Client {
     private OkHttpClient client;
     private Call last_call = null;
 
-    private SSLSocketFactory trustAllCerts() {
-        // Create a trust manager that does not validate certificate chains
-        final TrustManager[] trustAllCerts = new TrustManager[] {
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[]{};
-                    }
-                }
+    public OkHttp() {
+        X509TrustManager tm = new X509TrustManager() {
+            @Override public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+            @Override public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+            @Override public X509Certificate[] getAcceptedIssuers() {return new X509Certificate[]{};}
         };
 
-        // Install the all-trusting trust manager
-        try {
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            // Create an ssl socket factory with our all-trusting manager
-            return sslContext.getSocketFactory();
-        } catch (NoSuchAlgorithmException ignored) {
-        } catch (KeyManagementException ignored) {}
-
-        return null;
-    }
-
-    public OkHttp() {
         client = new OkHttpClient.Builder()
                 // Don't verify the hostname
                 .hostnameVerifier(new HostnameVerifier() {
@@ -101,7 +70,7 @@ public class OkHttp extends Client {
                         return true;
                     }
                 })
-                .sslSocketFactory(trustAllCerts())
+                .sslSocketFactory(new TLSSocketFactory(new TrustManager[]{tm}), tm)
                 // Store cookies for this session
                 .cookieJar(new CookieJar() {
                     private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
