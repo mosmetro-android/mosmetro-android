@@ -21,6 +21,7 @@ package pw.thedrhax.mosmetro.updater;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -35,6 +36,7 @@ import java.util.Locale;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Downloader;
 import pw.thedrhax.util.Version;
@@ -140,17 +142,22 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             dialog = dialog
                     .setTitle(context.getString(R.string.update_available))
                     .setMessage(current_branch.message)
-                    .setNegativeButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
+                    .setNeutralButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             current_branch.ignore(true);
                         }
                     })
-                    .setNeutralButton(R.string.later, null)
-                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                    .setNegativeButton(R.string.download, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             current_branch.download();
+                        }
+                    })
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            current_branch.install();
                         }
                     });
         } else {
@@ -209,7 +216,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     .apply();
         }
 
-        public void download() {
+        public void install() {
             final String version_name = String.format(Locale.ENGLISH, "%s-%s%d",
                     name, by_build ? "#" : "v", version
             );
@@ -222,6 +229,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                     Downloader.TYPE_APK
             );
 
+            settings.edit().putInt("pref_updater_build", version).apply();
+        }
+
+        public void download() {
+            context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
             settings.edit().putInt("pref_updater_build", version).apply();
         }
     }

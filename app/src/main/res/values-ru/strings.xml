@@ -12,10 +12,10 @@
     <string name="ok">Хорошо</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
+    <string name="download">Скачать</string>
     <string name="install">Установить</string>
     <string name="ignore_short">Игнор.</string>
     <string name="ignore">Игнорировать</string>
-    <string name="later">Позже</string>
     <string name="error" formatted="false">Ошибка: %s</string>
     <string name="not">не</string>
     <string name="try_out_of" formatted="false">попытка %d из %d</string>

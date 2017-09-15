@@ -13,11 +13,11 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="download">Download</string>
     <string name="install">Install</string>
 
     <string name="ignore_short">Ignore</string>
     <string name="ignore">Ignore</string>
-    <string name="later">Later</string>
     <string name="error" formatted="false">Error: %s</string>
     <string name="not">not</string>
     <string name="try_out_of" formatted="false">try %d out of %d</string>
