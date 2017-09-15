@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.os.AsyncTask;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ class StatisticsTask implements Task {
 
                 try {
                     new OkHttp(p.context).post(STATISTICS_URL, params);
-                } catch (Exception ignored) {}
+                } catch (IOException ignored) {}
 
                 return null;
             }

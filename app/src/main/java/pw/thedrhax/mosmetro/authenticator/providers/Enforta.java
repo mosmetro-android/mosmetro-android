@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 
+import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
@@ -62,7 +63,7 @@ public class Enforta extends Provider {
     public static boolean match(Client client) {
         try {
             return client.parseMetaRedirect().contains("enforta");
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             return false;
         }
     }

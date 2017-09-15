@@ -55,7 +55,7 @@ public class OkHttp extends Client {
     private OkHttpClient client;
     private Call last_call = null;
 
-    public OkHttp() {
+    private OkHttp() {
         X509TrustManager tm = new X509TrustManager() {
             @Override public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
             @Override public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
@@ -170,7 +170,7 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public Client get(String link, Map<String, String> params) throws Exception {
+    public Client get(String link, Map<String, String> params) throws IOException {
         parseDocument(call(
                 new Request.Builder().url(link + requestToString(params)).get()
         ));
@@ -179,7 +179,7 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public Client post(String link, Map<String, String> params) throws Exception {
+    public Client post(String link, Map<String, String> params) throws IOException {
         FormBody.Builder body = new FormBody.Builder();
 
         if (params != null) {
@@ -196,18 +196,18 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public InputStream getInputStream(String link) throws Exception {
+    public InputStream getInputStream(String link) throws IOException {
         Response response = call(
                 new Request.Builder().url(link).get()
         );
+        ResponseBody body = response.body();
         code = response.code();
 
-        if (code != 200) {
-            response.body().close();
-            throw new Exception("Empty response: " + code);
+        if (body == null) {
+            throw new IOException("Empty response: " + code);
         }
 
-        return response.body().byteStream();
+        return body.byteStream();
     }
 
     @Override
@@ -217,18 +217,19 @@ public class OkHttp extends Client {
         }
     }
 
-    private void parseDocument (Response response) throws Exception {
+    private void parseDocument (Response response) throws IOException {
         ResponseBody body = response.body();
+
+        if (body == null) {
+            throw new IOException("Response body is null!");
+        }
+
         raw_document = body.string();
         code = response.code();
         body.close();
 
         if (raw_document == null || raw_document.isEmpty()) {
-            if (code >= 400) {
-                throw new Exception("Error: " + code);
-            } else {
-                return;
-            }
+            return;
         }
 
         document = Jsoup.parse(raw_document, response.request().url().toString());

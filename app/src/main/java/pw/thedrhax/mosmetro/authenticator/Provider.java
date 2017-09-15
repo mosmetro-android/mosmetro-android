@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -181,14 +182,14 @@ public abstract class Provider extends LinkedList<Task> {
     public static boolean generate_204(Client client) {
         try {
             client.get(GENERATE_204_HTTP, null);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
         }
         if (client.getResponseCode() != 204) return false;
 
         try {
             client.get(GENERATE_204_HTTPS, null);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
         }
         return client.getResponseCode() == 204;

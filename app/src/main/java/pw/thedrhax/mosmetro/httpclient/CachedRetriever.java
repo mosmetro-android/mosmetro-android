@@ -28,6 +28,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -113,8 +114,9 @@ public class CachedRetriever {
 
         // Try to retrieve content from server
         try {
-            if (client.get(url, null).getResponseCode() != 200)
-                throw new Exception("Response Code != 200");
+            if (client.get(url, null).getResponseCode() != 200) {
+                throw new IOException("Invalid response: " + client.getResponseCode());
+            }
 
             result = client.getPage().trim();
 
@@ -128,7 +130,7 @@ public class CachedRetriever {
 
             // Write new content to cache
             writeCachedUrl(url, result);
-        } catch (Exception ex) {
+        } catch (Exception ex) {  // Exception type doesn't matter here
             Logger.log(this, ex.toString());
 
             // Get expired cache if can't retrieve content

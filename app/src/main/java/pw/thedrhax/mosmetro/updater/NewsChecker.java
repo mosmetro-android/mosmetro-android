@@ -63,6 +63,9 @@ public class NewsChecker extends AsyncTask<Void,Void,Void> {
             return null;
         }
 
+        if (data == null)
+            return null;
+
         long id, max_version;
         String title, message, url;
         try {
@@ -71,7 +74,7 @@ public class NewsChecker extends AsyncTask<Void,Void,Void> {
             title = (String)data.get("title");
             message = (String)data.get("message");
             url = (String)data.get("url");
-        } catch (Exception ex) {
+        } catch (ClassCastException ex) {
             return null;
         }
 

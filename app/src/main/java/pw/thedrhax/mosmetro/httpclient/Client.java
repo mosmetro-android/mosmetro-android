@@ -24,7 +24,9 @@ import android.support.annotation.NonNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,18 +78,18 @@ public abstract class Client {
     public abstract Client setTimeout(int ms);
 
     // IO methods
-    public abstract Client get(String link, Map<String,String> params) throws Exception;
-    public abstract Client post(String link, Map<String,String> params) throws Exception;
-    public abstract InputStream getInputStream(String link) throws Exception;
+    public abstract Client get(String link, Map<String,String> params) throws IOException;
+    public abstract Client post(String link, Map<String,String> params) throws IOException;
+    public abstract InputStream getInputStream(String link) throws IOException;
 
     // Retry methods
     private abstract class RetryOnException<T> {
-        T run(int retries) throws Exception {
-            Exception last_ex = null;
+        T run(int retries) throws IOException {
+            IOException last_ex = null;
             for (int i = 0; i < retries; i++) {
                 try {
                     return body();
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     last_ex = ex;
                     if (running.get()) {
                         SystemClock.sleep(1000);
@@ -98,31 +100,31 @@ public abstract class Client {
             }
             throw last_ex;
         }
-        public abstract T body() throws Exception;
+        public abstract T body() throws IOException;
     }
 
     public Client get(final String link, final Map<String,String> params,
-                      int retries) throws Exception {
+                      int retries) throws IOException {
         return new RetryOnException<Client>() {
             @Override
-            public Client body() throws Exception {
+            public Client body() throws IOException {
                 return get(link, params);
             }
         }.run(retries);
     }
     public Client post(final String link, final Map<String,String> params,
-                       int retries) throws Exception {
+                       int retries) throws IOException {
         return new RetryOnException<Client>() {
             @Override
-            public Client body() throws Exception {
+            public Client body() throws IOException {
                 return post(link, params);
             }
         }.run(retries);
     }
-    public InputStream getInputStream(final String link, int retries) throws Exception {
+    public InputStream getInputStream(final String link, int retries) throws IOException {
         return new RetryOnException<InputStream>() {
             @Override
-            public InputStream body() throws Exception {
+            public InputStream body() throws IOException {
                 return getInputStream(link);
             }
         }.run(retries);
@@ -144,7 +146,7 @@ public abstract class Client {
         return code;
     }
 
-    public String parseMetaContent (String name) throws Exception {
+    public String parseMetaContent (String name) throws ParseException {
         String value = null;
 
         for (Element element : document.getElementsByTag("meta")) {
@@ -154,13 +156,14 @@ public abstract class Client {
             }
         }
 
-        if (value == null || value.isEmpty())
-            throw new Exception("Meta tag not found");
+        if (value == null || value.isEmpty()) {
+            throw new ParseException("Meta tag '" + name + "' not found", 0);
+        }
 
         return value;
     }
 
-    public String parseMetaRedirect() throws Exception {
+    public String parseMetaRedirect() throws ParseException {
         String attr = parseMetaContent("refresh");
         String link = attr.substring(
                 attr.indexOf(
@@ -168,12 +171,14 @@ public abstract class Client {
                 ) + 1
         );
 
-        if (link.isEmpty())
-            throw new Exception("Meta redirect not found");
+        if (link.isEmpty()) {
+            throw new ParseException("Meta redirect not found", 0);
+        }
 
         // Check protocol of the URL
-        if (!(link.contains("http://") || link.contains("https://")))
+        if (!(link.contains("http://") || link.contains("https://"))) {
             link = "http://" + link;
+        }
 
         return link;
     }

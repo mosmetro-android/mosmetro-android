@@ -35,18 +35,18 @@ public class DummyClient extends Client {
     }
 
     @Override
-    public Client get(String link, Map<String, String> params) throws Exception {
+    public Client get(String link, Map<String, String> params) {
         return this;
     }
 
     @Override
-    public Client post(String link, Map<String, String> params) throws Exception {
+    public Client post(String link, Map<String, String> params) {
         return this;
     }
 
     @Override
-    public InputStream getInputStream(String link) throws Exception {
-        throw new Exception("Not implemented");
+    public InputStream getInputStream(String link) {
+        throw new RuntimeException("Stub!");
     }
 
     @Override

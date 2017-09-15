@@ -50,7 +50,7 @@ public class CaptchaRecognitionProxy {
         return true;
     }
 
-    public String recognize(final Bitmap bitmap) throws Exception {
+    public String recognize(final Bitmap bitmap) {
         final String[] reply = new String[]{null};
 
         BroadcastReceiver receiver = new BroadcastReceiver() {

@@ -22,6 +22,8 @@ import android.content.Context;
 
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
@@ -81,7 +83,7 @@ public class MosMetroV1 extends Provider {
                     client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
@@ -98,23 +100,16 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                try {
-                    Elements forms = client.getPageContent().getElementsByTag("form");
-                    if (forms.size() > 1) {
-                        Logger.log(context.getString(R.string.error,
+                Elements forms = client.getPageContent().getElementsByTag("form");
+                if (forms.size() > 1) {
+                    Logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_not_registered)
                         ));
-                        vars.put("result", RESULT.NOT_REGISTERED);
-                        return false;
-                    }
-                    vars.put("form", Client.parseForm(forms.first()));
-                    return true;
-                } catch (Exception ex) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_auth_form)
-                    ));
+                    vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }
+                vars.put("form", Client.parseForm(forms.first()));
+                return true;
             }
         });
 
@@ -131,7 +126,7 @@ public class MosMetroV1 extends Provider {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
                     client.post(redirect, form, pref_retry_count);
                     return true;
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
@@ -168,7 +163,7 @@ public class MosMetroV1 extends Provider {
         Client client = new OkHttp(context).followRedirects(false);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
@@ -177,7 +172,7 @@ public class MosMetroV1 extends Provider {
             redirect = client.parseMetaRedirect();
             Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
             Logger.log(Logger.LEVEL.DEBUG, redirect);
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             // Redirect not found => connected
             return super.isConnected();
         }
@@ -195,7 +190,7 @@ public class MosMetroV1 extends Provider {
     public static boolean match(Client client) {
         try {
             return client.parseMetaRedirect().contains("login.wi-fi.ru");
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             return false;
         }
     }
