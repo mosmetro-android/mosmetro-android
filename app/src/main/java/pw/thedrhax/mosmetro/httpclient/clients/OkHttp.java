@@ -48,10 +48,12 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.TLSSocketFactory;
+import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 public class OkHttp extends Client {
+    private Context context = null;
     private OkHttpClient client;
     private Call last_call = null;
 
@@ -114,6 +116,7 @@ public class OkHttp extends Client {
 
     public OkHttp(Context context) {
         this();
+        this.context = context;
         int timeout = Util.getIntPreference(context, "pref_timeout", 5);
         if (timeout != 0) setTimeout(timeout * 1000);
     }
@@ -163,6 +166,10 @@ public class OkHttp extends Client {
         // Populate headers
         for (String name : headers.keySet()) {
             builder.addHeader(name, getHeader(name));
+        }
+
+        if (context != null) {
+            AndroidHacks.bindToWiFi(context);
         }
 
         last_call = client.newCall(builder.build());
