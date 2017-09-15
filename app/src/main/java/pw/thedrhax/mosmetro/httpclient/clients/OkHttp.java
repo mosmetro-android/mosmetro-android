@@ -191,7 +191,8 @@ public class OkHttp extends Client {
 
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                body.add(entry.getKey(), entry.getValue());
+                if (entry.getValue() != null)
+                    body.add(entry.getKey(), entry.getValue());
             }
         }
 
