@@ -43,8 +43,6 @@ public class Downloader {
     private final static IntentFilter DOWNLOAD_COMPLETE =
             new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
 
-    public static final String TYPE_APK = "application/vnd.android.package-archive";
-
     private Context context;
     private DownloadManager dm;
     private LinkedList<DownloadResultReceiver> receivers;
