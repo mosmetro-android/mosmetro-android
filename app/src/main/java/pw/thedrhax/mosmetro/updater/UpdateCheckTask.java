@@ -139,33 +139,30 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 
         if (hasUpdate()) {
-            dialog.setTitle(context.getString(R.string.update_available))
+            dialog = dialog
+                    .setTitle(context.getString(R.string.update_available))
                     .setMessage(current_branch.message)
-                    .setNeutralButton(R.string.ignore_short,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    current_branch.ignore(true);
-                                }
-                            })
-                    .setNegativeButton(R.string.download,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    current_branch.download();
-                                }
-                            });
-
-            if (Downloader.isSupported())
-                    dialog.setPositiveButton(R.string.install,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    current_branch.install();
-                                }
-                            });
+                    .setNeutralButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            current_branch.ignore(true);
+                        }
+                    })
+                    .setNegativeButton(R.string.download, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            current_branch.download();
+                        }
+                    })
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            current_branch.install();
+                        }
+                    });
         } else {
-            dialog.setTitle(context.getString(R.string.update_not_available))
+            dialog = dialog
+                    .setTitle(context.getString(R.string.update_not_available))
                     .setMessage(context.getString(R.string.update_not_available_message))
                     .setNegativeButton(context.getString(R.string.ok), null);
         }

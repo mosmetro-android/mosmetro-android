@@ -55,14 +55,10 @@ public class Downloader {
         this.receivers = new LinkedList<>();
     }
 
-    // Workaround for Android < 5.0
-    // See commit 6e2b7b4e81fbf81f7b1e846c0436ea06cc82669f
-    public static boolean isSupported() {
-        return Build.VERSION.SDK_INT >= 21;
-    }
-
     public void get(String url, String title, String description, String mimeType) {
-        if (!isSupported()) {
+        // Workaround for Android < 5.0
+        // See commit 6e2b7b4e81fbf81f7b1e846c0436ea06cc82669f
+        if (Build.VERSION.SDK_INT < 21) {
             context.startActivity(
                     new Intent(context, SafeViewActivity.class).putExtra("data", url)
             );
