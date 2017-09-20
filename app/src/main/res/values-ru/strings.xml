@@ -4,7 +4,7 @@
 
     <string name="report">Отправить отчет</string>
     <string name="report_email_subject" formatted="false">Версия %s</string>
-    <string name="report_choose_client">Выберите E-mail клиент…</string>
+    <string name="report_choose_client">Выберите E-mail клиент или мессенджер…</string>
 
     <string name="retry">Попробовать снова</string>
     <string name="connect">Подключиться</string>
@@ -130,7 +130,6 @@
         нормально работать.\n Примечание: Разработчик этого приложения не имеет никакого отношения к регистрации.
         Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).
     </string>
-    <string name="auth_error_auth_form">форма авторизации не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
     <string name="auth_error_provider_unsupported" formatted="false">
@@ -138,7 +137,6 @@
         два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
     </string>
     <string name="auth_error_captcha">требуется ввод капчи</string>
-    <string name="auth_error_captcha_image">не удалось найти изображение</string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
@@ -190,8 +188,6 @@
     <string name="pref_timeout_summary">Количество секунд, в течение которого приложение ожидает ответа от сервера. Если установлен 0, приложение будет ждать до тех пор пока не будет поймана одна из ошибок (по умолчанию: 5).</string>
     <string name="toast_unsupported_function">Похоже эта функция не поддерживается вашим устройством :(</string>
     <string name="toast_view_exception">Похоже, у вас не установлено ни одного браузера</string>
-    <string name="please_wait">Пожалуйста, подождите…</string>
-    <string name="preparing_to_send_log">Подготовка к отправке письма</string>
     <string name="auth_provider_assume">Пытаюсь подключиться с помощью MosMetroV2…</string>
     <string name="pref_notify_priority">Приоритет уведомлений</string>
     <string name="pref_notify_priority_summary">Значение между -2 и 2, влияющее на приоритет всех уведомлений. (по умолчанию: 0)</string>

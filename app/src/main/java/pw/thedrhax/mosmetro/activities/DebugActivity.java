@@ -130,7 +130,7 @@ public class DebugActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                startActivity(new Intent(this, SendLogActivity.class));
+                Logger.share(this);
                 return true;
 
             case android.R.id.home:

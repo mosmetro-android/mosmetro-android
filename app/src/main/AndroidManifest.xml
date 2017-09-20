@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 
     <application
@@ -102,14 +101,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.SendLogActivity"
-            android:autoRemoveFromRecents="true"
-            android:excludeFromRecents="true"
-            android:label="@string/preparing_to_send_log"
-            android:theme="@style/AppBaseTheme.Dialog"
-            tools:ignore="UnusedAttribute" />
-
         <!-- Dialogs -->
 
         <activity
@@ -160,6 +151,18 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/toggle_widget" />
         </receiver>
+
+        <!-- Content Providers -->
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="pw.thedrhax.mosmetro.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 </manifest>

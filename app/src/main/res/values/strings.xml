@@ -5,7 +5,7 @@
     <string name="report">Send report</string>
     <string name="report_email_address" translatable="false">mosmetro@thedrhax.pw</string>
     <string name="report_email_subject" formatted="false">Version %s</string>
-    <string name="report_choose_client">Choose email client…</string>
+    <string name="report_choose_client">Choose email client or messenger…</string>
 
     <string name="retry">Try again</string>
     <string name="connect">Connect</string>
@@ -136,7 +136,6 @@
         Disclaimer: This application developer has nothing to do with registration.
         Registration is required by MaximaTelecom ISP (http://maximatelecom.ru).
     </string>
-    <string name="auth_error_auth_form">login form not found</string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
     <string name="auth_error_provider_unsupported" formatted="false">
@@ -144,7 +143,6 @@
         one of which is not supported yet. We apologize for inconvenience.
     </string>
     <string name="auth_error_captcha">CAPTCHA required</string>
-    <string name="auth_error_captcha_image">unable to find the image</string>
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>
@@ -207,8 +205,6 @@
     <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 5).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
     <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
-    <string name="preparing_to_send_log">Preparing to send E-mail</string>
-    <string name="please_wait">Please wait…</string>
     <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
     <string name="pref_notify_priority">Notification priority</string>
     <string name="pref_notify_priority_summary">A value between -2 and 2 that affects the priority of all notifications. (default: 0)</string>

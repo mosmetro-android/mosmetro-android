@@ -18,16 +18,25 @@
 
 package pw.thedrhax.util;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import pw.thedrhax.mosmetro.R;
 
 public class Logger {
     public enum LEVEL {INFO, DEBUG}
@@ -102,6 +111,42 @@ public class Logger {
 
     public static String read(LEVEL level) {
         return logs.get(level).toString();
+    }
+
+    /**
+     * Log sharing routines
+     */
+
+    public static Uri writeToFile(Context context) throws IOException {
+        File log_file = new File(context.getFilesDir(), "pw.thedrhax.mosmetro.txt");
+
+        FileWriter writer = new FileWriter(log_file);
+        writer.write(read(Logger.LEVEL.DEBUG));
+        writer.flush(); writer.close();
+
+        return FileProvider.getUriForFile(context, "pw.thedrhax.mosmetro.provider", log_file);
+    }
+
+    public static void share(Context context) {
+        Intent share = new Intent(Intent.ACTION_SEND).setType("text/plain")
+                .putExtra(Intent.EXTRA_EMAIL,
+                        new String[] {context.getString(R.string.report_email_address)}
+                )
+                .putExtra(Intent.EXTRA_SUBJECT,
+                        context.getString(R.string.report_email_subject, Version.getFormattedVersion())
+                );
+
+        try {
+            share.putExtra(Intent.EXTRA_STREAM, writeToFile(context));
+        } catch (IOException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(context.getString(R.string.error, context.getString(R.string.error_log_file)));
+            share.putExtra(Intent.EXTRA_TEXT, read(Logger.LEVEL.DEBUG));
+        }
+
+        context.startActivity(Intent.createChooser(
+                share, context.getString(R.string.report_choose_client)
+        ));
     }
 
     /**
