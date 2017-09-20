@@ -87,11 +87,17 @@ public class CaptchaDialog extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                text_captcha.removeTextChangedListener(this);
                 int pos = text_captcha.getSelectionEnd();
-                text_captcha.setText(Util.convertCyrillicSymbols(text_captcha.getText().toString()));
-                text_captcha.setSelection(pos);
-                text_captcha.addTextChangedListener(this);
+
+                String old_string = text_captcha.getText().toString();
+                String new_string = Util.convertCyrillicSymbols(old_string);
+
+                if (!old_string.equals(new_string)) {
+                    text_captcha.removeTextChangedListener(this);
+                    text_captcha.setText(new_string);
+                    text_captcha.setSelection(pos);
+                    text_captcha.addTextChangedListener(this);
+                }
             }
 
             @Override
