@@ -24,6 +24,7 @@ import android.net.Uri;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
@@ -42,7 +43,7 @@ import pw.thedrhax.util.Logger;
  */
 
 public class DomRu extends Provider {
-    private String redirect;
+    private String redirect = "https://spb.wifi.domru.ru/index.php";
 
     public DomRu(final Context context) {
         super(context);
@@ -68,24 +69,53 @@ public class DomRu extends Provider {
                 try {
                     redirect = client.parse302Redirect();
                 } catch (ParseException ex) {
-                    redirect = "https://spb.wifi.domru.ru/index.php";
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_redirect)
+                    ));
                 }
                 return true;
             }
         });
 
         /**
-         * Getting auth page
-         * ⇒ GET https://spb.wifi.domru.ru/index.php?... < redirect
-         * ⇐ Link: /guest
+         * Converting redirect URL
+         * redirect = scheme://domain/guest
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                Uri redirect_uri = Uri.parse(redirect);
+                redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost() + "/guest";
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
+                return true;
+            }
+        });
+
+        /**
+         * Getting session cookies
+         * ⇒ POST /guest/sendcode < redirect + "/sendcode"
+         *   AlcatelGuestSmsModel[phone] = pref_domru_login
+         *   AlcatelGuestSmsModel[password] = pref_domru_password
+         *   ajax = yw0
+         *   yt1 = Войти
+         * ⇐ HTTP 200
+         *   Cookies: WIFI_SESSID, WIFI_IDENTITY
          */
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 Logger.log(context.getString(R.string.auth_auth_page));
 
+                Map<String,String> params = new HashMap<String, String>() {{
+                    put("AlcatelGuestSmsModel[phone]", settings.getString("pref_domru_login", ""));
+                    put("AlcatelGuestSmsModel[password]", settings.getString("pref_domru_password", ""));
+                    put("ajax", "yw0");
+                    put("yt1", "Войти");
+                }};
+
                 try {
-                    client.get(redirect, null, pref_retry_count);
+                    client.post(redirect + "/sendcode", params, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
@@ -99,23 +129,26 @@ public class DomRu extends Provider {
         });
 
         /**
-         * "Clicking" guest button
-         * ⇒ GET https://spb.wifi.domru.ru/guest
+         * Sending auth form
+         * ⇒ GET https://spb.wifi.domru.ru/guest < redirect
          * ⇐ 302 redirect (on success)
-         * ⇐ ??? (on failure)
+         * ⇐ 200 (on failure)
          */
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 Logger.log(context.getString(R.string.auth_auth_form));
 
-                Uri redirect_uri = Uri.parse(redirect);
-                redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
-                Logger.log(Logger.LEVEL.DEBUG, redirect);
-
                 try {
-                    client.get(redirect_uri + "/guest", null, pref_retry_count);
+                    client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+
+                    int code = client.getResponseCode();
+                    if (code != 302) {
+                        Logger.log(Logger.LEVEL.DEBUG, "Wrong response code: " + code);
+                        return false;
+                    }
+
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
