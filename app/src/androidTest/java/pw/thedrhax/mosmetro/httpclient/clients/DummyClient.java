@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.httpclient.clients;
+package pw.thedrhax.mosmetro.httpclient.clients;
+
+import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
@@ -67,6 +69,11 @@ public class DummyClient extends Client {
     @Override
     public void stop() {
 
+    }
+
+    @Override @Nullable
+    public String getResponseHeader(String name) {
+        return null;
     }
 
     @Override
