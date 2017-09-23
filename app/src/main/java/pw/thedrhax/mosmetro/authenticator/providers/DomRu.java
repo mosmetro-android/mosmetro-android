@@ -86,6 +86,7 @@ public class DomRu extends Provider {
 
                 try {
                     client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -110,9 +111,11 @@ public class DomRu extends Provider {
 
                 Uri redirect_uri = Uri.parse(redirect);
                 redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
 
                 try {
                     client.get(redirect_uri + "/guest", null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
