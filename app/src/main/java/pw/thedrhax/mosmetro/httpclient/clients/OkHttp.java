@@ -19,6 +19,8 @@
 package pw.thedrhax.mosmetro.httpclient.clients;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
@@ -41,6 +43,7 @@ import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,6 +59,7 @@ public class OkHttp extends Client {
     private Context context = null;
     private OkHttpClient client;
     private Call last_call = null;
+    private Headers response_headers = null;
 
     private OkHttp() {
         X509TrustManager tm = new X509TrustManager() {
@@ -218,6 +222,15 @@ public class OkHttp extends Client {
         return body.byteStream();
     }
 
+    @Override @Nullable
+    public String getResponseHeader(String name) {
+        if (response_headers != null) {
+            return response_headers.get(name);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public void stop() {
         if (last_call != null) {
@@ -232,6 +245,7 @@ public class OkHttp extends Client {
             throw new IOException("Response body is null!");
         }
 
+        response_headers = response.headers();
         raw_document = body.string();
         code = response.code();
         body.close();

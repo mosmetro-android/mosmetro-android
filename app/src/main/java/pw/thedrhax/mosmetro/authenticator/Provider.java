@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.providers.DomRu;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
@@ -67,6 +68,7 @@ public abstract class Provider extends LinkedList<Task> {
                 add(MosMetroV1.class);
                 add(MosMetroV2.class);
                 add(Enforta.class);
+                add(DomRu.class);
             }};
 
     /**
@@ -78,7 +80,8 @@ public abstract class Provider extends LinkedList<Task> {
             "MosGorTrans_Free",
             "MT_FREE", "MT_FREE_",
             "CPPK_Free",
-            "Air_WiFi_Free"
+            "Air_WiFi_Free",
+            "DOM.RU Wi-Fi"
     };
 
     protected Context context;

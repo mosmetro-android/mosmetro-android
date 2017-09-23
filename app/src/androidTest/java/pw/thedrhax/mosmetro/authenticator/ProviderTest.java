@@ -23,7 +23,7 @@ import android.support.test.InstrumentationRegistry;
 
 import junit.framework.TestCase;
 
-import pw.thedrhax.httpclient.clients.DummyClient;
+import pw.thedrhax.mosmetro.httpclient.clients.DummyClient;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
