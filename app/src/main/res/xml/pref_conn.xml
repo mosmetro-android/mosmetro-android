@@ -65,8 +65,4 @@
         android:key="pref_domru_login"
         android:title="pref_domru_login" />
 
-    <EditTextPreference
-        android:key="pref_domru_password"
-        android:title="pref_domru_password" />
-
 </PreferenceScreen>

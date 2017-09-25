@@ -21,6 +21,8 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.net.Uri;
 
+import org.jsoup.nodes.Element;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -79,43 +81,76 @@ public class DomRu extends Provider {
         });
 
         /**
-         * Converting redirect URL
-         * redirect = scheme://domain/guest
+         * Getting initial page and parsing the next step
+         * ⇒ GET https://spb.wifi.domru.ru/index.php?... < redirect
+         * ⇐ Link: #join-internet > redirect
          */
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                Logger.log(context.getString(R.string.auth_auth_page)); // TODO: Unique message
+
+                try {
+                    client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_auth_page)
+                    ));
+                    return false;
+                }
+
+                String path = client.getPageContent().getElementById("join-internet").attr("href");
                 Uri redirect_uri = Uri.parse(redirect);
-                redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost() + "/guest";
+                redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost() + path;
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
                 return true;
             }
         });
 
         /**
-         * Getting session cookies
-         * ⇒ POST /guest/sendcode < redirect + "/sendcode"
-         *   AlcatelGuestSmsModel[phone] = pref_domru_login
-         *   AlcatelGuestSmsModel[password] = pref_domru_password
-         *   ajax = yw0
-         *   yt1 = Войти
-         * ⇐ HTTP 200
-         *   Cookies: WIFI_SESSID, WIFI_IDENTITY
+         * Getting auth page
+         * ⇒ GET https://spb.wifi.domru.ru/guest < redirect
+         * ⇐ Form: method="post" action="/guest"
          */
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 Logger.log(context.getString(R.string.auth_auth_page));
 
-                Map<String,String> params = new HashMap<String, String>() {{
-                    put("AlcatelGuestSmsModel[phone]", settings.getString("pref_domru_login", ""));
-                    put("AlcatelGuestSmsModel[password]", settings.getString("pref_domru_password", ""));
-                    put("ajax", "yw0");
-                    put("yt1", "Войти");
-                }};
+                try {
+                    client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    return true;
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_auth_page)
+                    ));
+                    return false;
+                }
+            }
+        });
+
+        /**
+         * Getting session cookies
+         * ⇒ POST https://spb.wifi.domru.ru/guest < redirect
+         *   AlcatelGuestSmsModel[phone] = pref_domru_login
+         * ⇐ HTTP 200
+         *   Cookies: WIFI_SESSID, WIFI_IDENTITY
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                Logger.log(context.getString(R.string.auth_auth_form));
+
+                Element form = client.getPageContent().getElementsByTag("form").first();
+                Map<String,String> params = Client.parseForm(form);
+                params.put("AlcatelGuestSmsModel[phone]", settings.getString("pref_domru_login", ""));
 
                 try {
-                    client.post(redirect + "/sendcode", params, pref_retry_count);
+                    client.post(redirect, params, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
