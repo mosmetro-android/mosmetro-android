@@ -255,7 +255,7 @@ public class MosMetroV2 extends Provider {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                         Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                         vars.put("result", RESULT.ERROR);
-                        return false;
+                        return true;
                     }
                 }
 
