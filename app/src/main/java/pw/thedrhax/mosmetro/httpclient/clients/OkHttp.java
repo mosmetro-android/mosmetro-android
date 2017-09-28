@@ -53,12 +53,14 @@ import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
 public class OkHttp extends Client {
     private Context context = null;
     private OkHttpClient client;
     private Call last_call = null;
+    private Randomizer random;
 
     private SSLSocketFactory trustAllCerts() {
         // Create a trust manager that does not validate certificate chains
@@ -80,7 +82,7 @@ public class OkHttp extends Client {
         return null;
     }
 
-    public OkHttp() {
+    public OkHttp(Context context) {
         client = new OkHttpClient.Builder()
                 // Don't verify the hostname
                 .hostnameVerifier(new HostnameVerifier() {
@@ -129,13 +131,13 @@ public class OkHttp extends Client {
                     }
                 })
                 .build();
-    }
 
-    public OkHttp(Context context) {
-        this();
+        // TODO: Move this to Client
         this.context = context;
         int timeout = Util.getIntPreference(context, "pref_timeout", 5);
         if (timeout != 0) setTimeout(timeout * 1000);
+
+        random = new Randomizer(context);
     }
 
     @Override
@@ -180,6 +182,8 @@ public class OkHttp extends Client {
     }
 
     private Response call(Request.Builder builder) throws IOException {
+        random.delay();
+
         // Populate headers
         for (String name : headers.keySet()) {
             builder.addHeader(name, getHeader(name));

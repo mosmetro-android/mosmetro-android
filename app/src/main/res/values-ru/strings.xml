@@ -216,4 +216,8 @@
     <string name="pref_captcha_backdoor">Обход блокировки</string>
     <string name="pref_captcha_backdoor_summary">Пытаться обойти блокировку используя официальный бекдор</string>
     <string name="pref_category_captcha">Капча и блокировки</string>
+    <string name="pref_delay_max">Максимальная задержка</string>
+    <string name="pref_delay_max_summary">Максимальное значение случайной задержки перед запросом.</string>
+    <string name="pref_delay_min">Минимальная задержка</string>
+    <string name="pref_delay_min_summary">Минимальное значение случайной задержки перед запросом.</string>
 </resources>
