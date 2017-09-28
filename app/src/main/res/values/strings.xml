@@ -230,4 +230,6 @@
     <string name="auth_captcha_bypass_backdoor">Trying to bypass CAPTCHA using the official backdoor…</string>
     <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
     <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
+    <string name="pref_internet_check_interval">Interval of checks</string>
+    <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
 </resources>

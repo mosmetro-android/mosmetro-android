@@ -210,4 +210,6 @@
     <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
     <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
     <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
+    <string name="pref_internet_check_interval">Интервал проверок</string>
+    <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
 </resources>

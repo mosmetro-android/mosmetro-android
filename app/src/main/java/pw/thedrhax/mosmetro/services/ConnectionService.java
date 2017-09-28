@@ -369,7 +369,8 @@ public class ConnectionService extends IntentService {
             SystemClock.sleep(1000);
 
             // Check internet connection each 10 seconds
-            if (settings.getBoolean("pref_internet_check", true) && ++count == 10) {
+            int check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
+            if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
                 Logger.log(this, "Checking internet connection");
                 count = 0;
                 if (!provider.isConnected())

@@ -23,6 +23,13 @@
         android:summary="@string/pref_internet_check_summary"
         android:title="@string/pref_internet_check" />
 
+    <EditTextPreference
+        android:defaultValue="10"
+        android:inputType="number"
+        android:key="pref_internet_check_interval"
+        android:title="@string/pref_internet_check_interval"
+        android:summary="@string/pref_internet_check_interval_summary" />
+
     <PreferenceCategory android:title="@string/pref_category_connection" />
 
     <CheckBoxPreference
