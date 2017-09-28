@@ -43,7 +43,12 @@ public class Randomizer {
         }
     }
 
+    // TODO: Add Listener for interrupts
     public void delay() {
-        SystemClock.sleep(delay_min + random.nextInt(1000 * (delay_max - delay_min)));
+        int delay = delay_min;
+        if (delay_max - delay_min != 0)
+            delay += random.nextInt(1000 * (delay_max - delay_min));
+
+        SystemClock.sleep(delay);
     }
 }
