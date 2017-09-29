@@ -208,7 +208,7 @@ public abstract class Client {
         return params_string.toString();
     }
 
-    private final Listener<Boolean> running = new Listener<Boolean>(true) {
+    protected final Listener<Boolean> running = new Listener<Boolean>(true) {
         @Override
         public void onChange(Boolean new_value) {
             if (!new_value) {
