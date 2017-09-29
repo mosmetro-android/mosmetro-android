@@ -232,4 +232,8 @@
     <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
+    <string name="pref_category_captcha">CAPTCHA and bans</string>
+    <string name="pref_captcha_backdoor">Ban bypass</string>
+    <string name="pref_captcha_backdoor_summary">Try to bypass ban using the official backdoor</string>
+    <string name="auth_banned">You were temporary banned by provider :(</string>
 </resources>

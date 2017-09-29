@@ -212,4 +212,8 @@
     <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
     <string name="pref_internet_check_interval">Интервал проверок</string>
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
+    <string name="auth_banned">Вы были временно заблокированы провайдером :(</string>
+    <string name="pref_captcha_backdoor">Обход блокировки</string>
+    <string name="pref_captcha_backdoor_summary">Пытаться обойти блокировку используя официальный бекдор</string>
+    <string name="pref_category_captcha">Капча и блокировки</string>
 </resources>

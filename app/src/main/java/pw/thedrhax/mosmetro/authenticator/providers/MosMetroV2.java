@@ -238,12 +238,17 @@ public class MosMetroV2 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
-                Logger.log(context.getString(R.string.auth_captcha_requested));
 
                 // Parsing CAPTCHA form
                 form = client.getPageContent().getElementsByTag("form").first();
 
                 if (form == null) { // No CAPTCHA form found => level 2 block
+                    Logger.log(context.getString(R.string.auth_banned));
+
+                    if (settings.getBoolean("pref_captcha_backdoor", true)) {
+                        return false;
+                    }
+
                     try {
                         if (bypass_backdoor()) {
                             Logger.log(context.getString(R.string.auth_captcha_bypass_success));
@@ -260,6 +265,8 @@ public class MosMetroV2 extends Provider {
                         return true;
                     }
                 }
+
+                Logger.log(context.getString(R.string.auth_captcha_requested));
 
                 // Parsing captcha URL
                 Element captcha_img = form.getElementsByTag("img").first();
