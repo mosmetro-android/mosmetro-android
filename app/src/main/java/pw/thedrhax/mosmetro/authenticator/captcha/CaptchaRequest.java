@@ -91,9 +91,8 @@ public class CaptchaRequest {
         final Notify captcha_notify = new Notify(context).id(2)
                 .title(context.getString(R.string.notification_captcha))
                 .text(context.getString(R.string.notification_captcha_summary))
-                .icon(pref_colored_icons ?
-                        R.drawable.ic_notification_register_colored :
-                        R.drawable.ic_notification_register)
+                .icon(R.drawable.ic_notification_register_colored,
+                      R.drawable.ic_notification_register)
                 .onClick(PendingIntent.getActivity(
                         context, 254, captcha_activity, PendingIntent.FLAG_UPDATE_CURRENT))
                 .onDelete(PendingIntent.getService(

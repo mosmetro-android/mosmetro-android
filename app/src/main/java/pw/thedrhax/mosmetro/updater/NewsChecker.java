@@ -41,13 +41,10 @@ import pw.thedrhax.util.Version;
 public class NewsChecker extends AsyncTask<Void,Void,Void> {
     private final Context context;
     private final SharedPreferences settings;
-    private final boolean pref_colored_icons;
 
     public NewsChecker(@NonNull Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
-        this.pref_colored_icons = (Build.VERSION.SDK_INT <= 20)
-                || settings.getBoolean("pref_notify_alternative", false);
     }
 
     @Override
@@ -85,9 +82,8 @@ public class NewsChecker extends AsyncTask<Void,Void,Void> {
             return null;
 
         new Notify(context).id(255)
-                .icon(pref_colored_icons ?
-                        R.drawable.ic_notification_message_colored :
-                        R.drawable.ic_notification_message)
+                .icon(R.drawable.ic_notification_message_colored,
+                      R.drawable.ic_notification_message)
                 .onClick(PendingIntent.getActivity(context, 255,
                         new Intent(context, SafeViewActivity.class)
                                 .putExtra("data", url),
