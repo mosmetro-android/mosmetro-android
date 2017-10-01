@@ -190,7 +190,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         private int getVersion() {
             if (by_build) {
-                return Version.getBuildNumber();
+                if (Version.getBranch().equals(name)) {
+                    return Version.getBuildNumber();
+                } else {
+                    return 0;
+                }
             } else {
                 return Version.getVersionCode();
             }

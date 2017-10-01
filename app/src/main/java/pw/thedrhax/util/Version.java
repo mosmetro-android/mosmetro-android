@@ -44,6 +44,17 @@ public final class Version {
         return getVersionName() + "-" + getVersionCode();
     }
 
+    // TODO: Store branch name in app.gradle
+    @NonNull public static String getBranch() {
+        String version_name = Version.getVersionName();
+
+        if (version_name.contains("#")) {
+            return version_name.substring(0, version_name.indexOf("#") - 1);
+        } else {
+            return "play";
+        }
+    }
+
     // TODO: Store build number in app.gradle
     public static int getBuildNumber() {
         String version_name = Version.getVersionName();
