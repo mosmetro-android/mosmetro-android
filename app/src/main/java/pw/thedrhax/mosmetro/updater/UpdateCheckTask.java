@@ -104,7 +104,6 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         if (current_branch == null && branches.size() > 0) {
             // Fallback to master
             settings.edit()
-                    .putInt("pref_updater_build", 0)
                     .putInt("pref_updater_ignore", 0)
                     .putString("pref_updater_branch", "master")
                     .apply();
@@ -190,8 +189,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         private int getVersion() {
-            return by_build ? settings.getInt("pref_updater_build", 0)
-                            : Version.getVersionCode();
+            if (by_build) {
+                return Version.getBuildNumber();
+            } else {
+                return Version.getVersionCode();
+            }
         }
 
         public boolean hasUpdate() {
@@ -208,10 +210,6 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         public void download() {
-            settings.edit()
-                    .putInt("pref_updater_build", version)
-                    .apply();
-
             context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
         }
     }

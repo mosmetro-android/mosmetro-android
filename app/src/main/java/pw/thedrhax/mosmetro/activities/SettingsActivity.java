@@ -138,7 +138,6 @@ public class SettingsActivity extends Activity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 settings.edit()
-                        .putInt("pref_updater_build", 0)
                         .putInt("pref_updater_ignore", 0)
                         .putString("pref_updater_branch", (String)newValue)
                         .apply();
