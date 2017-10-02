@@ -44,3 +44,9 @@
     * [Оставить отзыв в Google Play](https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro)
     * [Вступить в сообщество ВКонтакте](https://vk.com/wifi_v_metro)
     * [Вступить в группу Telegram](https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q)
+    
+## Лицензия
+
+* GNU General Public License v3.0
+* [Подробнее смотрите файл LICENSE](./LICENSE.md)
+* Исходный код, а также само приложение предоставлены для ознакомления. Автор не несёт никакой ответственности за его использование и возможное нарушения Правил Пользования других сервисов, посредствам данного программного кода или приложения, на его основе. 
