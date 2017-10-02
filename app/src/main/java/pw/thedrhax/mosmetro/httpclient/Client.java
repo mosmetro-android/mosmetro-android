@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -145,6 +146,10 @@ public abstract class Client {
 
     public String parseMetaContent (String name) throws ParseException {
         String value = null;
+
+        if (document == null) {
+            throw new ParseException("Document is null!", 0);
+        }
 
         for (Element element : document.getElementsByTag("meta")) {
             if (name.equalsIgnoreCase(element.attr("name")) ||
