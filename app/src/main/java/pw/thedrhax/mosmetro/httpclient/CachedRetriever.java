@@ -56,10 +56,6 @@ public class CachedRetriever {
         client = new OkHttp(context);
     }
 
-    public CachedRetriever setClient (Client client) {
-        this.client = client; return this;
-    }
-
     private long getTimestamp () {
         return System.currentTimeMillis() / 1000L;
     }
@@ -114,11 +110,13 @@ public class CachedRetriever {
 
         // Try to retrieve content from server
         try {
-            if (client.get(url, null).getResponseCode() != 200) {
-                throw new IOException("Invalid response: " + client.getResponseCode());
+            ParsedResponse response = client.get(url, null);
+
+            if (response.getResponseCode() != 200) {
+                throw new IOException("Invalid response: " + response.getResponseCode());
             }
 
-            result = client.getPage().trim();
+            result = response.getPage().trim();
 
             // Validate answer
             if (type == Type.URL && !Patterns.WEB_URL.matcher(result).matches()) {

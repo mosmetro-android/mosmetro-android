@@ -26,7 +26,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -56,13 +56,12 @@ public class Enforta extends Provider {
 
     /**
      * Checks if current network is supported by this Provider implementation.
-     * @param client    Client instance to get the information from. Provider.find()
-     *                  will execute one request to be analyzed by this method.
+     * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(Client client) {
+    public static boolean match(ParsedResponse response) {
         try {
-            return client.parseMetaRedirect().contains("enforta");
+            return response.parseMetaRedirect().contains("enforta");
         } catch (ParseException ex) {
             return false;
         }

@@ -23,12 +23,11 @@ import android.support.test.InstrumentationRegistry;
 
 import junit.framework.TestCase;
 
-import pw.thedrhax.mosmetro.httpclient.clients.DummyClient;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 
 /**
  * A collection of the Provider class tests
@@ -44,7 +43,7 @@ public class ProviderTest extends TestCase {
      */
     public void testFind() throws Exception {
         assertEquals("MosMetro v1 detection",
-                Provider.find(context, new DummyClient(
+                Provider.find(context, new ParsedResponse(
                         "<meta http-equiv=\"refresh\" content=\"0; " +
                                 "URL=http://login.wi-fi.ru/am/UI/Login?...\" />"
                 )).getClass(),
@@ -53,7 +52,7 @@ public class ProviderTest extends TestCase {
         );
 
         assertEquals("MosMetro v2 detection",
-                Provider.find(context, new DummyClient(
+                Provider.find(context, new ParsedResponse(
                         "<meta http-equiv=\"refresh\" content=\"0; " +
                                 "URL=http://auth.wi-fi.ru/?rand=...\" />"
                 )).getClass(),
@@ -62,7 +61,7 @@ public class ProviderTest extends TestCase {
         );
 
         assertEquals("Enforta detection",
-                Provider.find(context, new DummyClient(
+                Provider.find(context, new ParsedResponse(
                         "<meta http-equiv=\"refresh\" content=\"0; " +
                                 "URL=http://...enforta.ru/...\" />"
                 )).getClass(),
@@ -71,13 +70,13 @@ public class ProviderTest extends TestCase {
         );
 
         assertEquals("Empty response",
-                Provider.find(context, new DummyClient("")).getClass(),
+                Provider.find(context, new ParsedResponse("")).getClass(),
 
                 Unknown.class
         );
 
-        assertEquals("Empty client",
-                Provider.find(context, new OkHttp(context)).getClass(),
+        assertEquals("Null response",
+                Provider.find(context, (ParsedResponse)null).getClass(),
 
                 Unknown.class
         );
