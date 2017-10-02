@@ -21,6 +21,7 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import java.io.IOException;
@@ -95,7 +96,9 @@ class StatisticsTask implements Task {
         if (p.settings.getBoolean("pref_updater_enabled", true)) {
             new UpdateCheckTask(p.context) {
                 @Override
-                public void result(boolean hasUpdate, Branch current_branch) {
+                public void result(boolean hasUpdate, @Nullable Branch current_branch) {
+                    if (!hasUpdate || current_branch == null) return;
+
                     Notify notify = new Notify(p.context)
                             .title(p.context.getString(R.string.update_available))
                             .icon(R.drawable.ic_notification_message,
@@ -109,7 +112,7 @@ class StatisticsTask implements Task {
                     notify.setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(current_branch.message));
 
-                    if (hasUpdate) notify.show();
+                    notify.show();
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
         }

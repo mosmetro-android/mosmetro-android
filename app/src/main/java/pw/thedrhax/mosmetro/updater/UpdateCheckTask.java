@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -166,7 +167,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         check_ignored = !ignore; return this;
     }
 
-    public void result(boolean hasUpdate, Branch current_branch) {
+    public void result(boolean hasUpdate, @Nullable Branch current_branch) {
         if (hasUpdate || force_check) showDialog();
     }
 
