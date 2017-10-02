@@ -71,7 +71,7 @@ public class NewsChecker extends AsyncTask<Void,Void,Void> {
             title = (String)data.get("title");
             message = (String)data.get("message");
             url = (String)data.get("url");
-        } catch (ClassCastException ex) {
+        } catch (ClassCastException | NullPointerException ex) {
             return null;
         }
 
