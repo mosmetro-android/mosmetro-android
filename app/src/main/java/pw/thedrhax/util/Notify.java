@@ -72,7 +72,7 @@ public class Notify extends NotificationCompat.Builder {
         setPriority(priority); return this;
     }
 
-    public Notify icon(int white, int colored) {
+    public Notify icon(int colored, int white) {
         boolean pref_colored = (Build.VERSION.SDK_INT <= 20) ^
                 settings.getBoolean("pref_notify_alternative", false);
 
