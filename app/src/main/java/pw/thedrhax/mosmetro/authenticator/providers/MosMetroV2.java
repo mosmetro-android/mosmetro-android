@@ -62,7 +62,7 @@ public class MosMetroV2 extends Provider {
         /**
          * Checking Internet connection for a first time
          * ⇒ GET http://wi-fi.ru
-         * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect
+         * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect, segment
          */
         add(new Task() {
             @Override
@@ -76,6 +76,8 @@ public class MosMetroV2 extends Provider {
                 } else {
                     if (redirect.contains("segment")) {
                         vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                    } else {
+                        vars.put("segment", "metro");
                     }
                     return true;
                 }
@@ -102,8 +104,8 @@ public class MosMetroV2 extends Provider {
 
         /**
          * Getting redirect
-         * ⇒ GET http://auth.wi-fi.ru/?rand=... < redirect
-         * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth
+         * ⇒ GET http://auth.wi-fi.ru/?segment=... < redirect, segment
+         * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth?segment=...
          */
         add(new Task() {
             @Override
@@ -127,9 +129,9 @@ public class MosMetroV2 extends Provider {
         /**
          * Following JavaScript redirect to the auth page
          * redirect = "scheme://host"
-         * ⇒ GET http://auth.wi-fi.ru/auth < redirect + "/auth"
+         * ⇒ GET http://auth.wi-fi.ru/auth?segment= < redirect + "/auth?segment=" + segment
          * ⇐ Form: method="post" action="/auto_auth" (captcha)
-         * ⇐ AJAX: http://auth.wi-fi.ru/auth/init?segment=metro (no captcha)
+         * ⇐ AJAX: http://auth.wi-fi.ru/auth/init?segment=... (no captcha)
          */
         add(new Task() {
             @Override
@@ -140,7 +142,7 @@ public class MosMetroV2 extends Provider {
                 redirect = redirect_uri.getScheme() + "://" + redirect_uri.getHost();
 
                 try {
-                    client.get(redirect + "/auth", null, pref_retry_count);
+                    client.get(redirect + "/auth?segment=" + vars.get("segment"), null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
@@ -236,12 +238,17 @@ public class MosMetroV2 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
-                Logger.log(context.getString(R.string.auth_captcha_requested));
 
                 // Parsing CAPTCHA form
                 form = client.getPageContent().getElementsByTag("form").first();
 
                 if (form == null) { // No CAPTCHA form found => level 2 block
+                    Logger.log(context.getString(R.string.auth_banned));
+
+                    if (settings.getBoolean("pref_captcha_backdoor", true)) {
+                        return false;
+                    }
+
                     try {
                         if (bypass_backdoor()) {
                             Logger.log(context.getString(R.string.auth_captcha_bypass_success));
@@ -255,9 +262,11 @@ public class MosMetroV2 extends Provider {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                         Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
                         vars.put("result", RESULT.ERROR);
-                        return false;
+                        return true;
                     }
                 }
+
+                Logger.log(context.getString(R.string.auth_captcha_requested));
 
                 // Parsing captcha URL
                 Element captcha_img = form.getElementsByTag("img").first();
@@ -347,7 +356,7 @@ public class MosMetroV2 extends Provider {
 
         /**
          * Sending login form
-         * ⇒ POST http://auth.wi-fi.ru/auth/init?... < redirect + "/auth/init?segment=metro"
+         * ⇒ POST http://auth.wi-fi.ru/auth/init?... < redirect, segment, TODO: mode=?
          * ⇒ Cookie: afVideoPassed = 0
          * ⇒ Header: CSRF-Token = ...
          * ⇐ JSON
@@ -362,7 +371,10 @@ public class MosMetroV2 extends Provider {
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
                     client.setCookie(redirect, "afVideoPassed", "0");
 
-                    client.post(redirect + "/auth/init?segment=metro", null, pref_retry_count);
+                    client.post(
+                            redirect + "/auth/init?mode=0&segment=" + vars.get("segment"),
+                            null, pref_retry_count
+                    );
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                 } catch (ProtocolException ignored) { // Too many follow-up requests
                 } catch (IOException | ParseException ex) {

@@ -23,13 +23,28 @@
         android:summary="@string/pref_internet_check_summary"
         android:title="@string/pref_internet_check" />
 
-    <PreferenceCategory android:title="@string/pref_category_connection" />
+    <EditTextPreference
+        android:defaultValue="10"
+        android:inputType="number"
+        android:key="pref_internet_check_interval"
+        android:title="@string/pref_internet_check_interval"
+        android:summary="@string/pref_internet_check_interval_summary" />
+
+    <PreferenceCategory android:title="@string/pref_category_captcha" />
 
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_captcha_dialog"
         android:summary="@string/pref_captcha_dialog_summary"
         android:title="@string/pref_captcha_dialog" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_captcha_backdoor"
+        android:title="@string/pref_captcha_backdoor"
+        android:summary="@string/pref_captcha_backdoor_summary" />
+
+    <PreferenceCategory android:title="@string/pref_category_connection" />
 
     <EditTextPreference
         android:defaultValue="3"
@@ -58,6 +73,20 @@
         android:key="pref_timeout"
         android:summary="@string/pref_timeout_summary"
         android:title="@string/pref_timeout" />
+
+    <EditTextPreference
+        android:defaultValue="1"
+        android:key="pref_delay_min"
+        android:inputType="number"
+        android:title="@string/pref_delay_min"
+        android:summary="@string/pref_delay_min_summary" />
+
+    <EditTextPreference
+        android:defaultValue="3"
+        android:key="pref_delay_max"
+        android:inputType="number"
+        android:title="@string/pref_delay_max"
+        android:summary="@string/pref_delay_max_summary" />
 
     <PreferenceCategory android:title="domru" />
 

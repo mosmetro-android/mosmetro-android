@@ -230,4 +230,14 @@
     <string name="auth_captcha_bypass_backdoor">Trying to bypass CAPTCHA using the official backdoor…</string>
     <string name="auth_captcha_bypass_success">CAPTCHA disabled. Congratulations! :)</string>
     <string name="auth_captcha_bypass_fail">Unable to bypass CAPTCHA, proceeding…</string>
+    <string name="pref_internet_check_interval">Interval of checks</string>
+    <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
+    <string name="pref_category_captcha">CAPTCHA and bans</string>
+    <string name="pref_captcha_backdoor">Ban bypass</string>
+    <string name="pref_captcha_backdoor_summary">Try to bypass ban using the official backdoor</string>
+    <string name="auth_banned">You were temporary banned by provider :(</string>
+    <string name="pref_delay_min">Minimum delay</string>
+    <string name="pref_delay_min_summary">Set the minimum value of random delay before every request.</string>
+    <string name="pref_delay_max">Maximum delay</string>
+    <string name="pref_delay_max_summary">Set the maximum value of random delay before every request.</string>
 </resources>

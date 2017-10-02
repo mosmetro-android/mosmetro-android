@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.util.Listener;
+import pw.thedrhax.util.RandomUserAgent;
 
 public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
@@ -48,11 +49,7 @@ public abstract class Client {
     protected Client() {
         headers = new HashMap<>();
 
-        String ua = System.getProperty("http.agent", "()");
-        setHeader(HEADER_USER_AGENT,
-                "Mozilla/5.0 " + ua.substring(ua.indexOf("("), ua.indexOf(")") + 1) +
-                " AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.85 Mobile Safari/537.36"
-        );
+        setHeader(HEADER_USER_AGENT, RandomUserAgent.getRandomUserAgent());
         setHeader(HEADER_ACCEPT,
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
         );
@@ -154,6 +151,10 @@ public abstract class Client {
     public String parseMetaContent (String name) throws ParseException {
         String value = null;
 
+        if (document == null) {
+            throw new ParseException("Document is null!", 0);
+        }
+
         for (Element element : document.getElementsByTag("meta")) {
             if (name.equalsIgnoreCase(element.attr("name")) ||
                     name.equalsIgnoreCase(element.attr("http-equiv"))) {
@@ -227,7 +228,7 @@ public abstract class Client {
         return params_string.toString();
     }
 
-    private final Listener<Boolean> running = new Listener<Boolean>(true) {
+    protected final Listener<Boolean> running = new Listener<Boolean>(true) {
         @Override
         public void onChange(Boolean new_value) {
             if (!new_value) {

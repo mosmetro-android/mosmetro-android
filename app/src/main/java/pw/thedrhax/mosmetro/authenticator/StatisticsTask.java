@@ -18,16 +18,24 @@
 
 package pw.thedrhax.mosmetro.authenticator;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.BuildConfig;
+import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
+import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
@@ -83,6 +91,30 @@ class StatisticsTask implements Task {
 
         if (p.settings.getBoolean("pref_notify_news", true)) {
             new NewsChecker(p.context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+
+        if (p.settings.getBoolean("pref_updater_enabled", true)) {
+            new UpdateCheckTask(p.context) {
+                @Override
+                public void result(boolean hasUpdate, @Nullable Branch current_branch) {
+                    if (!hasUpdate || current_branch == null) return;
+
+                    Notify notify = new Notify(p.context)
+                            .title(p.context.getString(R.string.update_available))
+                            .icon(R.drawable.ic_notification_message,
+                                  R.drawable.ic_notification_message_colored)
+                            .cancelOnClick(true)
+                            .onClick(PendingIntent.getActivity(
+                                    p.context, 252,
+                                    new Intent(p.context, SettingsActivity.class),
+                                    PendingIntent.FLAG_UPDATE_CURRENT));
+
+                    notify.setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(current_branch.message));
+
+                    notify.show();
+                }
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
         }
 
         return false;

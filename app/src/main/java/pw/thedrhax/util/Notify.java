@@ -23,11 +23,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 public class Notify extends NotificationCompat.Builder {
     private Context context;
     private NotificationManager nm;
+    private SharedPreferences settings;
 
     private int id = 0;
     private boolean enabled = true;
@@ -37,6 +41,7 @@ public class Notify extends NotificationCompat.Builder {
         super(context);
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
@@ -67,8 +72,11 @@ public class Notify extends NotificationCompat.Builder {
         setPriority(priority); return this;
     }
 
-    public Notify icon(int icon) {
-        setSmallIcon(icon); return this;
+    public Notify icon(int white, int colored) {
+        boolean pref_colored = (Build.VERSION.SDK_INT <= 20) ^
+                settings.getBoolean("pref_notify_alternative", false);
+
+        setSmallIcon(pref_colored ? colored : white); return this;
     }
 
     public Notify progress(int progress, boolean indeterminate) {
