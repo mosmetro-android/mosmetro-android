@@ -44,7 +44,7 @@ public class Randomizer {
     }
 
     public void delay(Listener<Boolean> running) {
-        int delay = delay_min;
+        int delay = delay_min * 1000;
         if (delay_max - delay_min != 0) {
             delay += random.nextInt(1000 * (delay_max - delay_min));
         }
