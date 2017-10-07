@@ -38,6 +38,7 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
 public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
@@ -94,15 +95,29 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         branches = new LinkedList<>();
         for (Object key : branches_json.keySet()) {
-            Branch branch = new Branch((String)key, (JSONObject)branches_json.get(key));
+            Branch branch;
+
+            try {
+                branch = new Branch((String) key, (JSONObject) branches_json.get(key));
+            } catch (NumberFormatException ex) {
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+                continue;
+            }
+
             if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
                 current_branch = branch;
             }
+
             branches.add(branch);
         }
 
+        if (branches.size() == 0) {
+            update_failed = true;
+            return null;
+        }
+
         // Check if selected branch is deleted
-        if (current_branch == null && branches.size() > 0) {
+        if (current_branch == null) {
             // Fallback to master
             settings.edit()
                     .putInt("pref_updater_ignore", 0)
