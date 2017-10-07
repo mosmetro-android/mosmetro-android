@@ -22,6 +22,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -132,8 +133,8 @@ public abstract class Client {
     public abstract void stop();
 
     // Parse methods
-    public Document getPageContent() {
-        return document;
+    @NonNull public Document getPageContent() {
+        return document != null ? document : Jsoup.parse("<html></html>");
     }
 
     @NonNull public String getPage() {
