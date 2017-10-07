@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Patterns;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -113,10 +114,14 @@ public class MosMetroV2 extends Provider {
                 Logger.log(context.getString(R.string.auth_redirect));
 
                 try {
+                    if (!Patterns.WEB_URL.matcher(redirect).matches()) {
+                        throw new ParseException("Invalid URL: " + redirect, 0);
+                    }
+
                     client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
-                } catch (IOException ex) {
+                } catch (IOException | ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_redirect)
