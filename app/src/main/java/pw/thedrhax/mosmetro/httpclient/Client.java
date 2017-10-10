@@ -20,7 +20,6 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -97,7 +96,11 @@ public abstract class Client {
                     }
                 }
             }
-            throw last_ex;
+            if (last_ex != null) {
+                throw last_ex;
+            } else {
+                throw new IOException("Unknown exception (retries=" + retries + ")");
+            }
         }
         public abstract T body() throws IOException;
     }
