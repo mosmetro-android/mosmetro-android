@@ -88,4 +88,10 @@
         android:title="@string/pref_delay_max"
         android:summary="@string/pref_delay_max_summary" />
 
+    <EditTextPreference
+        android:defaultValue="unset"
+        android:key="pref_user_agent"
+        android:title="@string/pref_user_agent"
+        android:summary="@string/pref_user_agent_summary" />
+
 </PreferenceScreen>

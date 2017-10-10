@@ -240,4 +240,6 @@
     <string name="pref_delay_min_summary">Set the minimum value of random delay before every request.</string>
     <string name="pref_delay_max">Maximum delay</string>
     <string name="pref_delay_max_summary">Set the maximum value of random delay before every request.</string>
+    <string name="pref_user_agent">User-Agent header</string>
+    <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
 </resources>

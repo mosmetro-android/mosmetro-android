@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.util.Listener;
-import pw.thedrhax.util.RandomUserAgent;
 
 public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
@@ -48,7 +47,6 @@ public abstract class Client {
     protected Client() {
         headers = new HashMap<>();
 
-        setHeader(HEADER_USER_AGENT, RandomUserAgent.getRandomUserAgent());
         setHeader(HEADER_ACCEPT,
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
         );
