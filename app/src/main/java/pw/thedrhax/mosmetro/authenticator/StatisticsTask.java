@@ -100,6 +100,7 @@ class StatisticsTask implements Task {
                     if (!hasUpdate || current_branch == null) return;
 
                     Notify notify = new Notify(p.context)
+                            .id(3)
                             .title(p.context.getString(R.string.update_available))
                             .icon(R.drawable.ic_notification_message,
                                   R.drawable.ic_notification_message_colored)
