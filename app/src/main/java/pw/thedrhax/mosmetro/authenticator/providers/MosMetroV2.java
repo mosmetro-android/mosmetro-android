@@ -104,6 +104,31 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
+         * Checking for bad redirect
+         * redirect ~= welcome.wi-fi.ru
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (redirect.contains("welcome.wi-fi.ru")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
+                    try {
+                        client.get(redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, client.getPage());
+                    } catch (IOException ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                    }
+
+                    redirect = Uri.parse(redirect).buildUpon()
+                            .authority("auth.wi-fi.ru")
+                            .build().toString();
+                    Logger.log(Logger.LEVEL.DEBUG, redirect);
+                }
+                return true;
+            }
+        });
+
+        /**
          * Getting redirect
          * ⇒ GET http://auth.wi-fi.ru/?segment=... < redirect, segment
          * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth?segment=...
