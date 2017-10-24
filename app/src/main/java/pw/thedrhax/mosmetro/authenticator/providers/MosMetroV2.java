@@ -283,6 +283,10 @@ public class MosMetroV2 extends Provider {
                 if (form == null) { // No CAPTCHA form found => level 2 block
                     Logger.log(context.getString(R.string.auth_ban_message));
 
+                    if (settings.getBoolean("pref_captcha_backdoor", true)) {
+                        return false;
+                    }
+
                     try {
                         if (bypass_mcc(vars)) {
                             Logger.log(context.getString(R.string.auth_ban_bypass_success));
@@ -294,10 +298,6 @@ public class MosMetroV2 extends Provider {
                     } catch (Exception ex) { // Exception type doesn't matter here
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                         Logger.log(context.getString(R.string.auth_ban_bypass_fail));
-                    }
-
-                    if (settings.getBoolean("pref_captcha_backdoor", true)) {
-                        return false;
                     }
 
                     try {
