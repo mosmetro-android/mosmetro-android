@@ -265,9 +265,10 @@ public class MosMetroV2 extends Provider {
                 return tmp_client.getResponseCode() == 200 && isConnected();
             }
 
-            private boolean bypass_mcc() throws IOException {
+            private boolean bypass_mcc(HashMap<String, Object> vars) throws IOException {
                 Logger.log(context.getString(R.string.auth_captcha_bypass_mcc));
-                client.get(redirect + "/auth?segment=mcc", null, pref_retry_count);
+                vars.put("segment", "mcc");
+                client.get(redirect + "/auth?segment=" + vars.get("segment"), null, pref_retry_count);
                 Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                 return !isCaptchaRequested();
             }
@@ -283,7 +284,7 @@ public class MosMetroV2 extends Provider {
                     Logger.log(context.getString(R.string.auth_banned));
 
                     try {
-                        if (bypass_mcc()) {
+                        if (bypass_mcc(vars)) {
                             Logger.log(context.getString(R.string.auth_captcha_bypass_success));
                             vars.put("captcha", "mcc");
                             return true;
