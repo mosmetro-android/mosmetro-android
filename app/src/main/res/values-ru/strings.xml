@@ -207,12 +207,13 @@
     <string name="pref_notify_reply">Ответ через уведомление</string>
     <string name="pref_notify_reply_summary">Позволяет отвечать на некоторые запросы приложения (например, капча) прямо через уведомление. Требуется Android 7.0+.</string>
     <string name="developer_telegram">Группа Telegram</string>
-    <string name="auth_captcha_bypass_success">Капча отключена. Поздравляю! :)</string>
-    <string name="auth_captcha_bypass_fail">Не удалось обойти капчу, продолжаю работу…</string>
-    <string name="auth_captcha_bypass_backdoor">Пытаюсь обойти капчу при помощи официального бэкдора…</string>
+    <string name="auth_ban_message">Вы были временно заблокированы провайдером :(</string>
+    <string name="auth_ban_bypass_success">Блокировка отключена. Поздравляю! :)</string>
+    <string name="auth_ban_bypass_fail">Не удалось обойти блокировку, продолжаю работу…</string>
+    <string name="auth_ban_bypass_backdoor">Пытаюсь обойти блокировку при помощи официального бэкдора…</string>
+    <string name="auth_ban_bypass_mcc">Пытаюсь переопределить сегмент сети…</string>
     <string name="pref_internet_check_interval">Интервал проверок</string>
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
-    <string name="auth_banned">Вы были временно заблокированы провайдером :(</string>
     <string name="pref_captcha_backdoor">Обход блокировки</string>
     <string name="pref_captcha_backdoor_summary">Пытаться обойти блокировку используя официальный бекдор</string>
     <string name="pref_category_captcha">Капча и блокировки</string>
@@ -222,5 +223,4 @@
     <string name="pref_delay_min_summary">Минимальное значение случайной задержки перед запросом.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
-    <string name="auth_captcha_bypass_mcc">Пытаюсь переопределить сегмент сети...</string>
 </resources>
