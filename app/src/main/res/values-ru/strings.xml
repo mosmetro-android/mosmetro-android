@@ -222,4 +222,5 @@
     <string name="pref_delay_min_summary">Минимальное значение случайной задержки перед запросом.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
+    <string name="auth_captcha_bypass_mcc">Пытаюсь переопределить сегмент сети...</string>
 </resources>

@@ -265,6 +265,13 @@ public class MosMetroV2 extends Provider {
                 return tmp_client.getResponseCode() == 200 && isConnected();
             }
 
+            private boolean bypass_mcc() throws IOException {
+                Logger.log(context.getString(R.string.auth_captcha_bypass_mcc));
+                client.get(redirect + "/auth?segment=mcc", null, pref_retry_count);
+                Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                return !isCaptchaRequested();
+            }
+
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
@@ -274,6 +281,19 @@ public class MosMetroV2 extends Provider {
 
                 if (form == null) { // No CAPTCHA form found => level 2 block
                     Logger.log(context.getString(R.string.auth_banned));
+
+                    try {
+                        if (bypass_mcc()) {
+                            Logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                            vars.put("captcha", "mcc");
+                            return true;
+                        } else {
+                            throw new Exception("Doesn't work");
+                        }
+                    } catch (Exception ex) { // Exception type doesn't matter here
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                    }
 
                     if (settings.getBoolean("pref_captcha_backdoor", true)) {
                         return false;
