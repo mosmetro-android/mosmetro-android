@@ -134,7 +134,7 @@ public class DebugActivity extends Activity {
                 return true;
 
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
 
             case R.id.action_clear:
@@ -145,6 +145,15 @@ public class DebugActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(
+                new Intent(this, SettingsActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        );
+        finish();
     }
 
     public void button_shortcut (View view) {
