@@ -10,7 +10,7 @@
         android:title="@string/pref_wifi_reconnect" />
 
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="pref_wifi_bind"
         android:summary="@string/pref_wifi_bind_summary"
         android:title="@string/pref_wifi_bind" />
@@ -87,6 +87,12 @@
         android:inputType="number"
         android:title="@string/pref_delay_max"
         android:summary="@string/pref_delay_max_summary" />
+
+    <EditTextPreference
+        android:defaultValue="unset"
+        android:key="pref_user_agent"
+        android:title="@string/pref_user_agent"
+        android:summary="@string/pref_user_agent_summary" />
 
     <PreferenceCategory android:title="domru" />
 

@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Patterns;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -103,6 +104,31 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
+         * Checking for bad redirect
+         * redirect ~= welcome.wi-fi.ru
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (redirect.contains("welcome.wi-fi.ru")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
+                    try {
+                        client.get(redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, client.getPage());
+                    } catch (IOException ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                    }
+
+                    redirect = Uri.parse(redirect).buildUpon()
+                            .authority("auth.wi-fi.ru")
+                            .build().toString();
+                    Logger.log(Logger.LEVEL.DEBUG, redirect);
+                }
+                return true;
+            }
+        });
+
+        /**
          * Getting redirect
          * ⇒ GET http://auth.wi-fi.ru/?segment=... < redirect, segment
          * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth?segment=...
@@ -113,10 +139,14 @@ public class MosMetroV2 extends Provider {
                 Logger.log(context.getString(R.string.auth_redirect));
 
                 try {
+                    if (!Patterns.WEB_URL.matcher(redirect).matches()) {
+                        throw new ParseException("Invalid URL: " + redirect, 0);
+                    }
+
                     client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
                     return true;
-                } catch (IOException ex) {
+                } catch (IOException | ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_redirect)
@@ -185,7 +215,7 @@ public class MosMetroV2 extends Provider {
             }
 
             private boolean bypass_backdoor() throws IOException {
-                Logger.log(context.getString(R.string.auth_captcha_bypass_backdoor));
+                Logger.log(context.getString(R.string.auth_ban_bypass_backdoor));
 
                 Client tmp_client = new OkHttp(context)
                         .setTimeout(1000)
@@ -235,6 +265,14 @@ public class MosMetroV2 extends Provider {
                 return tmp_client.getResponseCode() == 200 && isConnected();
             }
 
+            private boolean bypass_mcc(HashMap<String, Object> vars) throws IOException {
+                Logger.log(context.getString(R.string.auth_ban_bypass_mcc));
+                vars.put("segment", "mcc");
+                client.get(redirect + "/auth?segment=" + vars.get("segment"), null, pref_retry_count);
+                Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                return !isCaptchaRequested();
+            }
+
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
@@ -243,15 +281,28 @@ public class MosMetroV2 extends Provider {
                 form = client.getPageContent().getElementsByTag("form").first();
 
                 if (form == null) { // No CAPTCHA form found => level 2 block
-                    Logger.log(context.getString(R.string.auth_banned));
+                    Logger.log(context.getString(R.string.auth_ban_message));
 
-                    if (settings.getBoolean("pref_captcha_backdoor", true)) {
+                    if (!settings.getBoolean("pref_captcha_backdoor", true)) {
                         return false;
                     }
 
                     try {
+                        if (bypass_mcc(vars)) {
+                            Logger.log(context.getString(R.string.auth_ban_bypass_success));
+                            vars.put("captcha", "mcc");
+                            return true;
+                        } else {
+                            throw new Exception("Doesn't work");
+                        }
+                    } catch (Exception ex) { // Exception type doesn't matter here
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        Logger.log(context.getString(R.string.auth_ban_bypass_fail));
+                    }
+
+                    try {
                         if (bypass_backdoor()) {
-                            Logger.log(context.getString(R.string.auth_captcha_bypass_success));
+                            Logger.log(context.getString(R.string.auth_ban_bypass_success));
                             vars.put("result", RESULT.CONNECTED);
                             vars.put("captcha", "backdoor");
                             return false;
@@ -260,7 +311,7 @@ public class MosMetroV2 extends Provider {
                         }
                     } catch (Exception ex) { // Exception type doesn't matter here
                         Logger.log(Logger.LEVEL.DEBUG, ex);
-                        Logger.log(context.getString(R.string.auth_captcha_bypass_fail));
+                        Logger.log(context.getString(R.string.auth_ban_bypass_fail));
                         vars.put("result", RESULT.ERROR);
                         return true;
                     }

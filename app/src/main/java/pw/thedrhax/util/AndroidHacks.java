@@ -35,7 +35,7 @@ public final class AndroidHacks {
     // Refactored answer from Stack Overflow: http://stackoverflow.com/a/28664841
     public static void bindToWiFi(@NonNull Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!settings.getBoolean("pref_wifi_bind", false))
+        if (!settings.getBoolean("pref_wifi_bind", true))
             return;
 
         ConnectivityManager cm = (ConnectivityManager)

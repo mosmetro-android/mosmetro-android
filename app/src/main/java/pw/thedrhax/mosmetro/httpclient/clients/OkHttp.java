@@ -142,6 +142,7 @@ public class OkHttp extends Client {
         if (timeout != 0) setTimeout(timeout * 1000);
 
         random = new Randomizer(context);
+        setHeader(HEADER_USER_AGENT, random.cached_useragent());
     }
 
     @Override

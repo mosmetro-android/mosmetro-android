@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.util.Randomizer;
 
 public class ConnectionPreferences extends Activity {
 
@@ -39,6 +40,9 @@ public class ConnectionPreferences extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Generate random User-Agent if it is unset
+        new Randomizer(this).cached_useragent();
 
         // Populate preferences
         PreferenceFragment fragment = new SettingsFragment();
