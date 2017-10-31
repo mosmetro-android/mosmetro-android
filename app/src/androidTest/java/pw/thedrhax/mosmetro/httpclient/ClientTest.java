@@ -20,7 +20,7 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import junit.framework.TestCase;
 
-import pw.thedrhax.httpclient.clients.DummyClient;
+import pw.thedrhax.mosmetro.httpclient.clients.DummyClient;
 
 /**
  * A collection of the Client class tests

@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
