@@ -456,7 +456,7 @@ public class MosMetroV2 extends Provider {
                 try {
                     JSONObject response = (JSONObject)new JSONParser().parse(client.getPage());
 
-                    if ((Boolean)response.get("result")) {
+                    if ((Boolean)response.get("result") && isConnected()) {
                         Logger.log(context.getString(R.string.auth_connected));
                         vars.put("result", RESULT.CONNECTED);
                         return true;
@@ -478,15 +478,23 @@ public class MosMetroV2 extends Provider {
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false);
         try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
+            client.get("http://mosgortrans.ru", null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
+        // Detect midsession
+        try {
+            String location = client.get300Redirect();
+            if (location.contains("midsession")) {
+                Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
+                return true;
+            }
+        } catch (ParseException ignored) {}
+
         try {
             redirect = client.parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
             Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected
