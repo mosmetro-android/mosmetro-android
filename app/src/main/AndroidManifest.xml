@@ -26,6 +26,7 @@
         <activity
             android:name=".activities.DebugActivity"
             android:configChanges="orientation|screenSize"
+            android:launchMode="singleTop"
             android:label="@string/manual_connection">
             <intent-filter>
                 <action android:name="pw.thedrhax.mosmetro.activities.DebugActivity" />
