@@ -104,7 +104,6 @@ public class OkHttp extends Client {
                     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
                         HttpUrl host = getHost(url);
                         List<Cookie> url_cookies = loadForRequest(host);
-                        // TODO: You can do better, come on!
                         for (Cookie cookie : cookies) {
                             List<Cookie> for_deletion = new ArrayList<>();
                             for (Cookie old_cookie : url_cookies) {
@@ -115,10 +114,6 @@ public class OkHttp extends Client {
                                 url_cookies.remove(old_cookie);
                             }
                             url_cookies.add(cookie);
-                            Logger.log(Logger.LEVEL.DEBUG, String.format(
-                                    "CookieJar | Add: %s = %s",
-                                    cookie.name(), cookie.value()
-                            ));
                         }
                         this.cookies.put(host, url_cookies);
                     }
