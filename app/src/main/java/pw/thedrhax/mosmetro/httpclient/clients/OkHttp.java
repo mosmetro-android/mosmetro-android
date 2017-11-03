@@ -51,10 +51,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.util.AndroidHacks;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
+import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
     private Context context = null;
@@ -191,7 +191,7 @@ public class OkHttp extends Client {
         }
 
         if (context != null) {
-            AndroidHacks.bindToWiFi(context);
+            new WifiUtils(context).bindToWifi();
         }
 
         last_call = client.newCall(builder.build());

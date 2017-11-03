@@ -22,6 +22,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
@@ -343,6 +344,7 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
+                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
                 if (!from_shortcut) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");

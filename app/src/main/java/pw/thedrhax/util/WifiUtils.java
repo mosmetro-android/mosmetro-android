@@ -20,19 +20,30 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 
 public class WifiUtils {
     public static final String UNKNOWN_SSID = "<unknown ssid>";
 
-    private final WifiManager manager;
+    private final SharedPreferences settings;
+    private final ConnectivityManager cm;
+    private final WifiManager wm;
 
     public WifiUtils(@NonNull Context context) {
-        this.manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        this.wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     /*
@@ -41,7 +52,7 @@ public class WifiUtils {
 
     // Wi-Fi connectivity conditions
     public boolean isConnected(String SSID) {
-        if (!manager.isWifiEnabled()) return false;
+        if (!wm.isWifiEnabled()) return false;
         if (!getSSID().equalsIgnoreCase(SSID)) return false;
         return true;
     }
@@ -57,7 +68,7 @@ public class WifiUtils {
             WifiInfo result = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
             if (result != null) return result;
         }
-        return manager.getConnectionInfo();
+        return wm.getConnectionInfo();
     }
 
     // Get SSID from Intent's EXTRA_WIFI_INFO (API > 14)
@@ -72,12 +83,26 @@ public class WifiUtils {
 
     // Get current IP from WifiManager
     public int getIP() {
-        return manager.getConnectionInfo().getIpAddress();
+        return wm.getConnectionInfo().getIpAddress();
     }
 
     // Get main Wi-Fi state
     public boolean isEnabled() {
-        return manager.isWifiEnabled();
+        return wm.isWifiEnabled();
+    }
+
+    // Get Wi-Fi Network object
+    @Nullable
+    @RequiresApi(21)
+    public Network getNetwork() {
+        for (Network network : cm.getAllNetworks()) {
+            NetworkInfo info = cm.getNetworkInfo(network);
+            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI) {
+                return network;
+            }
+        }
+        Logger.log(this, "getNetwork() | Network is null");
+        return null;
     }
 
     /*
@@ -87,12 +112,47 @@ public class WifiUtils {
     // Reconnect to SSID (only if already configured)
     public void reconnect(String SSID) {
         try {
-            for (WifiConfiguration network : manager.getConfiguredNetworks()) {
+            for (WifiConfiguration network : wm.getConfiguredNetworks()) {
                 if (clear(network.SSID).equals(SSID)) {
-                    manager.enableNetwork(network.networkId, true);
-                    manager.reassociate();
+                    wm.enableNetwork(network.networkId, true);
+                    wm.reassociate();
                 }
             }
         } catch (NullPointerException ignored) {}
+    }
+
+    // Bind to Network
+    @RequiresApi(21)
+    private void bindToNetwork(@Nullable Network network) {
+        if (Build.VERSION.SDK_INT < 23) {
+            try {
+                ConnectivityManager.setProcessDefaultNetwork(network);
+            } catch (IllegalStateException ignored) {}
+        } else {
+            cm.bindProcessToNetwork(network);
+        }
+    }
+
+    // Bind current process to Wi-Fi
+    // Refactored answer from Stack Overflow: http://stackoverflow.com/a/28664841
+    public void bindToWifi() {
+        if (!settings.getBoolean("pref_wifi_bind", true)) return;
+
+        if (Build.VERSION.SDK_INT < 21)
+            cm.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
+        else
+            bindToNetwork(getNetwork());
+    }
+
+    // Report connectivity status to system
+    @RequiresApi(21)
+    public void report(boolean status) {
+        Network network = getNetwork();
+        if (network == null) return;
+
+        if (Build.VERSION.SDK_INT >= 23)
+            cm.reportNetworkConnectivity(network, status);
+        else
+            cm.reportBadNetwork(network);
     }
 }
