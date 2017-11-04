@@ -215,7 +215,7 @@
     <string name="pref_internet_check_interval">Интервал проверок</string>
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
     <string name="pref_captcha_backdoor">Обход блокировки</string>
-Q    <string name="pref_captcha_backdoor_summary">Пытаться отключить блокировку с помощью нескольких методов обхода</string>
+    <string name="pref_captcha_backdoor_summary">Пытаться отключить блокировку с помощью нескольких методов обхода</string>
     <string name="pref_category_captcha">Капча и блокировки</string>
     <string name="pref_delay_max">Максимальная задержка</string>
     <string name="pref_delay_max_summary">Максимальное значение случайной задержки перед запросом.</string>
