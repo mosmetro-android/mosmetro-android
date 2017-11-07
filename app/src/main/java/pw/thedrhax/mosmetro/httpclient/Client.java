@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,6 +39,7 @@ public abstract class Client {
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
+    public static final String HEADER_LOCATION = "Location";
 
     protected Document document;
     protected Map<String,String> headers;
@@ -146,6 +148,9 @@ public abstract class Client {
         return code;
     }
 
+    @Nullable
+    public abstract String getResponseHeader(String name);
+
     public String parseMetaContent (String name) throws ParseException {
         String value = null;
 
@@ -189,6 +194,17 @@ public abstract class Client {
                 link = link.replace("?", "/?");
 
         return link;
+    }
+
+    @NonNull
+    public String get300Redirect() throws ParseException {
+        String redirect = getResponseHeader(HEADER_LOCATION);
+
+        if (redirect == null || redirect.isEmpty()) {
+            throw new ParseException("302 redirect is empty", 0);
+        } else {
+            return redirect;
+        }
     }
 
     public static Map<String,String> parseForm (Element form) {
