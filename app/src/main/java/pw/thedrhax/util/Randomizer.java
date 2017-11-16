@@ -49,10 +49,9 @@ public class Randomizer {
     }
 
     public void delay(Listener<Boolean> running) {
-        int delay = delay_min * 1000;
-        if (delay_max - delay_min != 0) {
-            delay += random.nextInt(1000 * (delay_max - delay_min));
-        }
+        double a = (delay_max + delay_min) / 2;
+        double s = Math.sqrt((delay_max - a)) / 3;
+        int delay = (int) ((random.nextGaussian() * s + a) * 1000);
 
         while (delay >= 100 && running.get()) {
             delay -= 100;
