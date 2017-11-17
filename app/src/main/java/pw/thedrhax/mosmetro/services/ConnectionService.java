@@ -281,8 +281,13 @@ public class ConnectionService extends IntentService {
             Logger.log(getString(R.string.auth_connecting, SSID));
 
             running.set(true);
-            main();
-            running.set(false);
+            while (running.get()) {
+                main();
+
+                if (running.get()) {
+                    Logger.log(this, "Still alive!");
+                }
+            }
             lock.unlock();
 
             notify.hide();
@@ -306,8 +311,10 @@ public class ConnectionService extends IntentService {
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
-            if (running.get())
+            if (running.get()) {
                 notify(Provider.RESULT.ERROR);
+                running.set(false);
+            }
             return;
         }
 
@@ -348,6 +355,7 @@ public class ConnectionService extends IntentService {
                 if (!from_shortcut) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
+                running.set(false);
                 return;
         }
 
@@ -367,8 +375,7 @@ public class ConnectionService extends IntentService {
             if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
                 Logger.log(this, "Checking internet connection");
                 count = 0;
-                if (!provider.isConnected())
-                    break;
+                if (!provider.isConnected()) running.set(false);
             }
         }
 
@@ -380,12 +387,6 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) {
             Logger.log(this, "Reconnecting to Wi-Fi");
             wifi.reconnect(SSID);
-        }
-
-        // If Service is not being killed, continue the main loop
-        if (running.get()) {
-            Logger.log(this, "Still alive!");
-            main();
         }
 	}
 
