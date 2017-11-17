@@ -261,6 +261,11 @@ public class ConnectionService extends IntentService {
         }
         SSID = wifi.getSSID(intent);
 
+        if (!running.get() && lock.isLocked()) {
+            // Service is shutting down. Trying to interrupt
+            running.set(true);
+        }
+
         if (!running.get() && !lock.isLocked()) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
                 if (Provider.isSSIDSupported(SSID) || from_shortcut)
