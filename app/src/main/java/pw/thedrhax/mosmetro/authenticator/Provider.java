@@ -184,6 +184,7 @@ public abstract class Provider extends LinkedList<Task> {
             client.get(GENERATE_204_HTTP, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
+            return false;
         }
         if (client.getResponseCode() != 204) return false;
 
@@ -191,6 +192,7 @@ public abstract class Provider extends LinkedList<Task> {
             client.get(GENERATE_204_HTTPS, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
+            return false;
         }
         return client.getResponseCode() == 204;
     }
