@@ -380,7 +380,8 @@ public class ConnectionService extends IntentService {
             if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
                 Logger.log(this, "Checking internet connection");
                 count = 0;
-                if (!provider.isConnected()) running.set(false);
+                if (!provider.isConnected())
+                    break;
             }
         }
 
