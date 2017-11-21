@@ -1,44 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical" android:weightSum="1">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <ScrollView android:layout_width="fill_parent"
-                android:layout_height="0dp"
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
         android:layout_weight="1">
-        <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/text_messages"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|top"
-                android:layout_margin="10dp"
-                android:enabled="true"
-                android:fontFamily="monospace"
-                android:textColor="@android:color/black"
-                android:textIsSelectable="true"
-                android:textSize="14sp"
-                tools:targetApi="jelly_bean" />
-        </FrameLayout>
-    </ScrollView>
-    <CheckBox
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/text_messages"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/show_debug_log"
-        android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
-            android:onClick="show_debug_log"/>
+            android:layout_margin="10dp"
+            android:fontFamily="monospace"
+            android:textColor="@android:color/black"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            tools:targetApi="jelly_bean" />
+
+    </ScrollView>
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_debug_log"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:onClick="show_debug_log" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <Button android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/retry"
-            android:onClick="button_connect" android:layout_weight="1" android:id="@+id/button_connect" />
-        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/manual_connection_shortcut"
-            android:onClick="button_shortcut" android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/button_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="button_connect"
+            android:text="@string/retry" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="button_shortcut"
+            android:text="@string/manual_connection_shortcut" />
+
     </LinearLayout>
+
 </LinearLayout>
