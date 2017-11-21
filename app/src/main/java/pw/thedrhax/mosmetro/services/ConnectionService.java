@@ -286,12 +286,15 @@ public class ConnectionService extends IntentService {
             Logger.log(getString(R.string.auth_connecting, SSID));
 
             running.set(true);
+            boolean first_iteration = true;
             while (running.get()) {
-                main();
-
-                if (running.get()) {
+                if (!first_iteration) {
                     Logger.log(this, "Still alive!");
+                } else {
+                    first_iteration = false;
                 }
+
+                main();
             }
             lock.unlock();
 
