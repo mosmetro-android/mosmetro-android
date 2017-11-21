@@ -261,6 +261,11 @@ public class ConnectionService extends IntentService {
         }
         SSID = wifi.getSSID(intent);
 
+        if (!running.get() && lock.isLocked()) {
+            // Service is shutting down. Trying to interrupt
+            running.set(true);
+        }
+
         if (!running.get() && !lock.isLocked()) // Ignore if service is already running
             if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
                 if (Provider.isSSIDSupported(SSID) || from_shortcut)
@@ -281,8 +286,16 @@ public class ConnectionService extends IntentService {
             Logger.log(getString(R.string.auth_connecting, SSID));
 
             running.set(true);
-            main();
-            running.set(false);
+            boolean first_iteration = true;
+            while (running.get()) {
+                if (!first_iteration) {
+                    Logger.log(this, "Still alive!");
+                } else {
+                    first_iteration = false;
+                }
+
+                main();
+            }
             lock.unlock();
 
             notify.hide();
@@ -306,8 +319,10 @@ public class ConnectionService extends IntentService {
 
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
-            if (running.get())
+            if (running.get()) {
                 notify(Provider.RESULT.ERROR);
+                running.set(false);
+            }
             return;
         }
 
@@ -348,6 +363,7 @@ public class ConnectionService extends IntentService {
                 if (!from_shortcut) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
+                running.set(false);
                 return;
         }
 
@@ -380,12 +396,6 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_wifi_reconnect", false)) {
             Logger.log(this, "Reconnecting to Wi-Fi");
             wifi.reconnect(SSID);
-        }
-
-        // If Service is not being killed, continue the main loop
-        if (running.get()) {
-            Logger.log(this, "Still alive!");
-            main();
         }
 	}
 
