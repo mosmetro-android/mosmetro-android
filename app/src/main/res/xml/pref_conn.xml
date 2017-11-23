@@ -75,14 +75,14 @@
         android:title="@string/pref_timeout" />
 
     <EditTextPreference
-        android:defaultValue="1"
+        android:defaultValue="5"
         android:key="pref_delay_min"
         android:inputType="number"
         android:title="@string/pref_delay_min"
         android:summary="@string/pref_delay_min_summary" />
 
     <EditTextPreference
-        android:defaultValue="3"
+        android:defaultValue="10"
         android:key="pref_delay_max"
         android:inputType="number"
         android:title="@string/pref_delay_max"
