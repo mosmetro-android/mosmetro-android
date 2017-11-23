@@ -43,6 +43,7 @@ public class Notify extends NotificationCompat.Builder {
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
 
+        style(new NotificationCompat.BigTextStyle());
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
 
@@ -77,6 +78,10 @@ public class Notify extends NotificationCompat.Builder {
                 settings.getBoolean("pref_notify_alternative", false);
 
         setSmallIcon(pref_colored ? colored : white); return this;
+    }
+
+    public Notify style(NotificationCompat.Style style) {
+        setStyle(style); return this;
     }
 
     public Notify progress(int progress, boolean indeterminate) {
