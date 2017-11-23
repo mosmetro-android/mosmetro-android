@@ -31,6 +31,7 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
@@ -59,19 +60,30 @@ class StatisticsTask implements Task {
         WifiUtils wifi = new WifiUtils(p.context);
 
         final Map<String,String> params = new HashMap<>();
-        params.put("version", Version.getFormattedVersion());
+
+        params.put("version_name", Version.getVersionName());
+        params.put("version_code", "" + Version.getVersionCode());
+        params.put("build_branch", Version.getBranch());
+        params.put("build_number", "" + Version.getBuildNumber());
+
         params.put("success", connected ? "true" : "false");
         params.put("ssid", wifi.getSSID());
         params.put("provider", p.getName());
-        if (vars.get("captcha") != null) {
-            params.put("captcha", (String) vars.get("captcha"));
-            if ("entered".equals(vars.get("captcha"))) {
+        params.put("bssid", wifi.getWifiInfo(null).getBSSID());
+
+        // MosMetroV2 metrics
+        if (p instanceof MosMetroV2) {
+            params.put("segment", (String) vars.get("segment"));
+
+            params.put("ban_bypass", (String) vars.get("captcha"));
+            params.put("ban_count", "" + p.settings.getInt("metric_ban_count", 0));
+            p.settings.edit().putInt("metric_ban_count", 0).apply();
+
+            if (vars.get("captcha") != null && "entered".equals(vars.get("captcha"))) {
                 params.put("captcha_image", (String) vars.get("captcha_image"));
                 params.put("captcha_code", (String) vars.get("captcha_code"));
             }
         }
-        params.put("bssid", wifi.getWifiInfo(null).getBSSID());
-        params.put("segment", (String)vars.get("segment"));
 
         new AsyncTask<Void,Void,Void>() {
             @Override

@@ -283,6 +283,11 @@ public class MosMetroV2 extends Provider {
                 if (form == null) { // No CAPTCHA form found => level 2 block
                     Logger.log(context.getString(R.string.auth_ban_message));
 
+                    // Increase ban counter
+                    settings.edit()
+                            .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                            .apply();
+
                     if (!settings.getBoolean("pref_captcha_backdoor", true)) {
                         return false;
                     }

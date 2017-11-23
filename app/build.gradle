@@ -21,7 +21,7 @@ android {
         buildConfigField "String", "API_URL_DEFAULT", "\"https://mosmetro.duckdns.org\""
 
         // Relative URLs for stat server
-        buildConfigField "String", "API_REL_STATISTICS", "\"/api/v1/statistics.php\""
+        buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
