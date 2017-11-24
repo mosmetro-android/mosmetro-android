@@ -44,7 +44,7 @@
         Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset.
     </string>
     <string name="pref_wifi_bind">Bind process to the network (Android 5.0+)</string>
-    <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network but may cause problems with VPN.</string>
+    <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network.</string>
 
     <string name="pref_internet_check">Connection monitoring</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
