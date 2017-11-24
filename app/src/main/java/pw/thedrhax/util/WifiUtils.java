@@ -91,18 +91,28 @@ public class WifiUtils {
         return wm.isWifiEnabled();
     }
 
-    // Get Wi-Fi Network object
+    // Get Network by type
     @Nullable
     @RequiresApi(21)
-    public Network getNetwork() {
+    public Network getNetwork(int type) {
         for (Network network : cm.getAllNetworks()) {
             NetworkInfo info = cm.getNetworkInfo(network);
-            if (info != null && info.getType() == ConnectivityManager.TYPE_WIFI) {
+            if (info != null && info.getType() == type) {
                 return network;
             }
         }
-        Logger.log(this, "getNetwork() | Network is null");
         return null;
+    }
+
+    // Get VPN (if active) or Wi-Fi Network object
+    @Nullable
+    @RequiresApi(21)
+    public Network getNetwork() {
+        Network result = getNetwork(ConnectivityManager.TYPE_VPN);
+        if (result == null) {
+            result = getNetwork(ConnectivityManager.TYPE_WIFI);
+        }
+        return result;
     }
 
     /*
