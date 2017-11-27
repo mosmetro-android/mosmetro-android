@@ -39,7 +39,7 @@
         android:title="@string/pref_captcha_dialog" />
 
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="pref_captcha_backdoor"
         android:title="@string/pref_captcha_backdoor"
         android:summary="@string/pref_captcha_backdoor_summary" />
