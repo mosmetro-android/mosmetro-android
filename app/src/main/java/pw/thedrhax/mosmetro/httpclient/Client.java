@@ -18,6 +18,7 @@
 
 package pw.thedrhax.mosmetro.httpclient;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.util.Listener;
+import pw.thedrhax.util.Randomizer;
+import pw.thedrhax.util.Util;
 
 public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
@@ -41,21 +44,32 @@ public abstract class Client {
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
 
+    protected Context context;
+    protected Randomizer random;
     protected Document document;
     protected Map<String,String> headers;
     protected String raw_document = "";
     protected int code = 200;
 
-    protected Client() {
-        headers = new HashMap<>();
-
-        setHeader(HEADER_ACCEPT,
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-        );
+    protected Client(Context context) {
+        this.context = context;
+        this.headers = new HashMap<>();
+        this.random = new Randomizer(context);
     }
 
     // Settings methods
     public abstract Client followRedirects(boolean follow);
+
+    public Client configure() {
+        setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
+
+        setHeader(HEADER_USER_AGENT, random.cached_useragent());
+        setHeader(HEADER_ACCEPT,
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        );
+
+        return this;
+    }
 
     public Client setHeader (String name, String value) {
         headers.put(name, value); return this;

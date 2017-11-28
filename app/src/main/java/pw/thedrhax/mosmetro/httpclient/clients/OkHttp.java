@@ -53,23 +53,23 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.util.Randomizer;
-import pw.thedrhax.util.Util;
 import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
-    private Context context = null;
     private OkHttpClient client;
     private Call last_call = null;
-    private Randomizer random;
     private Headers response_headers = null;
 
     private SSLSocketFactory trustAllCerts() {
         // Create a trust manager that does not validate certificate chains
         X509TrustManager tm = new X509TrustManager() {
-            @Override public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-            @Override public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-            @Override public X509Certificate[] getAcceptedIssuers() {return new X509Certificate[]{};}
+            @Override public void checkClientTrusted(X509Certificate[] chain, String authType)
+                    throws CertificateException {}
+            @Override public void checkServerTrusted(X509Certificate[] chain, String authType)
+                    throws CertificateException {}
+            @Override public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[]{};
+            }
         };
 
         // Install the all-trusting trust manager
@@ -85,6 +85,8 @@ public class OkHttp extends Client {
     }
 
     public OkHttp(Context context) {
+        super(context);
+
         client = new OkHttpClient.Builder()
                 // Don't verify the hostname
                 .hostnameVerifier(new HostnameVerifier() {
@@ -95,47 +97,10 @@ public class OkHttp extends Client {
                 })
                 .sslSocketFactory(trustAllCerts())
                 // Store cookies for this session
-                .cookieJar(new CookieJar() {
-                    private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
-
-                    private HttpUrl getHost (HttpUrl url) {
-                        return HttpUrl.parse("http://" + url.host());
-                    }
-
-                    @Override
-                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                        HttpUrl host = getHost(url);
-                        List<Cookie> url_cookies = loadForRequest(host);
-                        for (Cookie cookie : cookies) {
-                            List<Cookie> for_deletion = new ArrayList<>();
-                            for (Cookie old_cookie : url_cookies) {
-                                if (cookie.name().equals(old_cookie.name()))
-                                    for_deletion.add(old_cookie);
-                            }
-                            for (Cookie old_cookie : for_deletion) {
-                                url_cookies.remove(old_cookie);
-                            }
-                            url_cookies.add(cookie);
-                        }
-                        this.cookies.put(host, url_cookies);
-                    }
-
-                    @Override
-                    public List<Cookie> loadForRequest(HttpUrl url) {
-                        HttpUrl host = getHost(url);
-                        List<Cookie> url_cookies = cookies.get(host);
-                        return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
-                    }
-                })
+                .cookieJar(new InterceptedCookieJar())
                 .build();
 
-        // TODO: Move this to Client
-        this.context = context;
-        int timeout = Util.getIntPreference(context, "pref_timeout", 5);
-        if (timeout != 0) setTimeout(timeout * 1000);
-
-        random = new Randomizer(context);
-        setHeader(HEADER_USER_AGENT, random.cached_useragent());
+        configure();
     }
 
     @Override
@@ -160,6 +125,8 @@ public class OkHttp extends Client {
 
     @Override
     public Client setTimeout(int ms) {
+        if (ms == 0) return this;
+
         client = client.newBuilder()
                 .connectTimeout(ms, TimeUnit.MILLISECONDS)
                 .readTimeout(ms, TimeUnit.MILLISECONDS)
@@ -274,5 +241,38 @@ public class OkHttp extends Client {
         // Clean-up useless tags: <script>, <style>
         document.getElementsByTag("script").remove();
         document.getElementsByTag("style").remove();
+    }
+
+    private class InterceptedCookieJar implements CookieJar {
+        private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
+
+        private HttpUrl getHost (HttpUrl url) {
+            return HttpUrl.parse("http://" + url.host());
+        }
+
+        @Override
+        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+            HttpUrl host = getHost(url);
+            List<Cookie> url_cookies = loadForRequest(host);
+            for (Cookie cookie : cookies) {
+                List<Cookie> for_deletion = new ArrayList<>();
+                for (Cookie old_cookie : url_cookies) {
+                    if (cookie.name().equals(old_cookie.name()))
+                        for_deletion.add(old_cookie);
+                }
+                for (Cookie old_cookie : for_deletion) {
+                    url_cookies.remove(old_cookie);
+                }
+                url_cookies.add(cookie);
+            }
+            this.cookies.put(host, url_cookies);
+        }
+
+        @Override
+        public List<Cookie> loadForRequest(HttpUrl url) {
+            HttpUrl host = getHost(url);
+            List<Cookie> url_cookies = cookies.get(host);
+            return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
+        }
     }
 }
