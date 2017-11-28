@@ -39,10 +39,13 @@ import pw.thedrhax.util.Util;
 
 public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
+    public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
+    public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "upgrade-insecure-requests";
+    public static final String HEADER_DO_NOT_TRACK = "dnt";
 
     protected Context context;
     protected Randomizer random;
@@ -65,8 +68,13 @@ public abstract class Client {
 
         setHeader(HEADER_USER_AGENT, random.cached_useragent());
         setHeader(HEADER_ACCEPT,
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                "text/html,application/xhtml+xml," +
+                "application/xml;q=0.9,image/webp," +
+                "image/apng,*/*;q=0.8"
         );
+        setHeader(HEADER_UPGRADE_INSECURE_REQUESTS, "1");
+        setHeader(HEADER_DO_NOT_TRACK, "1");
+        setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
 
         return this;
     }
