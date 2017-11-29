@@ -44,8 +44,8 @@ public abstract class Client {
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
-    public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "upgrade-insecure-requests";
-    public static final String HEADER_DO_NOT_TRACK = "dnt";
+    public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
+    public static final String HEADER_DO_NOT_TRACK = "DNT";
 
     protected Context context;
     protected Randomizer random;
