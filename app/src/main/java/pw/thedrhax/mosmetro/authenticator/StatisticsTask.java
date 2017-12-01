@@ -76,8 +76,20 @@ class StatisticsTask implements Task {
             params.put("segment", (String) vars.get("segment"));
 
             params.put("ban_bypass", (String) vars.get("captcha"));
-            params.put("ban_count", "" + p.settings.getInt("metric_ban_count", 0));
-            p.settings.edit().putInt("metric_ban_count", 0).apply();
+
+            int version = Version.getBuildNumber() * Version.getVersionCode();
+            int last_version = p.settings.getInt("metric_ban_last_version", 0);
+
+            if (last_version == version) { // filter bans from previous versions
+                params.put("ban_count", "" + p.settings.getInt("metric_ban_count", 0));
+            } else {
+                params.put("ban_count", "" + 0);
+            }
+
+            p.settings.edit()
+                    .putInt("metric_ban_count", 0)
+                    .putInt("metric_ban_last_version", version)
+                    .apply();
 
             if (vars.get("captcha") != null && "entered".equals(vars.get("captcha"))) {
                 params.put("captcha_image", (String) vars.get("captcha_image"));
