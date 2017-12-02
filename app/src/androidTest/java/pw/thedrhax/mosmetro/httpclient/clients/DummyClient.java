@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.httpclient.clients;
 
 import android.support.annotation.Nullable;
+import android.support.test.InstrumentationRegistry;
 
 import org.jsoup.Jsoup;
 
@@ -31,6 +32,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 public class DummyClient extends Client {
 
     public DummyClient(String response) {
+        super(InstrumentationRegistry.getContext());
         this.raw_document = response;
         this.document = Jsoup.parse(response);
         this.code = 200;
