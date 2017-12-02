@@ -74,19 +74,15 @@
         android:summary="@string/pref_timeout_summary"
         android:title="@string/pref_timeout" />
 
-    <EditTextPreference
-        android:defaultValue="5"
-        android:key="pref_delay_min"
-        android:inputType="number"
-        android:title="@string/pref_delay_min"
-        android:summary="@string/pref_delay_min_summary" />
-
-    <EditTextPreference
-        android:defaultValue="10"
-        android:key="pref_delay_max"
-        android:inputType="number"
-        android:title="@string/pref_delay_max"
-        android:summary="@string/pref_delay_max_summary" />
+    <pw.thedrhax.mosmetro.preferences.RangeBarPreference
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:key="pref_delay_range"
+        android:title="@string/pref_delay"
+        android:summary="@string/pref_delay_summary"
+        custom:defaultMin="5"
+        custom:defaultMax="10"
+        custom:min="0"
+        custom:max="20" />
 
     <EditTextPreference
         android:defaultValue="unset"

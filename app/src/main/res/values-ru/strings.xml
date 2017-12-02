@@ -217,10 +217,8 @@
     <string name="pref_captcha_backdoor">Обход блокировки</string>
     <string name="pref_captcha_backdoor_summary">Пытаться отключить блокировку с помощью нескольких методов обхода</string>
     <string name="pref_category_captcha">Капча и блокировки</string>
-    <string name="pref_delay_max">Максимальная задержка</string>
-    <string name="pref_delay_max_summary">Максимальное значение случайной задержки перед запросом.</string>
-    <string name="pref_delay_min">Минимальная задержка</string>
-    <string name="pref_delay_min_summary">Минимальное значение случайной задержки перед запросом.</string>
+    <string name="pref_delay">Случайная задержка</string>
+    <string name="pref_delay_summary">Диапазон значений случайной задержки (в секундах), добавляемой к каждому запросу.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
 </resources>

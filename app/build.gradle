@@ -96,6 +96,7 @@ dependencies {
     compile ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
+    compile 'com.edmodo:rangebar:1.0.0'
 
     // Test dependencies.
     testCompile 'junit:junit:4.12'

@@ -19,6 +19,7 @@
 package pw.thedrhax.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
@@ -32,15 +33,16 @@ public final class Util {
 
     // TODO: Store Integers instead of Strings in SharedPreferences
     public static int getIntPreference (Context context, String name, int def_value) {
-        int result = def_value;
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         try {
-            result = Integer.parseInt(
-                    PreferenceManager
-                            .getDefaultSharedPreferences(context)
-                            .getString(name, Integer.valueOf(def_value).toString())
-            );
-        } catch (NumberFormatException ignored) {}
-        return result;
+            return Integer.parseInt(settings.getString(name, Integer.valueOf(def_value).toString()));
+        } catch (NumberFormatException|ClassCastException ignored) {}
+
+        try {
+            return settings.getInt(name, def_value);
+        } catch (ClassCastException ignored) {}
+
+        return def_value;
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {

@@ -1,0 +1,10 @@
+<resources>
+
+    <declare-styleable name="RangeBarPreference">
+        <attr name="min" format="integer" />
+        <attr name="max" format="integer" />
+        <attr name="defaultMin" format="integer" />
+        <attr name="defaultMax" format="integer" />
+    </declare-styleable>
+
+</resources>
