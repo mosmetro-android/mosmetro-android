@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Patterns;
 
@@ -476,6 +477,39 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     return false;
                 }
+            }
+        });
+
+        /**
+         * Try to disable midsession with non-blocking request
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                new AsyncTask<Void,Void,Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Client tmp_client = new OkHttp(context)
+                                .setRunningListener(running)
+                                .followRedirects(false)
+                                .setDelaysEnabled(true);
+
+                        try {
+                            String location = tmp_client
+                                    .get("http://ya.ru", null, pref_retry_count)
+                                    .get300Redirect();
+
+                            if (location.contains("midsession")) {
+                                Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
+                            }
+                        } catch (IOException|ParseException ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
+                        }
+
+                        return null;
+                    }
+                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                return true;
             }
         });
     }
