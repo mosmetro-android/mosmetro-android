@@ -105,7 +105,8 @@ public abstract class Provider extends LinkedList<Task> {
 
         Client client = new OkHttp(context)
                 .followRedirects(false)
-                .setRunningListener(running);
+                .setRunningListener(running)
+                .setDelaysEnabled(true);
 
         generate_204(client);
         Logger.log(Logger.LEVEL.DEBUG,
@@ -148,7 +149,7 @@ public abstract class Provider extends LinkedList<Task> {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        this.client = new OkHttp(context).setRunningListener(running);
+        this.client = new OkHttp(context).setRunningListener(running).setDelaysEnabled(true);
     }
 
     /**

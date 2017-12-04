@@ -147,7 +147,9 @@ public class OkHttp extends Client {
     }
 
     private Response call(Request.Builder builder) throws IOException {
-        random.delay(running);
+        if (random_delays) {
+            random.delay(running);
+        }
 
         // Populate headers
         for (String name : headers.keySet()) {

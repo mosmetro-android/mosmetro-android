@@ -53,6 +53,7 @@ public abstract class Client {
     protected Map<String,String> headers;
     protected String raw_document = "";
     protected int code = 200;
+    protected boolean random_delays = false;
 
     protected Client(Context context) {
         this.context = context;
@@ -90,6 +91,10 @@ public abstract class Client {
     public Client resetHeaders () {
         headers = new HashMap<>();
         return this;
+    }
+
+    public Client setDelaysEnabled(boolean enabled) {
+        this.random_delays = enabled; return this;
     }
 
     public abstract Client setCookie(String url, String name, String value);

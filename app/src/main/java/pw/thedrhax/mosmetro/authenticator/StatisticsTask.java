@@ -37,6 +37,7 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.Notify;
+import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
@@ -97,9 +98,13 @@ class StatisticsTask implements Task {
             }
         }
 
+        final Randomizer random = new Randomizer(p.context);
+
         new AsyncTask<Void,Void,Void>() {
             @Override
             protected Void doInBackground(Void... none) {
+                random.delay(p.running);
+
                 String STATISTICS_URL = new CachedRetriever(p.context).get(
                         BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT,
                         CachedRetriever.Type.URL
@@ -118,6 +123,8 @@ class StatisticsTask implements Task {
         }
 
         if (p.settings.getBoolean("pref_updater_enabled", true)) {
+            random.delay(p.running);
+
             new UpdateCheckTask(p.context) {
                 @Override
                 public void result(boolean hasUpdate, @Nullable Branch current_branch) {

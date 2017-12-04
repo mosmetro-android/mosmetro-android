@@ -160,7 +160,7 @@ public class MosMetroV1 extends Provider {
 
     @Override
     public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
+        Client client = new OkHttp(context).followRedirects(false).setDelaysEnabled(true);
         try {
             client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (IOException ex) {

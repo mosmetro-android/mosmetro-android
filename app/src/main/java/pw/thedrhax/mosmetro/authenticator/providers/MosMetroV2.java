@@ -219,6 +219,7 @@ public class MosMetroV2 extends Provider {
 
                 Client tmp_client = new OkHttp(context)
                         .setTimeout(1000)
+                        .setDelaysEnabled(true)
                         .resetHeaders()
                         .setHeader(Client.HEADER_USER_AGENT,
                                 new String(Base64.decode(
@@ -481,7 +482,7 @@ public class MosMetroV2 extends Provider {
 
     @Override
     public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
+        Client client = new OkHttp(context).followRedirects(false).setDelaysEnabled(true);
         try {
             client.get(Provider.GENERATE_204_HTTP, null, pref_retry_count);
         } catch (IOException ex) {
