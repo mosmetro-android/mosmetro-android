@@ -50,7 +50,7 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * URL used to detect if Captive Portal is present in the current network.
      */
-    private static final String GENERATE_204_HTTP = "http://google.ru/generate_204";
+    protected static final String GENERATE_204_HTTP = "http://google.ru/generate_204";
     private static final String GENERATE_204_HTTPS = "https://google.com/generate_204";
 
     /**

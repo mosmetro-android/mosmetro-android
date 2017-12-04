@@ -483,7 +483,7 @@ public class MosMetroV2 extends Provider {
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false);
         try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
+            client.get(Provider.GENERATE_204_HTTP, null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
