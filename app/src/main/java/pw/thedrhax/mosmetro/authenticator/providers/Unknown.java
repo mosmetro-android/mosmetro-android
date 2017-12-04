@@ -25,6 +25,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -39,7 +40,7 @@ import pw.thedrhax.util.Logger;
 
 public class Unknown extends Provider {
 
-    public Unknown(final Context context) {
+    public Unknown(final Context context, final Client response) {
         super(context);
 
         /**
@@ -50,7 +51,7 @@ public class Unknown extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 Logger.log(context.getString(R.string.auth_checking_connection));
 
-                if (isConnected()) {
+                if (response.getResponseCode() == 204) {
                     Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                 } else {

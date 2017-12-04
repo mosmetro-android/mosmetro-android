@@ -90,7 +90,7 @@ public abstract class Provider extends LinkedList<Task> {
         if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
         else if (Enforta.match(response)) return new Enforta(context);
-        else return new Unknown(context);
+        else return new Unknown(context, response);
     }
 
     /**
