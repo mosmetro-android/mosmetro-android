@@ -241,4 +241,7 @@
     <string name="pref_delay_summary">Set the range (in seconds) of random delays applied for every request.</string>
     <string name="pref_user_agent">User-Agent header</string>
     <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
+    <string name="do_not_warn">Do now warn anymore</string>
+    <string name="pref_share_warning">Be careful!</string>
+    <string name="pref_share_warning_summary">Connection log may contain sensitive data such as your MAC-address or phone number. Do not send this file to public chats or social networks.</string>
 </resources>

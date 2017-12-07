@@ -19,11 +19,15 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -130,7 +134,31 @@ public class DebugActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                Logger.share(this);
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+                if (!settings.getBoolean("pref_share_warning", false))
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.pref_share_warning)
+                            .setMessage(R.string.pref_share_warning_summary)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Logger.share(DebugActivity.this);
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .setNeutralButton(R.string.do_not_warn, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    PreferenceManager.getDefaultSharedPreferences(DebugActivity.this)
+                                            .edit().putBoolean("pref_share_warning", true).apply();
+                                    Logger.share(DebugActivity.this);
+                                }
+                            })
+                            .show();
+                else
+                    Logger.share(this);
+
                 return true;
 
             case android.R.id.home:
