@@ -18,7 +18,6 @@
 
 package pw.thedrhax.util;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -118,20 +117,11 @@ public class Logger {
      * Log sharing routines
      */
 
-    @SuppressLint("HardwareIds")
-    private static String filterSensitiveData(Context context, String input) {
-        input = input.replaceAll(
-                new WifiUtils(context).getWifiInfo(null).getMacAddress().replace(":", ".?"),
-                "00-00-00-00-00-00"
-        );
-        return input;
-    }
-
     public static Uri writeToFile(Context context) throws IOException {
         File log_file = new File(context.getFilesDir(), "pw.thedrhax.mosmetro.txt");
 
         FileWriter writer = new FileWriter(log_file);
-        writer.write(filterSensitiveData(context, read(Logger.LEVEL.DEBUG)));
+        writer.write(read(Logger.LEVEL.DEBUG));
         writer.flush(); writer.close();
 
         return FileProvider.getUriForFile(context, "pw.thedrhax.mosmetro.provider", log_file);
