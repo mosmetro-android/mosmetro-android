@@ -81,7 +81,7 @@ public class MosMetroV1 extends Provider {
                 Logger.log(context.getString(R.string.auth_auth_page));
 
                 try {
-                    client.get(redirect, null, pref_retry_count).save();
+                    client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
@@ -125,7 +125,7 @@ public class MosMetroV1 extends Provider {
 
                 try {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
-                    client.post(redirect, form, pref_retry_count).save();
+                    client.post(redirect, form, pref_retry_count);
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -163,7 +163,7 @@ public class MosMetroV1 extends Provider {
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false).setDelaysEnabled(true);
         try {
-            client.get("http://wi-fi.ru", null, pref_retry_count).save();
+            client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;

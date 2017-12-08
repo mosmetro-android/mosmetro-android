@@ -161,7 +161,7 @@ public class OkHttp extends Client {
             builder.addHeader(name, getHeader(name));
         }
 
-        if (context != null) {
+        if (context != null && context.getApplicationContext() != null) {
             new WifiUtils(context).bindToWifi();
         }
 
@@ -215,7 +215,7 @@ public class OkHttp extends Client {
         }
 
         return new ParsedResponse(
-                this, response.request().url().toString(), body.string(),
+                response.request().url().toString(), body.string(),
                 response.code(), response.headers().toMultimap()
         );
     }

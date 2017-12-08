@@ -74,12 +74,6 @@ public class ProviderTest extends TestCase {
 
                 Unknown.class
         );
-
-        assertEquals("Null response",
-                Provider.find(context, (ParsedResponse)null).getClass(),
-
-                Unknown.class
-        );
     }
 
     /**

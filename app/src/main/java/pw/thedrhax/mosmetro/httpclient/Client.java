@@ -19,7 +19,9 @@
 package pw.thedrhax.mosmetro.httpclient;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
@@ -44,13 +46,15 @@ public abstract class Client {
     protected Map<String,String> headers;
     protected Context context;
     protected Randomizer random;
+    protected SharedPreferences settings;
     protected boolean random_delays = false;
-    protected ParsedResponse last_response = new ParsedResponse(this, "", "", 200, null);
+    protected ParsedResponse last_response = new ParsedResponse("", "", 200, null);
 
     protected Client(Context context) {
         this.context = context;
         this.headers = new HashMap<>();
         this.random = new Randomizer(context);
+        this.settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     // Settings methods
@@ -99,6 +103,18 @@ public abstract class Client {
     public abstract ParsedResponse post(String link, Map<String,String> params) throws IOException;
     public abstract InputStream getInputStream(String link) throws IOException;
 
+    private ParsedResponse saveResponse(ParsedResponse response) {
+        this.last_response = response;
+
+        setHeader(Client.HEADER_REFERER, last_response.getURL());
+
+        if (settings.getBoolean("pref_load_resources", false)) {
+            last_response.loadResources(Client.this);
+        }
+
+        return response;
+    }
+
     @NonNull
     public ParsedResponse response() {
         return last_response;
@@ -111,7 +127,7 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 random.delay(running);
-                return get(link, params);
+                return saveResponse(get(link, params));
             }
         }.run(retries);
     }
@@ -121,7 +137,7 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 random.delay(running);
-                return post(link, params);
+                return saveResponse(post(link, params));
             }
         }.run(retries);
     }

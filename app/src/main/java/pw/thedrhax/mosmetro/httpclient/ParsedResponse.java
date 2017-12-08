@@ -19,7 +19,6 @@
 package pw.thedrhax.mosmetro.httpclient;
 
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -37,16 +36,14 @@ import java.util.Map;
 import pw.thedrhax.util.Logger;
 
 public class ParsedResponse {
-    private Client client;
     private String url;
     private String html;
     private Document document;
     private int code;
     private Map<String,List<String>> headers = new HashMap<>();
 
-    public ParsedResponse(Client client, @Nullable String url, @Nullable String html,
-                          int code, @Nullable Map<String,List<String>> headers) {
-        this.client = client;
+    public ParsedResponse(@Nullable String url, @Nullable String html, int code,
+                          @Nullable Map<String,List<String>> headers) {
         this.url = url;
         this.html = html;
 
@@ -70,35 +67,17 @@ public class ParsedResponse {
     }
 
     public ParsedResponse(String html) {
-        this(null, "", html, 200, null);
-    }
-
-    public Client save() {
-        if (client != null) {
-            client.last_response = this;
-            client.setHeader(Client.HEADER_REFERER, url);
-
-            if (PreferenceManager
-                    .getDefaultSharedPreferences(client.context)
-                    .getBoolean("pref_load_resources", false)) {
-
-                for (String link : parseResourceList()) {
-                    Logger.log(this, link);
-                    try {
-                        client.get(link, null);
-                    } catch (IOException ignored) {}
-                }
-            }
-
-            return client;
-        } else {
-            throw new RuntimeException("This ParsedResponse is not attached to any Client!");
-        }
+        this("", html, 200, null);
     }
 
     @NonNull
     public String getPage() {
         return html;
+    }
+
+    @Nullable
+    public String getURL() {
+        return url;
     }
 
     public int getResponseCode() {
@@ -223,6 +202,15 @@ public class ParsedResponse {
         }
 
         return result;
+    }
+
+    public void loadResources(Client client) {
+        for (String link : parseResourceList()) {
+            Logger.log(this, link);
+            try {
+                client.get(link, null);
+            } catch (IOException ignored) {}
+        }
     }
 
     public static Map<String,String> parseForm (Element form) {
