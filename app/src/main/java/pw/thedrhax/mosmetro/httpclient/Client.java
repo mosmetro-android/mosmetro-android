@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.util.Listener;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
@@ -190,8 +191,13 @@ public abstract class Client {
                 } catch (IOException ex) {
                     last_ex = ex;
                     if (running.get()) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        Logger.log(Client.this,
+                                "Retrying request (try " + (i+1) + " out of " + retries + ")"
+                        );
                         SystemClock.sleep(1000);
                     } else {
+                        Logger.log(Client.this, "Giving up (interrupted)");
                         break;
                     }
                 }
