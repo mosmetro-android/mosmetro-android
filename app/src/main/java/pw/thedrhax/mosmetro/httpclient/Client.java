@@ -191,7 +191,7 @@ public abstract class Client {
                 } catch (IOException ex) {
                     last_ex = ex;
                     if (running.get()) {
-                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                        Logger.log(Logger.LEVEL.DEBUG, ex.toString());
                         Logger.log(Client.this,
                                 "Retrying request (try " + (i+1) + " out of " + retries + ")"
                         );
