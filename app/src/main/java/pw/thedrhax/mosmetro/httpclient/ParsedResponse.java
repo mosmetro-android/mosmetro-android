@@ -22,6 +22,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -140,6 +142,11 @@ public class ParsedResponse {
                 link = link.replace("?", "/?");
 
         return link;
+    }
+
+    @NonNull
+    public JSONObject json() throws org.json.simple.parser.ParseException {
+        return (JSONObject) new JSONParser().parse(getPage());
     }
 
     @NonNull

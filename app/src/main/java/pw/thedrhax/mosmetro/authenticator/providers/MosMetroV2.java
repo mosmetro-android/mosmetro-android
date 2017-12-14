@@ -27,7 +27,6 @@ import android.util.Base64;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
@@ -491,23 +490,24 @@ public class MosMetroV2 extends Provider {
                 Logger.log(context.getString(R.string.auth_checking_connection));
 
                 try {
-                    JSONObject response = (JSONObject)new JSONParser()
-                            .parse(client.response().getPage());
+                    JSONObject response = client.get(
+                            redirect + "/auth/check?segment=" + vars.get("segment"),
+                            null, pref_retry_count
+                    ).json();
 
-                    if ((Boolean)response.get("result")) {
+                    if ((Boolean) response.get("result")) {
                         Logger.log(context.getString(R.string.auth_connected));
                         vars.put("result", RESULT.CONNECTED);
                         return true;
-                    } else {
-                        Logger.log(context.getString(R.string.error,
-                                context.getString(R.string.auth_error_connection)
-                        ));
-                        return false;
                     }
-                } catch (org.json.simple.parser.ParseException ex) {
+                } catch (IOException|org.json.simple.parser.ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
-                    return false;
                 }
+
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_connection)
+                ));
+                return false;
             }
         });
 
