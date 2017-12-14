@@ -219,4 +219,16 @@ public class Randomizer {
 
         return settings.getString("pref_user_agent", useragent());
     }
+
+    public String string(String chars, int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            builder.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return builder.toString();
+    }
+
+    public String string(int length) {
+        return string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length);
+    }
 }

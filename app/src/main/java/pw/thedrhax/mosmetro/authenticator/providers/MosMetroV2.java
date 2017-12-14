@@ -46,6 +46,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Randomizer;
 
 /**
  * The MosMetroV2 class supports the actual version of the MosMetro algorithm.
@@ -186,6 +187,29 @@ public class MosMetroV2 extends Provider {
                     ));
                     return false;
                 }
+            }
+        });
+
+        /**
+         * Setting auth token
+         * ⇒ GET http://auth.wi-fi.ru/auth/set_token?token= < random.string(6)
+         * ⇐ 200 OK
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                String token = new Randomizer(context).string(6);
+                Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
+
+                try {
+                    ParsedResponse response = client.get(
+                            redirect + "/auth/set_token?token=" + token, null
+                    );
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                }
+                return true;
             }
         });
 
