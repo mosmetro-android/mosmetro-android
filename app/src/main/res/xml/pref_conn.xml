@@ -91,7 +91,7 @@
         android:summary="@string/pref_user_agent_summary" />
 
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="pref_load_resources"
         android:title="@string/pref_load_resources"
         android:summary="@string/pref_load_resources_summary" />

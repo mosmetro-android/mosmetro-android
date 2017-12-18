@@ -109,7 +109,7 @@ public abstract class Client {
 
         setHeader(Client.HEADER_REFERER, last_response.getURL());
 
-        if (settings.getBoolean("pref_load_resources", false)) {
+        if (settings.getBoolean("pref_load_resources", true)) {
             last_response.loadResources(Client.this);
         }
 
