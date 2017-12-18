@@ -530,9 +530,12 @@ public class MosMetroV2 extends Provider {
                                     .get("http://ya.ru", null, pref_retry_count)
                                     .get300Redirect();
 
-                            if (location.contains("midsession")) {
-                                Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
-                            }
+                            if (!location.contains("midsession")) return null;
+
+                            Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
+
+                            tmp_client.get(location, null, pref_retry_count);
+                            Logger.log(Logger.LEVEL.DEBUG, tmp_client.response().toString());
                         } catch (IOException|ParseException ex) {
                             Logger.log(Logger.LEVEL.DEBUG, ex);
                         }
