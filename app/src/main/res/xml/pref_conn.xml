@@ -96,4 +96,10 @@
         android:title="@string/pref_load_resources"
         android:summary="@string/pref_load_resources_summary" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_mosmetro_midsession"
+        android:title="@string/pref_mosmetro_midsession"
+        android:summary="@string/pref_mosmetro_midsession_summary" />
+
 </PreferenceScreen>

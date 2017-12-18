@@ -243,4 +243,6 @@
     <string name="pref_load_resources_summary">Download all resources included into HTML page to emulate browser activity.</string>
     <string name="pref_user_agent">User-Agent header</string>
     <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
+    <string name="pref_mosmetro_midsession">Try to disable midsession</string>
+    <string name="pref_mosmetro_midsession_summary">Midsession is a random redirect from any HTTP site to advertisement page.</string>
 </resources>

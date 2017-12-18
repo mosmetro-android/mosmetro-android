@@ -223,4 +223,6 @@
     <string name="pref_load_resources_summary">Скачивать все ресурсы, включённые в HTML-страницу, для более точной имитации поведения браузера.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
+    <string name="pref_mosmetro_midsession">Пытаться отключить midsession</string>
+    <string name="pref_mosmetro_midsession_summary">Midsession это случайное перенаправление с любого HTTP сайта на страницу с рекламой.</string>
 </resources>

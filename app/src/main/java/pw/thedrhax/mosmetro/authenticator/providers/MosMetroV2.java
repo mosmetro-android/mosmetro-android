@@ -514,6 +514,7 @@ public class MosMetroV2 extends Provider {
         /**
          * Try to disable midsession with non-blocking request
          */
+        if (settings.getBoolean("pref_mosmetro_midsession", true))
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
