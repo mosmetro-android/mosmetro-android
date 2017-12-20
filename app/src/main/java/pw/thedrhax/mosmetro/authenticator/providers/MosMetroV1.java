@@ -30,6 +30,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 
@@ -81,7 +82,7 @@ public class MosMetroV1 extends Provider {
 
                 try {
                     client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -100,7 +101,7 @@ public class MosMetroV1 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Elements forms = client.getPageContent().getElementsByTag("form");
+                Elements forms = client.response().getPageContent().getElementsByTag("form");
                 if (forms.size() > 1) {
                     Logger.log(context.getString(R.string.error,
                                 context.getString(R.string.auth_error_not_registered)
@@ -108,7 +109,7 @@ public class MosMetroV1 extends Provider {
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }
-                vars.put("form", Client.parseForm(forms.first()));
+                vars.put("form", ParsedResponse.parseForm(forms.first()));
                 return true;
             }
         });
@@ -169,8 +170,8 @@ public class MosMetroV1 extends Provider {
         }
 
         try {
-            redirect = client.parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, client.getPageContent().outerHtml());
+            redirect = client.response().parseMetaRedirect();
+            Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
             Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected
@@ -183,13 +184,12 @@ public class MosMetroV1 extends Provider {
 
     /**
      * Checks if current network is supported by this Provider implementation.
-     * @param client    Client instance to get the information from. Provider.find()
-     *                  will execute one request to be analyzed by this method.
+     * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(Client client) {
+    public static boolean match(ParsedResponse response) {
         try {
-            return client.parseMetaRedirect().contains("login.wi-fi.ru");
+            return response.parseMetaRedirect().contains("login.wi-fi.ru");
         } catch (ParseException ex) {
             return false;
         }

@@ -18,10 +18,8 @@
 
 package pw.thedrhax.mosmetro.httpclient.clients;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.Nullable;
-
-import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,53 +52,60 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.util.WifiUtils;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
     private Call last_call = null;
-    private Headers response_headers = null;
 
-    private SSLSocketFactory trustAllCerts() {
-        // Create a trust manager that does not validate certificate chains
+    public OkHttp(Context context) {
+        super(context);
+        client = new OkHttpClient.Builder().cookieJar(new InterceptedCookieJar()).build();
+        configure();
+    }
+
+    @Override
+    public Client trustAllCerts() {
         X509TrustManager tm = new X509TrustManager() {
-            @Override public void checkClientTrusted(X509Certificate[] chain, String authType)
+            @SuppressLint("TrustAllX509TrustManager")
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType)
                     throws CertificateException {}
-            @Override public void checkServerTrusted(X509Certificate[] chain, String authType)
+
+            @SuppressLint("TrustAllX509TrustManager")
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType)
                     throws CertificateException {}
-            @Override public X509Certificate[] getAcceptedIssuers() {
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[]{};
             }
         };
 
-        // Install the all-trusting trust manager
+        SSLSocketFactory socketFactory;
         try {
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{tm}, new java.security.SecureRandom());
+            socketFactory = sslContext.getSocketFactory();
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+            return this;
+        }
 
-            // Create an ssl socket factory with our all-trusting manager
-            return sslContext.getSocketFactory();
-        } catch (KeyManagementException | NoSuchAlgorithmException ignored) {}
+        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+            @SuppressLint("BadHostnameVerifier")
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
 
-        return null;
-    }
-
-    public OkHttp(Context context) {
-        super(context);
-
-        client = new OkHttpClient.Builder()
-                // Don't verify the hostname
-                .hostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                })
-                .sslSocketFactory(trustAllCerts())
-                // Store cookies for this session
-                .cookieJar(new InterceptedCookieJar())
+        client = client.newBuilder()
+                .hostnameVerifier(hostnameVerifier)
+                .sslSocketFactory(socketFactory, tm)
                 .build();
 
-        configure();
+        return this;
     }
 
     @Override
@@ -156,7 +161,7 @@ public class OkHttp extends Client {
             builder.addHeader(name, getHeader(name));
         }
 
-        if (context != null) {
+        if (context != null && context.getApplicationContext() != null) {
             new WifiUtils(context).bindToWifi();
         }
 
@@ -165,16 +170,12 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public Client get(String link, Map<String, String> params) throws IOException {
-        parseDocument(call(
-                new Request.Builder().url(link + requestToString(params)).get()
-        ));
-        setHeader(HEADER_REFERER, link);
-        return this;
+    public ParsedResponse get(String link, Map<String, String> params) throws IOException {
+        return parse(call(new Request.Builder().url(link + requestToString(params)).get()));
     }
 
     @Override
-    public Client post(String link, Map<String, String> params) throws IOException {
+    public ParsedResponse post(String link, Map<String, String> params) throws IOException {
         FormBody.Builder body = new FormBody.Builder();
 
         if (params != null) {
@@ -184,35 +185,19 @@ public class OkHttp extends Client {
             }
         }
 
-        parseDocument(call(
-                new Request.Builder().url(link).post(body.build())
-        ));
-        setHeader(HEADER_REFERER, link);
-        return this;
+        return parse(call(new Request.Builder().url(link).post(body.build())));
     }
 
     @Override
     public InputStream getInputStream(String link) throws IOException {
-        Response response = call(
-                new Request.Builder().url(link).get()
-        );
+        Response response = call(new Request.Builder().url(link).get());
         ResponseBody body = response.body();
-        code = response.code();
 
         if (body == null) {
-            throw new IOException("Empty response: " + code);
+            throw new IOException("Empty response: " + response.code());
         }
 
         return body.byteStream();
-    }
-
-    @Override @Nullable
-    public String getResponseHeader(String name) {
-        if (response_headers != null) {
-            return response_headers.get(name);
-        } else {
-            return null;
-        }
     }
 
     @Override
@@ -222,27 +207,17 @@ public class OkHttp extends Client {
         }
     }
 
-    private void parseDocument (Response response) throws IOException {
+    private ParsedResponse parse(Response response) throws IOException {
         ResponseBody body = response.body();
 
         if (body == null) {
-            throw new IOException("Response body is null!");
+            throw new IOException("Response body is null! Code: " + response.code());
         }
 
-        response_headers = response.headers();
-        raw_document = body.string();
-        code = response.code();
-        body.close();
-
-        if (raw_document == null || raw_document.isEmpty()) {
-            return;
-        }
-
-        document = Jsoup.parse(raw_document, response.request().url().toString());
-
-        // Clean-up useless tags: <script>, <style>
-        document.getElementsByTag("script").remove();
-        document.getElementsByTag("style").remove();
+        return new ParsedResponse(
+                response.request().url().toString(), body.string(),
+                response.code(), response.headers().toMultimap()
+        );
     }
 
     private class InterceptedCookieJar implements CookieJar {

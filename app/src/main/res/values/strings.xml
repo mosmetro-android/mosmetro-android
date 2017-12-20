@@ -239,9 +239,13 @@
     <string name="pref_captcha_backdoor_summary">Try to temporary disable the ban by applying one of bypass methods</string>
     <string name="pref_delay">Random delay</string>
     <string name="pref_delay_summary">Set the range (in seconds) of random delays applied for every request.</string>
+    <string name="pref_load_resources">Emulate resource loading (beta)</string>
+    <string name="pref_load_resources_summary">Download all resources included into HTML page to emulate browser activity.</string>
     <string name="pref_user_agent">User-Agent header</string>
     <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
-    <string name="do_not_warn">Do now warn anymore</string>
+    <string name="do_not_warn">Do not warn anymore</string>
     <string name="pref_share_warning">Be careful!</string>
     <string name="pref_share_warning_summary">Connection log may contain sensitive data such as your MAC-address or phone number. Do not send this file to public chats or social networks.</string>
+    <string name="pref_mosmetro_midsession">Try to disable midsession</string>
+    <string name="pref_mosmetro_midsession_summary">Midsession is a random redirect from any HTTP site to advertisement page.</string>
 </resources>

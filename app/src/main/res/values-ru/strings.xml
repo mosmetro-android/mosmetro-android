@@ -219,9 +219,13 @@
     <string name="pref_category_captcha">Капча и блокировки</string>
     <string name="pref_delay">Случайная задержка</string>
     <string name="pref_delay_summary">Диапазон значений случайной задержки (в секундах), добавляемой к каждому запросу.</string>
+    <string name="pref_load_resources">Имитация загрузки ресурсов (бета)</string>
+    <string name="pref_load_resources_summary">Скачивать все ресурсы, включённые в HTML-страницу, для более точной имитации поведения браузера.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
     <string name="do_not_warn">Больше не предупреждать</string>
     <string name="pref_share_warning">Будьте осторожны!</string>
     <string name="pref_share_warning_summary">Лог подключения может содержать информацию, которую вы не хотели бы публиковать, например MAC-адрес устройства или номер телефона. Не отправляйте этот файл в чаты или социальные сети.</string>
+    <string name="pref_mosmetro_midsession">Пытаться отключить midsession</string>
+    <string name="pref_mosmetro_midsession_summary">Midsession — это случайное перенаправление с любого HTTP-сайта на страницу с рекламой.</string>
 </resources>

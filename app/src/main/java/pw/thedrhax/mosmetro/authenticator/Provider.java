@@ -33,6 +33,7 @@ import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -81,12 +82,12 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Find Provider using already received response from server.
      * @param context   Android Context required to create the new instance.
-     * @param response  Client, that contains server's response.
+     * @param response  Instance of ParsedResponse.
      * @return          New Provider instance.
      *
      * @see Client
      */
-    @NonNull static Provider find(Context context, Client response) {
+    @NonNull static Provider find(Context context, ParsedResponse response) {
         if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
         else if (Enforta.match(response)) return new Enforta(context);
@@ -103,20 +104,11 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
 
-        Client client = new OkHttp(context)
-                .followRedirects(false)
-                .setRunningListener(running)
-                .setDelaysEnabled(true);
+        ParsedResponse response = generate_204(context, running);
+        Provider result = Provider.find(context, response);
 
-        generate_204(client);
-        Logger.log(Logger.LEVEL.DEBUG,
-                "Provider: generate_204() = " + client.getResponseCode()
-        );
-
-        Provider result = Provider.find(context, client);
-
-        if (result instanceof Unknown && client.getResponseCode() != 204) {
-            Logger.log(Logger.LEVEL.DEBUG, client.getPage());
+        if (result instanceof Unknown && response.getResponseCode() != 204) {
+            Logger.log(Logger.LEVEL.DEBUG, response.toString());
             Logger.log(context.getString(R.string.error,
                     context.getString(R.string.auth_error_provider)
             ));
@@ -155,24 +147,33 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Checks network connection state without binding to a specific provider.
      * This implementation uses generate_204 method, that is default for Android.
-     * @return True if internet access is available; otherwise, false is returned.
+     * @return ParsedResponse that contains response code to be compared with 204.
      */
-    public static boolean generate_204(Client client) {
-        try {
-            client.get(GENERATE_204_HTTP, null);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
-        }
-        if (client.getResponseCode() != 204) return false;
+    public static ParsedResponse generate_204(Context context, Listener<Boolean> running) {
+        Client client = new OkHttp(context)
+                .trustAllCerts()
+                .followRedirects(false)
+                .setRunningListener(running)
+                .setDelaysEnabled(true);
+
+        ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 
         try {
-            client.get(GENERATE_204_HTTPS, null);
+            response = client.get(GENERATE_204_HTTP, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
+            return response;
         }
-        return client.getResponseCode() == 204;
+        if (response.getResponseCode() != 204) return response;
+
+        try {
+            response = client.get(GENERATE_204_HTTPS, null);
+        } catch (IOException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+            return response;
+        }
+
+        return response;
     }
 
     /**
@@ -180,7 +181,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return generate_204(client);
+        return generate_204(context, running).getResponseCode() == 204;
     }
 
     /**
