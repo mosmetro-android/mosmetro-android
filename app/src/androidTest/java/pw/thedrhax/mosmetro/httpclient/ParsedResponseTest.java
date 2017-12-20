@@ -77,10 +77,10 @@ public class ParsedResponseTest extends TestCase {
         );
     }
 
-    public void testLocation() throws Exception {
-        Client client = new OkHttp(context);
+    public void testGet300Redirect() throws Exception {
+        Client client = new OkHttp(context).followRedirects(false);
         ParsedResponse response = client.get("http://httpbin.org/redirect-to?" +
                                              "url=https://thedrhax.pw/", null);
-        assertEquals("https://thedrhax.pw/", response.getPageContent().location());
+        assertEquals("https://thedrhax.pw/", response.get300Redirect());
     }
 }

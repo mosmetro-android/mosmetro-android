@@ -88,8 +88,8 @@ public class ParsedResponse {
 
     @Nullable
     public String getResponseHeader(String name) {
-        if (headers != null && headers.get(name) != null) {
-            return headers.get(name).get(0);
+        if (headers != null && headers.get(name.toLowerCase()) != null) {
+            return headers.get(name.toLowerCase()).get(0);
         } else {
             return null;
         }
