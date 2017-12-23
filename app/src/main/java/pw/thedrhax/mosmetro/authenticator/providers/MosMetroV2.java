@@ -553,20 +553,11 @@ public class MosMetroV2 extends Provider {
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false).setDelaysEnabled(true);
         try {
-            client.get("http://mosgortrans.ru", null, pref_retry_count);
+            client.get(Provider.GENERATE_204_HTTP, null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
-
-        // Detect midsession
-        try {
-            String location = client.response().get300Redirect();
-            if (location.contains("midsession")) {
-                Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
-                return true;
-            }
-        } catch (ParseException ignored) {}
 
         try {
             redirect = client.response().parseMetaRedirect();
