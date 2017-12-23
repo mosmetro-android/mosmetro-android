@@ -74,16 +74,6 @@
         android:summary="@string/pref_timeout_summary"
         android:title="@string/pref_timeout" />
 
-    <pw.thedrhax.mosmetro.preferences.RangeBarPreference
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:key="pref_delay_range"
-        android:title="@string/pref_delay"
-        android:summary="@string/pref_delay_summary"
-        custom:defaultMin="5"
-        custom:defaultMax="10"
-        custom:min="0"
-        custom:max="20" />
-
     <EditTextPreference
         android:defaultValue="unset"
         android:key="pref_user_agent"
@@ -101,5 +91,23 @@
         android:key="pref_mosmetro_midsession"
         android:title="@string/pref_mosmetro_midsession"
         android:summary="@string/pref_mosmetro_midsession_summary" />
+
+    <PreferenceCategory android:title="@string/pref_category_delays" />
+
+    <pw.thedrhax.mosmetro.preferences.RangeBarPreference
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:key="pref_delay_range"
+        android:title="@string/pref_delay"
+        android:summary="@string/pref_delay_summary"
+        custom:defaultMin="10"
+        custom:defaultMax="20"
+        custom:min="0"
+        custom:max="60" />
+
+    <CheckBoxPreference
+        android:key="pref_delay_always"
+        android:title="@string/pref_delay_always"
+        android:summary="@string/pref_delay_always_summary"
+        android:defaultValue="false" />
 
 </PreferenceScreen>

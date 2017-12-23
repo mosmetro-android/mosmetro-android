@@ -35,6 +35,7 @@ import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
+import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
@@ -324,6 +325,15 @@ public class ConnectionService extends IntentService {
                 running.set(false);
             }
             return;
+        }
+
+        // Apply random delay
+        if (!from_debug && !settings.getBoolean("pref_delay_always", false)) {
+            Logger.log(getString(R.string.notification_progress_waiting));
+            notify.title(getString(R.string.notification_progress_waiting))
+                    .progress(0, true)
+                    .show();
+            new Randomizer(this).delay(running);
         }
 
         new Notify(this).id(2).hide(); // hide error notification

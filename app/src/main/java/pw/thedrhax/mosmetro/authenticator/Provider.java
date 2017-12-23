@@ -37,6 +37,7 @@ import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
 /**
@@ -68,6 +69,7 @@ public abstract class Provider extends LinkedList<Task> {
 
     protected Context context;
     protected SharedPreferences settings;
+    protected Randomizer random;
 
     /**
      * Number of retries for each request
@@ -140,8 +142,11 @@ public abstract class Provider extends LinkedList<Task> {
     public Provider(Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.random = new Randomizer(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        this.client = new OkHttp(context).setRunningListener(running).setDelaysEnabled(true);
+        this.client = new OkHttp(context)
+                .setRunningListener(running)
+                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
     }
 
     /**
@@ -153,8 +158,7 @@ public abstract class Provider extends LinkedList<Task> {
         Client client = new OkHttp(context)
                 .trustAllCerts()
                 .followRedirects(false)
-                .setRunningListener(running)
-                .setDelaysEnabled(true);
+                .setRunningListener(running);
 
         ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 

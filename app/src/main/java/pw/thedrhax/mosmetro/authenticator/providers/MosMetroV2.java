@@ -246,7 +246,6 @@ public class MosMetroV2 extends Provider {
 
                 Client tmp_client = new OkHttp(context)
                         .setTimeout(1000)
-                        .setDelaysEnabled(true)
                         .resetHeaders()
                         .setHeader(Client.HEADER_USER_AGENT,
                                 new String(Base64.decode(
@@ -441,6 +440,16 @@ public class MosMetroV2 extends Provider {
         };
         add(captcha_task);
 
+        if (!settings.getBoolean("pref_delay_always", false))
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                Logger.log(context.getString(R.string.notification_progress_waiting));
+                random.delay(running);
+                return true;
+            }
+        });
+
         /**
          * Sending login form
          * ⇒ POST http://auth.wi-fi.ru/auth/init?... < redirect, segment, TODO: mode=?
@@ -523,8 +532,9 @@ public class MosMetroV2 extends Provider {
                     protected Void doInBackground(Void... params) {
                         Client tmp_client = new OkHttp(context)
                                 .setRunningListener(running)
-                                .followRedirects(false)
-                                .setDelaysEnabled(true);
+                                .followRedirects(false);
+
+                        random.delay(running);
 
                         try {
                             String location = tmp_client
@@ -551,7 +561,7 @@ public class MosMetroV2 extends Provider {
 
     @Override
     public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false).setDelaysEnabled(true);
+        Client client = new OkHttp(context).followRedirects(false);
         try {
             client.get(Provider.GENERATE_204_HTTP, null, pref_retry_count);
         } catch (IOException ex) {
