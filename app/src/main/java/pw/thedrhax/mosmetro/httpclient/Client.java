@@ -127,7 +127,9 @@ public abstract class Client {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
-                random.delay(running);
+                if (random_delays) {
+                    random.delay(running);
+                }
                 return saveResponse(get(link, params));
             }
         }.run(retries);
@@ -137,7 +139,9 @@ public abstract class Client {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
-                random.delay(running);
+                if (random_delays) {
+                    random.delay(running);
+                }
                 return saveResponse(post(link, params));
             }
         }.run(retries);
