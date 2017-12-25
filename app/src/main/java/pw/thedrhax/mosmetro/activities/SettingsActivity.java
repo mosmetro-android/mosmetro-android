@@ -72,6 +72,10 @@ public class SettingsActivity extends Activity {
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                ClipboardManager clipboard = (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip;
+
                 switch (i) {
                     case 0: // Yandex.Money
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
@@ -80,12 +84,7 @@ public class SettingsActivity extends Activity {
                         break;
 
                     case 1: // Bitcoin
-                        ClipboardManager clipboard = (ClipboardManager)
-                                getSystemService(Context.CLIPBOARD_SERVICE);
-
-                        ClipData clip = ClipData.newPlainText("",
-                                getString(R.string.donate_bitcoin_data)
-                        );
+                        clip = ClipData.newPlainText("", getString(R.string.donate_bitcoin_data));
                         clipboard.setPrimaryClip(clip);
 
                         Toast.makeText(SettingsActivity.this,
@@ -94,19 +93,29 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 2: // GitHub
+                    case 2: // Ethereum
+                        clip = ClipData.newPlainText("", getString(R.string.donate_ethereum_data));
+                        clipboard.setPrimaryClip(clip);
+
+                        Toast.makeText(SettingsActivity.this,
+                                R.string.clipboard_copy,
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        break;
+
+                    case 3: // GitHub
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
                                 .putExtra("data", getString(R.string.developer_github_repo_link))
                         );
                         break;
 
-                    case 3: // VK
+                    case 4: // VK
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
                                 .putExtra("data", getString(R.string.developer_vkontakte_link))
                         );
                         break;
 
-                    case 4: // Google Play
+                    case 5: // Google Play
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
                                 .putExtra("data", getString(R.string.developer_google_play_link))
                         );

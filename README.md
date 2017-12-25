@@ -38,7 +38,8 @@
 * Материальная поддержка:
     * [Яндекс.Деньги](https://money.yandex.ru/to/410014087156910)
     * Bitcoin: 12biWJwYNqSqLF8ChrrW1xBGfjr1LAjEcb
-* Интеллектуальная помощь:
+    * Ethereum: 0x949aecb10ae89673a9574f53bda04baffddabff7
+* Помощь в разработке:
     * Создание Pull Request'ов крайне приветствуется (если, конечно, они ничего не ломают)
 * Популяризация:
     * [Оставить отзыв в Google Play](https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro)

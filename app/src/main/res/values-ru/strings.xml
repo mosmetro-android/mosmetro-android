@@ -164,6 +164,7 @@
     <string-array name="donate_options">
         <item>Яндекс.Деньги или карта</item>
         <item>Bitcoin (скопировать адрес)</item>
+        <item>Ethereum (скопировать адрес)</item>
         <item>Помочь в разработке (GitHub)</item>
         <item>Вступить в группу (ВКонтакте)</item>
         <item>Оставить отзыв (Google Play)</item>

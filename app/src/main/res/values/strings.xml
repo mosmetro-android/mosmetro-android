@@ -178,12 +178,14 @@
     <string-array name="donate_options">
         <item>Yandex.Money or credit card</item>
         <item>Bitcoin (copy the address)</item>
+        <item>Ethereum (copy the address)</item>
         <item>Help with development (GitHub)</item>
         <item>Join the community (VK)</item>
         <item>Give feedback (Google Play)</item>
         <item>Cancel</item>
     </string-array>
     <string name="donate_bitcoin_data" translatable="false">12biWJwYNqSqLF8ChrrW1xBGfjr1LAjEcb</string>
+    <string name="donate_ethereum_data" translatable="false">0x949aecb10ae89673a9574f53bda04baffddabff7</string>
     <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>
     <string name="pref_category_wifi">Wi-Fi control</string>
     <string name="pref_category_internet">Internet checks</string>
