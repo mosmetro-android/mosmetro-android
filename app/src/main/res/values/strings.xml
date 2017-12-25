@@ -251,6 +251,6 @@
     <string name="pref_mosmetro_midsession">Try to disable midsession</string>
     <string name="pref_mosmetro_midsession_summary">Midsession is a random redirect from any HTTP site to advertisement page.</string>
     <string name="pref_delay_always">Apply to all requests</string>
-    <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests.</string>
+    <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests. Don\'t forget to reduce the range of delays, or connection will slow down too much!</string>
     <string name="pref_category_delays">Random delays</string>
 </resources>

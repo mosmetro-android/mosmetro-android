@@ -99,8 +99,8 @@
         android:key="pref_delay_range"
         android:title="@string/pref_delay"
         android:summary="@string/pref_delay_summary"
-        custom:defaultMin="10"
-        custom:defaultMax="20"
+        custom:defaultMin="20"
+        custom:defaultMax="40"
         custom:min="0"
         custom:max="60" />
 
