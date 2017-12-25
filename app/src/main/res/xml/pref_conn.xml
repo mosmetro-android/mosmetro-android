@@ -96,7 +96,7 @@
 
     <pw.thedrhax.mosmetro.preferences.RangeBarPreference
         xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:key="pref_delay_range"
+        android:key="pref_random_delay"
         android:title="@string/pref_delay"
         android:summary="@string/pref_delay_summary"
         custom:defaultMin="20"
