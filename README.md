@@ -37,7 +37,7 @@
 
 * Материальная поддержка:
     * [Яндекс.Деньги](https://money.yandex.ru/to/410014087156910)
-    * Bitcoin: 12biWJwYNqSqLF8ChrrW1xBGfjr1LAjEcb
+    * Bitcoin: 1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m
     * Ethereum: 0x949aecb10ae89673a9574f53bda04baffddabff7
 * Помощь в разработке:
     * Создание Pull Request'ов крайне приветствуется (если, конечно, они ничего не ломают)
