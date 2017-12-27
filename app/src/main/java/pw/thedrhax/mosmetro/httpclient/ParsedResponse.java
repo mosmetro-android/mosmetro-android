@@ -198,6 +198,12 @@ public class ParsedResponse {
                 links.add(element.attr("src"));
         }
 
+        // <img src="..." />
+        for (Element element : document.getElementsByTag("img")) {
+            if (element.hasAttr("src"))
+                links.add(element.attr("src"));
+        }
+
         // Absolute path to full URL
         LinkedList<String> result = new LinkedList<>();
         for (String link : links) {
