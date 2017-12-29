@@ -39,8 +39,8 @@ public class Randomizer {
     public Randomizer(Context context) {
         this.context = context;
 
-        delay_min = Util.getIntPreference(context, "pref_random_delay_min", 20);
-        delay_max = Util.getIntPreference(context, "pref_random_delay_max", 40);
+        delay_min = Util.getIntPreference(context, "pref_random_delay_min", 5);
+        delay_max = Util.getIntPreference(context, "pref_random_delay_max", 10);
         if (delay_min > delay_max) { // User tries to break everything again...
             int temp = delay_max;
             delay_max = delay_min;

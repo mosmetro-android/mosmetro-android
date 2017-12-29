@@ -230,6 +230,6 @@
     <string name="pref_mosmetro_midsession">Пытаться отключить midsession</string>
     <string name="pref_mosmetro_midsession_summary">Midsession — это случайное перенаправление с любого HTTP-сайта на страницу с рекламой.</string>
     <string name="pref_delay_always">Применить ко всем запросам</string>
-    <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах. Не забудьте уменьшить настройку выше, иначе подключение очень сильно замедлится!</string>
+    <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах.</string>
     <string name="pref_category_delays">Случайные задержки</string>
 </resources>
