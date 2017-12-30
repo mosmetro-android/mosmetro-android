@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -55,11 +56,9 @@ public class MosMetroV1 extends Provider {
          * ⇐ Meta-redirect: http://login.wi-fi.ru/am/UI/Login?... > redirect
          * Note: Do not change id of this Task! (see MosMetroV2)
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_checking_connection));
-
                 if (isConnected()) {
                     Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
@@ -75,11 +74,9 @@ public class MosMetroV1 extends Provider {
          * ⇒ GET http://login.wi-fi.ru/am/UI/Login?... < redirect
          * ⇐ Form: method="post" action=""
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_auth_page));
-
                 try {
                     client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
@@ -118,11 +115,9 @@ public class MosMetroV1 extends Provider {
          * Sending login form
          * ⇒ POST http://login.wi-fi.ru/am/UI/Login?... < redirect, form
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_auth_form));
-
                 try {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
                     client.post(redirect, form, pref_retry_count);
@@ -140,11 +135,9 @@ public class MosMetroV1 extends Provider {
         /**
          * Checking Internet connection
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_checking_connection));
-
                 if (isConnected()) {
                     Logger.log(context.getString(R.string.auth_connected));
                     vars.put("result", RESULT.CONNECTED);

@@ -23,9 +23,8 @@ import android.content.Context;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Logger;
 
@@ -47,11 +46,9 @@ public class Unknown extends Provider {
         /**
          * Checking Internet connection for a first (and the last) time
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_checking_connection));
-
                 if (response.getResponseCode() == 204) {
                     Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
@@ -61,7 +58,6 @@ public class Unknown extends Provider {
                     ));
                     vars.put("result", RESULT.NOT_SUPPORTED);
                 }
-
                 return false;
             }
         });

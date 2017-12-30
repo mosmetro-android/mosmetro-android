@@ -219,12 +219,6 @@ public class ConnectionService extends IntentService {
                 SystemClock.sleep(Util.getIntPreference(this, "pref_retry_delay", 5) * 1000);
             }
 
-            notify.text(String.format("%s (%s)",
-                            getString(R.string.notification_progress_connecting),
-                            getString(R.string.try_out_of, count + 1, pref_retry_count)
-                    ))
-                    .show();
-
             result = provider.start();
 
             if (result == Provider.RESULT.NOT_REGISTERED) break;
@@ -349,6 +343,11 @@ public class ConnectionService extends IntentService {
                     @Override
                     public void onProgressUpdate(int progress) {
                         notify.progress(progress).show();
+                    }
+
+                    @Override
+                    public void onProgressUpdate(int progress, String message) {
+                        notify.text(message).progress(progress).show();
                     }
                 });
 

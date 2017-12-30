@@ -146,7 +146,6 @@
     <string name="notification_error_log">Нажмите, чтобы узнать подробности или попробовать снова</string>
     <string name="notification_unsupported">Сеть не поддерживается</string>
     <string name="notification_progress_waiting">Ожидание…</string>
-    <string name="notification_progress_connecting">Подключаюсь…</string>
     <string name="notification_captcha">Требуется ввести код</string>
     <string name="notification_captcha_summary">Нажмите сюда, чтобы ввести код с картинки</string>
 

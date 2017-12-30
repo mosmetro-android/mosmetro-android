@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
@@ -67,11 +68,9 @@ public class MosMetroV2 extends Provider {
          * ⇒ GET http://wi-fi.ru
          * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect, segment
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_checking_connection));
-
                 if (isConnected()) {
                     Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
@@ -135,11 +134,9 @@ public class MosMetroV2 extends Provider {
          * ⇒ GET http://auth.wi-fi.ru/?segment=... < redirect, segment
          * ⇐ JavaScript Redirect: http://auth.wi-fi.ru/auth?segment=...
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_redirect)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_redirect));
-
                 try {
                     if (!Patterns.WEB_URL.matcher(redirect).matches()) {
                         throw new ParseException("Invalid URL: " + redirect, 0);
@@ -165,11 +162,9 @@ public class MosMetroV2 extends Provider {
          * ⇐ Form: method="post" action="/auto_auth" (captcha)
          * ⇐ AJAX: http://auth.wi-fi.ru/auth/init?segment=... (no captcha)
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_auth_page));
-
                 redirect = ParsedResponse.removePathFromUrl(redirect);
 
                 try {
@@ -441,12 +436,10 @@ public class MosMetroV2 extends Provider {
         add(captcha_task);
 
         if (!settings.getBoolean("pref_delay_always", false))
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.notification_progress_waiting)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.notification_progress_waiting));
-                random.delay(running);
-                return true;
+                random.delay(running); return true;
             }
         });
 
@@ -457,11 +450,9 @@ public class MosMetroV2 extends Provider {
          * ⇒ Header: CSRF-Token = ...
          * ⇐ JSON
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_auth_form));
-
                 try {
                     String csrf_token = client.response().parseMetaContent("csrf-token");
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
@@ -493,11 +484,9 @@ public class MosMetroV2 extends Provider {
          * Checking Internet connection
          * JSON result > status
          */
-        add(new Task() {
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Logger.log(context.getString(R.string.auth_checking_connection));
-
                 try {
                     JSONObject response = client.get(
                             redirect + "/auth/check?segment=" + vars.get("segment"),

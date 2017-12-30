@@ -152,7 +152,6 @@
     <string name="notification_error_log">Click to get details or retry</string>
     <string name="notification_unsupported">Network is not supported</string>
     <string name="notification_progress_waiting">Waiting…</string>
-    <string name="notification_progress_connecting">Connecting…</string>
     <string name="notification_captcha">CAPTCHA is required</string>
     <string name="notification_captcha_summary">Click here to pass CAPTCHA manually</string>
 

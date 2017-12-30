@@ -208,9 +208,17 @@ public abstract class Provider extends LinkedList<Task> {
     public RESULT start() {
         HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
+
+        int progress;
         for (Task task : this) {
             if (isStopped()) return RESULT.INTERRUPTED;
-            callback.onProgressUpdate((indexOf(task) + 1) * 100 / size());
+            progress = (indexOf(task) + 1) * 100 / size();
+            if (task instanceof NamedTask) {
+                Logger.log(((NamedTask)task).getName());
+                callback.onProgressUpdate(progress, ((NamedTask)task).getName());
+            } else {
+                callback.onProgressUpdate(progress);
+            }
             if (!task.run(vars)) break;
         }
 
@@ -249,11 +257,23 @@ public abstract class Provider extends LinkedList<Task> {
          * @param progress  Any Integer between 0 and 100.
          */
         void onProgressUpdate(int progress);
+
+        /**
+         * Report the progress of algorithm execution with the description of current Task.
+         * @param progress  Any Integer between 0 and 100.
+         * @param message   Text massage to display in notification.
+         */
+        void onProgressUpdate(int progress, String message);
     }
 
     protected ICallback callback = new ICallback() {
         @Override
         public void onProgressUpdate(int progress) {
+
+        }
+
+        @Override
+        public void onProgressUpdate(int progress, String message) {
 
         }
     };
