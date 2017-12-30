@@ -587,11 +587,18 @@ public class MosMetroV2 extends Provider {
      * @return          True if response matches this Provider implementation.
      */
     public static boolean match(ParsedResponse response) {
+        String redirect;
+
         try {
-            String redirect = response.parseMetaRedirect();
-            return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
-        } catch (ParseException ex) {
-            return false;
+            redirect = response.parseMetaRedirect();
+        } catch (ParseException ex1) {
+            try {
+                redirect = response.get300Redirect();
+            } catch (ParseException ex2) {
+                return false;
+            }
         }
+
+        return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
     }
 }

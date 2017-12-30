@@ -120,6 +120,7 @@ public class ParsedResponse {
         return value;
     }
 
+    @NonNull
     public String parseMetaRedirect() throws ParseException {
         String attr = parseMetaContent("refresh");
         String link = attr.substring(
@@ -136,7 +137,8 @@ public class ParsedResponse {
         if (!(link.contains("http://") || link.contains("https://"))) {
             link = "http://" + link;
         }
-        
+
+        // Workaround for auth.wi-fi.ru[/]?segment=
         if (link.contains("?"))
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
@@ -151,13 +153,18 @@ public class ParsedResponse {
 
     @NonNull
     public String get300Redirect() throws ParseException {
-        String redirect = getResponseHeader(Client.HEADER_LOCATION);
+        String link = getResponseHeader(Client.HEADER_LOCATION);
 
-        if (redirect == null || redirect.isEmpty()) {
+        if (link == null || link.isEmpty()) {
             throw new ParseException("302 redirect is empty", 0);
-        } else {
-            return redirect;
         }
+
+        // Workaround for auth.wi-fi.ru[/]?segment=
+        if (link.contains("?"))
+            if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
+                link = link.replace("?", "/?");
+
+        return link;
     }
 
     public static String removePathFromUrl(String url) {
