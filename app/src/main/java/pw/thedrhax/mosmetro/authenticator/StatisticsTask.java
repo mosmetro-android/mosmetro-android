@@ -123,8 +123,6 @@ class StatisticsTask implements Task {
         }
 
         if (p.settings.getBoolean("pref_updater_enabled", true)) {
-            random.delay(p.running);
-
             new UpdateCheckTask(p.context) {
                 @Override
                 public void result(boolean hasUpdate, @Nullable Branch current_branch) {
