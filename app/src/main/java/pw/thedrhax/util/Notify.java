@@ -36,6 +36,7 @@ public class Notify extends NotificationCompat.Builder {
     private int id = 0;
     private boolean enabled = true;
     private boolean locked = false;
+    private boolean big_text = true;
 
     public Notify(Context context) {
         super(context);
@@ -43,7 +44,6 @@ public class Notify extends NotificationCompat.Builder {
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        style(new NotificationCompat.BigTextStyle());
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
 
@@ -52,7 +52,9 @@ public class Notify extends NotificationCompat.Builder {
     }
 
     public Notify text(String text) {
-        setContentText(text); return this;
+        setContentText(text);
+        if (big_text) style(new NotificationCompat.BigTextStyle().bigText(text));
+        return this;
     }
 
     public Notify onClick(PendingIntent intent) {
@@ -81,6 +83,7 @@ public class Notify extends NotificationCompat.Builder {
     }
 
     public Notify style(NotificationCompat.Style style) {
+        big_text = style instanceof NotificationCompat.BigTextStyle;
         setStyle(style); return this;
     }
 

@@ -133,6 +133,7 @@ class StatisticsTask implements Task {
                     Notify notify = new Notify(p.context)
                             .id(3)
                             .title(p.context.getString(R.string.update_available))
+                            .text(current_branch.message)
                             .icon(R.drawable.ic_notification_message,
                                   R.drawable.ic_notification_message_colored)
                             .cancelOnClick(true)
@@ -140,9 +141,6 @@ class StatisticsTask implements Task {
                                     p.context, 252,
                                     new Intent(p.context, SettingsActivity.class),
                                     PendingIntent.FLAG_UPDATE_CURRENT));
-
-                    notify.setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(current_branch.message));
 
                     notify.show();
                 }
