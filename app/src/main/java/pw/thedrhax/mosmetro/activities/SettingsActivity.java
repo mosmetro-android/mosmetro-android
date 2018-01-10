@@ -157,11 +157,23 @@ public class SettingsActivity extends Activity {
         });
 
         // Force check
-        Preference pref_updater_check = fragment.findPreference("pref_updater_check");
+        final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new UpdateCheckTask(SettingsActivity.this) {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        pref_updater_check.setEnabled(false);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        pref_updater_check.setEnabled(true);
+                    }
+
                     @Override
                     public void result(List<Branch> branches) {
                         if (branches == null) return;
