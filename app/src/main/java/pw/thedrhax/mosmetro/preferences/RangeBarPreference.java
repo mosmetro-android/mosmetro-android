@@ -88,7 +88,12 @@ public class RangeBarPreference extends DialogPreference {
 
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int left, int right) {
-                rangetext.setText("" + (left + min) + " - " + (right + min));
+                if (left < min)
+                    rangeBar.setLeft(min);
+                else if (right > max)
+                    rangeBar.setRight(max);
+                else
+                    rangetext.setText("" + (left + min) + " - " + (right + min));
             }
         });
 
