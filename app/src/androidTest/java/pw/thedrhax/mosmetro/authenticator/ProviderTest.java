@@ -35,7 +35,7 @@ import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
  * @see pw.thedrhax.mosmetro.authenticator.Provider
  */
 public class ProviderTest extends TestCase {
-    private Context context = InstrumentationRegistry.getContext();
+    private Context context = InstrumentationRegistry.getTargetContext();
 
     /**
      * Test automatic Provider detection for predefined server responses.
