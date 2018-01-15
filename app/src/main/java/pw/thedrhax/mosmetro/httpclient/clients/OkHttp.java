@@ -44,7 +44,6 @@ import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
-import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -151,10 +150,24 @@ public class OkHttp extends Client {
         return this;
     }
 
-    private Response call(Request.Builder builder) throws IOException {
+    private Response call(String url, FormBody data) throws IOException {
+        Request.Builder builder = new Request.Builder().url(url);
+
+        // Choose appropriate request method
+        if (data == null) {
+            builder = builder.get();
+        } else {
+            builder = builder.post(data);
+        }
+
         // Populate headers
         for (String name : headers.keySet()) {
             builder.addHeader(name, getHeader(name));
+        }
+
+        // Upgrade-Insecure-Requests
+        if (url.contains("http://")) {
+            builder.addHeader(Client.HEADER_UPGRADE_INSECURE_REQUESTS, "1");
         }
 
         if (context != null && context.getApplicationContext() != null) {
@@ -167,7 +180,7 @@ public class OkHttp extends Client {
 
     @Override
     public ParsedResponse get(String link, Map<String, String> params) throws IOException {
-        return parse(call(new Request.Builder().url(link + requestToString(params)).get()));
+        return parse(call(link + requestToString(params), null));
     }
 
     @Override
@@ -181,12 +194,12 @@ public class OkHttp extends Client {
             }
         }
 
-        return parse(call(new Request.Builder().url(link).post(body.build())));
+        return parse(call(link, body.build()));
     }
 
     @Override
     public InputStream getInputStream(String link) throws IOException {
-        Response response = call(new Request.Builder().url(link).get());
+        Response response = call(link, null);
         ResponseBody body = response.body();
 
         if (body == null) {

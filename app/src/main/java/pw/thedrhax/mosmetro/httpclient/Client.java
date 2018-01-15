@@ -71,7 +71,6 @@ public abstract class Client {
                 "application/xml;q=0.9,image/webp," +
                 "image/apng,*/*;q=0.8"
         );
-        setHeader(HEADER_UPGRADE_INSECURE_REQUESTS, "1");
         setHeader(HEADER_DO_NOT_TRACK, "1");
         setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
 
