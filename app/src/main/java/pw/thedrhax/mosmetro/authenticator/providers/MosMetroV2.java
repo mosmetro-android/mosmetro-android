@@ -456,7 +456,6 @@ public class MosMetroV2 extends Provider {
                 try {
                     String csrf_token = client.response().parseMetaContent("csrf-token");
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
-                    client.setCookie(redirect, "afVideoPassed", "0");
 
                     client.post(
                             redirect + "/auth/init?mode=0&segment=" + vars.get("segment"),
