@@ -42,7 +42,6 @@ public abstract class Client {
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
     public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
-    public static final String HEADER_DO_NOT_TRACK = "DNT";
 
     protected Map<String,String> headers;
     protected Context context;
@@ -66,7 +65,6 @@ public abstract class Client {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
 
         setHeader(HEADER_USER_AGENT, random.cached_useragent());
-        setHeader(HEADER_DO_NOT_TRACK, "1");
         setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
 
         return this;
