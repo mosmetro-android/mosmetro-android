@@ -170,6 +170,12 @@ public class OkHttp extends Client {
             builder.addHeader(Client.HEADER_UPGRADE_INSECURE_REQUESTS, "1");
         }
 
+        // Accept
+        String accept = Client.acceptByExtension(url);
+        if (!accept.isEmpty()) {
+            builder.addHeader(Client.HEADER_ACCEPT, accept);
+        }
+
         if (context != null && context.getApplicationContext() != null) {
             new WifiUtils(context).bindToWifi();
         }

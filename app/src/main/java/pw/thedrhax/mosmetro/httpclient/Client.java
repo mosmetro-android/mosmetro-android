@@ -66,15 +66,27 @@ public abstract class Client {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
 
         setHeader(HEADER_USER_AGENT, random.cached_useragent());
-        setHeader(HEADER_ACCEPT,
-                "text/html,application/xhtml+xml," +
-                "application/xml;q=0.9,image/webp," +
-                "image/apng,*/*;q=0.8"
-        );
         setHeader(HEADER_DO_NOT_TRACK, "1");
         setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
 
         return this;
+    }
+
+    @NonNull
+    protected static String acceptByExtension(String url) {
+        if (url.contains(".css")) {
+            return "text/css,*/*;q=0.1";
+        } else if (url.contains(".js") || url.contains(".woff")) {
+            return "*/*";
+        } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".gif")) {
+            return "image/webp,image/apng,image/*,*/*;q=0.8";
+        } else if (url.contains(".mp4")) {
+            return "";
+        } else {
+            return "text/html,application/xhtml+xml," +
+                   "application/xml;q=0.9,image/webp," +
+                   "image/apng,*/*;q=0.8";
+        }
     }
 
     public Client setHeader (String name, String value) {
