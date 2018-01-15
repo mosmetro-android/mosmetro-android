@@ -215,7 +215,9 @@ public class ParsedResponse {
         LinkedList<String> result = new LinkedList<>();
         for (String link : links) {
             try {
-                result.add(absolutePathToUrl(document.location(), link));
+                String url = absolutePathToUrl(document.location(), link);
+                if (!result.contains(url))
+                    result.add(url);
             } catch (ParseException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
             }
