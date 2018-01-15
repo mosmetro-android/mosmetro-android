@@ -52,8 +52,13 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * URL used to detect if Captive Portal is present in the current network.
      */
-    protected static final String GENERATE_204_HTTP = "http://google.ru/generate_204";
-    private static final String GENERATE_204_HTTPS = "https://google.com/generate_204";
+    protected static final String[] GENERATE_204 = {
+            "www.google.ru/generate_204",
+            "www.google.ru/gen_204",
+            "www.google.com/generate_204",
+            "www.google.com/gen_204",
+            "connectivitycheck.gstatic.com/generate_204",
+    };
 
     /**
      * List of supported SSIDs
@@ -155,6 +160,8 @@ public abstract class Provider extends LinkedList<Task> {
      * @return ParsedResponse that contains response code to be compared with 204.
      */
     public static ParsedResponse generate_204(Context context, Listener<Boolean> running) {
+        Randomizer random  = new Randomizer(context);
+
         Client client = new OkHttp(context)
                 .trustAllCerts()
                 .followRedirects(false)
@@ -163,7 +170,7 @@ public abstract class Provider extends LinkedList<Task> {
         ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 
         try {
-            response = client.get(GENERATE_204_HTTP, null);
+            response = client.get("http://" + random.choose(GENERATE_204), null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return response;
@@ -171,7 +178,7 @@ public abstract class Provider extends LinkedList<Task> {
         if (response.getResponseCode() != 204) return response;
 
         try {
-            response = client.get(GENERATE_204_HTTPS, null);
+            response = client.get("https://" + random.choose(GENERATE_204), null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return response;

@@ -204,7 +204,7 @@ public class Randomizer {
     private String useragent() {
         String ua = System.getProperty("http.agent", "()");
         String device = ua.substring(ua.indexOf("("), ua.indexOf(")") + 1);
-        ua = useragents[(int) Math.floor(random.nextInt(useragents.length))];
+        ua = (String)choose(useragents);
         ua = ua.replace("(DEVICE)", device);
         return ua;
     }
@@ -230,5 +230,9 @@ public class Randomizer {
 
     public String string(int length) {
         return string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length);
+    }
+
+    public Object choose(Object[] array) {
+        return array[(int) Math.floor(random.nextInt(array.length))];
     }
 }
