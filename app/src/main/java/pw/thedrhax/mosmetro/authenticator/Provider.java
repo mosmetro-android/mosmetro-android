@@ -58,6 +58,7 @@ public abstract class Provider extends LinkedList<Task> {
             "www.google.com/generate_204",
             "www.google.com/gen_204",
             "connectivitycheck.gstatic.com/generate_204",
+            "www.gstatic.com/generate_204",
     };
 
     /**
