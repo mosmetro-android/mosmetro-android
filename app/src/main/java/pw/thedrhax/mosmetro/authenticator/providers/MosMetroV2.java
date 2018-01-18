@@ -168,9 +168,9 @@ public class MosMetroV2 extends Provider {
                 redirect = ParsedResponse.removePathFromUrl(redirect);
 
                 String prefix = "0:" + random.string(8) + ":";
-                client.setCookie("auth.wi-fi.ru", "_ym_uid", random.string("0123456789", 19))
-                      .setCookie("auth.wi-fi.ru", "_mts", prefix + random.string(11) + "~" + random.string(20))
-                      .setCookie("auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
+                client.setCookie("http://auth.wi-fi.ru", "_ym_uid", random.string("0123456789", 19))
+                      .setCookie("http://auth.wi-fi.ru", "_mts", prefix + random.string(11) + "~" + random.string(20))
+                      .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
                 try {
                     client.get(
                             redirect + "/auth?segment=" + vars.get("segment"),
