@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -312,6 +313,7 @@ public class MosMetroV2 extends Provider {
                     }
                 }
 
+                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
                 vars.put("result", RESULT.ERROR);
                 return true;
             }
