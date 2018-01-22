@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -43,7 +42,6 @@ import android.widget.Toast;
 import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.PermissionUtils;
@@ -199,46 +197,6 @@ public class SettingsActivity extends Activity {
             pref_updater_check
                     .getOnPreferenceClickListener()
                     .onPreferenceClick(null);
-
-        // Extension: Captcha Recognition
-        final boolean module_installed = new CaptchaRecognitionProxy(this).isModuleAvailable();
-        Preference ext_captcha = fragment.findPreference("pref_extension_captcha_recognition");
-        ext_captcha.setSummary(module_installed ? R.string.ext_installed : R.string.ext_not_installed);
-        ext_captcha.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                if (!module_installed) {
-                    new AlertDialog.Builder(SettingsActivity.this)
-                            .setTitle(R.string.ext_captcha_recognition_title)
-                            .setMessage(R.string.ext_captcha_recognition_summary)
-                            .setPositiveButton(R.string.google_play, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(
-                                            new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                                    .putExtra("data", getString(R.string.ext_captcha_recognition_link_google_play))
-                                    );
-                                }
-                            })
-                            .setNegativeButton(R.string.direct_link, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(
-                                            new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                                    .putExtra("data", getString(R.string.ext_captcha_recognition_link_direct))
-                                    );
-                                }
-                            })
-                            .show();
-                } else {
-                    startActivity(new Intent(Intent.ACTION_DELETE)
-                            .setData(Uri.parse("package:" + CaptchaRecognitionProxy.REMOTE_PACKAGE))
-                    );
-                }
-
-                return false;
-            }
-        });
     }
 
     @RequiresApi(23)

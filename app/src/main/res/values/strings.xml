@@ -26,7 +26,6 @@
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
     <string name="about">About</string>
-    <string name="reply">Reply</string>
 
     <string name="pref_category_main">Main preferences</string>
     <string name="pref_category_connection">Connection preferences</string>
@@ -114,17 +113,9 @@
     <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>
     <string name="auth_redirect">Getting redirection</string>
-    <string name="auth_captcha_result">CAPTCHA entered: %s</string>
-    <string name="auth_captcha_dialog">Please solve the CAPTCHA</string>
-    <string name="auth_captcha_dialog_summary">
-        MaximaTelecom asks to enter this code from time to time to login.
-        Here you can enter it without watching ads.
-    </string>
-    <string name="auth_captcha_requested">CAPTCHA requested</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
     <string name="auth_connected">Connection established :3</string>
-    <string name="auth_request">Sending request</string>
 
     <string name="auth_error_connection">Internet connection is not available</string>
     <string name="auth_error_redirect">redirect is not received</string>
@@ -142,7 +133,6 @@
         provider %s is not supported by application yet. Maybe the network is maintained by two providers
         one of which is not supported yet. We apologize for inconvenience.
     </string>
-    <string name="auth_error_captcha">CAPTCHA required</string>
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>
@@ -152,8 +142,6 @@
     <string name="notification_error_log">Click to get details or retry</string>
     <string name="notification_unsupported">Network is not supported</string>
     <string name="notification_progress_waiting">Waiting…</string>
-    <string name="notification_captcha">CAPTCHA is required</string>
-    <string name="notification_captcha_summary">Click here to pass CAPTCHA manually</string>
 
     <string name="ip_wait">Waiting for IP address…</string>
     <string name="ip_wait_result" formatted="false">IP address%s assigned within %d seconds</string>
@@ -212,11 +200,6 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
-    <string name="error_image">failed to download an image</string>
-    <string name="auth_captcha_dialog_toggle">Open this dialog automatically</string>
-    <string name="auth_captcha_recognized">CAPTCHA solved successfully! :)</string>
-    <string name="auth_captcha_recognition_failed">CAPTCHA recognition failed (no answer received)</string>
-    <string name="auth_captcha_dialog_summary_with_ext">Looks like recognition module couldn\'t solve the CAPTCHA within given attempts. You can correct the proposed solution below and send it to server.</string>
     <string name="google_play" translatable="false">Google Play</string>
     <string name="direct_link">Direct link</string>
     <string name="ext_captcha_recognition_summary">This module will automatically solve CAPTCHA during connection. It is pretty huge (~40 MB), so it isn\'t bundled with the app. You can download it from these sources:</string>
@@ -225,7 +208,6 @@
     <string name="ext_captcha_recognition_link_direct" translatable="false">https://mosmetro.duckdns.org/api/v1/download.php?module=captcha_recognition</string>
     <string name="ext_installed">Installed</string>
     <string name="ext_not_installed">Not installed</string>
-    <string name="pref_category_extensions">Extensions</string>
     <string name="pref_notify_reply">Inline reply</string>
     <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
     <string name="auth_ban_bypass_backdoor">Trying to bypass ban using the official backdoor…</string>

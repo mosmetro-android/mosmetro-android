@@ -118,18 +118,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.CaptchaDialog"
-            android:label="@string/auth_captcha_dialog"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/AppBaseTheme.Dialog">
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <!-- Services -->
 
         <service android:name=".services.ConnectionService" />

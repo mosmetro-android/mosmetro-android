@@ -19,29 +19,22 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
-import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRecognitionProxy;
-import pw.thedrhax.mosmetro.authenticator.captcha.CaptchaRequest;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -215,29 +208,8 @@ public class MosMetroV2 extends Provider {
          * Asking user to solve the CAPTCHA and send the form
          */
         Task captcha_task = new Task() {
-            private Element form = null;
-
             private boolean isCaptchaRequested() {
                 return client.response().getPageContent().location().contains("auto_auth");
-            }
-
-            private boolean submit(String code) {
-                Logger.log(context.getString(R.string.auth_request));
-
-                Map<String,String> fields = ParsedResponse.parseForm(form);
-                fields.put("_rucaptcha", code);
-
-                try {
-                    client.post(redirect + form.attr("action"), fields, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().toString());
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_server)
-                    ));
-                }
-
-                return !isCaptchaRequested();
             }
 
             private boolean bypass_backdoor() throws IOException {
@@ -306,28 +278,19 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 if (!isCaptchaRequested()) return true;
 
-                // Parsing CAPTCHA form
-                form = client.response().getPageContent().getElementsByTag("form").first();
+                Logger.log(context.getString(R.string.auth_ban_message));
 
-                if (form == null) { // No CAPTCHA form found => level 2 block
-                    Logger.log(context.getString(R.string.auth_ban_message));
+                // Increase ban counter
+                settings.edit()
+                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                        .apply();
 
-                    // Increase ban counter
-                    settings.edit()
-                            .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                            .apply();
-
-                    if (!settings.getBoolean("pref_captcha_backdoor", false)) {
-                        return false;
-                    }
-
+                if (settings.getBoolean("pref_captcha_backdoor", false)) {
                     try {
                         if (bypass_mcc(vars)) {
                             Logger.log(context.getString(R.string.auth_ban_bypass_success));
                             vars.put("captcha", "mcc");
                             return true;
-                        } else {
-                            throw new Exception("Doesn't work");
                         }
                     } catch (Exception ex) { // Exception type doesn't matter here
                         Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -346,95 +309,11 @@ public class MosMetroV2 extends Provider {
                     } catch (Exception ex) { // Exception type doesn't matter here
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                         Logger.log(context.getString(R.string.auth_ban_bypass_fail));
-                        vars.put("result", RESULT.ERROR);
-                        return true;
                     }
                 }
 
-                Logger.log(context.getString(R.string.auth_captcha_requested));
-
-                // Parsing captcha URL
-                Element captcha_img = form.getElementsByTag("img").first();
-                String captcha_url = redirect + captcha_img.attr("src");
-
-                // Try to recognize CAPTCHA within pref_retry_count attempts
-                Bitmap captcha = null;
-                String code = null;
-                CaptchaRecognitionProxy cr = new CaptchaRecognitionProxy(context)
-                        .setRunningListener(running);
-                for (int i = 0; i < pref_retry_count + 1 && running.get(); i++) {
-                    // Download CAPTCHA
-                    try {
-                        captcha = BitmapFactory.decodeStream(
-                                client.getInputStream(captcha_url, pref_retry_count)
-                        );
-
-                        if (captcha == null)
-                            throw new Exception("CAPTCHA is null!");
-                    } catch (Exception ex) { // Exception type doesn't matter here
-                        continue;
-                    }
-
-                    if (!cr.isModuleAvailable()) {
-                        Logger.log(Logger.LEVEL.DEBUG, "CAPTCHA recognition module is not installed");
-                        break;
-                    }
-
-                    code = cr.recognize(captcha); // neural magic
-
-                    if (code == null) {
-                        Logger.log(context.getString(R.string.auth_captcha_recognition_failed));
-                        continue;
-                    }
-
-                    if (i == pref_retry_count) break; // Leave the last unsolved CAPTCHA to user
-
-                    if (submit(code)) {
-                        Logger.log(this, String.format(Locale.ENGLISH,
-                                "CAPTCHA solved: tries=%d, code=%s", i+1, code
-                        ));
-                        Logger.log(Logger.LEVEL.INFO,
-                                context.getString(R.string.auth_captcha_recognized)
-                        );
-                        vars.put("captcha", "recognized");
-                        return true;
-                    }
-                }
-
-                if (captcha == null) {
-                    Logger.log(context.getString(
-                            R.string.error, context.getString(R.string.error_image)
-                    ));
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                }
-
-                if (isStopped()) return false;
-
-                // Asking user to enter the CAPTCHA
-                vars.putAll(
-                        new CaptchaRequest(context)
-                                .setRunningListener(running)
-                                .getResult(captcha, code)
-                );
-
-                // Check the answer
-                code = (String) vars.get("captcha_code");
-                if (code == null || code.isEmpty()) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_captcha)
-                    ));
-                    vars.put("result", RESULT.ERROR);
-                    return false;
-                } else {
-                    Logger.log(Logger.LEVEL.DEBUG, String.format(
-                            context.getString(R.string.auth_captcha_result), code
-                    ));
-                    vars.put("captcha", "entered");
-                }
-
-                // Send code to server and proceed
-                return submit(code);
+                vars.put("result", RESULT.ERROR);
+                return true;
             }
         };
         add(captcha_task);
