@@ -181,15 +181,8 @@
     <string name="pref_notify_reply_summary">Позволяет отвечать на некоторые запросы приложения (например, капча) прямо через уведомление. Требуется Android 7.0+.</string>
     <string name="developer_telegram">Группа Telegram</string>
     <string name="auth_ban_message">Вы были временно заблокированы провайдером :(</string>
-    <string name="auth_ban_bypass_success">Блокировка отключена. Поздравляю! :)</string>
-    <string name="auth_ban_bypass_fail">Не удалось обойти блокировку, продолжаю работу…</string>
-    <string name="auth_ban_bypass_backdoor">Пытаюсь обойти блокировку при помощи официального бэкдора…</string>
-    <string name="auth_ban_bypass_mcc">Пытаюсь переопределить сегмент сети…</string>
     <string name="pref_internet_check_interval">Интервал проверок</string>
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
-    <string name="pref_captcha_backdoor">Обход блокировки</string>
-    <string name="pref_captcha_backdoor_summary">Пытаться отключить блокировку с помощью нескольких методов обхода</string>
-    <string name="pref_category_captcha">Капча и блокировки</string>
     <string name="pref_delay">Диапазон задержек (в секундах)</string>
     <string name="pref_delay_summary">Диапазон значений случайной задержки, добавляемой к каждому запросу.</string>
     <string name="pref_load_resources">Имитация загрузки ресурсов (бета)</string>

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Base64;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -183,6 +182,32 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
+         * Detect ban (redirect to /auto_auth)
+         */
+        Task captcha_task = new Task() {
+            private boolean isCaptchaRequested() {
+                return client.response().getPageContent().location().contains("auto_auth");
+            }
+
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (!isCaptchaRequested()) return true;
+
+                Logger.log(context.getString(R.string.auth_ban_message));
+
+                // Increase ban counter
+                settings.edit()
+                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                        .apply();
+
+                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
+                vars.put("result", RESULT.ERROR);
+                return false;
+            }
+        };
+        add(captcha_task);
+
+        /**
          * Setting auth token
          * ⇒ GET http://auth.wi-fi.ru/auth/set_token?token= < random.string(6)
          * ⇐ 200 OK
@@ -204,121 +229,6 @@ public class MosMetroV2 extends Provider {
                 return true;
             }
         });
-
-        /**
-         * Asking user to solve the CAPTCHA and send the form
-         */
-        Task captcha_task = new Task() {
-            private boolean isCaptchaRequested() {
-                return client.response().getPageContent().location().contains("auto_auth");
-            }
-
-            private boolean bypass_backdoor() throws IOException {
-                Logger.log(context.getString(R.string.auth_ban_bypass_backdoor));
-
-                Client tmp_client = new OkHttp(context)
-                        .setTimeout(1000)
-                        .resetHeaders()
-                        .setHeader(Client.HEADER_USER_AGENT,
-                                new String(Base64.decode(
-                                        "QXV0b01vc01ldHJvV2lmaS8xLjUuMyAoTGlud" +
-                                        "Xg7IEFuZHJvaWQgNC40LjQ7IEEwMTIzIEJ1aW" +
-                                        "xkL0tUVTg0UCk=",
-                                        Base64.DEFAULT
-                                ))
-                        )
-                        .setHeader(Client.HEADER_REFERER,
-                                new String(Base64.decode(
-                                        "aHR0cDovL25ldGNoZWNrLndpLWZpLnJ1Lw==",
-                                        Base64.DEFAULT
-                                ))
-                        );
-
-                try {
-                    tmp_client.get(
-                            new String(Base64.decode(
-                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vYXV0aA==",
-                                    Base64.DEFAULT
-                            )), null
-                    );
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                }
-
-                if (tmp_client.response().getResponseCode() == 401) {
-                    tmp_client.get(
-                            new String(Base64.decode(
-                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vcmVnCg==",
-                                    Base64.DEFAULT
-                            )), null
-                    );
-
-                    tmp_client.get(
-                            new String(Base64.decode(
-                                    "aHR0cHM6Ly9hbW13LndpLWZpLnJ1L25ldGluZm8vYXV0aA==",
-                                    Base64.DEFAULT
-                            )), null
-                    );
-                }
-
-                return tmp_client.response().getResponseCode() == 200 && isConnected();
-            }
-
-            private boolean bypass_mcc(HashMap<String, Object> vars) throws IOException {
-                Logger.log(context.getString(R.string.auth_ban_bypass_mcc));
-                vars.put("segment", "mcc");
-                client.get(
-                        redirect + "/auth?segment=" + vars.get("segment"),
-                        null, pref_retry_count
-                );
-                Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
-                return !isCaptchaRequested();
-            }
-
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (!isCaptchaRequested()) return true;
-
-                Logger.log(context.getString(R.string.auth_ban_message));
-
-                // Increase ban counter
-                settings.edit()
-                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                        .apply();
-
-                if (settings.getBoolean("pref_captcha_backdoor", false)) {
-                    try {
-                        if (bypass_mcc(vars)) {
-                            Logger.log(context.getString(R.string.auth_ban_bypass_success));
-                            vars.put("captcha", "mcc");
-                            return true;
-                        }
-                    } catch (Exception ex) { // Exception type doesn't matter here
-                        Logger.log(Logger.LEVEL.DEBUG, ex);
-                        Logger.log(context.getString(R.string.auth_ban_bypass_fail));
-                    }
-
-                    try {
-                        if (bypass_backdoor()) {
-                            Logger.log(context.getString(R.string.auth_ban_bypass_success));
-                            vars.put("result", RESULT.CONNECTED);
-                            vars.put("captcha", "backdoor");
-                            return false;
-                        } else {
-                            throw new Exception("Server didn't accept the backdoor");
-                        }
-                    } catch (Exception ex) { // Exception type doesn't matter here
-                        Logger.log(Logger.LEVEL.DEBUG, ex);
-                        Logger.log(context.getString(R.string.auth_ban_bypass_fail));
-                    }
-                }
-
-                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-                vars.put("result", RESULT.ERROR);
-                return true;
-            }
-        };
-        add(captcha_task);
 
         if (!settings.getBoolean("pref_delay_always", false))
         add(new NamedTask(context.getString(R.string.notification_progress_waiting)) {

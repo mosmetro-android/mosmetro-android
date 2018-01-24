@@ -200,16 +200,9 @@
     <string name="error_log_file">failed to save log to file</string>
     <string name="pref_notify_reply">Inline reply</string>
     <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
-    <string name="auth_ban_bypass_backdoor">Trying to bypass ban using the official backdoor…</string>
-    <string name="auth_ban_bypass_mcc">Trying to override network segment…</string>
-    <string name="auth_ban_bypass_success">Ban disabled. Congratulations! :)</string>
-    <string name="auth_ban_bypass_fail">Unable to bypass ban, proceeding…</string>
     <string name="auth_ban_message">You were temporary banned by provider :(</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
-    <string name="pref_category_captcha">CAPTCHA and bans</string>
-    <string name="pref_captcha_backdoor">Ban bypass</string>
-    <string name="pref_captcha_backdoor_summary">Try to temporary disable the ban by applying one of bypass methods</string>
     <string name="pref_delay">Delay range (seconds)</string>
     <string name="pref_delay_summary">Set the range of random delays applied for every request.</string>
     <string name="pref_load_resources">Emulate resource loading (beta)</string>
