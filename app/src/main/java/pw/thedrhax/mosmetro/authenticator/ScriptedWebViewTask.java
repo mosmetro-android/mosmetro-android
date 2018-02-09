@@ -44,6 +44,7 @@ public class ScriptedWebViewTask implements Task {
         this.p = p;
 
         this.intent = new Intent(p.context, ScriptedWebViewActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra("url", url)
                 .putExtra("script", script)
                 .putExtra("callback", ACTION)
