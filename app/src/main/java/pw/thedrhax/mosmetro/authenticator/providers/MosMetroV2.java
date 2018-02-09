@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Patterns;
 
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
@@ -56,6 +58,16 @@ public class MosMetroV2 extends Provider {
 
     public MosMetroV2(final Context context) {
         super(context);
+
+        /**
+         * Temporary workaround to avoid provider block
+         */
+        if (Build.VERSION.SDK_INT >= 19 && settings.getBoolean("pref_webview_authpage", true))
+            add(new ScriptedWebViewTask(this,
+                    context.getString(R.string.auth_webview_message),
+                    "https://auth.wi-fi.ru/",
+                    "if (document.URL == 'https://auth.wi-fi.ru/auth') 'STOP';"
+            ));
 
         /**
          * Checking Internet connection for a first time

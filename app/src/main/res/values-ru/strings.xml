@@ -211,4 +211,5 @@
     <string name="pref_delay_always">Применить ко всем запросам</string>
     <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах.</string>
     <string name="pref_category_delays">Случайные задержки</string>
+    <string name="auth_webview_message">Открываю страницу входа, чтобы снизить вероятность получения блокировки. Это необходимо сделать только один раз в день. Пожалуйста, подождите…</string>
 </resources>
