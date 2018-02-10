@@ -185,8 +185,6 @@
     <string name="more_information">More information</string>
     <string name="more_information_summary">Links, communities, contibutors</string>
     <string name="auth_provider_check">Detecting the provider…</string>
-    <string name="pref_captcha_dialog">Show CAPTCHA dialog</string>
-    <string name="pref_captcha_dialog_summary">If enabled, CAPTCHA dialog will be opened automatically on top of other apps.</string>
     <string name="stop">Stop</string>
     <string name="pref_notify_foreground">Foreground process</string>
     <string name="pref_notify_foreground_summary">Bind background process to notification to protect it from being killed. If you disable this option, background process will be killed even if you simply open and close the app window.</string>
@@ -200,26 +198,11 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
-    <string name="google_play" translatable="false">Google Play</string>
-    <string name="direct_link">Direct link</string>
-    <string name="ext_captcha_recognition_summary">This module will automatically solve CAPTCHA during connection. It is pretty huge (~40 MB), so it isn\'t bundled with the app. You can download it from these sources:</string>
-    <string name="ext_captcha_recognition_title">Captcha recognition</string>
-    <string name="ext_captcha_recognition_link_google_play" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.captcharecognition</string>
-    <string name="ext_captcha_recognition_link_direct" translatable="false">https://mosmetro.duckdns.org/api/v1/download.php?module=captcha_recognition</string>
-    <string name="ext_installed">Installed</string>
-    <string name="ext_not_installed">Not installed</string>
     <string name="pref_notify_reply">Inline reply</string>
     <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
-    <string name="auth_ban_bypass_backdoor">Trying to bypass ban using the official backdoor…</string>
-    <string name="auth_ban_bypass_mcc">Trying to override network segment…</string>
-    <string name="auth_ban_bypass_success">Ban disabled. Congratulations! :)</string>
-    <string name="auth_ban_bypass_fail">Unable to bypass ban, proceeding…</string>
     <string name="auth_ban_message">You were temporary banned by provider :(</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
-    <string name="pref_category_captcha">CAPTCHA and bans</string>
-    <string name="pref_captcha_backdoor">Ban bypass</string>
-    <string name="pref_captcha_backdoor_summary">Try to temporary disable the ban by applying one of bypass methods</string>
     <string name="pref_delay">Delay range (seconds)</string>
     <string name="pref_delay_summary">Set the range of random delays applied for every request.</string>
     <string name="pref_load_resources">Emulate resource loading (beta)</string>
