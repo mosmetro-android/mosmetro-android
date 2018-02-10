@@ -25,15 +25,19 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.webkit.ValueCallback;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Randomizer;
 
 public class ScriptedWebViewActivity extends Activity {
     private WebView webview;
+
+    private String result = null;
 
     @SuppressLint("SetJavaScriptEnabled")
     @RequiresApi(19)
@@ -43,32 +47,44 @@ public class ScriptedWebViewActivity extends Activity {
         setContentView(R.layout.webview_activity);
 
         final Intent intent = getIntent();
-        if (intent == null || !intent.hasExtra("url")) {
+        if (intent == null || !intent.hasExtra("url") || !intent.hasExtra("script")) {
             finish(); return;
         }
 
         TextView text = (TextView) findViewById(R.id.text);
         text.setText(intent.getStringExtra("message"));
 
+        final ValueCallback<String> vc = new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                Logger.log(ScriptedWebViewActivity.this, "Received value: " + value);
+
+                if ("\"SUCCESS\"".equals(value)) {
+                    result = "SUCCESS";
+                    finish();
+                }
+
+                if ("\"ERROR\"".equals(value)) {
+                    result = "ERROR";
+                    finish();
+                }
+            }
+        };
+
         webview = (WebView) findViewById(R.id.webview);
-        webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 Logger.log(webview, "onPageFinished | " + url);
-
-                view.evaluateJavascript(
-                        intent.hasExtra("script") ? intent.getStringExtra("script") : "",
-                        new ValueCallback<String>() {
-                            @Override
-                            public void onReceiveValue(String value) {
-                                if ("\"STOP\"".equals(value)) finish();
-                            }
-                        }
-                );
+                view.evaluateJavascript(intent.getStringExtra("script"), vc);
             }
         });
+
+        WebSettings settings = webview.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setUserAgentString(new Randomizer(this).cached_useragent());
+
         webview.loadUrl(intent.getStringExtra("url"));
     }
 
@@ -77,7 +93,13 @@ public class ScriptedWebViewActivity extends Activity {
         super.onDestroy();
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("callback"))
-            sendBroadcast(new Intent(intent.getStringExtra("callback")));
+        if (intent != null && intent.hasExtra("callback")) {
+            Intent callback = new Intent(intent.getStringExtra("callback"));
+
+            if (result != null)
+                callback.putExtra("result", result);
+
+            sendBroadcast(callback);
+        }
     }
 }

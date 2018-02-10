@@ -35,9 +35,6 @@ public class ScriptedWebViewTask implements Task {
 
     private Provider p;
     private Intent intent;
-    private BroadcastReceiver receiver;
-
-    private Listener<Boolean> stopped = new Listener<>(false);
 
     @RequiresApi(19)
     public ScriptedWebViewTask(Provider p, String message, String url, String script) {
@@ -49,20 +46,22 @@ public class ScriptedWebViewTask implements Task {
                 .putExtra("script", script)
                 .putExtra("callback", ACTION)
                 .putExtra("message", message);
-
-        this.receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (ACTION.equals(intent.getAction())) {
-                    stopped.set(true);
-                }
-            }
-        };
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        stopped.set(false);
+        final Listener<Boolean> stopped = new Listener<>(false);
+        final Listener<Boolean> result = new Listener<>(false);
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ACTION.equals(intent.getAction())) {
+                    result.set(!intent.hasExtra("result") || "SUCCESS".equals(intent.getStringExtra("result")));
+                    stopped.set(true);
+                }
+            }
+        };
 
         p.context.registerReceiver(receiver, new IntentFilter(ACTION));
         p.context.startActivity(intent);
@@ -72,6 +71,7 @@ public class ScriptedWebViewTask implements Task {
         }
 
         p.context.unregisterReceiver(receiver);
-        return true;
+        // TODO: Force finish Activity at this point
+        return result.get();
     }
 }

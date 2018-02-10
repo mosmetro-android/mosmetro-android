@@ -65,7 +65,9 @@ public class MosMetroV2 extends Provider {
             add(new ScriptedWebViewTask(this,
                     context.getString(R.string.auth_webview_message),
                     "https://auth.wi-fi.ru/",
-                    "if (document.URL == 'https://auth.wi-fi.ru/auth') 'STOP';"
+                    "if (document.URL == 'https://auth.wi-fi.ru/') { 'redirect'; } " +
+                        "else if (document.URL == 'https://auth.wi-fi.ru/auth') { 'SUCCESS'; } " +
+                        "else { document.URL; 'ERROR'; }"
             ));
 
         /**
