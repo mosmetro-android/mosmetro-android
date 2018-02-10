@@ -49,5 +49,6 @@ node('android') {
                 repo: github_repo,
                 sha: env.BRANCH_NAME
         )
+        build job: 'MosMetro-Android-Backend', wait: false
     }
 }
