@@ -85,6 +85,15 @@ task svgToDrawablePng(type: SvgDrawableTask) {
     outputFormat = 'PNG'
     outputType = 'drawable'
 }
+task svgToMipmapPng(type: SvgDrawableTask) {
+    from = files('src/main/res-svg/mipmap')
+    to = file('build/generated/res/main')
+    createMissingDirectories = true
+    overwriteMode = 'ifModified'
+    targetedDensities = ['ldpi', 'hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+    outputFormat = 'PNG'
+    outputType = 'mipmap'
+}
 
 dependencies {
     // Runtime dependencies.
