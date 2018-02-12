@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -30,6 +31,7 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
@@ -58,17 +60,42 @@ public class MosMetroV2 extends Provider {
     public MosMetroV2(final Context context) {
         super(context);
 
+        final Calendar cal = Calendar.getInstance();
+        Task auth_webview = new ScriptedWebViewTask(this,
+                context.getString(R.string.auth_webview_message),
+                "https://auth.wi-fi.ru/",
+                "if (document.URL == 'https://auth.wi-fi.ru/') { 'redirect'; } " +
+                       "else if (document.URL == 'https://auth.wi-fi.ru/auth') { 'SUCCESS'; } " +
+                       "else { document.URL; 'ERROR'; }") {
+
+            @Override
+            public boolean onResult(@Nullable Intent intent) {
+                if (intent == null) {
+                    return false;
+                }
+
+                boolean success = false;
+                if (intent.hasExtra("result")) {
+                    success = "SUCCESS".equals(intent.getStringExtra("result"));
+                }
+
+                if (success) {
+                    settings.edit()
+                            .putInt("webview_last_day", cal.get(Calendar.DAY_OF_WEEK))
+                            .apply();
+                }
+
+                return success;
+            }
+        };
+
         /**
          * Temporary workaround to avoid provider block
          */
-        if (Build.VERSION.SDK_INT >= 19 && settings.getBoolean("pref_webview_authpage", true))
-            add(new ScriptedWebViewTask(this,
-                    context.getString(R.string.auth_webview_message),
-                    "https://auth.wi-fi.ru/",
-                    "if (document.URL == 'https://auth.wi-fi.ru/') { 'redirect'; } " +
-                        "else if (document.URL == 'https://auth.wi-fi.ru/auth') { 'SUCCESS'; } " +
-                        "else { document.URL; 'ERROR'; }"
-            ));
+        if (Build.VERSION.SDK_INT >= 19)
+            if (settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK))
+                if (settings.getBoolean("pref_webview_authpage", true))
+                    add(auth_webview);
 
         /**
          * Checking Internet connection for a first time

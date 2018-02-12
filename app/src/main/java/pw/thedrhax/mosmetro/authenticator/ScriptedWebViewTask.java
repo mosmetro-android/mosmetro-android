@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity;
 import pw.thedrhax.util.Listener;
 
-public class ScriptedWebViewTask implements Task {
+public abstract class ScriptedWebViewTask implements Task {
     private static final String ACTION = "pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask";
 
     private Provider p;
@@ -51,13 +52,13 @@ public class ScriptedWebViewTask implements Task {
     @Override
     public boolean run(HashMap<String, Object> vars) {
         final Listener<Boolean> stopped = new Listener<>(false);
-        final Listener<Boolean> result = new Listener<>(false);
+        final Intent[] result = new Intent[] {null};
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (ACTION.equals(intent.getAction())) {
-                    result.set(!intent.hasExtra("result") || "SUCCESS".equals(intent.getStringExtra("result")));
+                    result[0] = intent;
                     stopped.set(true);
                 }
             }
@@ -72,6 +73,8 @@ public class ScriptedWebViewTask implements Task {
 
         p.context.unregisterReceiver(receiver);
         // TODO: Force finish Activity at this point
-        return result.get();
+        return onResult(result[0]);
     }
+
+    public abstract boolean onResult(@Nullable Intent intent);
 }
