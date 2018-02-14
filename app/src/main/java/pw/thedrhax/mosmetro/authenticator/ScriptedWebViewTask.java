@@ -31,6 +31,11 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity;
 import pw.thedrhax.util.Listener;
 
+import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_CALLBACK;
+import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_MESSAGE;
+import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_SCRIPT;
+import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_URL;
+
 public abstract class ScriptedWebViewTask implements Task {
     private static final String ACTION = "pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask";
 
@@ -43,10 +48,10 @@ public abstract class ScriptedWebViewTask implements Task {
 
         this.intent = new Intent(p.context, ScriptedWebViewActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("url", url)
-                .putExtra("script", script)
-                .putExtra("callback", ACTION)
-                .putExtra("message", message);
+                .putExtra(EXTRA_URL, url)
+                .putExtra(EXTRA_SCRIPT, script)
+                .putExtra(EXTRA_CALLBACK, ACTION)
+                .putExtra(EXTRA_MESSAGE, message);
     }
 
     @Override

@@ -36,6 +36,16 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
 public class ScriptedWebViewActivity extends Activity {
+    public static final String EXTRA_URL = "url";
+    public static final String EXTRA_SCRIPT = "script";
+    public static final String EXTRA_MESSAGE = "message";
+    public static final String EXTRA_RESULT = "result";
+    public static final String EXTRA_COOKIES = "cookies";
+    public static final String EXTRA_CALLBACK = "callback";
+
+    public static final String RESULT_SUCCESS = "SUCCESS";
+    public static final String RESULT_ERROR = "ERROR";
+
     private WebView webview;
 
     private String result = null;
@@ -48,12 +58,12 @@ public class ScriptedWebViewActivity extends Activity {
         setContentView(R.layout.webview_activity);
 
         final Intent intent = getIntent();
-        if (intent == null || !intent.hasExtra("url") || !intent.hasExtra("script")) {
+        if (intent == null || !intent.hasExtra(EXTRA_URL) || !intent.hasExtra(EXTRA_SCRIPT)) {
             finish(); return;
         }
 
-        TextView text = (TextView) findViewById(R.id.text);
-        text.setText(intent.getStringExtra("message"));
+        TextView text = findViewById(R.id.text);
+        text.setText(intent.getStringExtra(EXTRA_MESSAGE));
 
         final ValueCallback<String> vc = new ValueCallback<String>() {
             @Override
@@ -61,24 +71,22 @@ public class ScriptedWebViewActivity extends Activity {
                 Logger.log(ScriptedWebViewActivity.this, "Received value: " + value);
 
                 if ("\"SUCCESS\"".equals(value)) {
-                    result = "SUCCESS";
-                    finish();
+                    result = RESULT_SUCCESS; finish();
                 }
 
                 if ("\"ERROR\"".equals(value)) {
-                    result = "ERROR";
-                    finish();
+                    result = RESULT_ERROR; finish();
                 }
             }
         };
 
-        webview = (WebView) findViewById(R.id.webview);
+        webview = findViewById(R.id.webview);
         webview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 Logger.log(webview, "onPageFinished | " + url);
-                view.evaluateJavascript(intent.getStringExtra("script"), vc);
+                view.evaluateJavascript(intent.getStringExtra(EXTRA_SCRIPT), vc);
             }
         });
 
@@ -86,7 +94,7 @@ public class ScriptedWebViewActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(new Randomizer(this).cached_useragent());
 
-        webview.loadUrl(intent.getStringExtra("url"));
+        webview.loadUrl(intent.getStringExtra(EXTRA_URL));
     }
 
     @Override
@@ -94,15 +102,15 @@ public class ScriptedWebViewActivity extends Activity {
         super.onDestroy();
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("callback")) {
-            Intent callback = new Intent(intent.getStringExtra("callback"));
+        if (intent != null && intent.hasExtra(EXTRA_CALLBACK)) {
+            Intent callback = new Intent(intent.getStringExtra(EXTRA_CALLBACK));
 
             String[] cookies = CookieManager.getInstance()
-                    .getCookie(intent.getStringExtra("url")).split("; ");
-            callback.putExtra("cookies", cookies);
+                    .getCookie(intent.getStringExtra(EXTRA_URL)).split("; ");
+            callback.putExtra(EXTRA_COOKIES, cookies);
 
             if (result != null)
-                callback.putExtra("result", result);
+                callback.putExtra(EXTRA_RESULT, result);
 
             sendBroadcast(callback);
         }

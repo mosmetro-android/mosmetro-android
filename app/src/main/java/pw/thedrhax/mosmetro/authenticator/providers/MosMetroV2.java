@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask;
@@ -75,8 +76,12 @@ public class MosMetroV2 extends Provider {
                 }
 
                 boolean success = false;
-                if (intent.hasExtra("result")) {
-                    success = "SUCCESS".equals(intent.getStringExtra("result"));
+                if (intent.hasExtra(ScriptedWebViewActivity.EXTRA_RESULT)) {
+                    success = ScriptedWebViewActivity.RESULT_SUCCESS.equals(
+                            intent.getStringExtra(
+                                    ScriptedWebViewActivity.EXTRA_RESULT
+                            )
+                    );
                 }
 
                 if (success) {
@@ -85,8 +90,8 @@ public class MosMetroV2 extends Provider {
                             .apply();
                 }
 
-                if (intent.hasExtra("cookies")) {
-                    String[] cookies = intent.getStringArrayExtra("cookies");
+                if (intent.hasExtra(ScriptedWebViewActivity.EXTRA_COOKIES)) {
+                    String[] cookies = intent.getStringArrayExtra(ScriptedWebViewActivity.EXTRA_COOKIES);
                     Logger.log(Logger.LEVEL.DEBUG, "Importing Cookies from WebView...");
                     for (String cookie : cookies) {
                         Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
