@@ -85,6 +85,15 @@ public class MosMetroV2 extends Provider {
                             .apply();
                 }
 
+                if (intent.hasExtra("cookies")) {
+                    String[] cookies = intent.getStringArrayExtra("cookies");
+                    Logger.log(Logger.LEVEL.DEBUG, "Importing Cookies from WebView...");
+                    for (String cookie : cookies) {
+                        Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
+                        client.setCookie("https://auth.wi-fi.ru/", cookie);
+                    }
+                }
+
                 return success;
             }
         };

@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -95,6 +96,10 @@ public class ScriptedWebViewActivity extends Activity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("callback")) {
             Intent callback = new Intent(intent.getStringExtra("callback"));
+
+            String[] cookies = CookieManager.getInstance()
+                    .getCookie(intent.getStringExtra("url")).split("; ");
+            callback.putExtra("cookies", cookies);
 
             if (result != null)
                 callback.putExtra("result", result);
