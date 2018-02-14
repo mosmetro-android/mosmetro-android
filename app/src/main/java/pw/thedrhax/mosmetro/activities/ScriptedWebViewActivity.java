@@ -20,7 +20,10 @@ package pw.thedrhax.mosmetro.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -36,6 +39,8 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
 public class ScriptedWebViewActivity extends Activity {
+    public static final String ACTION_FINISH = "pw.thedrhax.activity.ScriptedWebViewActivity.FINISH";
+
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_SCRIPT = "script";
     public static final String EXTRA_MESSAGE = "message";
@@ -47,6 +52,8 @@ public class ScriptedWebViewActivity extends Activity {
     public static final String RESULT_ERROR = "ERROR";
 
     private WebView webview;
+
+    private BroadcastReceiver receiver;
 
     private String result = null;
 
@@ -61,6 +68,14 @@ public class ScriptedWebViewActivity extends Activity {
         if (intent == null || !intent.hasExtra(EXTRA_URL) || !intent.hasExtra(EXTRA_SCRIPT)) {
             finish(); return;
         }
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                finish();
+            }
+        };
+        registerReceiver(receiver, new IntentFilter(ACTION_FINISH));
 
         TextView text = findViewById(R.id.text);
         text.setText(intent.getStringExtra(EXTRA_MESSAGE));
@@ -100,7 +115,7 @@ public class ScriptedWebViewActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        unregisterReceiver(receiver);
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_CALLBACK)) {
             Intent callback = new Intent(intent.getStringExtra(EXTRA_CALLBACK));

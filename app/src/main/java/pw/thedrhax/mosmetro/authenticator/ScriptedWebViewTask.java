@@ -77,7 +77,7 @@ public abstract class ScriptedWebViewTask implements Task {
         }
 
         p.context.unregisterReceiver(receiver);
-        // TODO: Force finish Activity at this point
+        p.context.sendBroadcast(new Intent(ScriptedWebViewActivity.ACTION_FINISH));
         return onResult(result[0]);
     }
 
