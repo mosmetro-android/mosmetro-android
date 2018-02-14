@@ -106,6 +106,7 @@ public class ScriptedWebViewActivity extends Activity {
         });
 
         WebSettings settings = webview.getSettings();
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(new Randomizer(this).cached_useragent());
 
