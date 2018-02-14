@@ -96,4 +96,16 @@
         android:summary="@string/pref_delay_always_summary"
         android:defaultValue="false" />
 
+    <PreferenceCategory android:title="pref_webview" />
+
+    <CheckBoxPreference
+        android:key="pref_webview_enabled"
+        android:title="pref_webview_enabled"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_webview_always"
+        android:title="pref_webview_always"
+        android:defaultValue="false" />
+
 </PreferenceScreen>

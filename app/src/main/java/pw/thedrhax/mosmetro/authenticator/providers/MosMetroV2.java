@@ -93,8 +93,9 @@ public class MosMetroV2 extends Provider {
          * Temporary workaround to avoid provider block
          */
         if (Build.VERSION.SDK_INT >= 19)
-            if (settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK))
-                if (settings.getBoolean("pref_webview_authpage", true))
+            if (settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK)
+                    || settings.getBoolean("pref_webview_always", false))
+                if (settings.getBoolean("pref_webview_enabled", true))
                     add(auth_webview);
 
         /**
