@@ -19,6 +19,7 @@
 package pw.thedrhax.util;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -28,7 +29,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import pw.thedrhax.mosmetro.R;
+
 public class Notify extends NotificationCompat.Builder {
+    private static final String channel_id = "wifi_v_metro";
+
     private Context context;
     private NotificationManager nm;
     private SharedPreferences settings;
@@ -39,10 +44,19 @@ public class Notify extends NotificationCompat.Builder {
     private boolean big_text = true;
 
     public Notify(Context context) {
-        super(context);
+        super(context, channel_id);
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(channel_id) == null) {
+            NotificationChannel channel = new NotificationChannel(
+                    channel_id,
+                    context.getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            nm.createNotificationChannel(channel);
+        }
 
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
