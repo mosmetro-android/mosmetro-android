@@ -121,9 +121,13 @@ public class ScriptedWebViewActivity extends Activity {
         if (intent != null && intent.hasExtra(EXTRA_CALLBACK)) {
             Intent callback = new Intent(intent.getStringExtra(EXTRA_CALLBACK));
 
-            String[] cookies = CookieManager.getInstance()
-                    .getCookie(intent.getStringExtra(EXTRA_URL)).split("; ");
-            callback.putExtra(EXTRA_COOKIES, cookies);
+            String cookie_string = CookieManager
+                    .getInstance()
+                    .getCookie(intent.getStringExtra(EXTRA_URL));
+            if (cookie_string != null) {
+                String[] cookies = cookie_string.split("; ");
+                callback.putExtra(EXTRA_COOKIES, cookies);
+            }
 
             if (result != null)
                 callback.putExtra(EXTRA_RESULT, result);
