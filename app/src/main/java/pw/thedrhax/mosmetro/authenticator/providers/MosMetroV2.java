@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask;
@@ -43,6 +42,7 @@ import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.services.ScriptedWebViewService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
@@ -76,10 +76,10 @@ public class MosMetroV2 extends Provider {
                 }
 
                 boolean success = false;
-                if (intent.hasExtra(ScriptedWebViewActivity.EXTRA_RESULT)) {
-                    success = ScriptedWebViewActivity.RESULT_SUCCESS.equals(
+                if (intent.hasExtra(ScriptedWebViewService.EXTRA_RESULT)) {
+                    success = ScriptedWebViewService.RESULT_SUCCESS.equals(
                             intent.getStringExtra(
-                                    ScriptedWebViewActivity.EXTRA_RESULT
+                                    ScriptedWebViewService.EXTRA_RESULT
                             )
                     );
                 }
@@ -90,8 +90,8 @@ public class MosMetroV2 extends Provider {
                             .apply();
                 }
 
-                if (intent.hasExtra(ScriptedWebViewActivity.EXTRA_COOKIES)) {
-                    String[] cookies = intent.getStringArrayExtra(ScriptedWebViewActivity.EXTRA_COOKIES);
+                if (intent.hasExtra(ScriptedWebViewService.EXTRA_COOKIES)) {
+                    String[] cookies = intent.getStringArrayExtra(ScriptedWebViewService.EXTRA_COOKIES);
                     Logger.log(Logger.LEVEL.DEBUG, "Importing Cookies from WebView...");
                     for (String cookie : cookies) {
                         Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);

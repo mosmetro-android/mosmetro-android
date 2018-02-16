@@ -16,31 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.activities;
+package pw.thedrhax.mosmetro.services;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
+import android.graphics.PixelFormat;
+import android.os.IBinder;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
-public class ScriptedWebViewActivity extends Activity {
-    public static final String ACTION_FINISH = "pw.thedrhax.activity.ScriptedWebViewActivity.FINISH";
-
+public class ScriptedWebViewService extends Service {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_SCRIPT = "script";
     public static final String EXTRA_MESSAGE = "message";
@@ -51,51 +52,84 @@ public class ScriptedWebViewActivity extends Activity {
     public static final String RESULT_SUCCESS = "SUCCESS";
     public static final String RESULT_ERROR = "ERROR";
 
+    private ViewGroup view;
+    private WindowManager wm;
     private WebView webview;
 
-    private BroadcastReceiver receiver;
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        setContentView(R.layout.webview_activity);
+        webview = view.findViewById(R.id.webview);
+    }
 
-    private String result = null;
+    private void setContentView(@LayoutRes int layoutResID) {
+        view = new LinearLayout(this);
+
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        if (inflater != null) {
+            inflater.inflate(layoutResID, view);
+        } else {
+            return;
+        }
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                300,300, 0, 0,
+                WindowManager.LayoutParams.TYPE_TOAST,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+        );
+
+        wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+        if (wm != null) {
+            wm.addView(view, params);
+        }
+    }
+
+    private void callback(Intent intent, String result) {
+        if (intent != null && intent.hasExtra(EXTRA_CALLBACK)) {
+            Intent callback = new Intent(intent.getStringExtra(EXTRA_CALLBACK));
+
+            String cookie_string = CookieManager.getInstance()
+                    .getCookie(intent.getStringExtra(EXTRA_URL));
+            if (cookie_string != null) {
+                String[] cookies = cookie_string.split("; ");
+                callback.putExtra(EXTRA_COOKIES, cookies);
+            }
+
+            if (result != null)
+                callback.putExtra(EXTRA_RESULT, result);
+
+            sendBroadcast(callback);
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @RequiresApi(19)
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.webview_activity);
-
-        final Intent intent = getIntent();
+    public int onStartCommand(final Intent intent, int flags, int startId) {
         if (intent == null || !intent.hasExtra(EXTRA_URL) || !intent.hasExtra(EXTRA_SCRIPT)) {
-            finish(); return;
+            stopSelf(); return START_NOT_STICKY;
         }
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                finish();
-            }
-        };
-        registerReceiver(receiver, new IntentFilter(ACTION_FINISH));
-
-        TextView text = findViewById(R.id.text);
+        TextView text = view.findViewById(R.id.text);
         text.setText(intent.getStringExtra(EXTRA_MESSAGE));
 
         final ValueCallback<String> vc = new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
-                Logger.log(ScriptedWebViewActivity.this, "Received value: " + value);
+                Logger.log(ScriptedWebViewService.this, "Received value: " + value);
 
                 if ("\"SUCCESS\"".equals(value)) {
-                    result = RESULT_SUCCESS; finish();
+                    callback(intent, RESULT_SUCCESS);
                 }
 
                 if ("\"ERROR\"".equals(value)) {
-                    result = RESULT_ERROR; finish();
+                    callback(intent, RESULT_ERROR);
                 }
             }
         };
 
-        webview = findViewById(R.id.webview);
         webview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -111,28 +145,20 @@ public class ScriptedWebViewActivity extends Activity {
         settings.setUserAgentString(new Randomizer(this).cached_useragent());
 
         webview.loadUrl(intent.getStringExtra(EXTRA_URL));
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(EXTRA_CALLBACK)) {
-            Intent callback = new Intent(intent.getStringExtra(EXTRA_CALLBACK));
-
-            String cookie_string = CookieManager
-                    .getInstance()
-                    .getCookie(intent.getStringExtra(EXTRA_URL));
-            if (cookie_string != null) {
-                String[] cookies = cookie_string.split("; ");
-                callback.putExtra(EXTRA_COOKIES, cookies);
-            }
-
-            if (result != null)
-                callback.putExtra(EXTRA_RESULT, result);
-
-            sendBroadcast(callback);
+        if (view != null && wm != null) {
+            wm.removeView(view);
         }
+    }
+
+    @Nullable @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

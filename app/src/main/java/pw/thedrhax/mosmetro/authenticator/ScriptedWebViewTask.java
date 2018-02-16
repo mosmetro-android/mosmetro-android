@@ -28,13 +28,8 @@ import android.support.annotation.RequiresApi;
 
 import java.util.HashMap;
 
-import pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity;
+import pw.thedrhax.mosmetro.services.ScriptedWebViewService;
 import pw.thedrhax.util.Listener;
-
-import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_CALLBACK;
-import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_MESSAGE;
-import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_SCRIPT;
-import static pw.thedrhax.mosmetro.activities.ScriptedWebViewActivity.EXTRA_URL;
 
 public abstract class ScriptedWebViewTask implements Task {
     private static final String ACTION = "pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask";
@@ -46,12 +41,12 @@ public abstract class ScriptedWebViewTask implements Task {
     public ScriptedWebViewTask(Provider p, String message, String url, String script) {
         this.p = p;
 
-        this.intent = new Intent(p.context, ScriptedWebViewActivity.class)
+        this.intent = new Intent(p.context, ScriptedWebViewService.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(EXTRA_URL, url)
-                .putExtra(EXTRA_SCRIPT, script)
-                .putExtra(EXTRA_CALLBACK, ACTION)
-                .putExtra(EXTRA_MESSAGE, message);
+                .putExtra(ScriptedWebViewService.EXTRA_URL, url)
+                .putExtra(ScriptedWebViewService.EXTRA_SCRIPT, script)
+                .putExtra(ScriptedWebViewService.EXTRA_CALLBACK, ACTION)
+                .putExtra(ScriptedWebViewService.EXTRA_MESSAGE, message);
     }
 
     @Override
@@ -70,14 +65,14 @@ public abstract class ScriptedWebViewTask implements Task {
         };
 
         p.context.registerReceiver(receiver, new IntentFilter(ACTION));
-        p.context.startActivity(intent);
+        p.context.startService(intent);
 
         while (p.running.get() && !stopped.get()) {
             SystemClock.sleep(100);
         }
 
         p.context.unregisterReceiver(receiver);
-        p.context.sendBroadcast(new Intent(ScriptedWebViewActivity.ACTION_FINISH));
+        p.context.stopService(new Intent(p.context, ScriptedWebViewService.class));
         return onResult(result[0]);
     }
 
