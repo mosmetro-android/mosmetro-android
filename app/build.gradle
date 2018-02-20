@@ -12,6 +12,8 @@ android {
         versionCode 70
         versionName "1.8.3.2"
 
+        vectorDrawables.useSupportLibrary = true
+
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
