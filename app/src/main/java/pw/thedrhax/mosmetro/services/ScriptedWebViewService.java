@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -43,6 +44,7 @@ import android.widget.LinearLayout;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Listener;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
 public class ScriptedWebViewService extends Service {
@@ -170,6 +172,19 @@ public class ScriptedWebViewService extends Service {
     private abstract class FilteredWebViewClient extends WebViewClient {
         private boolean finished = true;
         private boolean redirecting = false;
+
+        @Override
+        @TargetApi(21)
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            Logger.log(this, "Request | " + request.getUrl().toString());
+            return super.shouldInterceptRequest(view, request);
+        }
+
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            Logger.log(this, "Request | " + url);
+            return super.shouldInterceptRequest(view, url);
+        }
 
         @Override
         @TargetApi(24)
