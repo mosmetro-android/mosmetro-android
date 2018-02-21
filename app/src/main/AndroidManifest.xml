@@ -128,6 +128,7 @@
         <receiver android:name=".services.NetworkReceiver">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
+                <action android:name="android.net.wifi.supplicant.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 

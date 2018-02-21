@@ -70,34 +70,42 @@ public class NetworkReceiver extends BroadcastReceiver {
             return;
         }
 
-        switch (intent.getAction()) {
-            /**
-             * Listen to all Wi-Fi state changes and start ConnectionService if Wi-Fi is connected
-             * Also check SupplicantState for better results
-             */
-            case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-                SupplicantState state = wifi.getWifiInfo(intent).getSupplicantState();
-                if (state == null) break;
+        SupplicantState state = null;
 
-                Logger.log(this, String.format(Locale.ENGLISH, "Intent: %s (%s)",
-                        intent.getAction(), state.name()
-                ));
+        /**
+         * Listen to all Wi-Fi state changes and start ConnectionService if Wi-Fi is connected
+         */
+        if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+            state = wifi.getWifiInfo(intent).getSupplicantState();
+        }
 
-                switch (state) {
-                    case COMPLETED:
-                    case ASSOCIATED: // This appears randomly between multiple CONNECTED states
-                        startService();
-                        break;
-                    case SCANNING: // Some devices do not report DISCONNECTED state so...
-                    case DISCONNECTED:
-                        stopService();
-                        break;
-                }
+        /**
+         * Catch extra SupplicantState broadcast for devices that are skipping
+         * STATE_CHANGE with state == DISCONNECTED
+         */
+        if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+            state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+        }
 
-                break;
+        if (state != null) {
+            Logger.log(this, String.format(Locale.ENGLISH, "Intent: %s (%s)",
+                    intent.getAction(), state.name()
+            ));
 
-            default:
-                Logger.log(this, "Unknown Intent: " + intent.getAction());
+            switch (state) {
+                case COMPLETED:
+                case ASSOCIATED: // This appears randomly between multiple CONNECTED states
+                    startService();
+                    break;
+                case SCANNING: // Some devices do not report DISCONNECTED state so...
+                case DISCONNECTED:
+                    stopService();
+                    break;
+                default:
+                    Logger.log(this, "Unknown SupplicantState: " + state.name());
+            }
+        } else {
+            Logger.log(this, "Unknown Intent: " + intent.getAction());
         }
     }
 

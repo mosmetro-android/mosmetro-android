@@ -60,7 +60,7 @@ public class ScriptedWebViewService extends Service {
     public void onCreate() {
         super.onCreate();
         setContentView(R.layout.webview_activity);
-        webview = view.findViewById(R.id.webview);
+        webview = (WebView)view.findViewById(R.id.webview);
     }
 
     private void setContentView(@LayoutRes int layoutResID) {
@@ -112,7 +112,7 @@ public class ScriptedWebViewService extends Service {
             stopSelf(); return START_NOT_STICKY;
         }
 
-        TextView text = view.findViewById(R.id.text);
+        TextView text = (TextView)view.findViewById(R.id.text);
         text.setText(intent.getStringExtra(EXTRA_MESSAGE));
 
         final ValueCallback<String> vc = new ValueCallback<String>() {
