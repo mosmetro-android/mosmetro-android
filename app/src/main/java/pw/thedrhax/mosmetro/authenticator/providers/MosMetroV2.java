@@ -23,8 +23,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.util.Patterns;
+import android.webkit.CookieManager;
 
 import org.json.simple.JSONObject;
 
@@ -61,56 +63,43 @@ public class MosMetroV2 extends Provider {
     public MosMetroV2(final Context context) {
         super(context);
 
-        final Calendar cal = Calendar.getInstance();
-        Task auth_webview = new ScriptedWebViewTask(this,
-                context.getString(R.string.auth_webview_message),
-                "https://auth.wi-fi.ru/",
-                "if (document.URL == 'https://auth.wi-fi.ru/') { 'redirect'; } " +
-                       "else if (document.URL == 'https://auth.wi-fi.ru/auth') { 'SUCCESS'; } " +
-                       "else { document.URL; 'ERROR'; }") {
-
-            @Override
-            public boolean onResult(@Nullable Intent intent) {
-                if (intent == null) {
-                    return false;
-                }
-
-                boolean success = false;
-                if (intent.hasExtra(ScriptedWebViewService.EXTRA_RESULT)) {
-                    success = ScriptedWebViewService.RESULT_SUCCESS.equals(
-                            intent.getStringExtra(
-                                    ScriptedWebViewService.EXTRA_RESULT
-                            )
-                    );
-                }
-
-                if (success) {
-                    settings.edit()
-                            .putInt("webview_last_day", cal.get(Calendar.DAY_OF_WEEK))
-                            .apply();
-                }
-
-                if (intent.hasExtra(ScriptedWebViewService.EXTRA_COOKIES)) {
-                    String[] cookies = intent.getStringArrayExtra(ScriptedWebViewService.EXTRA_COOKIES);
-                    Logger.log(Logger.LEVEL.DEBUG, "Importing Cookies from WebView...");
-                    for (String cookie : cookies) {
-                        Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
-                        client.setCookie("https://auth.wi-fi.ru/", cookie);
-                    }
-                }
-
-                return success;
-            }
-        };
-
         /**
          * Temporary workaround to avoid provider block
          */
-        if (Build.VERSION.SDK_INT >= 19)
-            if (settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK)
-                    || settings.getBoolean("pref_webview_always", false))
-                if (settings.getBoolean("pref_webview_enabled", true))
-                    add(auth_webview);
+        final Calendar cal = Calendar.getInstance();
+        boolean ran_today = settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK);
+        if (settings.getBoolean("pref_webview_enabled", true))
+            if (!ran_today || settings.getBoolean("pref_webview_always", false))
+                add(new ScriptedWebViewTask(this) {
+                    @Override
+                    public boolean script(@NonNull ScriptedWebViewService wv) {
+                        Logger.log(this, "Opening auth page");
+                        wv.get("https://auth.wi-fi.ru/");
+
+                        Logger.log(this, "Clicking auth button");
+                        if (Build.VERSION.SDK_INT >= 19) {
+                            wv.js("$('div.c-branding-button').click()");
+                        }
+
+                        Logger.log(this, "Waiting 3 seconds");
+                        SystemClock.sleep(3000);
+
+                        // Dumping Cookies from WebView
+                        String[] cookies = CookieManager.getInstance()
+                                .getCookie("https://auth.wi-fi.ru/")
+                                .split("; ");
+                        for (String cookie : cookies) {
+                            Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
+                            client.setCookie("https://auth.wi-fi.ru/", cookie);
+                        }
+
+                        settings.edit().putInt(
+                                "webview_last_day", cal.get(Calendar.DAY_OF_WEEK)
+                        ).apply();
+
+                        return true;
+                    }
+                });
 
         /**
          * Checking Internet connection for a first time

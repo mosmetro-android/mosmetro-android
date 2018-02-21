@@ -18,63 +18,67 @@
 
 package pw.thedrhax.mosmetro.authenticator;
 
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.services.ScriptedWebViewService;
-import pw.thedrhax.util.Listener;
 
 public abstract class ScriptedWebViewTask implements Task {
-    private static final String ACTION = "pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask";
-
     private Provider p;
-    private Intent intent;
 
     @RequiresApi(19)
-    public ScriptedWebViewTask(Provider p, String message, String url, String script) {
+    protected ScriptedWebViewTask(Provider p) {
         this.p = p;
-
-        this.intent = new Intent(p.context, ScriptedWebViewService.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(ScriptedWebViewService.EXTRA_URL, url)
-                .putExtra(ScriptedWebViewService.EXTRA_SCRIPT, script)
-                .putExtra(ScriptedWebViewService.EXTRA_CALLBACK, ACTION)
-                .putExtra(ScriptedWebViewService.EXTRA_MESSAGE, message);
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        final Listener<Boolean> stopped = new Listener<>(false);
-        final Intent[] result = new Intent[] {null};
+        Intent intent = new Intent(
+                p.context, ScriptedWebViewService.class
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (ACTION.equals(intent.getAction())) {
-                    result[0] = intent;
-                    stopped.set(true);
-                }
-            }
-        };
+        p.context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        p.context.registerReceiver(receiver, new IntentFilter(ACTION));
-        p.context.startService(intent);
-
-        while (p.running.get() && !stopped.get()) {
+        while (service == null) {
             SystemClock.sleep(100);
+
+            if (!p.running.get()) {
+                return false;
+            }
         }
 
-        p.context.unregisterReceiver(receiver);
-        p.context.stopService(new Intent(p.context, ScriptedWebViewService.class));
-        return onResult(result[0]);
+        boolean result = script(service);
+
+        p.context.unbindService(connection);
+
+        return result;
     }
 
-    public abstract boolean onResult(@Nullable Intent intent);
+    public abstract boolean script(@NonNull ScriptedWebViewService wv);
+
+    /*
+     * Binding interface
+     */
+
+    private ScriptedWebViewService service = null;
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            service = ((ScriptedWebViewService.ScriptedWebViewBinder)iBinder).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            service = null;
+        }
+    };
 }
