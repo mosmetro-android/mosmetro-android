@@ -35,6 +35,8 @@ import android.support.annotation.RequiresApi;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -68,12 +70,37 @@ public class ScriptedWebViewService extends Service {
         setContentView(R.layout.webview_activity);
         webview = (WebView)view.findViewById(R.id.webview);
 
+        clear();
+
         WebSettings settings = webview.getSettings();
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(new Randomizer(this).cached_useragent());
 
         pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
+    }
+
+    /**
+     * Clear user data: Cookies, History, Cache
+     * Source: https://stackoverflow.com/a/31950789
+     */
+    @SuppressWarnings("deprecation")
+    private void clear() {
+        webview.clearCache(true);
+        webview.clearHistory();
+
+        CookieManager manager = CookieManager.getInstance();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            manager.removeAllCookies(null);
+            manager.flush();
+        } else {
+            CookieSyncManager syncmanager = CookieSyncManager.createInstance(this);
+            syncmanager.startSync();
+            manager.removeAllCookie();
+            manager.removeSessionCookie();
+            syncmanager.stopSync();
+            syncmanager.sync();
+        }
     }
 
     private void setContentView(@LayoutRes int layoutResID) {
