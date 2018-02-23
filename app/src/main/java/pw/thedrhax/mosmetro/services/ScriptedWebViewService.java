@@ -174,15 +174,8 @@ public class ScriptedWebViewService extends Service {
         private boolean redirecting = false;
 
         @Override
-        @TargetApi(21)
-        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-            Logger.log(this, "Request | " + request.getUrl().toString());
-            return super.shouldInterceptRequest(view, request);
-        }
-
-        @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            Logger.log(this, "Request | " + url);
+            Logger.log(ScriptedWebViewService.this, "Request | " + url);
             return super.shouldInterceptRequest(view, url);
         }
 
