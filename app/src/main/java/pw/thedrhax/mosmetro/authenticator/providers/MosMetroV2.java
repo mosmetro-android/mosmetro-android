@@ -71,15 +71,24 @@ public class MosMetroV2 extends Provider {
                 add(new ScriptedWebViewTask(this) {
                     @Override
                     public boolean script(HashMap<String, Object> vars) {
-                        Logger.log(this, "Opening auth page");
-                        wv.get("https://auth.wi-fi.ru/");
-
-                        Logger.log(this, "Clicking auth button");
-                        if (Build.VERSION.SDK_INT >= 19) {
-                            wv.js("$('div.c-branding-button').click()");
+                        Logger.log("Opening auth page");
+                        try {
+                            wv.get("https://auth.wi-fi.ru/");
+                        } catch (Exception ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
+                            return false;
                         }
 
-                        Logger.log(this, "Waiting 3 seconds");
+                        Logger.log("Clicking auth button");
+                        if (Build.VERSION.SDK_INT >= 19) {
+                            try {
+                                wv.js("$('div.c-branding-button').click()");
+                            } catch (Exception ex) {
+                                Logger.log(Logger.LEVEL.DEBUG, ex);
+                            }
+                        }
+
+                        Logger.log("Waiting 3 seconds");
                         SystemClock.sleep(3000);
 
                         // Dumping Cookies from WebView

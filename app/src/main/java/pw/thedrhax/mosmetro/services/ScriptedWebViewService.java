@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -35,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -42,10 +44,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import java.util.concurrent.TimeoutException;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
+import pw.thedrhax.util.Util;
 
 public class ScriptedWebViewService extends Service {
     private Listener<Boolean> running = new Listener<>(true);
@@ -53,6 +58,8 @@ public class ScriptedWebViewService extends Service {
     private ViewGroup view;
     private WindowManager wm;
     private WebView webview;
+
+    private int pref_timeout;
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -65,6 +72,8 @@ public class ScriptedWebViewService extends Service {
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(new Randomizer(this).cached_useragent());
+
+        pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
     }
 
     private void setContentView(@LayoutRes int layoutResID) {
@@ -94,20 +103,38 @@ public class ScriptedWebViewService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        webview.stopLoading();
         if (view != null && wm != null) {
             wm.removeView(view);
         }
         running.set(false);
     }
 
-    public boolean get(final String url) {
-        return new Synchronizer<Boolean>() {
+    // TODO: Return some information about the loaded page
+    public void get(final String url) throws Exception {
+        new Synchronizer<Boolean>() {
             @Override
             public void handlerThread() {
                 webview.setWebViewClient(new FilteredWebViewClient() {
                     @Override
                     public void onPageCompletelyFinished(WebView view, String url) {
                         setResult(true);
+                    }
+
+                    @Override
+                    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                        super.onReceivedError(view, request, error);
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            setError((String) error.getDescription());
+                        }
+                    }
+
+                    @Override
+                    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                        super.onReceivedError(view, errorCode, description, failingUrl);
+                        if (Build.VERSION.SDK_INT < 23) {
+                            setError(description);
+                        }
                     }
                 });
                 webview.loadUrl(url);
@@ -116,7 +143,7 @@ public class ScriptedWebViewService extends Service {
     }
 
     @Nullable @RequiresApi(19)
-    public String js(final String script) {
+    public String js(final String script) throws Exception {
         return new Synchronizer<String>() {
             @Override
             public void handlerThread() {
@@ -131,20 +158,25 @@ public class ScriptedWebViewService extends Service {
     }
 
     public abstract class Synchronizer<T> {
-        private Listener<T> listener = new Listener<>(null);
+        private Listener<T> result = new Listener<>(null);
+        private Listener<String> error = new Listener<>(null);
 
         /**
          * This method will be executed on Handler's thread.
          * It MUST call the setResult(T result) method! Call can be asynchronous.
-         * TODO: Add timeout handlers
          */
         public abstract void handlerThread();
 
-        protected void setResult(T result) {
-            listener.set(result);
+        protected void setError(String message) {
+            this.error.set(message);
         }
 
-        public T run(Handler handler) {
+        protected void setResult(T result) {
+            this.result.set(result);
+        }
+
+        @Nullable
+        public T run(Handler handler) throws Exception {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -152,22 +184,32 @@ public class ScriptedWebViewService extends Service {
                 }
             });
 
-            while (listener.get() == null) {
-                SystemClock.sleep(100);
+            int counter = pref_timeout * 1000;
+            while (result.get() == null) {
+                if (counter <= 0) {
+                    throw new TimeoutException("Synchronizer timed out");
+                } else {
+                    counter -= 100;
+                }
+
+                if (error.get() != null) {
+                    throw new Exception(error.get());
+                }
 
                 if (!running.get()) {
-                    return null;
+                    throw new InterruptedException("Interrupted by Listener");
                 }
+
+                SystemClock.sleep(100);
             }
 
-            return listener.get();
+            return result.get();
         }
     }
 
     /**
      * Implementation of WebViewClient that ignores redirects in onPageFinished()
      * Inspired by https://stackoverflow.com/a/25547544
-     * TODO: Add error handlers
      */
     private abstract class FilteredWebViewClient extends WebViewClient {
         private boolean finished = true;
