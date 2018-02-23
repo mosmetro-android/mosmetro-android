@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.util.Patterns;
 import android.webkit.CookieManager;
 
@@ -44,7 +43,6 @@ import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.services.ScriptedWebViewService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
@@ -72,7 +70,7 @@ public class MosMetroV2 extends Provider {
             if (!ran_today || settings.getBoolean("pref_webview_always", false))
                 add(new ScriptedWebViewTask(this) {
                     @Override
-                    public boolean script(@NonNull ScriptedWebViewService wv) {
+                    public boolean script(HashMap<String, Object> vars) {
                         Logger.log(this, "Opening auth page");
                         wv.get("https://auth.wi-fi.ru/");
 

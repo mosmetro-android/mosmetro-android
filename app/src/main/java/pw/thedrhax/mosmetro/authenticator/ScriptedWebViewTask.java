@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public abstract class ScriptedWebViewTask implements Task {
 
         p.context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        while (service == null) {
+        while (wv == null) {
             SystemClock.sleep(100);
 
             if (!p.running.get()) {
@@ -55,30 +54,30 @@ public abstract class ScriptedWebViewTask implements Task {
             }
         }
 
-        boolean result = script(service);
+        boolean result = script(vars);
 
         p.context.unbindService(connection);
 
         return result;
     }
 
-    public abstract boolean script(@NonNull ScriptedWebViewService wv);
+    public abstract boolean script(HashMap<String, Object> vars);
 
     /*
      * Binding interface
      */
 
-    private ScriptedWebViewService service = null;
+    protected ScriptedWebViewService wv = null;
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            service = ((ScriptedWebViewService.ScriptedWebViewBinder)iBinder).getService();
+            wv = ((ScriptedWebViewService.ScriptedWebViewBinder)iBinder).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            service = null;
+            wv = null;
         }
     };
 }
