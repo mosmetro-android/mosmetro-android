@@ -28,20 +28,20 @@ import android.support.annotation.RequiresApi;
 
 import java.util.HashMap;
 
-import pw.thedrhax.mosmetro.services.ScriptedWebViewService;
+import pw.thedrhax.mosmetro.services.WebViewService;
 
-public abstract class ScriptedWebViewTask implements Task {
+public abstract class WebViewTask implements Task {
     private Provider p;
 
     @RequiresApi(19)
-    protected ScriptedWebViewTask(Provider p) {
+    protected WebViewTask(Provider p) {
         this.p = p;
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
         Intent intent = new Intent(
-                p.context, ScriptedWebViewService.class
+                p.context, WebViewService.class
         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         p.context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -67,12 +67,12 @@ public abstract class ScriptedWebViewTask implements Task {
      * Binding interface
      */
 
-    protected ScriptedWebViewService wv = null;
+    protected WebViewService wv = null;
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            wv = ((ScriptedWebViewService.ScriptedWebViewBinder)iBinder).getService();
+            wv = ((WebViewService.ScriptedWebViewBinder)iBinder).getService();
         }
 
         @Override

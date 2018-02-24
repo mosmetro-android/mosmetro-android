@@ -38,8 +38,8 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.ScriptedWebViewTask;
 import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.authenticator.WebViewTask;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -68,7 +68,7 @@ public class MosMetroV2 extends Provider {
         boolean ran_today = settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK);
         if (settings.getBoolean("pref_webview_enabled", true))
             if (!ran_today || settings.getBoolean("pref_webview_always", false))
-                add(new ScriptedWebViewTask(this) {
+                add(new WebViewTask(this) {
                     @Override
                     public boolean script(HashMap<String, Object> vars) {
                         Logger.log("Opening auth page");

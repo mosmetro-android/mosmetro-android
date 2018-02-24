@@ -121,7 +121,7 @@
         <!-- Services -->
 
         <service android:name=".services.ConnectionService" />
-        <service android:name=".services.ScriptedWebViewService" />
+        <service android:name=".services.WebViewService" />
 
         <!-- Receivers -->
 

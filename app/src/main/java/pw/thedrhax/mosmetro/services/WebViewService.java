@@ -54,7 +54,7 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
-public class ScriptedWebViewService extends Service {
+public class WebViewService extends Service {
     private Listener<Boolean> running = new Listener<>(true);
 
     private ViewGroup view;
@@ -244,7 +244,7 @@ public class ScriptedWebViewService extends Service {
 
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            Logger.log(ScriptedWebViewService.this, "Request | " + url);
+            Logger.log(WebViewService.this, "Request | " + url);
             return super.shouldInterceptRequest(view, url);
         }
 
@@ -294,8 +294,8 @@ public class ScriptedWebViewService extends Service {
      */
 
     public class ScriptedWebViewBinder extends Binder {
-        public ScriptedWebViewService getService() {
-            return ScriptedWebViewService.this;
+        public WebViewService getService() {
+            return WebViewService.this;
         }
     }
 
