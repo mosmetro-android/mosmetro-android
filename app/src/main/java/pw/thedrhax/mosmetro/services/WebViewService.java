@@ -131,6 +131,14 @@ public class WebViewService extends Service {
     public void onDestroy() {
         super.onDestroy();
         webview.stopLoading();
+
+        // Avoid WebView leaks
+        // Source: https://stackoverflow.com/a/48596543
+        ((ViewGroup) webview.getParent()).removeView(webview);
+        webview.removeAllViews();
+        webview.destroy();
+        webview = null;
+
         if (view != null && wm != null) {
             wm.removeView(view);
         }
