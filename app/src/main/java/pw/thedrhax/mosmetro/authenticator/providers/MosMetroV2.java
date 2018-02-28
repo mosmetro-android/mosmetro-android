@@ -92,12 +92,14 @@ public class MosMetroV2 extends Provider {
                         SystemClock.sleep(3000);
 
                         // Dumping Cookies from WebView
-                        String[] cookies = CookieManager.getInstance()
-                                .getCookie("https://auth.wi-fi.ru/")
-                                .split("; ");
-                        for (String cookie : cookies) {
-                            Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
-                            client.setCookie("https://auth.wi-fi.ru/", cookie);
+                        String cookie_string = CookieManager.getInstance()
+                                .getCookie("https://auth.wi-fi.ru/");
+                        if (cookie_string != null) {
+                            String[] cookies = cookie_string.split("; ");
+                            for (String cookie : cookies) {
+                                Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
+                                client.setCookie("https://auth.wi-fi.ru/", cookie);
+                            }
                         }
 
                         settings.edit().putInt(
