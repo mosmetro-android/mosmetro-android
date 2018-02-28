@@ -160,7 +160,7 @@ public class WebViewService extends Service {
                     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                         super.onReceivedError(view, request, error);
                         if (Build.VERSION.SDK_INT >= 23) {
-                            setError((String) error.getDescription());
+                            Logger.log(WebViewService.this, (String) error.getDescription());
                         }
                     }
 
@@ -168,7 +168,7 @@ public class WebViewService extends Service {
                     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                         super.onReceivedError(view, errorCode, description, failingUrl);
                         if (Build.VERSION.SDK_INT < 23) {
-                            setError(description);
+                            Logger.log(WebViewService.this, description);
                         }
                     }
                 });
