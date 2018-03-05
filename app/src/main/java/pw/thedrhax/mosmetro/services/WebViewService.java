@@ -219,12 +219,10 @@ public class WebViewService extends Service {
                 }
             });
 
-            int counter = pref_timeout * 1000;
+            int counter = 0;
             while (result.get() == null) {
-                if (counter <= 0) {
+                if (pref_timeout != 0 && counter++ >= pref_timeout * 10) {
                     throw new TimeoutException("Synchronizer timed out");
-                } else {
-                    counter -= 100;
                 }
 
                 if (error.get() != null) {
