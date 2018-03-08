@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.SystemClock;
 import android.util.Patterns;
 import android.webkit.CookieManager;
@@ -69,6 +68,9 @@ public class MosMetroV2 extends Provider {
         if (settings.getBoolean("pref_webview_enabled", true))
             if (!ran_today || settings.getBoolean("pref_webview_always", false))
                 add(new WebViewTask(this) {
+                    private final String JS_IS_LOADED = "document.getElementsByClassName('spinner')[0].offsetParent === null";
+                    private final String JS_AUTH_CLICK = "document.getElementsByClassName('join')[0].click()";
+
                     @Override
                     public boolean script(HashMap<String, Object> vars) {
                         Logger.log("Opening auth page");
@@ -76,20 +78,33 @@ public class MosMetroV2 extends Provider {
                             wv.get("https://auth.wi-fi.ru/");
                         } catch (Exception ex) {
                             Logger.log(Logger.LEVEL.DEBUG, ex);
+                        }
+
+                        Logger.log("Waiting for page to load completely");
+                        try {
+                            while ("false".equals(wv.js(JS_IS_LOADED))) {
+                                if (!running.get()) {
+                                    return false;
+                                }
+                                SystemClock.sleep(500);
+                            }
+                        } catch (Exception ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
                             return false;
                         }
 
                         Logger.log("Clicking auth button");
-                        if (Build.VERSION.SDK_INT >= 19) {
-                            try {
-                                wv.js("$('div.c-branding-button').click()");
-                            } catch (Exception ex) {
-                                Logger.log(Logger.LEVEL.DEBUG, ex);
-                            }
+                        try {
+                            wv.js(JS_AUTH_CLICK);
+                        } catch (Exception ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
+                            return false;
                         }
 
-                        Logger.log("Waiting 3 seconds");
-                        SystemClock.sleep(3000);
+                        Logger.log("Waiting 5 seconds");
+                        for (int i = 0; i < 50 && running.get(); i++) {
+                            SystemClock.sleep(100);
+                        }
 
                         // Dumping Cookies from WebView
                         String cookie_string = CookieManager.getInstance()
