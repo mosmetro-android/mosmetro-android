@@ -257,7 +257,7 @@ public class WebViewService extends Service {
         @Override
         @TargetApi(24)
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            return super.shouldOverrideUrlLoading(view, request.getUrl().toString());
+            return shouldOverrideUrlLoading(view, request.getUrl().toString());
         }
 
         @Override
