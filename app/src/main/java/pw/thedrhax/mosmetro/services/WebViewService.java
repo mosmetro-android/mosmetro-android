@@ -22,13 +22,16 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.net.http.SslError;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -37,6 +40,7 @@ import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -59,6 +63,7 @@ public class WebViewService extends Service {
     private String js_interface;
     private JavascriptListener js_result;
 
+    private SharedPreferences settings;
     private ViewGroup view;
     private WindowManager wm;
     private WebView webview;
@@ -85,6 +90,7 @@ public class WebViewService extends Service {
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(random.cached_useragent());
 
+        this.settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
     }
 
@@ -291,6 +297,15 @@ public class WebViewService extends Service {
             }
             view.loadUrl(url);
             return true;
+        }
+
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            if (settings.getBoolean("pref_trust_all_certs", false)) {
+                handler.proceed();
+            } else {
+                super.onReceivedSslError(view, handler, error);
+            }
         }
 
         @Override
