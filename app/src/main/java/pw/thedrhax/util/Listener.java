@@ -61,6 +61,12 @@ public class Listener<T> {
         this.value = master.value;
     }
 
+    public void unsubscribe(Listener<T> master) {
+        synchronized (master.callbacks) {
+            master.callbacks.remove(this);
+        }
+    }
+
     public void onChange(T new_value) {
 
     }

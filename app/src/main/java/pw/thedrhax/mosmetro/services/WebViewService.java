@@ -31,13 +31,12 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.webkit.ValueCallback;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -57,6 +56,9 @@ import pw.thedrhax.util.Util;
 public class WebViewService extends Service {
     private Listener<Boolean> running = new Listener<>(true);
 
+    private String js_interface;
+    private JavascriptListener js_result;
+
     private ViewGroup view;
     private WindowManager wm;
     private WebView webview;
@@ -64,18 +66,24 @@ public class WebViewService extends Service {
     private int pref_timeout;
 
     @Override
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public void onCreate() {
         super.onCreate();
         setContentView(R.layout.webview_activity);
         webview = (WebView)view.findViewById(R.id.webview);
+
+        Randomizer random = new Randomizer(this);
+
+        js_interface = random.string("abcdef", 8);
+        js_result = new JavascriptListener();
+        webview.addJavascriptInterface(js_result, js_interface);
 
         clear();
 
         WebSettings settings = webview.getSettings();
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
-        settings.setUserAgentString(new Randomizer(this).cached_useragent());
+        settings.setUserAgentString(random.cached_useragent());
 
         pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
     }
@@ -131,6 +139,7 @@ public class WebViewService extends Service {
     public void onDestroy() {
         super.onDestroy();
         webview.stopLoading();
+        webview.removeJavascriptInterface(js_interface);
 
         // Avoid WebView leaks
         // Source: https://stackoverflow.com/a/48596543
@@ -177,19 +186,32 @@ public class WebViewService extends Service {
         }.run(webview.getHandler());
     }
 
-    @Nullable @RequiresApi(19)
+    @Nullable
     public String js(final String script) throws Exception {
         return new Synchronizer<String>() {
             @Override
             public void handlerThread() {
-                webview.evaluateJavascript(script, new ValueCallback<String>() {
+                new Listener<String>(null) {
                     @Override
-                    public void onReceiveValue(String value) {
-                        setResult(value);
+                    public void onChange(String new_value) {
+                        setResult(new_value);
+                        unsubscribe(js_result);
                     }
-                });
+                }.subscribe(js_result);
+                webview.loadUrl("javascript:" + js_interface + ".onResult(String(" + script + "));");
             }
         }.run(webview.getHandler());
+    }
+
+    private class JavascriptListener extends Listener<String> {
+        JavascriptListener() {
+            super(null);
+        }
+
+        @JavascriptInterface
+        public void onResult(String result) {
+            set(result);
+        }
     }
 
     public abstract class Synchronizer<T> {
