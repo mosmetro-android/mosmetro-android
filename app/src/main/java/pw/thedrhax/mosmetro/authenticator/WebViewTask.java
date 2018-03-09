@@ -73,6 +73,7 @@ public abstract class WebViewTask implements Task {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             wv = ((WebViewService.ScriptedWebViewBinder)iBinder).getService();
+            wv.getRunningListener().subscribe(p.running);
         }
 
         @Override

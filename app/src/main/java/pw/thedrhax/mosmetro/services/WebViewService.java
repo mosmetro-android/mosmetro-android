@@ -58,7 +58,14 @@ import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
 public class WebViewService extends Service {
-    private Listener<Boolean> running = new Listener<>(true);
+    private Listener<Boolean> running = new Listener<Boolean>(true) {
+        @Override
+        public void onChange(Boolean new_value) {
+            if (!new_value) {
+                stopSelf();
+            }
+        }
+    };
 
     private String js_interface;
     private JavascriptListener js_result;
@@ -330,6 +337,14 @@ public class WebViewService extends Service {
         }
 
         public abstract void onPageCompletelyFinished(WebView view, String url);
+    }
+
+    /*
+     * Listener interface
+     */
+
+    public Listener<Boolean> getRunningListener() {
+        return running;
     }
 
     /*
