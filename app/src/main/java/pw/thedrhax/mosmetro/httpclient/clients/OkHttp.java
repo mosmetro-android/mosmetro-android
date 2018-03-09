@@ -50,8 +50,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.util.WifiUtils;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
@@ -230,8 +230,8 @@ public class OkHttp extends Client {
         }
 
         return new ParsedResponse(
-                response.request().url().toString(), body.string(),
-                response.code(), response.headers().toMultimap()
+                response.request().url().toString(), body.bytes(),
+                response.code(), response.message(), response.headers().toMultimap()
         );
     }
 

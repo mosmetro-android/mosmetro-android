@@ -49,7 +49,7 @@ public abstract class Client {
     protected Randomizer random;
     protected SharedPreferences settings;
     protected boolean random_delays = false;
-    protected ParsedResponse last_response = new ParsedResponse("", "", 200, null);
+    protected ParsedResponse last_response = new ParsedResponse("");
 
     protected Client(Context context) {
         this.context = context;

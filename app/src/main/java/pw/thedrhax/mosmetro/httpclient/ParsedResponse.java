@@ -31,6 +31,7 @@ import org.jsoup.nodes.Element;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,15 +42,27 @@ import pw.thedrhax.util.Logger;
 
 public class ParsedResponse {
     private String url;
+    private byte[] bytes;
     private String html;
     private Document document;
     private int code;
+    private String reason;
     private Map<String,List<String>> headers = new HashMap<>();
 
-    public ParsedResponse(@Nullable String url, @Nullable String html, int code,
+    public ParsedResponse(@Nullable String url, @NonNull byte[] bytes, int code, String reason,
                           @Nullable Map<String,List<String>> headers) {
         this.url = url;
-        this.html = html;
+        this.bytes = bytes;
+
+        if (headers != null){
+            this.headers.putAll(headers);
+        }
+
+        try {
+            this.html = new String(bytes, getEncoding());
+        } catch (UnsupportedEncodingException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+        }
 
         if (html != null && !html.isEmpty()) {
             document = Jsoup.parse(html, url);
@@ -64,14 +77,11 @@ public class ParsedResponse {
         }
 
         this.code = code;
-
-        if (headers != null){
-            this.headers.putAll(headers);
-        }
+        this.reason = reason;
     }
 
     public ParsedResponse(String html) {
-        this("", html, 200, null);
+        this("", html.getBytes(), 200, "OK", null);
     }
 
     @NonNull
@@ -86,6 +96,14 @@ public class ParsedResponse {
 
     public int getResponseCode() {
         return code;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public Map<String,List<String>> getHeaders() {
+        return headers;
     }
 
     @Nullable
@@ -131,7 +149,7 @@ public class ParsedResponse {
     @Nullable
     public InputStream getInputStream() {
         if (html != null) {
-            return new ByteArrayInputStream(html.getBytes());
+            return new ByteArrayInputStream(bytes);
         } else {
             return null;
         }
@@ -291,6 +309,7 @@ public class ParsedResponse {
 
         builder.append("URL: ").append(" ").append(url).append("\n");
         builder.append("Response code: ").append(code).append("\n");
+        builder.append("Response reason: ").append(reason).append("\n");
 
         for (String header : headers.keySet()) {
             for (String value : headers.get(header)) {
