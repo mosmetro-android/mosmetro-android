@@ -111,9 +111,11 @@ public abstract class Client {
     public abstract Client setCookie(String url, String name, String value);
     public abstract Map<String,String> getCookies(String url);
 
-    public Client setCookie(String url, String cookie) {
-        String[] name_value = cookie.split("=");
-        return setCookie(url, name_value[0], name_value.length > 1 ? name_value[1] : "");
+    public Client setCookies(String url, Map<String,String> cookies) {
+        for (String name : cookies.keySet()) {
+            setCookie(url, name, cookies.get(name));
+        }
+        return this;
     }
 
     public abstract Client setTimeout(int ms);

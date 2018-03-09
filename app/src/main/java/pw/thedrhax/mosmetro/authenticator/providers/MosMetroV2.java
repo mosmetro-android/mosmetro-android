@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Patterns;
-import android.webkit.CookieManager;
 
 import org.json.simple.JSONObject;
 
@@ -107,15 +106,10 @@ public class MosMetroV2 extends Provider {
                         }
 
                         // Dumping Cookies from WebView
-                        String cookie_string = CookieManager.getInstance()
-                                .getCookie("https://auth.wi-fi.ru/");
-                        if (cookie_string != null) {
-                            String[] cookies = cookie_string.split("; ");
-                            for (String cookie : cookies) {
-                                Logger.log(Logger.LEVEL.DEBUG, "Cookie: " + cookie);
-                                client.setCookie("https://auth.wi-fi.ru/", cookie);
-                            }
-                        }
+                        client.setCookies(
+                                "https://auth.wi-fi.ru/",
+                                wv.getCookies("https://auth.wi-fi.ru/")
+                        );
 
                         settings.edit().putInt(
                                 "webview_last_day", cal.get(Calendar.DAY_OF_WEEK)

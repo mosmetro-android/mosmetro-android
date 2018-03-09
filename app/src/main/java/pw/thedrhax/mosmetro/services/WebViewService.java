@@ -50,6 +50,8 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import pw.thedrhax.mosmetro.R;
@@ -220,6 +222,44 @@ public class WebViewService extends Service {
         }.run(webview.getHandler());
     }
 
+    public void setCookies(String url, Map<String, String> cookies) {
+        CookieManager manager = CookieManager.getInstance();
+
+        CookieSyncManager syncmanager = null;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            syncmanager = CookieSyncManager.createInstance(this);
+            syncmanager.startSync();
+        }
+
+        for (String name : cookies.keySet()) {
+            manager.setCookie(url, name + "=" + cookies.get(name));
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if (syncmanager != null) {
+                syncmanager.stopSync();
+                syncmanager.sync();
+            }
+        } else {
+            manager.flush();
+        }
+    }
+
+    public Map<String,String> getCookies(String url) {
+        Map<String,String> result = new HashMap<>();
+
+        String cookie_string = CookieManager.getInstance().getCookie(url);
+        if (cookie_string != null) {
+            String[] cookies = cookie_string.split("; ");
+            for (String cookie : cookies) {
+                String[] name_value = cookie.split("=");
+                result.put(name_value[0], name_value.length > 1 ? name_value[1] : "");
+            }
+        }
+
+        return result;
+    }
+
     private class JavascriptListener extends Listener<String> {
         JavascriptListener() {
             super(null);
@@ -304,7 +344,9 @@ public class WebViewService extends Service {
             }
 
             try {
+                client.setCookies(url, getCookies(url));
                 ParsedResponse response = client.get(url, null, pref_retry_count);
+                setCookies(url, client.getCookies(url));
 
                 if (response != null) {
                     Logger.log(Logger.LEVEL.DEBUG, url);
