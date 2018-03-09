@@ -282,6 +282,8 @@ public class WebViewService extends Service {
     /**
      * Implementation of WebViewClient that ignores redirects in onPageFinished()
      * Inspired by https://stackoverflow.com/a/25547544
+     *
+     * TODO: Referer is not reliable. It has been tested only on JavaScript redirect
      */
     private abstract class FilteredWebViewClient extends WebViewClient {
         private boolean finished = true;
@@ -290,8 +292,17 @@ public class WebViewService extends Service {
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
         private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
 
+        private String next_referer;
+        private String referer;
+
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            WebResourceResponse result = null;
+
+            if (referer != null) {
+                client.setHeader(Client.HEADER_REFERER, referer);
+            }
+
             try {
                 ParsedResponse response = client.get(url, null, pref_retry_count);
 
@@ -302,7 +313,7 @@ public class WebViewService extends Service {
                         Logger.log(Logger.LEVEL.DEBUG, response.toString());
                     }
 
-                    return new WebResourceResponse(
+                    result = new WebResourceResponse(
                             response.getMimeType(),
                             response.getEncoding(),
                             response.getInputStream()
@@ -311,7 +322,21 @@ public class WebViewService extends Service {
             } catch (IOException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
             }
-            return null;
+
+            // Apply scheduled referer update
+            if (next_referer != null && next_referer.equals(url)) {
+                Logger.log(WebViewService.this, "Referer | Scheduled: " + next_referer);
+                referer = next_referer;
+                next_referer = null;
+            }
+
+            // First request sets referer for others
+            if (referer == null) {
+                Logger.log(WebViewService.this, "Referer | First: " + url);
+                referer = url;
+            }
+
+            return result;
         }
 
         @Override
@@ -327,6 +352,10 @@ public class WebViewService extends Service {
             } else {
                 finished = false;
             }
+
+            // Schedule referer update
+            next_referer = url;
+
             view.loadUrl(url);
             return true;
         }
