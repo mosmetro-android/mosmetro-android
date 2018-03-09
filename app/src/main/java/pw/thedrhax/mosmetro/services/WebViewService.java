@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Binder;
 import android.os.Build;
@@ -51,6 +52,7 @@ import android.widget.LinearLayout;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -102,6 +104,7 @@ public class WebViewService extends Service {
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptEnabled(true);
         settings.setUserAgentString(random.cached_useragent());
+        settings.setDomStorageEnabled(true);
 
         this.settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
@@ -345,7 +348,7 @@ public class WebViewService extends Service {
 
             try {
                 client.setCookies(url, getCookies(url));
-                ParsedResponse response = client.get(url, null, pref_retry_count);
+                final ParsedResponse response = client.get(url, null, pref_retry_count);
                 setCookies(url, client.getCookies(url));
 
                 if (response != null) {
@@ -360,6 +363,29 @@ public class WebViewService extends Service {
                             response.getEncoding(),
                             response.getInputStream()
                     );
+
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        result.setResponseHeaders(new HashMap<String, String>() {{
+                            Map<String,List<String>> headers = response.getHeaders();
+                            for (String name : headers.keySet()) {
+                                if (headers.get(name) != null && headers.get(name).size() == 1) {
+                                    put(name, headers.get(name).get(0));
+                                }
+                            }
+
+                            if (referer != null) {
+                                Uri uri = Uri.parse(referer);
+                                remove("access-control-allow-origin");
+                                put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
+                                put("access-control-allow-credentials", "true");
+                            }
+                            // remove("x-xss-protection");
+                        }});
+                        result.setStatusCodeAndReasonPhrase(
+                                response.getResponseCode(),
+                                response.getReason()
+                        );
+                    }
                 }
             } catch (IOException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
