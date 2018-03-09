@@ -42,6 +42,7 @@ public abstract class Client {
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
     public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
+    public static final String HEADER_CONTENT_TYPE = "Content-Type";
 
     protected Map<String,String> headers;
     protected Context context;

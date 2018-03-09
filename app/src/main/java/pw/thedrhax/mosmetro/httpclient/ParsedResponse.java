@@ -28,7 +28,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -97,6 +99,42 @@ public class ParsedResponse {
 
     public Document getPageContent() {
         return document != null ? document : Jsoup.parse("<html></html>");
+    }
+
+    @NonNull
+    public String getContentType() {
+        if (headers.containsKey(Client.HEADER_CONTENT_TYPE.toLowerCase())) {
+            return headers.get(Client.HEADER_CONTENT_TYPE.toLowerCase()).get(0);
+        } else {
+            return "text/plain";
+        }
+    }
+
+    @NonNull
+    public String getMimeType() {
+        return getContentType().split("; ")[0];
+    }
+
+    @NonNull
+    public String getEncoding() {
+        String content_type = getContentType();
+
+        for (String param : content_type.split(";")) {
+            if (param.contains("charset")) {
+                return param.split("charset=")[1];
+            }
+        }
+
+        return "utf-8";
+    }
+
+    @Nullable
+    public InputStream getInputStream() {
+        if (html != null) {
+            return new ByteArrayInputStream(html.getBytes());
+        } else {
+            return null;
+        }
     }
 
     public String parseMetaContent (String name) throws ParseException {

@@ -49,9 +49,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
@@ -283,10 +287,31 @@ public class WebViewService extends Service {
         private boolean finished = true;
         private boolean redirecting = false;
 
+        private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
+        private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
+
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            Logger.log(WebViewService.this, "Request | " + url);
-            return super.shouldInterceptRequest(view, url);
+            try {
+                ParsedResponse response = client.get(url, null, pref_retry_count);
+
+                if (response != null) {
+                    Logger.log(Logger.LEVEL.DEBUG, url);
+
+                    if (response.getMimeType().contains("text/html")) {
+                        Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                    }
+
+                    return new WebResourceResponse(
+                            response.getMimeType(),
+                            response.getEncoding(),
+                            response.getInputStream()
+                    );
+                }
+            } catch (IOException ex) {
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+            }
+            return null;
         }
 
         @Override
