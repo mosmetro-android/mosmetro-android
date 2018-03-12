@@ -171,7 +171,9 @@ public abstract class Provider extends LinkedList<Task> {
         ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 
         try {
-            response = client.get("http://" + random.choose(GENERATE_204), null);
+            String url = "http://" + random.choose(GENERATE_204);
+            Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | URL: " + url);
+            response = client.get(url, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return response;
