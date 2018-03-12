@@ -108,6 +108,12 @@ public class WebViewService extends Service {
 
         this.settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
+
+        if (this.settings.getBoolean("pref_webview_debug", false)) {
+            if (Build.VERSION.SDK_INT >= 19) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+        }
     }
 
     /**
@@ -341,6 +347,11 @@ public class WebViewService extends Service {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             WebResourceResponse result = null;
+
+            // Avoid crash during remote debugging
+            if (url.equals("about:blank")) {
+                return null;
+            }
 
             if (referer != null) {
                 client.setHeader(Client.HEADER_REFERER, referer);

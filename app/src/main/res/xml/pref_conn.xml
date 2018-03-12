@@ -113,4 +113,16 @@
         android:title="pref_trust_all_certs"
         android:defaultValue="false" />
 
+    <CheckBoxPreference
+        android:key="pref_debug_force_MosMetroV2"
+        android:title="pref_debug_force_MosMetroV2"
+        android:summary="Всегда подключаться к MosMetroV2 (даже если интернет уже есть). Использовать только для отладки!"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:key="pref_webview_debug"
+        android:title="pref_webview_debug"
+        android:summary="Включить удалённую отладку Chrome (Android 4.4+). Внимание: останавливает процесс подключения после загрузки страницы авторизации. Продолжить можно только без этой опции!"
+        android:defaultValue="false" />
+
 </PreferenceScreen>

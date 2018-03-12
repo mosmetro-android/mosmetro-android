@@ -112,6 +112,10 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
 
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_debug_force_MosMetroV2", false)) {
+            return new MosMetroV2(context);
+        }
+
         ParsedResponse response = generate_204(context, running);
         Provider result = Provider.find(context, response);
 
