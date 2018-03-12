@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -201,18 +200,6 @@ public class OkHttp extends Client {
         }
 
         return parse(call(link, body.build()));
-    }
-
-    @Override
-    public InputStream getInputStream(String link) throws IOException {
-        Response response = call(link, null);
-        ResponseBody body = response.body();
-
-        if (body == null) {
-            throw new IOException("Empty response: " + response.code());
-        }
-
-        return body.byteStream();
     }
 
     @Override

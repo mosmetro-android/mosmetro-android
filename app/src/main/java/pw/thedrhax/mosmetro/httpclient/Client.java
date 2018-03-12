@@ -25,7 +25,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,7 +122,6 @@ public abstract class Client {
     // IO methods
     public abstract ParsedResponse get(String link, Map<String,String> params) throws IOException;
     public abstract ParsedResponse post(String link, Map<String,String> params) throws IOException;
-    public abstract InputStream getInputStream(String link) throws IOException;
 
     private ParsedResponse saveResponse(ParsedResponse response) {
         this.last_response = response;
@@ -158,14 +156,6 @@ public abstract class Client {
                     random.delay(running);
                 }
                 return saveResponse(post(link, params));
-            }
-        }.run(retries);
-    }
-    public InputStream getInputStream(final String link, int retries) throws IOException {
-        return new RetryOnException<InputStream>() {
-            @Override
-            public InputStream body() throws IOException {
-                return getInputStream(link);
             }
         }.run(retries);
     }
