@@ -346,7 +346,7 @@ public class WebViewService extends Service {
             WebResourceResponse result = null;
 
             // Avoid crash during remote debugging
-            if (url.equals("about:blank")) {
+            if ("about:blank".equals(url)) {
                 return null;
             }
 
