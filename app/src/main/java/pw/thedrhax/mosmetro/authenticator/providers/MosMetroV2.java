@@ -65,7 +65,7 @@ public class MosMetroV2 extends Provider {
         final Calendar cal = Calendar.getInstance();
         boolean ran_today = settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK);
         if (settings.getBoolean("pref_webview_enabled", true))
-            if (!ran_today || settings.getBoolean("pref_webview_always", false))
+            if (!ran_today || settings.getBoolean("pref_webview_always", true))
                 add(new WebViewTask(this) {
                     private final String JS_IS_LOADED = "document.getElementsByClassName('spinner')[0].offsetParent === null";
                     private final String JS_AUTH_CLICK = "document.getElementsByClassName('join')[0].click()";
