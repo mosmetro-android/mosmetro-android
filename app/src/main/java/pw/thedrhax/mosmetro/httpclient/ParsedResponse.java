@@ -29,12 +29,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -226,69 +224,6 @@ public class ParsedResponse {
     public static String removePathFromUrl(String url) {
         Uri base_uri = Uri.parse(url);
         return base_uri.getScheme() + "://" + base_uri.getHost();
-    }
-
-    private static String absolutePathToUrl(String base_url, String path) throws ParseException {
-        String base = removePathFromUrl(base_url);
-
-        if (path.startsWith("//")) {
-            return Uri.parse(base_url).getScheme() + ":" + path;
-        } else if (path.startsWith("/")) {
-            return base + path;
-        } else if (path.startsWith("http")) {
-            return path;
-        } else {
-            throw new ParseException("Malformed URL: " + path, 0);
-        }
-    }
-
-    public List<String> parseResourceList() {
-        LinkedList<String> links = new LinkedList<>();
-
-        if (document == null) {
-            return links;
-        }
-
-        // <link href="..." />
-        for (Element element : document.getElementsByTag("link")) {
-            if (element.hasAttr("href"))
-                links.add(element.attr("href"));
-        }
-
-        // <script src="..." />
-        for (Element element : document.getElementsByTag("script")) {
-            if (element.hasAttr("src"))
-                links.add(element.attr("src"));
-        }
-
-        // <img src="..." />
-        for (Element element : document.getElementsByTag("img")) {
-            if (element.hasAttr("src"))
-                links.add(element.attr("src"));
-        }
-
-        // Absolute path to full URL
-        LinkedList<String> result = new LinkedList<>();
-        for (String link : links) {
-            try {
-                String url = absolutePathToUrl(document.location(), link);
-                if (!result.contains(url))
-                    result.add(url);
-            } catch (ParseException ex) {
-                Logger.log(Logger.LEVEL.DEBUG, ex);
-            }
-        }
-
-        return result;
-    }
-
-    public void loadResources(Client client) {
-        for (String link : parseResourceList()) {
-            Logger.log(this, link);
-            try {
-                client.get(link, null);
-            } catch (IOException ignored) {}
-        }
     }
 
     public static Map<String,String> parseForm (Element form) {
