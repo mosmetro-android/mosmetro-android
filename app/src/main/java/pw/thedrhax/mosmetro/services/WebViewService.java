@@ -83,8 +83,6 @@ public class WebViewService extends Service {
     private WindowManager wm;
     private WebView webview;
 
-    private int pref_timeout;
-
     @Override
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public void onCreate() {
@@ -107,7 +105,6 @@ public class WebViewService extends Service {
         settings.setDomStorageEnabled(true);
 
         this.settings = PreferenceManager.getDefaultSharedPreferences(this);
-        pref_timeout = Util.getIntPreference(this, "pref_timeout", 5);
 
         if (this.settings.getBoolean("pref_webview_debug", false)) {
             if (Build.VERSION.SDK_INT >= 19) {
@@ -309,7 +306,7 @@ public class WebViewService extends Service {
 
             int counter = 0;
             while (result.get() == null) {
-                if (pref_timeout != 0 && counter++ >= pref_timeout * 10) {
+                if (counter++ >= 60000) {
                     throw new TimeoutException("Synchronizer timed out");
                 }
 
