@@ -213,7 +213,7 @@ public class WebViewService extends Service {
 
     @Nullable
     public String js(final String script) throws Exception {
-        return new Synchronizer<String>() {
+        return new Synchronizer<String>(1000) {
             @Override
             public void handlerThread() {
                 new Listener<String>(null) {
@@ -281,6 +281,16 @@ public class WebViewService extends Service {
         private Listener<T> result = new Listener<>(null);
         private Listener<String> error = new Listener<>(null);
 
+        private final int timeout;
+
+        public Synchronizer(int timeout) {
+            this.timeout = timeout;
+        }
+
+        public Synchronizer() {
+            this(60000);
+        }
+
         /**
          * This method will be executed on Handler's thread.
          * It MUST call the setResult(T result) method! Call can be asynchronous.
@@ -306,7 +316,7 @@ public class WebViewService extends Service {
 
             int counter = 0;
             while (result.get() == null) {
-                if (counter++ >= 60000) {
+                if (counter >= timeout) {
                     throw new TimeoutException("Synchronizer timed out");
                 }
 
@@ -318,6 +328,7 @@ public class WebViewService extends Service {
                     throw new InterruptedException("Interrupted by Listener");
                 }
 
+                counter += 100;
                 SystemClock.sleep(100);
             }
 
