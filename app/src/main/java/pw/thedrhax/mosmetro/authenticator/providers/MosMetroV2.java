@@ -80,16 +80,19 @@ public class MosMetroV2 extends Provider {
                         }
 
                         Logger.log("Waiting for page to load completely");
-                        try {
-                            while ("false".equals(wv.js(JS_IS_LOADED))) {
-                                if (!running.get()) {
-                                    return false;
-                                }
-                                SystemClock.sleep(500);
+                        String js_result = "false";
+                        while ("false".equals(js_result)) {
+                            try {
+                                js_result = wv.js(JS_IS_LOADED);
+                            } catch (Exception ex) {
+                                Logger.log(Logger.LEVEL.DEBUG, ex.toString());
                             }
-                        } catch (Exception ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                            return false;
+
+                            if (!running.get()) {
+                                return false;
+                            }
+
+                            SystemClock.sleep(500);
                         }
 
                         if (settings.getBoolean("pref_webview_debug", false)) {
@@ -106,10 +109,7 @@ public class MosMetroV2 extends Provider {
                         Logger.log("Clicking auth button");
                         try {
                             wv.js(JS_AUTH_CLICK);
-                        } catch (Exception ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                            return false;
-                        }
+                        } catch (Exception ignored) {}
 
                         Logger.log("Waiting 5 seconds");
                         for (int i = 0; i < 50 && running.get(); i++) {
