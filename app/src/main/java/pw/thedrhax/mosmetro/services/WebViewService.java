@@ -342,7 +342,7 @@ public class WebViewService extends Service {
         private String referer;
 
         @Override
-        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        public synchronized WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             WebResourceResponse result = null;
 
             // Avoid crash during remote debugging
