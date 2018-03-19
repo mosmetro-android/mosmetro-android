@@ -183,11 +183,11 @@ public class WebViewService extends Service {
     public void get(final String url) throws Exception {
         new Synchronizer<Boolean>() {
             @Override
-            public void handlerThread() {
+            public void handlerThread(final Listener<Boolean> result, Listener<String> error) {
                 webview.setWebViewClient(new FilteredWebViewClient() {
                     @Override
                     public void onPageCompletelyFinished(WebView view, String url) {
-                        setResult(true);
+                        result.set(true);
                     }
 
                     @Override
@@ -215,11 +215,11 @@ public class WebViewService extends Service {
     public String js(final String script) throws Exception {
         return new Synchronizer<String>(1000) {
             @Override
-            public void handlerThread() {
+            public void handlerThread(final Listener<String> result, Listener<String> error) {
                 new Listener<String>(null) {
                     @Override
                     public void onChange(String new_value) {
-                        setResult(new_value);
+                        result.set(new_value);
                         unsubscribe(js_result);
                     }
                 }.subscribe(js_result);
@@ -293,24 +293,16 @@ public class WebViewService extends Service {
 
         /**
          * This method will be executed on Handler's thread.
-         * It MUST call the setResult(T result) method! Call can be asynchronous.
+         * It MUST call either result.set() or error.set()! Call can be asynchronous.
          */
-        public abstract void handlerThread();
-
-        protected void setError(String message) {
-            this.error.set(message);
-        }
-
-        protected void setResult(T result) {
-            this.result.set(result);
-        }
+        public abstract void handlerThread(Listener<T> result, Listener<String> error);
 
         @Nullable
         public T run(Handler handler) throws Exception {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    handlerThread();
+                    handlerThread(result, error);
                 }
             });
 
