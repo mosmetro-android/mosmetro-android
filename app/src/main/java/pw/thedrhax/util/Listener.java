@@ -18,8 +18,8 @@
 
 package pw.thedrhax.util;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Util class used to monitor every change of the stored variable.
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class Listener<T> {
     private T value;
-    private final List<Listener<T>> callbacks = new LinkedList<>();
+    private final Queue<Listener<T>> callbacks = new ConcurrentLinkedQueue<>();
 
     public Listener(T initial_value) {
         value = initial_value;
@@ -43,10 +43,8 @@ public class Listener<T> {
     public final synchronized void set(T new_value) {
         value = new_value;
         onChange(new_value);
-        synchronized (callbacks) {
-            for (Listener<T> callback : callbacks) {
-                callback.set(new_value);
-            }
+        for (Listener<T> callback : callbacks) {
+            callback.set(new_value);
         }
     }
 
@@ -55,16 +53,12 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
-        synchronized (master.callbacks) {
-            master.callbacks.add(this);
-        }
+        master.callbacks.add(this);
         this.value = master.value;
     }
 
     public void unsubscribe(Listener<T> master) {
-        synchronized (master.callbacks) {
-            master.callbacks.remove(this);
-        }
+        master.callbacks.remove(this);
     }
 
     public void onChange(T new_value) {
