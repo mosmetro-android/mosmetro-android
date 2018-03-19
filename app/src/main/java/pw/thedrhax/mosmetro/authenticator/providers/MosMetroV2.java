@@ -84,6 +84,7 @@ public class MosMetroV2 extends Provider {
                         while ("false".equals(js_result)) {
                             try {
                                 js_result = wv.js(JS_IS_LOADED);
+                                Logger.log(Logger.LEVEL.DEBUG, "JS | " + js_result);
                             } catch (Exception ex) {
                                 Logger.log(Logger.LEVEL.DEBUG, ex.toString());
                             }
