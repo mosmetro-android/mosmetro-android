@@ -183,7 +183,7 @@ public class WebViewService extends Service {
     public void get(final String url) throws Exception {
         new Synchronizer<Boolean>() {
             @Override
-            public void handlerThread(final Listener<Boolean> result, Listener<String> error) {
+            public void handlerThread(final Listener<Boolean> result, final Listener<String> error) {
                 webview.setWebViewClient(new FilteredWebViewClient() {
                     @Override
                     public void onPageCompletelyFinished(WebView view, String url) {
@@ -191,10 +191,14 @@ public class WebViewService extends Service {
                     }
 
                     @Override
-                    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                        super.onReceivedError(view, request, error);
+                    @TargetApi(23)
+                    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError err) {
+                        super.onReceivedError(view, request, err);
                         if (Build.VERSION.SDK_INT >= 23) {
-                            Logger.log(WebViewService.this, (String) error.getDescription());
+                            Logger.log(WebViewService.this, (String) err.getDescription());
+                        }
+                        if (err.getErrorCode() == ERROR_HOST_LOOKUP) {
+                            error.set((String) err.getDescription());
                         }
                     }
 
@@ -203,6 +207,9 @@ public class WebViewService extends Service {
                         super.onReceivedError(view, errorCode, description, failingUrl);
                         if (Build.VERSION.SDK_INT < 23) {
                             Logger.log(WebViewService.this, description);
+                        }
+                        if (errorCode == ERROR_HOST_LOOKUP) {
+                            error.set(description);
                         }
                     }
                 });
@@ -307,7 +314,7 @@ public class WebViewService extends Service {
             });
 
             int counter = 0;
-            while (result.get() == null) {
+            while (true) {
                 if (counter >= timeout) {
                     throw new TimeoutException("Synchronizer timed out");
                 }
@@ -320,11 +327,13 @@ public class WebViewService extends Service {
                     throw new InterruptedException("Interrupted by Listener");
                 }
 
+                if (result.get() != null) {
+                    return result.get();
+                }
+
                 counter += 100;
                 SystemClock.sleep(100);
             }
-
-            return result.get();
         }
     }
 
