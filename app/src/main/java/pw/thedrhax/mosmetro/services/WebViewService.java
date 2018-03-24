@@ -51,6 +51,7 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,14 +192,12 @@ public class WebViewService extends Service {
                     }
 
                     @Override
-                    @TargetApi(23)
                     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError err) {
                         super.onReceivedError(view, request, err);
                         if (Build.VERSION.SDK_INT >= 23) {
-                            Logger.log(WebViewService.this, (String) err.getDescription());
-                        }
-                        if (err.getErrorCode() == ERROR_HOST_LOOKUP) {
-                            error.set((String) err.getDescription());
+                            onReceivedError(view, err.getErrorCode(),
+                                            (String) err.getDescription(),
+                                            request.getUrl().toString());
                         }
                     }
 
@@ -355,7 +354,7 @@ public class WebViewService extends Service {
 
         @Override
         public synchronized WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            WebResourceResponse result = null;
+            WebResourceResponse result = new WebResourceResponse("text/html", "utf-8", null);
 
             // Avoid crash during remote debugging
             if ("about:blank".equals(url)) {
@@ -407,6 +406,9 @@ public class WebViewService extends Service {
                         );
                     }
                 }
+            } catch (UnknownHostException ex) {
+                onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
+                return result;
             } catch (IOException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
             }
