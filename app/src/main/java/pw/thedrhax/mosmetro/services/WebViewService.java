@@ -106,12 +106,6 @@ public class WebViewService extends Service {
         settings.setDomStorageEnabled(true);
 
         this.settings = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (this.settings.getBoolean("pref_webview_debug", false)) {
-            if (Build.VERSION.SDK_INT >= 19) {
-                WebView.setWebContentsDebuggingEnabled(true);
-            }
-        }
     }
 
     /**
@@ -355,11 +349,6 @@ public class WebViewService extends Service {
         @Override
         public synchronized WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             WebResourceResponse result = new WebResourceResponse("text/html", "utf-8", null);
-
-            // Avoid crash during remote debugging
-            if ("about:blank".equals(url)) {
-                return null;
-            }
 
             if (referer != null) {
                 client.setHeader(Client.HEADER_REFERER, referer);

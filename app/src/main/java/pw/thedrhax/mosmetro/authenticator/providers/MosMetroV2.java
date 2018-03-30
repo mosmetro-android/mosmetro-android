@@ -96,17 +96,6 @@ public class MosMetroV2 extends Provider {
                             SystemClock.sleep(500);
                         }
 
-                        if (settings.getBoolean("pref_webview_debug", false)) {
-                            Logger.log("Chrome remote debugging started. Disable pref_webview_debug to continue!");
-                            while (settings.getBoolean("pref_webview_debug", false)) {
-                                if (!running.get()) {
-                                    vars.put("result", RESULT.INTERRUPTED);
-                                    return false;
-                                }
-                                SystemClock.sleep(100);
-                            }
-                        }
-
                         Logger.log("Clicking auth button");
                         try {
                             wv.js(JS_AUTH_CLICK);
