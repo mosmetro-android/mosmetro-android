@@ -185,6 +185,8 @@
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
     <string name="pref_delay">Диапазон задержек (в секундах)</string>
     <string name="pref_delay_summary">Диапазон значений случайной задержки, добавляемой к каждому запросу.</string>
+    <string name="pref_load_resources">Имитация загрузки ресурсов (бета)</string>
+    <string name="pref_load_resources_summary">Скачивать все ресурсы, включённые в HTML-страницу, для более точной имитации поведения браузера.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
     <string name="do_not_warn">Больше не предупреждать</string>
@@ -196,4 +198,5 @@
     <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах.</string>
     <string name="pref_category_delays">Случайные задержки</string>
     <string name="auth_webview_message">Открываю страницу входа, чтобы снизить вероятность получения блокировки. Это необходимо сделать только один раз в день. Пожалуйста, подождите…</string>
+    <string name="manual_connection_shortcut_summary">Запускайте ручное подключение прямо с рабочего стола</string>
 </resources>

@@ -205,6 +205,8 @@
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
     <string name="pref_delay">Delay range (seconds)</string>
     <string name="pref_delay_summary">Set the range of random delays applied for every request.</string>
+    <string name="pref_load_resources">Emulate resource loading (beta)</string>
+    <string name="pref_load_resources_summary">Download all resources included into HTML page to emulate browser activity.</string>
     <string name="pref_user_agent">User-Agent header</string>
     <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
     <string name="do_not_warn">Do not warn anymore</string>
@@ -216,4 +218,5 @@
     <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests.</string>
     <string name="pref_category_delays">Random delays</string>
     <string name="auth_webview_message">Opening auth page to avoid block from provider. It should be done only once a day. Please wait…</string>
+    <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
 </resources>
