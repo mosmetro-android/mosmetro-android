@@ -26,15 +26,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import java.util.LinkedList;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
@@ -42,11 +49,9 @@ import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
     // UI Elements
-    private TextView text_messages;
+    private RecyclerView text_messages;
+    private LogAdapter text_messages_adapter;
     private Button button_connect;
-    
-    // Logger
-    private boolean show_debug = false;
 
     // Status variables
     private boolean service_running = false;
@@ -76,14 +81,15 @@ public class DebugActivity extends Activity {
         };
         service_filter = new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService");
 
-        text_messages = (TextView)findViewById(R.id.text_messages);
+        text_messages = (RecyclerView)findViewById(R.id.text_messages);
+        text_messages_adapter = new LogAdapter();
+        text_messages.setAdapter(text_messages_adapter);
+        text_messages.setLayoutManager(new LinearLayoutManager(this));
+
         logger_callback = new Logger.Callback() {
             @Override
             public void log(Logger.LEVEL level, String message) {
-                if (level != Logger.LEVEL.INFO || show_debug)
-                    if (level != Logger.LEVEL.DEBUG || !show_debug)
-                        return;
-                text_messages.append(message + "\n");
+                text_messages_adapter.refresh();
             }
         };
 
@@ -104,12 +110,7 @@ public class DebugActivity extends Activity {
         super.onResume();
         registerReceiver(service_state, service_filter);
         Logger.registerCallback(this, logger_callback);
-        text_messages.setText("");
-
-        // Load all logs
-        for (Logger.LEVEL level : Logger.LEVEL.values()) {
-            Logger.getCallback(this).log(level, Logger.read(level));
-        }
+        text_messages_adapter.refresh();
 
         // Get initial ConnectionService state (not very accurate)
         service_state.onReceive(this,
@@ -167,7 +168,7 @@ public class DebugActivity extends Activity {
 
             case R.id.action_clear:
                 Logger.wipe();
-                text_messages.setText("");
+                text_messages_adapter.refresh();
                 return true;
 
             default:
@@ -199,8 +200,52 @@ public class DebugActivity extends Activity {
 
     // Handle debug log checkbox
     public void show_debug_log (View view) {
-        show_debug = ((CheckBox)view).isChecked();
-        text_messages.setText("");
-        text_messages.append(Logger.read(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO));
+        text_messages_adapter.showDebug(((CheckBox)view).isChecked());
+    }
+
+    public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
+        private boolean show_debug = false;
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView mTextView;
+
+            ViewHolder(TextView view) {
+                super(view);
+                mTextView = view;
+            }
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            TextView view = new TextView(parent.getContext());
+            view.setTypeface(Typeface.MONOSPACE);
+            view.setTextColor(Color.BLACK);
+            view.setTextSize(14);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.mTextView.setText(getDataset().get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return getDataset().size();
+        }
+
+        private LinkedList<String> getDataset() {
+            return Logger.read(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO);
+        }
+
+        void showDebug(boolean enabled) {
+            show_debug = enabled;
+            refresh();
+        }
+
+        void refresh() {
+            notifyDataSetChanged();
+            text_messages.scrollToPosition(text_messages_adapter.getItemCount() - 1);
+        }
     }
 }

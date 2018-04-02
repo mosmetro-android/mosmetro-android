@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -41,9 +42,9 @@ import pw.thedrhax.mosmetro.R;
 public class Logger {
     public enum LEVEL {INFO, DEBUG}
 
-    private static final Map<LEVEL,StringBuilder> logs = new HashMap<LEVEL,StringBuilder>() {{
+    private static final Map<LEVEL,LinkedList<String>> logs = new HashMap<LEVEL,LinkedList<String>>() {{
         for (LEVEL level : LEVEL.values()) {
-            put(level, new StringBuilder());
+            put(level, new LinkedList<String>());
         }
     }};
 
@@ -64,7 +65,7 @@ public class Logger {
             message = timestamp() + " " + message;
         }
         synchronized (logs) {
-            logs.get(level).append(message).append("\n");
+            logs.get(level).add(message);
         }
         for (Callback callback : callbacks.values()) {
             callback.call(level, message);
@@ -100,7 +101,7 @@ public class Logger {
     public static void wipe() {
         synchronized (logs) {
             for (LEVEL level : LEVEL.values()) {
-                logs.put(level, new StringBuilder());
+                logs.get(level).clear();
             }
         }
     }
@@ -109,8 +110,16 @@ public class Logger {
      * Outputs
      */
 
-    public static String read(LEVEL level) {
-        return logs.get(level).toString();
+    public static LinkedList<String> read(LEVEL level) {
+        return logs.get(level);
+    }
+
+    public static String toString(LEVEL level) {
+        StringBuilder result = new StringBuilder();
+        for (String message : read(level)) {
+            result.append(message).append("\n");
+        }
+        return result.toString();
     }
 
     /**
@@ -121,7 +130,7 @@ public class Logger {
         File log_file = new File(context.getFilesDir(), "pw.thedrhax.mosmetro.txt");
 
         FileWriter writer = new FileWriter(log_file);
-        writer.write(read(Logger.LEVEL.DEBUG));
+        writer.write(toString(Logger.LEVEL.DEBUG));
         writer.flush(); writer.close();
 
         return FileProvider.getUriForFile(context, "pw.thedrhax.mosmetro.provider", log_file);
