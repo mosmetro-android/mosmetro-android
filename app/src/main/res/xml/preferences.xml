@@ -13,6 +13,13 @@
         <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity" />
     </Preference>
 
+    <Preference
+        android:title="@string/manual_connection_shortcut"
+        android:summary="@string/manual_connection_shortcut_summary">
+
+        <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
+    </Preference>
+
     <PreferenceCategory
         android:key="pref_category_main"
         android:title="@string/pref_category_main">
