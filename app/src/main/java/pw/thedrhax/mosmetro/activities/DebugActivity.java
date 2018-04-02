@@ -28,6 +28,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -85,6 +86,16 @@ public class DebugActivity extends Activity {
         text_messages_adapter = new LogAdapter();
         text_messages.setAdapter(text_messages_adapter);
         text_messages.setLayoutManager(new LinearLayoutManager(this));
+        text_messages.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (Build.VERSION.SDK_INT >= 14) {
+                    text_messages_adapter.autoscroll = !recyclerView.canScrollVertically(1);
+                }
+            }
+        });
 
         logger_callback = new Logger.Callback() {
             @Override
@@ -205,6 +216,7 @@ public class DebugActivity extends Activity {
 
     public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         private boolean show_debug = false;
+        private boolean autoscroll = true;
 
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView mTextView;
@@ -245,7 +257,10 @@ public class DebugActivity extends Activity {
 
         void refresh() {
             notifyDataSetChanged();
-            text_messages.scrollToPosition(text_messages_adapter.getItemCount() - 1);
+
+            if (autoscroll) {
+                text_messages.scrollToPosition(text_messages_adapter.getItemCount() - 1);
+            }
         }
     }
 }
