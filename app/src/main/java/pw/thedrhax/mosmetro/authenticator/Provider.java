@@ -55,10 +55,8 @@ public abstract class Provider extends LinkedList<Task> {
     protected static final String[] GENERATE_204 = {
             "www.google.ru/generate_204",
             "www.google.ru/gen_204",
-            "www.google.com/generate_204",
-            "www.google.com/gen_204",
-            "connectivitycheck.gstatic.com/generate_204",
-            "www.gstatic.com/generate_204",
+            "google.com/generate_204",
+            "gstatic.com/generate_204"
     };
 
     /**
