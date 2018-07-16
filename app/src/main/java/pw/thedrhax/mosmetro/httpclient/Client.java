@@ -111,6 +111,7 @@ public abstract class Client {
     // IO methods
     public abstract ParsedResponse get(String link, Map<String,String> params) throws IOException;
     public abstract ParsedResponse post(String link, Map<String,String> params) throws IOException;
+    public abstract ParsedResponse post(String link, String type, String body) throws IOException;
     public abstract InputStream getInputStream(String link) throws IOException;
 
     private ParsedResponse saveResponse(ParsedResponse response) {
@@ -152,6 +153,18 @@ public abstract class Client {
                     random.delay(running);
                 }
                 return saveResponse(post(link, params));
+            }
+        }.run(retries);
+    }
+    public ParsedResponse post(final String link, final String type, final String body,
+                               int retries) throws IOException {
+        return new RetryOnException<ParsedResponse>() {
+            @Override
+            public ParsedResponse body() throws IOException {
+                if (random_delays) {
+                    random.delay(running);
+                }
+                return saveResponse(post(link, type, body));
             }
         }.run(retries);
     }

@@ -45,8 +45,10 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -150,7 +152,7 @@ public class OkHttp extends Client {
         return this;
     }
 
-    private Response call(String url, FormBody data) throws IOException {
+    private Response call(String url, RequestBody data) throws IOException {
         Request.Builder builder = new Request.Builder().url(url);
 
         // Choose appropriate request method
@@ -201,6 +203,11 @@ public class OkHttp extends Client {
         }
 
         return parse(call(link, body.build()));
+    }
+
+    @Override
+    public ParsedResponse post(String link, String type, String body) throws IOException {
+        return parse(call(link, RequestBody.create(MediaType.parse(type), body)));
     }
 
     @Override
