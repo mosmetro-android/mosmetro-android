@@ -31,6 +31,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
@@ -94,7 +95,8 @@ public abstract class Provider extends LinkedList<Task> {
      * @see Client
      */
     @NonNull static Provider find(Context context, ParsedResponse response) {
-        if (MosMetroV2.match(response)) return new MosMetroV2(context);
+        if (MosMetroV3.match(response)) return new MosMetroV3(context);
+        else if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
         else if (Enforta.match(response)) return new Enforta(context);
         else return new Unknown(context, response);
