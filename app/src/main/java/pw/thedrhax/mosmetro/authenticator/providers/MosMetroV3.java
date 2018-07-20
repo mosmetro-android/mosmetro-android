@@ -107,7 +107,7 @@ public class MosMetroV3 extends Provider {
                 try {
                     JSONObject body = new JSONObject();
                     body.put("authenticity_token", vars.get("token"));
-                    body.put("user_mac", vars.get("mac"));
+                    body.put("client_mac", vars.get("mac"));
                     body.put("client_ip", "");
 
                     Logger.log(Logger.LEVEL.DEBUG, "POST /auth/init");
