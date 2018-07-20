@@ -82,9 +82,7 @@ public class MosMetroV3 extends Provider {
                 }
 
                 try {
-                    String token = client.response().parseMetaContent("csrf-token");
-                    Logger.log(Logger.LEVEL.DEBUG, "CSRF token parsed: " + token);
-                    vars.put("token", token);
+                    vars.put("token", client.response().parseMetaContent("csrf-token"));
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -112,10 +110,12 @@ public class MosMetroV3 extends Provider {
                     body.put("user_mac", vars.get("mac"));
                     body.put("client_ip", "");
 
+                    Logger.log(Logger.LEVEL.DEBUG, "POST /auth/init");
+                    Logger.log(Logger.LEVEL.DEBUG, "Body: " + body.toJSONString());
                     client.post(
                             redirect + "/auth/init",
                             "application/json; charset=UTF-8",
-                            body.toString(),
+                            body.toJSONString(),
                             pref_retry_count
                     );
                     Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
