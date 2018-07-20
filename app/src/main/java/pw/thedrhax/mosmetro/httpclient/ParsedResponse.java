@@ -218,9 +218,7 @@ public class ParsedResponse {
                 String url = absolutePathToUrl(document.location(), link);
                 if (!result.contains(url))
                     result.add(url);
-            } catch (ParseException ex) {
-                Logger.log(Logger.LEVEL.DEBUG, ex);
-            }
+            } catch (ParseException ignored) {}
         }
 
         return result;
