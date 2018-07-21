@@ -110,8 +110,6 @@ public class MosMetroV3 extends Provider {
                     body.put("client_mac", vars.get("mac"));
                     body.put("client_ip", "");
 
-                    Logger.log(Logger.LEVEL.DEBUG, "POST /auth/init");
-                    Logger.log(Logger.LEVEL.DEBUG, "Body: " + body.toJSONString());
                     client.post(
                             redirect + "/auth/init",
                             "application/json; charset=UTF-8",
