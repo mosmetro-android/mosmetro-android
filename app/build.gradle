@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'androidsvgdrawable'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
-        minSdkVersion 11
-        targetSdkVersion 25
+        minSdkVersion 14
+        targetSdkVersion 27
         versionCode 70
         versionName "1.8.3.2"
 
@@ -68,10 +68,6 @@ android {
                 exclude 'test/**'
             }
         }
-
-        lintOptions {
-            abortOnError false
-        }
     }
 }
 
@@ -88,22 +84,22 @@ task svgToDrawablePng(type: SvgDrawableTask) {
 
 dependencies {
     // Runtime dependencies.
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-annotations:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'org.jsoup:jsoup:1.8.3'
+    implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
-    compile 'com.edmodo:rangebar:1.0.0'
+    implementation 'com.edmodo:rangebar:1.0.0'
 
     // Test dependencies.
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
     // Needed because there is a conflict in 'com.android.support.test:runner' package.
     // Here we explicitly define the version for the 'androidTest' sources build variant.
-    androidTestCompile 'com.android.support:support-annotations:25.3.1'
-    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestImplementation 'com.android.support:support-annotations:27.1.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
