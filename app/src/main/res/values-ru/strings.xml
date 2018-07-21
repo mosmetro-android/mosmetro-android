@@ -102,6 +102,10 @@
     <string name="auth_waiting">Ожидание…</string>
     <string name="auth_checking_connection">Проверка доступа в интернет</string>
     <string name="auth_already_connected">Уже подключено</string>
+    <string name="auth_init">Инициализация процесса авторизации</string>
+    <string name="auth_check">Проверка состояния авторизации</string>
+    <string name="auth_finish">Завершение процесса авторизации</string>
+    <string name="auth_algorithm_switch">Переключаюсь на другой алгоритм: %s</string>
     <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>

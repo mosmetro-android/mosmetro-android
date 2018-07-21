@@ -101,7 +101,7 @@ public class MosMetroV3 extends Provider {
          * ⇒ JSON: { "authenticity_token": token, "client_mac": mac, "client_ip": "" } < token, mac
          * ⇐ JSON: { "result": true, "user_mac": ..., "auth_status": "initial" }
          */
-        add(new NamedTask("Initializing auth procedure") {
+        add(new NamedTask(context.getString(R.string.auth_init)) {
             @Override @SuppressLint("HardwareIds")
             public boolean run(HashMap<String, Object> vars) {
                 try {
@@ -128,14 +128,10 @@ public class MosMetroV3 extends Provider {
                 try {
                     JSONObject answer = client.response().json();
                     boolean result = answer.containsKey("result") && answer.get("result").equals(true);
-
                     if (!result) {
-                        Logger.log(context.getString(R.string.error,
-                                "Unexpected answer: false"
-                        ));
-                        return false;
+                        throw new Exception("Unexpected answer: false");
                     }
-                } catch (org.json.simple.parser.ParseException ex) {
+                } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
@@ -152,7 +148,7 @@ public class MosMetroV3 extends Provider {
          * ⇒ GET redirect + /auth/check?client_mac=mac&client_ip= < redirect, mac
          * ⇐ TODO: 304 Not Modified?
          */
-        add(new NamedTask("Checking auth status") {
+        add(new NamedTask(context.getString(R.string.auth_check)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
@@ -174,7 +170,7 @@ public class MosMetroV3 extends Provider {
          * ⇒ GET redirect + /success?client_mac=mac < redirect, mac
          * ⇐ Location redirect > client.response()
          */
-        add(new NamedTask("Finishing auth procedure") {
+        add(new NamedTask(context.getString(R.string.auth_finish)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
@@ -216,7 +212,9 @@ public class MosMetroV3 extends Provider {
                             "Infinite loop!"
                     ));
                 } else {
-                    Logger.log("Switching to another algorithm: " + provider.getName());
+                    Logger.log(context.getString(R.string.auth_algorithm_switch,
+                            provider.getName()
+                    ));
                     RESULT result = provider.start();
                     vars.put("result", result);
                 }

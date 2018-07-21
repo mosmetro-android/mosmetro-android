@@ -112,6 +112,10 @@
     <string name="auth_waiting">Waiting…</string>
     <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>
+    <string name="auth_init">Initializing auth procedure</string>
+    <string name="auth_check">Checking auth status</string>
+    <string name="auth_finish">Finishing auth procedure</string>
+    <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
