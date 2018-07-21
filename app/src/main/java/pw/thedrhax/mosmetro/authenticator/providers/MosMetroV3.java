@@ -208,13 +208,15 @@ public class MosMetroV3 extends Provider {
                     Logger.log(context.getString(R.string.auth_connected));
                     vars.put("result", RESULT.CONNECTED);
                 } else if (provider instanceof MosMetroV3) {
-                    Logger.log(context.getString(R.string.error,
-                            "Infinite loop!"
-                    ));
+                    Logger.log(context.getString(R.string.error, "Infinite loop!"));
                 } else {
-                    Logger.log(context.getString(R.string.auth_algorithm_switch,
-                            provider.getName()
-                    ));
+                    if (provider instanceof Unknown) {
+                        Logger.log(context.getString(R.string.auth_unknown_redirect));
+                        provider = Provider.find(context, running)
+                                .setClient(client).setCallback(callback);
+                    }
+
+                    Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
                     RESULT result = provider.start();
                     vars.put("result", result);
                 }

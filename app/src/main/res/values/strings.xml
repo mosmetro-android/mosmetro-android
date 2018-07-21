@@ -115,6 +115,7 @@
     <string name="auth_init">Initializing auth procedure</string>
     <string name="auth_check">Checking auth status</string>
     <string name="auth_finish">Finishing auth procedure</string>
+    <string name="auth_unknown_redirect">Unknown redirect. Trying to detect algorithm…</string>
     <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
