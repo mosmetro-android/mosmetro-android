@@ -94,7 +94,7 @@ public abstract class Provider extends LinkedList<Task> {
      *
      * @see Client
      */
-    @NonNull static Provider find(Context context, ParsedResponse response) {
+    @NonNull public static Provider find(Context context, ParsedResponse response) {
         if (MosMetroV3.match(response)) return new MosMetroV3(context);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
@@ -247,6 +247,13 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public Provider setRunningListener(Listener<Boolean> master) {
         running.subscribe(master); return this;
+    }
+
+    /**
+     * Replace default Client
+     */
+    public Provider setClient(Client client) {
+        this.client = client; return this;
     }
 
     /**

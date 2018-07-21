@@ -174,7 +174,7 @@ public class MosMetroV3 extends Provider {
         /**
          * Finishing auth procedure
          * ⇒ GET redirect + /success?client_mac=mac < redirect, mac
-         * ⇐ Location: http://gowifi.ru
+         * ⇐ Location redirect > client.response()
          */
         add(new NamedTask("Finishing auth procedure") {
             @Override
@@ -185,47 +185,21 @@ public class MosMetroV3 extends Provider {
 
                     client.get(redirect + "/success", params, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
-
-                    redirect = client.response().get300Redirect();
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
-                } catch (ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_redirect)
-                    ));
-                    return false;
                 }
-                return true;
-            }
-        });
 
-        /**
-         * Following the last redirect
-         * ⇒ GET redirect
-         * ⇐ Location: http://wi-fi.ru
-         */
-        add(new NamedTask("Following the last redirect") {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                try {
-                    client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                }
                 return true;
             }
         });
 
         /**
          * Checking Internet connection
-         * ⇒ GET generate_204
+         * < client.response()
          * ⇐ GOOD: 204 No Content
          * ⇐ BAD: Meta + Location redirect: http://welcome.wi-fi.ru/?client_mac=... > redirect, mac
          * ⇐ OKAY: Meta + Location redirect: http://auth.wi-fi.ru/?segment=... > redirect
@@ -233,7 +207,8 @@ public class MosMetroV3 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Provider provider = Provider.find(context, running).setCallback(callback);
+                Provider provider = Provider.find(context, client.response())
+                        .setCallback(callback).setClient(client);
 
                 if (provider instanceof Unknown && isConnected()) {
                     Logger.log(context.getString(R.string.auth_connected));
