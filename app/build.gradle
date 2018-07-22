@@ -69,6 +69,10 @@ android {
             }
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 import fr.avianey.androidsvgdrawable.gradle.SvgDrawableTask
