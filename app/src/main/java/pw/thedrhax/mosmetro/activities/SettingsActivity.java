@@ -44,6 +44,7 @@ import java.util.List;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Version;
 
@@ -237,6 +238,8 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Logger.configure(this);
+
         // Populate preferences
         fragment = new SettingsFragment();
         getFragmentManager()
@@ -262,6 +265,16 @@ public class SettingsActivity extends Activity {
                 if (pref_autoconnect.isChecked())
                     service.setAction("STOP");
                 context.startService(service);
+                return true;
+            }
+        });
+
+        CheckBoxPreference pref_debug_logcat =
+                (CheckBoxPreference) fragment.findPreference("pref_debug_logcat");
+        pref_debug_logcat.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Logger.configure(SettingsActivity.this);
                 return true;
             }
         });

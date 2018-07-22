@@ -112,6 +112,11 @@
     <string name="auth_waiting">Waiting…</string>
     <string name="auth_checking_connection">Checking Internet connection</string>
     <string name="auth_already_connected">Already connected</string>
+    <string name="auth_init">Initializing auth procedure</string>
+    <string name="auth_check">Checking auth status</string>
+    <string name="auth_finish">Finishing auth procedure</string>
+    <string name="auth_unknown_redirect">Unknown redirect. Trying to detect algorithm…</string>
+    <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
@@ -219,4 +224,6 @@
     <string name="pref_category_delays">Random delays</string>
     <string name="auth_webview_message">Opening auth page to avoid block from provider. It should be done only once a day. Please wait…</string>
     <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
+    <string name="pref_debug_logcat">System log</string>
+    <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
 </resources>

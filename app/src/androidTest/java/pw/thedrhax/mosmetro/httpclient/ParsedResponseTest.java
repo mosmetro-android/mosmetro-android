@@ -26,9 +26,9 @@ import junit.framework.TestCase;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 
 /**
- * A collection of the Client class tests
+ * A collection of the ParsedResponse class tests
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
- * @see pw.thedrhax.mosmetro.httpclient.Client
+ * @see pw.thedrhax.mosmetro.httpclient.ParsedResponse
  */
 public class ParsedResponseTest extends TestCase {
     private Context context = InstrumentationRegistry.getContext();
