@@ -223,4 +223,6 @@
     <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests.</string>
     <string name="pref_category_delays">Random delays</string>
     <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
+    <string name="pref_debug_logcat">System log</string>
+    <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
 </resources>

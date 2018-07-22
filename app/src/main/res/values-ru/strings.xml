@@ -203,4 +203,6 @@
     <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах.</string>
     <string name="pref_category_delays">Случайные задержки</string>
     <string name="manual_connection_shortcut_summary">Запускайте ручное подключение прямо с рабочего стола</string>
+    <string name="pref_debug_logcat">Системный лог</string>
+    <string name="pref_debug_logcat_summary">Записывать сообщения в системный лог для отладки в случае аварийного завершения.</string>
 </resources>

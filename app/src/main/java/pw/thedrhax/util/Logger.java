@@ -20,10 +20,12 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
@@ -57,6 +59,17 @@ public class Logger {
     }
 
     /*
+     * Configuration
+     */
+
+    private static boolean logcat = false;
+
+    public static void configure(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        logcat = settings.getBoolean("pref_debug_logcat", false);
+    }
+
+    /*
      * Inputs
      */
 
@@ -65,6 +78,9 @@ public class Logger {
             message = timestamp() + " " + message;
         }
         synchronized (logs) {
+            if (logcat && level == LEVEL.DEBUG) {
+                Log.d("pw.thedrhax.mosmetro", message);
+            }
             logs.get(level).add(message);
         }
         for (Callback callback : callbacks.values()) {
