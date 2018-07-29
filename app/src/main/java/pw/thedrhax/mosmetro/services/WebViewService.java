@@ -354,6 +354,8 @@ public class WebViewService extends Service {
                 client.setHeader(Client.HEADER_REFERER, referer);
             }
 
+            if ("about:blank".equals(url)) return null;
+
             try {
                 client.setCookies(url, getCookies(url));
                 final ParsedResponse response = client.get(url, null, pref_retry_count);
@@ -387,12 +389,14 @@ public class WebViewService extends Service {
                                 put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
                                 put("access-control-allow-credentials", "true");
                             }
-                            // remove("x-xss-protection");
                         }});
-                        result.setStatusCodeAndReasonPhrase(
-                                response.getResponseCode(),
-                                response.getReason()
-                        );
+
+                        if (!response.getReason().isEmpty()) {
+                            result.setStatusCodeAndReasonPhrase(
+                                    response.getResponseCode(),
+                                    response.getReason()
+                            );
+                        }
                     }
                 }
             } catch (UnknownHostException ex) {
