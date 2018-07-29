@@ -68,7 +68,7 @@ public class MosMetroV2 extends Provider {
         if (settings.getBoolean("pref_webview_enabled", true))
             if (!ran_today || settings.getBoolean("pref_webview_always", true))
                 add(new WebViewTask(this) {
-                    private final String JS_IS_LOADED = "document.getElementsByClassName('spinner')[0].offsetParent === null";
+                    private final String JS_IS_LOADED = "document.getElementById('loader').offsetParent === null";
                     private final String JS_AUTH_CLICK = "document.getElementsByClassName('join')[0].click()";
 
                     @Override
