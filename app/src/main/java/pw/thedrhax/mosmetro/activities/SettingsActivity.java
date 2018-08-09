@@ -18,8 +18,12 @@
 
 package pw.thedrhax.mosmetro.activities;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -29,10 +33,11 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +55,7 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
+    private BranchFragment branch_fragment;
     private SharedPreferences settings;
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -57,6 +63,56 @@ public class SettingsActivity extends Activity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+        }
+    }
+
+    public static class BranchFragment extends PreferenceFragment {
+        protected List<UpdateCheckTask.Branch> branches;
+
+        public void setBranches(List<UpdateCheckTask.Branch> branches) {
+            this.branches = branches;
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+
+            ActionBar bar = getActivity().getActionBar();
+            if (bar != null) {
+                bar.setTitle(R.string.pref_updater_branch);
+            }
+
+            PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(screen);
+
+            final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String current_branch = settings.getString("pref_updater_branch", "play");
+            for (final UpdateCheckTask.Branch branch : branches) {
+                CheckBoxPreference pref = new CheckBoxPreference(getActivity());
+                pref.setTitle(branch.name);
+                pref.setSummary(branch.description);
+                pref.setChecked(current_branch.equals(branch.name));
+                pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        settings.edit()
+                                .putInt("pref_updater_ignore", 0)
+                                .putString("pref_updater_branch", branch.name)
+                                .apply();
+                        new UpdateCheckTask(getActivity()).execute(false);
+                        getActivity().onBackPressed();
+                        return true;
+                    }
+                });
+                screen.addPreference(pref);
+            }
+        }
+
+        @Override
+        public void onPrepareOptionsMenu(Menu menu) {
+            super.onPrepareOptionsMenu(menu);
+            menu.clear();
         }
     }
 
@@ -135,22 +191,24 @@ public class SettingsActivity extends Activity {
             case R.id.action_donate:
                 donate_dialog();
                 return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void update_checker_setup() {
-        final ListPreference pref_updater_branch =
-                (ListPreference) fragment.findPreference("pref_updater_branch");
-        pref_updater_branch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        final Preference pref_updater_branch = fragment.findPreference("pref_updater_branch");
+        pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                settings.edit()
-                        .putInt("pref_updater_ignore", 0)
-                        .putString("pref_updater_branch", (String)newValue)
-                        .apply();
-
-                new UpdateCheckTask(SettingsActivity.this).execute(false);
+            public boolean onPreferenceClick(Preference preference) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, branch_fragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack("branch")
+                        .commit();
                 return true;
             }
         });
@@ -158,6 +216,7 @@ public class SettingsActivity extends Activity {
         // Force check
         final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @SuppressLint("StaticFieldLeak")
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new UpdateCheckTask(SettingsActivity.this) {
@@ -176,17 +235,11 @@ public class SettingsActivity extends Activity {
                     @Override
                     public void result(List<Branch> branches) {
                         if (branches == null) return;
-
-                        String[] branch_names = new String[branches.size()];
-                        for (int i = 0; i < branch_names.length; i++) {
-                            branch_names[i] = branches.get(i).name;
-                        }
-
-                        if (branch_names.length > 0) {
-                            pref_updater_branch.setEntries(branch_names);
-                            pref_updater_branch.setEntryValues(branch_names);
+                        if (branches.size() > 0) {
                             pref_updater_branch.setEnabled(true);
                         }
+                        branch_fragment = new BranchFragment();
+                        branch_fragment.setBranches(branches);
                     }
                 }.setIgnore(preference == null).execute(preference != null);
                 return false;
@@ -241,12 +294,27 @@ public class SettingsActivity extends Activity {
         Logger.configure(this);
 
         // Populate preferences
+        final FragmentManager fmanager = getFragmentManager();
         fragment = new SettingsFragment();
-        getFragmentManager()
-                .beginTransaction()
+        fmanager.beginTransaction()
                 .replace(android.R.id.content, fragment)
                 .commit();
-        getFragmentManager().executePendingTransactions();
+        fmanager.executePendingTransactions();
+        fmanager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                boolean root = fmanager.getBackStackEntryCount() == 0;
+
+                ActionBar bar = getActionBar();
+                if (bar != null) {
+                    bar.setDisplayHomeAsUpEnabled(!root);
+
+                    if (root) { // reset to defaults
+                        bar.setTitle(R.string.app_name);
+                    }
+                }
+            }
+        });
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 

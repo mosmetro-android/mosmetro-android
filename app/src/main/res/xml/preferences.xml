@@ -58,7 +58,7 @@
             android:title="@string/pref_updater_check"
             android:summary="@string/pref_updater_check_summary" />
 
-        <ListPreference
+        <Preference
             android:key="pref_updater_branch"
             android:title="@string/pref_updater_branch"
             android:summary="@string/pref_updater_branch_summary"

@@ -191,6 +191,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     public class Branch {
         public String name;
         public String message;
+        public String description;
         public String url;
 
         private int version;
@@ -201,6 +202,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             this.by_build = "1".equals(data.get("by_build"));
             this.version = Integer.parseInt((String)data.get(by_build ? "build" : "version"));
             this.message = ((String)data.get("message")).replace("<br>", "");
+            this.description = (String)data.get("description");
             this.url = (String)data.get("url");
         }
 
