@@ -43,6 +43,8 @@ import android.support.annotation.RequiresApi;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -98,7 +100,17 @@ public class SettingsActivity extends Activity {
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String current_branch = settings.getString("pref_updater_branch", "play");
             for (final UpdateCheckTask.Branch branch : branches) {
-                CheckBoxPreference pref = new CheckBoxPreference(getActivity());
+                CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
+                    @Override
+                    protected void onBindView(View view) {
+                        super.onBindView(view);
+
+                        // Increase number of lines on Android 4.x
+                        // Source: https://stackoverflow.com/a/2615650
+                        TextView summary = (TextView) view.findViewById(android.R.id.summary);
+                        summary.setMaxLines(15);
+                    }
+                };
                 pref.setTitle(branch.name);
                 pref.setSummary(branch.description);
                 pref.setChecked(current_branch.equals(branch.name));
