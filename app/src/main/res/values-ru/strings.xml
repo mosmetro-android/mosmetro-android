@@ -76,7 +76,7 @@
     <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
     <string name="pref_updater_branch">Ветка обновления</string>
     <string name="pref_updater_branch_summary">
-        Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
+        Ветки обновления отличаются набором функций и частотой обновлений. Нажмите сюда, чтобы узнать подробности или выбрать ветку.
     </string>
 
     <string name="update_available">Доступно обновление</string>
@@ -205,4 +205,6 @@
     <string name="manual_connection_shortcut_summary">Запускайте ручное подключение прямо с рабочего стола</string>
     <string name="pref_debug_logcat">Системный лог</string>
     <string name="pref_debug_logcat_summary">Записывать сообщения в системный лог для отладки в случае аварийного завершения.</string>
+    <string name="pref_updater_branch_stable">Основные ветки</string>
+    <string name="pref_updater_branch_experimental">Экспериментальные ветки</string>
 </resources>

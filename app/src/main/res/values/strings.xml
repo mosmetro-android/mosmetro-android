@@ -78,7 +78,7 @@
     <string name="pref_updater_check_summary">Check for new application version on developer website</string>
     <string name="pref_updater_branch">Update branch</string>
     <string name="pref_updater_branch_summary">
-        Choose branch from which application will receive updates (default: play)
+        Branches differ by functionality and update frequency. Tap here to see more or select a branch.
     </string>
 
     <string name="update_available">Update is available</string>
@@ -225,4 +225,6 @@
     <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
     <string name="pref_debug_logcat">System log</string>
     <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
+    <string name="pref_updater_branch_stable">Main branches</string>
+    <string name="pref_updater_branch_experimental">Experimental branches</string>
 </resources>

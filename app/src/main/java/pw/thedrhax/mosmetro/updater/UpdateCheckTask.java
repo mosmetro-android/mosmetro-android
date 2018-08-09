@@ -189,10 +189,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     public void result(List<Branch> branches) {}
 
     public class Branch {
-        public String name;
-        public String message;
-        public String description;
-        public String url;
+        public final String name;
+        public final String message;
+        public final String description;
+        public final boolean stable;
+        public final String url;
 
         private int version;
         private boolean by_build = false; // Check by build number instead of version code
@@ -203,6 +204,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             this.version = Integer.parseInt((String)data.get(by_build ? "build" : "version"));
             this.message = ((String)data.get("message")).replace("<br>", "");
             this.description = (String)data.get("description");
+            this.stable = (Boolean)data.get("stable");
             this.url = (String)data.get("url");
         }
 

@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -86,6 +87,14 @@ public class SettingsActivity extends Activity {
             PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(screen);
 
+            PreferenceCategory stable = new PreferenceCategory(getActivity());
+            stable.setTitle(R.string.pref_updater_branch_stable);
+            screen.addPreference(stable);
+
+            PreferenceCategory experimental = new PreferenceCategory(getActivity());
+            experimental.setTitle(R.string.pref_updater_branch_experimental);
+            screen.addPreference(experimental);
+
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String current_branch = settings.getString("pref_updater_branch", "play");
             for (final UpdateCheckTask.Branch branch : branches) {
@@ -105,7 +114,12 @@ public class SettingsActivity extends Activity {
                         return true;
                     }
                 });
-                screen.addPreference(pref);
+
+                if (branch.stable) {
+                    stable.addPreference(pref);
+                } else {
+                    experimental.addPreference(pref);
+                }
             }
         }
 
