@@ -11,17 +11,6 @@ node('android') {
         git branch: env.BRANCH_NAME, credentialsId: cred_git, url: repo_url
     }
 
-    stage('Prepare') {
-        sh """
-            if ! echo $BRANCH_NAME | grep -Eq '(play|beta)'; then
-                sed -i "s/\\(versionName \\)\\"[0-9\\.]*\\"/\\1\\"$BRANCH_NAME-#$BUILD_NUMBER\\"/" app/build.gradle
-                sed -i "s/\\(android:defaultValue=\\)\\"play\\"/\\1\\"$BRANCH_NAME\\"/" app/src/main/res/xml/preferences.xml
-                sed -i "s/\\(\\"pref_updater_branch\\", \\)\\"play\\"/\\1\\"$BRANCH_NAME\\"/" app/src/main/java/pw/thedrhax/mosmetro/updater/UpdateCheckTask.java
-                sed -i "s/\\(\\"pref_updater_build\\", \\)0/\\1$BUILD_NUMBER/" app/src/main/java/pw/thedrhax/mosmetro/updater/UpdateCheckTask.java
-            fi
-        """
-    }
-
     stage('Build') {
         sh 'gradle build'
         sh """

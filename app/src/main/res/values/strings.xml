@@ -21,7 +21,7 @@
     <string name="error" formatted="false">Error: %s</string>
     <string name="not">not</string>
     <string name="try_out_of" formatted="false">try %d out of %d</string>
-    <string name="version" formatted="false">Application version: %s</string>
+    <string name="version" formatted="false">Version: %s</string>
     <string name="show_debug_log">Show verbose messages</string>
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
@@ -78,7 +78,7 @@
     <string name="pref_updater_check_summary">Check for new application version on developer website</string>
     <string name="pref_updater_branch">Update branch</string>
     <string name="pref_updater_branch_summary">
-        Choose branch from which application will receive updates (default: play)
+        Branches differ by functionality and update frequency. Tap here to see more or select a branch.
     </string>
 
     <string name="update_available">Update is available</string>
@@ -92,8 +92,6 @@
     <string name="developer_github_repo">GitHub repository</string>
     <string name="developer_github_repo_summary" translatable="false">mosmetro-android</string>
     <string name="developer_github_repo_link" translatable="false">https://github.com/mosmetro-android</string>
-    <string name="developer_google_play">Google Play application webpage</string>
-    <string name="developer_google_play_link" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
     <string name="developer_vkontakte">VK community</string>
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
@@ -173,7 +171,6 @@
         <item>Ethereum (copy the address)</item>
         <item>Help with development (GitHub)</item>
         <item>Join the community (VK)</item>
-        <item>Give feedback (Google Play)</item>
         <item>Cancel</item>
     </string-array>
     <string name="donate_bitcoin_data" translatable="false">1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m</string>
@@ -226,4 +223,6 @@
     <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
     <string name="pref_debug_logcat">System log</string>
     <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
+    <string name="pref_updater_branch_stable">Main branches</string>
+    <string name="pref_updater_branch_experimental">Experimental branches</string>
 </resources>

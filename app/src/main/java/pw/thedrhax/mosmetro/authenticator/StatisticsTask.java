@@ -22,7 +22,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -142,7 +141,7 @@ class StatisticsTask implements Task {
 
                     notify.show();
                 }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
+            }.force(false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         return false;
