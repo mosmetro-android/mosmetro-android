@@ -49,15 +49,6 @@
 
     </PreferenceScreen>
 
-    <PreferenceScreen
-        android:title="@string/developer_google_play">
-
-        <intent android:action="pw.thedrhax.mosmetro.activities.SafeViewActivity">
-            <extra android:name="data" android:value="@string/developer_google_play_link" />
-        </intent>
-
-    </PreferenceScreen>
-
     <PreferenceCategory
         android:title="@string/pref_category_contributors">
 

@@ -19,7 +19,7 @@
     <string name="error" formatted="false">Ошибка: %s</string>
     <string name="not">не</string>
     <string name="try_out_of" formatted="false">попытка %d из %d</string>
-    <string name="version" formatted="false">Версия приложения: %s</string>
+    <string name="version" formatted="false">Версия: %s</string>
     <string name="show_debug_log">Показать подробные сообщения</string>
     <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
     <string name="screen_clear">Очистить экран</string>
@@ -76,7 +76,7 @@
     <string name="pref_updater_check_summary">Проверить наличие новых версий приложения на сервере разработчика</string>
     <string name="pref_updater_branch">Ветка обновления</string>
     <string name="pref_updater_branch_summary">
-        Выбор ветки, из которой приложение будет получать обновления (по умолчанию: play)
+        Ветки обновления отличаются набором функций и частотой обновлений. Нажмите сюда, чтобы узнать подробности или выбрать ветку.
     </string>
 
     <string name="update_available">Доступно обновление</string>
@@ -87,7 +87,6 @@
     <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Сайт разработчика</string>
     <string name="developer_github_repo">Репозиторий GitHub</string>
-    <string name="developer_google_play">Страница приложения в Google Play</string>
     <string name="developer_vkontakte">Сообщество ВКонтакте</string>
 
     <string name="manual_connection">Ручное подключение</string>
@@ -156,7 +155,6 @@
         <item>Ethereum (скопировать адрес)</item>
         <item>Помочь в разработке (GitHub)</item>
         <item>Вступить в группу (ВКонтакте)</item>
-        <item>Оставить отзыв (Google Play)</item>
         <item>Отмена</item>
     </string-array>
     <string name="pref_category_internet">Проверка соединения</string>
@@ -207,4 +205,6 @@
     <string name="pref_debug_logcat_summary">Записывать сообщения в системный лог для отладки в случае аварийного завершения.</string>
     <string name="receiver_service_title">Фоновый процесс активен</string>
     <string name="receiver_service_summary">Ожидается подключение к одной из поддерживаемых сетей Wi-Fi</string>
+    <string name="pref_updater_branch_stable">Основные ветки</string>
+    <string name="pref_updater_branch_experimental">Экспериментальные ветки</string>
 </resources>
