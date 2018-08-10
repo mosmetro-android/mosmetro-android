@@ -47,7 +47,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
+import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
@@ -70,9 +70,9 @@ public class SettingsActivity extends Activity {
     }
 
     public static class BranchFragment extends PreferenceFragment {
-        protected List<UpdateCheckTask.Branch> branches;
+        protected Map<String, UpdateCheckTask.Branch> branches;
 
-        public void setBranches(List<UpdateCheckTask.Branch> branches) {
+        public void setBranches(Map<String, UpdateCheckTask.Branch> branches) {
             this.branches = branches;
         }
 
@@ -96,7 +96,7 @@ public class SettingsActivity extends Activity {
             screen.addPreference(experimental);
 
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            for (final UpdateCheckTask.Branch branch : branches) {
+            for (final UpdateCheckTask.Branch branch : branches.values()) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
                     @Override
                     protected void onBindView(View view) {
@@ -114,8 +114,12 @@ public class SettingsActivity extends Activity {
                 pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
-                        settings.edit().putInt("pref_updater_ignore", 0).apply();
-                        branch.download();
+                        boolean same = Version.getBranch().equals(branch.name);
+                        ((CheckBoxPreference)preference).setChecked(same);
+                        if (!same) {
+                            settings.edit().putInt("pref_updater_ignore", 0).apply();
+                            branch.dialog().show();
+                        }
                         getActivity().onBackPressed();
                         return true;
                     }
@@ -253,7 +257,7 @@ public class SettingsActivity extends Activity {
                     }
 
                     @Override
-                    public void result(List<Branch> branches) {
+                    public void result(Map<String, Branch> branches) {
                         if (branches == null) return;
                         if (branches.size() > 0) {
                             pref_updater_branch.setEnabled(true);
@@ -261,7 +265,7 @@ public class SettingsActivity extends Activity {
                         branch_fragment = new BranchFragment();
                         branch_fragment.setBranches(branches);
                     }
-                }.setIgnore(preference == null).execute(preference != null);
+                }.ignore(preference == null).force(preference != null).execute();
                 return false;
             }
         });

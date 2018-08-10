@@ -31,8 +31,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
@@ -41,13 +41,14 @@ import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
-public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
+public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
+    private final CachedRetriever retriever;
 
     // Info from the server
-    private List<Branch> branches;
+    private Map<String, Branch> branches;
     private Branch current_branch;
 
     // Updater state
@@ -58,17 +59,26 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     public UpdateCheckTask (Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+        this.retriever = new CachedRetriever(context);
     }
 
-    private boolean hasUpdate() {
-        return !update_failed && current_branch.hasUpdate();
+    /**
+     * Force check for updates even if current last version is marked 'ignored' by user.
+     */
+    public UpdateCheckTask ignore(boolean skip_ignored) {
+        this.check_ignored = !skip_ignored; return this;
+    }
+
+    /**
+     * Clear branch cache before checking for updates and force update notification even if
+     * there are no updates available.
+     */
+    public UpdateCheckTask force(boolean force) {
+        this.force_check = force; return this;
     }
 
     @Override
-    protected Void doInBackground (Boolean... force) {
-        force_check = force[0];
-        CachedRetriever retriever = new CachedRetriever(context);
-
+    protected Void doInBackground (Void... aVoid) {
         // Generate base URL
         String UPDATE_INFO_URL = retriever.get(
                 BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT, CachedRetriever.Type.URL
@@ -94,7 +104,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
             return null;
         }
 
-        branches = new LinkedList<>();
+        branches = new HashMap<>();
         for (Object key : branches_json.keySet()) {
             Branch branch;
 
@@ -109,7 +119,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                 current_branch = branch;
             }
 
-            branches.add(branch);
+            branches.put(branch.name, branch);
         }
 
         if (branches.size() == 0) {
@@ -118,15 +128,15 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         // Check if selected branch is deleted
-        if (current_branch == null) {
-            // Fallback to master
+        if (current_branch == null) { // Fallback to master
             settings.edit().putInt("pref_updater_ignore", 0).apply();
-            for (Branch branch : branches) {
-                if (branch.name.equals("master")) {
-                    current_branch = branch;
-                    current_branch.ignore(false);
-                    break;
-                }
+
+            if (branches.containsKey("master")) {
+                current_branch = branches.get("master");
+                current_branch.ignore(false);
+            } else {
+                update_failed = true;
+                return null;
             }
         }
 
@@ -138,6 +148,10 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         return null;
     }
 
+    private boolean hasUpdate() {
+        return !update_failed && current_branch.hasUpdate();
+    }
+
     @Override
     protected void onPostExecute(Void aVoid) {
         result(hasUpdate(), current_branch);
@@ -145,27 +159,12 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
     }
 
     public void showDialog() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        AlertDialog.Builder dialog;
 
         if (hasUpdate()) {
-            dialog = dialog
-                    .setTitle(context.getString(R.string.update_available))
-                    .setMessage(current_branch.message)
-                    .setNegativeButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            current_branch.ignore(true);
-                        }
-                    })
-                    .setNeutralButton(R.string.later, null)
-                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            current_branch.download();
-                        }
-                    });
+            dialog = current_branch.dialog_update();
         } else {
-            dialog = dialog
+            dialog = new AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.update_not_available))
                     .setMessage(context.getString(R.string.update_not_available_message))
                     .setNegativeButton(context.getString(R.string.ok), null);
@@ -176,15 +175,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         } catch (Exception ignored) {}
     }
 
-    public UpdateCheckTask setIgnore (boolean ignore) {
-        check_ignored = !ignore; return this;
-    }
-
     public void result(boolean hasUpdate, @Nullable Branch current_branch) {
         if (hasUpdate || force_check) showDialog();
     }
 
-    public void result(List<Branch> branches) {}
+    public void result(Map<String, Branch> branches) {}
 
     public class Branch {
         public final String name;
@@ -231,6 +226,29 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         public void download() {
             context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
+        }
+
+        public AlertDialog.Builder dialog() {
+            return new AlertDialog.Builder(context)
+                    .setTitle(context.getString(R.string.update_available))
+                    .setMessage(message)
+                    .setNeutralButton(R.string.later, null)
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            download();
+                        }
+                    });
+        }
+
+        public AlertDialog.Builder dialog_update() {
+            return dialog()
+                    .setNegativeButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ignore(true);
+                        }
+                    });
         }
     }
 }
