@@ -92,8 +92,6 @@
     <string name="developer_github_repo">GitHub repository</string>
     <string name="developer_github_repo_summary" translatable="false">mosmetro-android</string>
     <string name="developer_github_repo_link" translatable="false">https://github.com/mosmetro-android</string>
-    <string name="developer_google_play">Google Play application webpage</string>
-    <string name="developer_google_play_link" translatable="false">https://play.google.com/store/apps/details?id=pw.thedrhax.mosmetro</string>
     <string name="developer_vkontakte">VK community</string>
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
@@ -173,7 +171,6 @@
         <item>Ethereum (copy the address)</item>
         <item>Help with development (GitHub)</item>
         <item>Join the community (VK)</item>
-        <item>Give feedback (Google Play)</item>
         <item>Cancel</item>
     </string-array>
     <string name="donate_bitcoin_data" translatable="false">1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m</string>

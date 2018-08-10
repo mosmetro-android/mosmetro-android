@@ -193,12 +193,6 @@ public class SettingsActivity extends Activity {
                                 .putExtra("data", getString(R.string.developer_vkontakte_link))
                         );
                         break;
-
-                    case 5: // Google Play
-                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                .putExtra("data", getString(R.string.developer_google_play_link))
-                        );
-                        break;
                 }
             }
         };

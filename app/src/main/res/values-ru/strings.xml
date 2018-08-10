@@ -87,7 +87,6 @@
     <string name="developer_info">Дмитрий Карих (mosmetro@thedrhax.pw)</string>
     <string name="developer_site">Сайт разработчика</string>
     <string name="developer_github_repo">Репозиторий GitHub</string>
-    <string name="developer_google_play">Страница приложения в Google Play</string>
     <string name="developer_vkontakte">Сообщество ВКонтакте</string>
 
     <string name="manual_connection">Ручное подключение</string>
@@ -156,7 +155,6 @@
         <item>Ethereum (скопировать адрес)</item>
         <item>Помочь в разработке (GitHub)</item>
         <item>Вступить в группу (ВКонтакте)</item>
-        <item>Оставить отзыв (Google Play)</item>
         <item>Отмена</item>
     </string-array>
     <string name="pref_category_internet">Проверка соединения</string>
