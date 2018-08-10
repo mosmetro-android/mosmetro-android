@@ -79,8 +79,9 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         // Retrieve info from server
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
-                "{\"" + settings.getString("pref_updater_branch", Version.getBranch()) + "\":" +
-                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"0\",\"message\":\"none\"}}",
+                "{\"" + Version.getBranch() + "\":" +
+                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"" + Version.getVersionCode() +
+                "\",\"message\":\"none\",\"description\":\"Connection error\"}}",
                 CachedRetriever.Type.JSON
         );
 
@@ -104,7 +105,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                 continue;
             }
 
-            if (branch.name.equals(settings.getString("pref_updater_branch", Version.getBranch()))) {
+            if (Version.getBranch().equals(branch.name)) {
                 current_branch = branch;
             }
 
@@ -119,14 +120,11 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         // Check if selected branch is deleted
         if (current_branch == null) {
             // Fallback to master
-            settings.edit()
-                    .putInt("pref_updater_ignore", 0)
-                    .putString("pref_updater_branch", "master")
-                    .apply();
-
+            settings.edit().putInt("pref_updater_ignore", 0).apply();
             for (Branch branch : branches) {
                 if (branch.name.equals("master")) {
                     current_branch = branch;
+                    current_branch.ignore(false);
                     break;
                 }
             }
@@ -228,9 +226,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
         }
 
         public void ignore(boolean ignore) {
-            settings.edit()
-                    .putInt("pref_updater_ignore", ignore ? version : 0)
-                    .apply();
+            settings.edit().putInt("pref_updater_ignore", ignore ? version : 0).apply();
         }
 
         public void download() {

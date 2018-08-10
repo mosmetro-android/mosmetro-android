@@ -82,9 +82,7 @@ public class SettingsActivity extends Activity {
             setHasOptionsMenu(true);
 
             ActionBar bar = getActivity().getActionBar();
-            if (bar != null) {
-                bar.setTitle(R.string.pref_updater_branch);
-            }
+            if (bar != null) bar.setTitle(R.string.pref_updater_branch);
 
             PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(screen);
@@ -98,7 +96,6 @@ public class SettingsActivity extends Activity {
             screen.addPreference(experimental);
 
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String current_branch = settings.getString("pref_updater_branch", Version.getBranch());
             for (final UpdateCheckTask.Branch branch : branches) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
                     @Override
@@ -113,15 +110,12 @@ public class SettingsActivity extends Activity {
                 };
                 pref.setTitle(branch.name);
                 pref.setSummary(branch.description);
-                pref.setChecked(current_branch.equals(branch.name));
+                pref.setChecked(Version.getBranch().equals(branch.name));
                 pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
-                        settings.edit()
-                                .putInt("pref_updater_ignore", 0)
-                                .putString("pref_updater_branch", branch.name)
-                                .apply();
-                        new UpdateCheckTask(getActivity()).execute(false);
+                        settings.edit().putInt("pref_updater_ignore", 0).apply();
+                        branch.download();
                         getActivity().onBackPressed();
                         return true;
                     }
