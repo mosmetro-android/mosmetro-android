@@ -79,7 +79,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
 
         // Retrieve info from server
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
-                "{\"" + settings.getString("pref_updater_branch", "play") + "\":" +
+                "{\"" + settings.getString("pref_updater_branch", Version.getBranch()) + "\":" +
                 "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"0\",\"message\":\"none\"}}",
                 CachedRetriever.Type.JSON
         );
@@ -104,7 +104,7 @@ public class UpdateCheckTask extends AsyncTask<Boolean,Void,Void> {
                 continue;
             }
 
-            if (branch.name.equals(settings.getString("pref_updater_branch", "play"))) {
+            if (branch.name.equals(settings.getString("pref_updater_branch", Version.getBranch()))) {
                 current_branch = branch;
             }
 

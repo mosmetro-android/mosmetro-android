@@ -20,6 +20,8 @@ package pw.thedrhax.util;
 
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 import pw.thedrhax.mosmetro.BuildConfig;
 
 /**
@@ -41,28 +43,18 @@ public final class Version {
     }
 
     @NonNull public static String getFormattedVersion() {
-        return getVersionName() + "-" + getVersionCode();
+        if (getBranch().equals("play")) {
+            return getVersionName();
+        } else {
+            return String.format(Locale.ENGLISH,"%s #%d", getBranch(), getBuildNumber());
+        }
     }
 
-    // TODO: Store branch name in app.gradle
     @NonNull public static String getBranch() {
-        String version_name = Version.getVersionName();
-
-        if (version_name.contains("#")) {
-            return version_name.substring(0, version_name.indexOf("#") - 1);
-        } else {
-            return "play";
-        }
+        return BuildConfig.BRANCH_NAME;
     }
 
-    // TODO: Store build number in app.gradle
     public static int getBuildNumber() {
-        String version_name = Version.getVersionName();
-
-        if (version_name.contains("#")) {
-            return Integer.parseInt(version_name.substring(version_name.indexOf("#") + 1));
-        } else {
-            return 0; // play or beta are currently installed
-        }
+        return BuildConfig.BUILD_NUMBER;
     }
 }

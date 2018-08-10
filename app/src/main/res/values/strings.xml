@@ -21,7 +21,7 @@
     <string name="error" formatted="false">Error: %s</string>
     <string name="not">not</string>
     <string name="try_out_of" formatted="false">try %d out of %d</string>
-    <string name="version" formatted="false">Application version: %s</string>
+    <string name="version" formatted="false">Version: %s</string>
     <string name="show_debug_log">Show verbose messages</string>
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>

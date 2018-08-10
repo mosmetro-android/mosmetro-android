@@ -12,6 +12,12 @@ android {
         versionCode 70
         versionName "1.8.3.2"
 
+        // Jenkins build info
+        def branch_name = System.getenv("BRANCH_NAME") ?: "play"
+        buildConfigField "String", "BRANCH_NAME", "\"$branch_name\""
+        buildConfigField "Integer", "BUILD_NUMBER", System.getenv("BUILD_NUMBER") ?: "0"
+        resValue "string", "build_branch_name", "\"$branch_name\""
+
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""

@@ -98,7 +98,7 @@ public class SettingsActivity extends Activity {
             screen.addPreference(experimental);
 
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String current_branch = settings.getString("pref_updater_branch", "play");
+            String current_branch = settings.getString("pref_updater_branch", Version.getBranch());
             for (final UpdateCheckTask.Branch branch : branches) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
                     @Override
