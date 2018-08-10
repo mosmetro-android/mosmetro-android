@@ -36,6 +36,7 @@ public class ReceiverService extends Service {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ))
                 .id(NOTIFY_ID)
+                .priority(-2)
                 .locked(true);
 
         receiver = new NetworkReceiver();

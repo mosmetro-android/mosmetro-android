@@ -39,6 +39,7 @@ public class Notify extends NotificationCompat.Builder {
     private SharedPreferences settings;
 
     private int id = 0;
+    private int priority = 0;
     private boolean enabled = true;
     private boolean locked = false;
     private boolean big_text = true;
@@ -48,15 +49,6 @@ public class Notify extends NotificationCompat.Builder {
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
-
-        if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(channel_id) == null) {
-            NotificationChannel channel = new NotificationChannel(
-                    channel_id,
-                    context.getString(R.string.app_name),
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            nm.createNotificationChannel(channel);
-        }
 
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
@@ -86,7 +78,9 @@ public class Notify extends NotificationCompat.Builder {
     public Notify priority(int priority) {
         if (priority < -2) priority = -2;
         if (priority > 2) priority = 2;
-        setPriority(priority); return this;
+        setPriority(priority);
+        this.priority = priority;
+        return this;
     }
 
     public Notify icon(int colored, int white) {
@@ -131,6 +125,23 @@ public class Notify extends NotificationCompat.Builder {
 
     public Notify show() {
         if (!enabled) return this;
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (nm.getNotificationChannel(channel_id) != null &&
+                    priority != nm.getNotificationChannel(channel_id).getImportance() - 2) {
+                nm.deleteNotificationChannel(channel_id);
+            }
+
+            if (nm.getNotificationChannel(channel_id) != null) {
+                NotificationChannel channel = new NotificationChannel(
+                        channel_id,
+                        context.getString(R.string.app_name),
+                        priority + 2
+                );
+
+                nm.createNotificationChannel(channel);
+            }
+        }
 
         Notification notification = build();
 
