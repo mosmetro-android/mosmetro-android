@@ -132,7 +132,7 @@ public class Notify extends NotificationCompat.Builder {
                 nm.deleteNotificationChannel(channel_id);
             }
 
-            if (nm.getNotificationChannel(channel_id) != null) {
+            if (nm.getNotificationChannel(channel_id) == null) {
                 NotificationChannel channel = new NotificationChannel(
                         channel_id,
                         context.getString(R.string.app_name),
