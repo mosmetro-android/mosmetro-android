@@ -205,4 +205,6 @@
     <string name="manual_connection_shortcut_summary">Запускайте ручное подключение прямо с рабочего стола</string>
     <string name="pref_debug_logcat">Системный лог</string>
     <string name="pref_debug_logcat_summary">Записывать сообщения в системный лог для отладки в случае аварийного завершения.</string>
+    <string name="receiver_service_title">Фоновый процесс активен</string>
+    <string name="receiver_service_summary">Ожидается подключение к одной из поддерживаемых сетей Wi-Fi</string>
 </resources>
