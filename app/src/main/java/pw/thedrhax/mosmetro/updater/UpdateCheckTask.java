@@ -91,7 +91,7 @@ public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         String content = retriever.get(UPDATE_INFO_URL, 60*60,
                 "{\"" + Version.getBranch() + "\":" +
                 "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"" + Version.getVersionCode() +
-                "\",\"message\":\"none\",\"description\":\"Connection error\"}}",
+                "\",\"message\":\"none\",\"description\":\"Connection error\",\"stable\":true}}",
                 CachedRetriever.Type.JSON
         );
 
@@ -197,7 +197,7 @@ public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
             this.version = Integer.parseInt((String)data.get(by_build ? "build" : "version"));
             this.message = ((String)data.get("message")).replace("<br>", "");
             this.description = (String)data.get("description");
-            this.stable = (Boolean)data.get("stable");
+            this.stable = data.containsKey("stable") && (Boolean)data.get("stable");
             this.url = (String)data.get("url");
         }
 
