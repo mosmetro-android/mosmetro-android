@@ -25,16 +25,14 @@
         android:title="@string/pref_category_main">
 
         <Preference
+            android:key="pref_conn"
             android:title="@string/pref_category_connection"
-            android:summary="@string/pref_category_connection_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.ConnectionPreferences" />
-        </Preference>
+            android:summary="@string/pref_category_connection_summary" />
 
         <Preference
+            android:key="pref_notify"
             android:title="@string/pref_category_notifications"
-            android:summary="@string/pref_category_notifications_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.NotificationPreferences" />
-        </Preference>
+            android:summary="@string/pref_category_notifications_summary" />
 
         <CheckBoxPreference
             android:key="acra.enable"
@@ -82,9 +80,9 @@
             android:title="@string/app_name" />
 
         <Preference
+            android:key="pref_about"
             android:title="@string/more_information"
-            android:summary="@string/more_information_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.AboutActivity" />
-        </Preference>
+            android:summary="@string/more_information_summary" />
+
     </PreferenceCategory>
 </PreferenceScreen>

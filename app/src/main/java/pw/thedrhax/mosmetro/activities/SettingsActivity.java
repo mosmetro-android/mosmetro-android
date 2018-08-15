@@ -54,6 +54,7 @@ import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
+import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
@@ -69,7 +70,26 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    public static class BranchFragment extends PreferenceFragment {
+    public static class NestedFragment extends PreferenceFragment {
+        protected void setTitle(String title) {
+            ActionBar bar = getActivity().getActionBar();
+            if (bar != null) bar.setTitle(title);
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onPrepareOptionsMenu(Menu menu) {
+            super.onPrepareOptionsMenu(menu);
+            menu.clear();
+        }
+    }
+
+    public static class BranchFragment extends NestedFragment {
         protected Map<String, UpdateCheckTask.Branch> branches;
 
         public void setBranches(Map<String, UpdateCheckTask.Branch> branches) {
@@ -79,10 +99,7 @@ public class SettingsActivity extends Activity {
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setHasOptionsMenu(true);
-
-            ActionBar bar = getActivity().getActionBar();
-            if (bar != null) bar.setTitle(R.string.pref_updater_branch);
+            setTitle(getString(R.string.pref_updater_branch));
 
             PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(screen);
@@ -132,11 +149,57 @@ public class SettingsActivity extends Activity {
                 }
             }
         }
+    }
 
+    public static class ConnectionSettingsFragment extends NestedFragment {
         @Override
-        public void onPrepareOptionsMenu(Menu menu) {
-            super.onPrepareOptionsMenu(menu);
-            menu.clear();
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            // Generate random User-Agent if it is unset
+            new Randomizer(getActivity()).cached_useragent();
+
+            setTitle(getString(R.string.pref_category_connection));
+            addPreferencesFromResource(R.xml.pref_conn);
+        }
+    }
+
+    public static class NotificationSettingsFragment extends NestedFragment {
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setTitle(getString(R.string.pref_category_notifications));
+            addPreferencesFromResource(R.xml.pref_notify);
+
+            PreferenceScreen screen = getPreferenceScreen();
+
+            // Link pref_notify_foreground and pref_notify_success_lock
+            final CheckBoxPreference foreground = (CheckBoxPreference)
+                    screen.findPreference("pref_notify_foreground");
+            final CheckBoxPreference success = (CheckBoxPreference)
+                    screen.findPreference("pref_notify_success");
+            final CheckBoxPreference success_lock = (CheckBoxPreference)
+                    screen.findPreference("pref_notify_success_lock");
+            foreground.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    success.setEnabled(!((Boolean) newValue));
+                    success_lock.setEnabled(!((Boolean) newValue));
+                    return true;
+                }
+            });
+            foreground
+                    .getOnPreferenceChangeListener()
+                    .onPreferenceChange(foreground, foreground.isChecked());
+        }
+    }
+
+    public static class AboutFragment extends NestedFragment {
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setTitle(getString(R.string.about));
+            addPreferencesFromResource(R.xml.about);
         }
     }
 
@@ -361,6 +424,51 @@ public class SettingsActivity extends Activity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 Logger.configure(SettingsActivity.this);
+                return true;
+            }
+        });
+
+        // Connection Preferences
+        Preference pref_conn = fragment.findPreference("pref_conn");
+        pref_conn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, new ConnectionSettingsFragment())
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack("conn")
+                        .commit();
+                return true;
+            }
+        });
+
+        // Notification Preferences
+        Preference pref_notify = fragment.findPreference("pref_notify");
+        pref_notify.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, new NotificationSettingsFragment())
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack("notify")
+                        .commit();
+                return true;
+            }
+        });
+
+        // About
+        Preference pref_about = fragment.findPreference("pref_about");
+        pref_about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, new AboutFragment())
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack("about")
+                        .commit();
                 return true;
             }
         });
