@@ -207,4 +207,6 @@
     <string name="pref_debug_acra_summary">Автоматически отправлять отчёты о сбоях разработчику приложения.</string>
     <string name="pref_updater_branch_stable">Основные ветки</string>
     <string name="pref_updater_branch_experimental">Экспериментальные ветки</string>
+    <string name="pref_debug">Отладка</string>
+    <string name="pref_debug_summary">Автоматические отчёты, LogCat, и т.д.</string>
 </resources>

@@ -194,6 +194,25 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    public static class DebugSettingsFragment extends NestedFragment {
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setTitle(getString(R.string.pref_debug));
+            addPreferencesFromResource(R.xml.pref_debug);
+
+            CheckBoxPreference pref_debug_logcat =
+                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
+            pref_debug_logcat.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Logger.configure(getActivity());
+                    return true;
+                }
+            });
+        }
+    }
+
     public static class AboutFragment extends NestedFragment {
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -418,16 +437,6 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        CheckBoxPreference pref_debug_logcat =
-                (CheckBoxPreference) fragment.findPreference("pref_debug_logcat");
-        pref_debug_logcat.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Logger.configure(SettingsActivity.this);
-                return true;
-            }
-        });
-
         // Connection Preferences
         Preference pref_conn = fragment.findPreference("pref_conn");
         pref_conn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -453,6 +462,21 @@ public class SettingsActivity extends Activity {
                         .replace(android.R.id.content, new NotificationSettingsFragment())
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack("notify")
+                        .commit();
+                return true;
+            }
+        });
+
+        // Debug
+        Preference pref_debug = fragment.findPreference("pref_debug");
+        pref_debug.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(android.R.id.content, new DebugSettingsFragment())
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack("debug")
                         .commit();
                 return true;
             }

@@ -34,17 +34,10 @@
             android:title="@string/pref_category_notifications"
             android:summary="@string/pref_category_notifications_summary" />
 
-        <CheckBoxPreference
-            android:key="acra.enable"
-            android:title="@string/pref_debug_acra"
-            android:summary="@string/pref_debug_acra_summary"
-            android:defaultValue="true" />
-
-        <CheckBoxPreference
-            android:key="pref_debug_logcat"
-            android:title="@string/pref_debug_logcat"
-            android:summary="@string/pref_debug_logcat_summary"
-            android:defaultValue="false" />
+        <Preference
+            android:key="pref_debug"
+            android:title="@string/pref_debug"
+            android:summary="@string/pref_debug_summary" />
 
     </PreferenceCategory>
 

@@ -226,4 +226,6 @@
     <string name="pref_debug_acra_summary">Automatically send crash reports to application developer.</string>
     <string name="pref_updater_branch_stable">Main branches</string>
     <string name="pref_updater_branch_experimental">Experimental branches</string>
+    <string name="pref_debug">Debug options</string>
+    <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
 </resources>
