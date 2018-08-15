@@ -29,7 +29,7 @@ android {
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
-        buildConfigField "String", "API_REL_ACRA", "\"/send\""
+        buildConfigField "String", "API_REL_ACRA", "\"/acra/send\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
