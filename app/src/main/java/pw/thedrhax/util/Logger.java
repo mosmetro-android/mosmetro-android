@@ -110,8 +110,8 @@ public class Logger {
      * Logger Utils
      */
 
-    public static void date() {
-        log(DateFormat.getDateTimeInstance().format(new Date()));
+    public static void date(String prefix) {
+        log(prefix + DateFormat.getDateTimeInstance().format(new Date()));
     }
 
     public static void wipe() {
