@@ -220,16 +220,16 @@ public abstract class Provider extends LinkedList<Task> {
         vars.put("result", RESULT.ERROR);
 
         int progress;
-        for (Task task : this) {
+        for (int i = 0; i < size(); i++) {
             if (isStopped()) return RESULT.INTERRUPTED;
-            progress = (indexOf(task) + 1) * 100 / size();
-            if (task instanceof NamedTask) {
-                Logger.log(((NamedTask)task).getName());
-                callback.onProgressUpdate(progress, ((NamedTask)task).getName());
+            progress = (i + 1) * 100 / size();
+            if (get(i) instanceof NamedTask) {
+                Logger.log(((NamedTask)get(i)).getName());
+                callback.onProgressUpdate(progress, ((NamedTask)get(i)).getName());
             } else {
                 callback.onProgressUpdate(progress);
             }
-            if (!task.run(vars)) break;
+            if (!get(i).run(vars)) break;
         }
 
         new StatisticsTask(this).run(vars);
