@@ -333,13 +333,13 @@ public class SettingsActivity extends Activity {
                     }
 
                     @Override
-                    public void result(Map<String, Branch> branches) {
-                        if (branches == null) return;
-                        if (branches.size() > 0) {
-                            pref_updater_branch.setEnabled(true);
+                    public void result(@Nullable Map<String, Branch> branches) {
+                        boolean success = branches != null && branches.size() > 0;
+                        pref_updater_branch.setEnabled(success);
+                        if (success) {
+                            branch_fragment = new BranchFragment();
+                            branch_fragment.setBranches(branches);
                         }
-                        branch_fragment = new BranchFragment();
-                        branch_fragment.setBranches(branches);
                     }
                 }.ignore(preference == null).force(preference != null).execute();
                 return false;

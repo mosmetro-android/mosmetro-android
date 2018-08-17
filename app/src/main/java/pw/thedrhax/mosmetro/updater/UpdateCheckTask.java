@@ -179,7 +179,7 @@ public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         if (hasUpdate || force_check) showDialog();
     }
 
-    public void result(Map<String, Branch> branches) {}
+    public void result(@Nullable Map<String, Branch> branches) {}
 
     public class Branch {
         public final String name;
