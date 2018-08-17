@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
@@ -47,11 +48,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.acra.ACRA;
+
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Randomizer;
@@ -59,7 +63,7 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
-    private BranchFragment branch_fragment;
+    private Listener<Map<String,UpdateCheckTask.Branch>> branches;
     private SharedPreferences settings;
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -90,10 +94,10 @@ public class SettingsActivity extends Activity {
     }
 
     public static class BranchFragment extends NestedFragment {
-        protected Map<String, UpdateCheckTask.Branch> branches;
+        private Map<String,UpdateCheckTask.Branch> branches;
 
-        public void setBranches(Map<String, UpdateCheckTask.Branch> branches) {
-            this.branches = branches;
+        public BranchFragment branches(Map<String, UpdateCheckTask.Branch> branches) {
+            this.branches = branches; return this;
         }
 
         @Override
@@ -299,20 +303,6 @@ public class SettingsActivity extends Activity {
     }
 
     private void update_checker_setup() {
-        final Preference pref_updater_branch = fragment.findPreference("pref_updater_branch");
-        pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(android.R.id.content, branch_fragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack("branch")
-                        .commit();
-                return true;
-            }
-        });
-
         // Force check
         final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
         pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -333,13 +323,8 @@ public class SettingsActivity extends Activity {
                     }
 
                     @Override
-                    public void result(@Nullable Map<String, Branch> branches) {
-                        boolean success = branches != null && branches.size() > 0;
-                        pref_updater_branch.setEnabled(success);
-                        if (success) {
-                            branch_fragment = new BranchFragment();
-                            branch_fragment.setBranches(branches);
-                        }
+                    public void result(@Nullable Map<String, Branch> result) {
+                        branches.set(result);
                     }
                 }.ignore(preference == null).force(preference != null).execute();
                 return false;
@@ -385,6 +370,21 @@ public class SettingsActivity extends Activity {
         if (!settings.getBoolean("pref_battery_saving_ignore", false))
             if (!pu.isBatterySavingIgnored())
                 dialog.show();
+    }
+
+    private void replaceFragment(String id, Fragment fragment) {
+        try {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(android.R.id.content, fragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack(id)
+                    .commit();
+        } catch (IllegalStateException ex) { // https://stackoverflow.com/q/7575921
+            ACRA.getErrorReporter().putCustomData("crash", "false");
+            ACRA.getErrorReporter().handleException(ex);
+            ACRA.getErrorReporter().removeCustomData("crash");
+        }
     }
 
     @Override
@@ -437,17 +437,29 @@ public class SettingsActivity extends Activity {
             }
         });
 
+        // Branch Selector
+        Preference pref_updater_branch = fragment.findPreference("pref_updater_branch");
+        pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                replaceFragment("branch", new BranchFragment().branches(branches.get()));
+                return true;
+            }
+        });
+
+        branches = new Listener<Map<String,UpdateCheckTask.Branch>>(null) {
+            @Override
+            public void onChange(Map<String, UpdateCheckTask.Branch> new_value) {
+                pref_updater_branch.setEnabled(new_value != null && new_value.size() > 0);
+            }
+        };
+
         // Connection Preferences
         Preference pref_conn = fragment.findPreference("pref_conn");
         pref_conn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(android.R.id.content, new ConnectionSettingsFragment())
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack("conn")
-                        .commit();
+                replaceFragment("conn", new ConnectionSettingsFragment());
                 return true;
             }
         });
@@ -457,12 +469,7 @@ public class SettingsActivity extends Activity {
         pref_notify.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(android.R.id.content, new NotificationSettingsFragment())
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack("notify")
-                        .commit();
+                replaceFragment("notify", new NotificationSettingsFragment());
                 return true;
             }
         });
@@ -472,12 +479,7 @@ public class SettingsActivity extends Activity {
         pref_debug.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(android.R.id.content, new DebugSettingsFragment())
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack("debug")
-                        .commit();
+                replaceFragment("debug", new DebugSettingsFragment());
                 return true;
             }
         });
@@ -487,12 +489,7 @@ public class SettingsActivity extends Activity {
         pref_about.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(android.R.id.content, new AboutFragment())
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack("about")
-                        .commit();
+                replaceFragment("about", new AboutFragment());
                 return true;
             }
         });
