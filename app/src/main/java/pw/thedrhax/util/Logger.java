@@ -127,7 +127,9 @@ public class Logger {
      */
 
     public static LinkedList<String> read(LEVEL level) {
-        return logs.get(level);
+        synchronized (logs) {
+            return new LinkedList<>(logs.get(level));
+        }
     }
 
     public static String toString(LEVEL level) {
