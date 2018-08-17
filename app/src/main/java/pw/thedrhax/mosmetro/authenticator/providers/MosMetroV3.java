@@ -217,8 +217,8 @@ public class MosMetroV3 extends Provider {
                     }
 
                     Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                    RESULT result = provider.start();
-                    vars.put("result", result);
+                    addAll(indexOf(this) + 1, provider);
+                    return true;
                 }
 
                 return false;
