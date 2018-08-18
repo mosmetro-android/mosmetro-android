@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import org.acra.ACRA;
+import org.acra.ErrorReporter;
 import org.acra.annotation.AcraCore;
 import org.acra.annotation.AcraHttpSender;
 import org.acra.data.StringFormat;
@@ -19,5 +20,9 @@ public class MosMetroApp extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         ACRA.init(this);
+
+        ErrorReporter reporter = ACRA.getErrorReporter();
+        reporter.putCustomData("BRANCH_NAME", BuildConfig.BRANCH_NAME);
+        reporter.putCustomData("BUILD_NUMBER", "" + BuildConfig.BUILD_NUMBER);
     }
 }
