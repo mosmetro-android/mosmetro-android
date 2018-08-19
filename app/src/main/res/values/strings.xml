@@ -193,7 +193,7 @@
     <string name="pref_timeout">Connection timeout</string>
     <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 5).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
-    <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
+    <string name="toast_view_exception">Looks like you don\'t have any apps suitable for this link.</string>
     <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
     <string name="pref_notify_priority">Notification priority</string>
     <string name="pref_notify_priority_summary">A value between -2 and 2 that affects the priority of all notifications. (default: 0)</string>

@@ -173,7 +173,7 @@
     <string name="pref_timeout">Таймаут соединения</string>
     <string name="pref_timeout_summary">Количество секунд, в течение которого приложение ожидает ответа от сервера. Если установлен 0, приложение будет ждать до тех пор пока не будет поймана одна из ошибок (по умолчанию: 5).</string>
     <string name="toast_unsupported_function">Похоже эта функция не поддерживается вашим устройством :(</string>
-    <string name="toast_view_exception">Похоже, у вас не установлено ни одного браузера</string>
+    <string name="toast_view_exception">Похоже, у вас не установлено ни одного приложения, подходящего для открытия этой ссылки.</string>
     <string name="auth_provider_assume">Пытаюсь подключиться с помощью MosMetroV2…</string>
     <string name="pref_notify_priority">Приоритет уведомлений</string>
     <string name="pref_notify_priority_summary">Значение между -2 и 2, влияющее на приоритет всех уведомлений. (по умолчанию: 0)</string>
