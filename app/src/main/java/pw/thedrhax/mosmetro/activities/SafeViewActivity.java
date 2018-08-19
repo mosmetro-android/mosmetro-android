@@ -19,10 +19,12 @@ public class SafeViewActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(getIntent().getStringExtra("data"))
-        );
+        if (!getIntent().hasExtra("data")) {
+            finish(); return;
+        }
+
+        Uri data = Uri.parse(getIntent().getStringExtra("data"));
+        Intent intent = new Intent(Intent.ACTION_VIEW, data);
 
         if (getIntent().hasExtra("action")) {
             intent.setAction(getIntent().getStringExtra("action"));
