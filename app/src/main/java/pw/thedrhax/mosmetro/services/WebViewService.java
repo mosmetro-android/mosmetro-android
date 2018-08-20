@@ -208,7 +208,7 @@ public class WebViewService extends Service {
                 });
                 webview.loadUrl(url);
             }
-        }.run(webview.getHandler());
+        }.run(webview.getHandler(), running);
     }
 
     @Nullable
@@ -225,7 +225,7 @@ public class WebViewService extends Service {
                 }.subscribe(js_result);
                 webview.loadUrl("javascript:" + js_interface + ".onResult(String(" + script + "));");
             }
-        }.run(webview.getHandler());
+        }.run(webview.getHandler(), running);
     }
 
     public void setCookies(String url, Map<String, String> cookies) {
@@ -298,7 +298,7 @@ public class WebViewService extends Service {
         public abstract void handlerThread(Listener<T> result, Listener<String> error);
 
         @Nullable
-        public T run(Handler handler) throws Exception {
+        public T run(Handler handler, Listener<Boolean> running) throws Exception {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
