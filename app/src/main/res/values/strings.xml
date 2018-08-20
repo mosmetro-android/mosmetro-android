@@ -193,7 +193,7 @@
     <string name="pref_timeout">Connection timeout</string>
     <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 5).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
-    <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
+    <string name="toast_view_exception">Looks like you don\'t have any apps suitable for this link.</string>
     <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
     <string name="pref_notify_priority">Notification priority</string>
     <string name="pref_notify_priority_summary">A value between -2 and 2 that affects the priority of all notifications. (default: 0)</string>
@@ -223,6 +223,10 @@
     <string name="manual_connection_shortcut_summary">Start manual connection directly from launcher</string>
     <string name="pref_debug_logcat">System log</string>
     <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
+    <string name="pref_debug_acra">Crash reports</string>
+    <string name="pref_debug_acra_summary">Automatically send crash reports to application developer.</string>
     <string name="pref_updater_branch_stable">Main branches</string>
     <string name="pref_updater_branch_experimental">Experimental branches</string>
+    <string name="pref_debug">Debug options</string>
+    <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
 </resources>

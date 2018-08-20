@@ -18,14 +18,24 @@ public class SafeViewActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!getIntent().hasExtra("data")) {
+            finish(); return;
+        }
+
+        Uri data = Uri.parse(getIntent().getStringExtra("data"));
+        Intent intent = new Intent(Intent.ACTION_VIEW, data);
+
+        if (getIntent().hasExtra("action")) {
+            intent.setAction(getIntent().getStringExtra("action"));
+        }
+
         try {
-            startActivity(new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(getIntent().getStringExtra("data"))
-            ));
+            startActivity(intent);
         } catch (ActivityNotFoundException ex) {
             Toast.makeText(this, R.string.toast_view_exception, Toast.LENGTH_LONG).show();
         }
+
         finish();
     }
 }

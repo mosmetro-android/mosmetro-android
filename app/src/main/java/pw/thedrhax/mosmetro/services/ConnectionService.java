@@ -278,7 +278,7 @@ public class ConnectionService extends IntentService {
                     .putExtra("RUNNING", true)
             );
 
-            Logger.date();
+            Logger.date(">>> ");
             Logger.log(getString(R.string.version, Version.getFormattedVersion()));
             Logger.log(getString(R.string.auth_connecting, SSID));
 

@@ -233,6 +233,7 @@ public abstract class Provider extends LinkedList<Task> {
         }
 
         new StatisticsTask(this).run(vars);
+        Logger.date("<<< ");
         return (RESULT)vars.get("result");
     }
 
