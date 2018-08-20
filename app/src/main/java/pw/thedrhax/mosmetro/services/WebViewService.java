@@ -223,7 +223,12 @@ public class WebViewService extends Service {
                         unsubscribe(js_result);
                     }
                 }.subscribe(js_result);
-                webview.loadUrl("javascript:" + js_interface + ".onResult(String(" + script + "));");
+
+                if (Build.VERSION.SDK_INT >= 19) {
+                    webview.evaluateJavascript(js_interface + ".onResult(String(" + script + "));", null);
+                } else {
+                    webview.loadUrl("javascript:" + js_interface + ".onResult(String(" + script + "));");
+                }
             }
         }.run(webview.getHandler(), running);
     }
