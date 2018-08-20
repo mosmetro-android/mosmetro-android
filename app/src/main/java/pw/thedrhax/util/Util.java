@@ -25,8 +25,10 @@ import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public final class Util {
     private Util() {}
@@ -43,6 +45,20 @@ public final class Util {
         } catch (ClassCastException ignored) {}
 
         return def_value;
+    }
+
+    // Source: https://stackoverflow.com/a/34836992
+    public static String readAsset(Context context, String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(context.getAssets().open(filename), "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String mLine = reader.readLine();
+        while (mLine != null) {
+            sb.append(mLine).append('\n');
+            mLine = reader.readLine();
+        }
+        reader.close();
+        return sb.toString();
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {

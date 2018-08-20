@@ -98,11 +98,6 @@
         android:defaultValue="true" />
 
     <CheckBoxPreference
-        android:key="pref_webview_always"
-        android:title="pref_webview_always"
-        android:defaultValue="true" />
-
-    <CheckBoxPreference
         android:key="pref_trust_all_certs"
         android:title="pref_trust_all_certs"
         android:defaultValue="false" />

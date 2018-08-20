@@ -75,6 +75,12 @@ public class WebViewService extends Service {
             }
         }
     };
+    private Listener<String> current_url = new Listener<String>("") {
+        @Override
+        public void onChange(String new_value) {
+            Logger.log(WebViewService.this, "URL | " + new_value);
+        }
+    };
 
     private String js_interface;
     private JavascriptListener js_result;
@@ -233,6 +239,10 @@ public class WebViewService extends Service {
         }.run(webview.getHandler(), running);
     }
 
+    public String getCurrentUrl() {
+        return current_url.get();
+    }
+
     public void setCookies(String url, Map<String, String> cookies) {
         CookieManager manager = CookieManager.getInstance();
 
@@ -247,10 +257,8 @@ public class WebViewService extends Service {
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            if (syncmanager != null) {
-                syncmanager.stopSync();
-                syncmanager.sync();
-            }
+            syncmanager.stopSync();
+            syncmanager.sync();
         } else {
             manager.flush();
         }
@@ -435,6 +443,7 @@ public class WebViewService extends Service {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Logger.log(WebViewService.this, "shouldOverrideUrlLoading(" + url + ")");
             if (!finished) {
                 redirecting = true;
             } else {
@@ -460,12 +469,15 @@ public class WebViewService extends Service {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            Logger.log(WebViewService.this, "onPageStarted(" + url + ")");
+            current_url.set(url);
             finished = false;
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+            Logger.log(WebViewService.this, "onPageFinished(" + url + ")");
 
             if (!redirecting) {
                 finished = true;
@@ -473,6 +485,7 @@ public class WebViewService extends Service {
 
             if (finished && !redirecting) {
                 onPageCompletelyFinished(view, url);
+                Logger.log(WebViewService.this, "onPageCompletelyFinished(" + url + ")");
             } else {
                 redirecting = false;
             }

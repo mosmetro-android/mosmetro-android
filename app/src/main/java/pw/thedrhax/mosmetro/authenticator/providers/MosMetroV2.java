@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -30,14 +29,12 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.authenticator.WebViewTask;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -59,67 +56,6 @@ public class MosMetroV2 extends Provider {
 
     public MosMetroV2(final Context context) {
         super(context);
-
-        /**
-         * Temporary workaround to avoid provider block
-         */
-        final Calendar cal = Calendar.getInstance();
-        boolean ran_today = settings.getInt("webview_last_day", 50) != cal.get(Calendar.DAY_OF_WEEK);
-        if (settings.getBoolean("pref_webview_enabled", true))
-            if (!ran_today || settings.getBoolean("pref_webview_always", true))
-                add(new WebViewTask(this) {
-                    private final String JS_IS_LOADED = "document.getElementById('loader').offsetParent === null";
-                    private final String JS_AUTH_CLICK = "document.getElementsByClassName('join')[0].click()";
-
-                    @Override
-                    public boolean script(HashMap<String, Object> vars) {
-                        Logger.log("Opening auth page");
-                        try {
-                            wv.get("https://auth.wi-fi.ru/");
-                        } catch (Exception ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                        }
-
-                        Logger.log("Waiting for page to load completely");
-                        String js_result = "false";
-                        while ("false".equals(js_result)) {
-                            try {
-                                js_result = wv.js(JS_IS_LOADED);
-                                Logger.log(Logger.LEVEL.DEBUG, "JS | " + js_result);
-                            } catch (Exception ex) {
-                                Logger.log(Logger.LEVEL.DEBUG, ex.toString());
-                            }
-
-                            if (!running.get()) {
-                                return false;
-                            }
-
-                            SystemClock.sleep(500);
-                        }
-
-                        Logger.log("Clicking auth button");
-                        try {
-                            wv.js(JS_AUTH_CLICK);
-                        } catch (Exception ignored) {}
-
-                        Logger.log("Waiting 5 seconds");
-                        for (int i = 0; i < 50 && running.get(); i++) {
-                            SystemClock.sleep(100);
-                        }
-
-                        // Dumping Cookies from WebView
-                        client.setCookies(
-                                "https://auth.wi-fi.ru/",
-                                wv.getCookies("https://auth.wi-fi.ru/")
-                        );
-
-                        settings.edit().putInt(
-                                "webview_last_day", cal.get(Calendar.DAY_OF_WEEK)
-                        ).apply();
-
-                        return true;
-                    }
-                });
 
         /**
          * Checking Internet connection for a first time
