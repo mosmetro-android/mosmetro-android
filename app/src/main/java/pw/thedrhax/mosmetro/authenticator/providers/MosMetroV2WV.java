@@ -127,10 +127,10 @@ public class MosMetroV2WV extends WebViewProvider {
          * ⇒ GET https://wi-fi.ru
          * ⇐ Don't wait for response
          */
-        add(new NamedTask("Waiting for result") {
+        add(new NamedTask("Waiting for auth page to close") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                while ("https://auth.wi-fi.ru/auth".equals(wv.getCurrentUrl())) {
+                while (wv.getCurrentUrl().contains("auth.wi-fi.ru/auth")) {
                     SystemClock.sleep(100);
                     if (!running.get()) {
                         return false;
