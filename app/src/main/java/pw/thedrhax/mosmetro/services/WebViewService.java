@@ -50,6 +50,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -276,6 +277,10 @@ public class WebViewService extends Service {
         return result;
     }
 
+    public void setBlacklist(String[] blacklist) {
+        webviewclient.setBlacklist(blacklist);
+    }
+
     private class JavascriptListener extends Listener<String> {
         JavascriptListener() {
             super(null);
@@ -351,19 +356,35 @@ public class WebViewService extends Service {
 
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
         private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
+        private String[] blacklist = new String[]{};
 
         private String next_referer;
         private String referer;
 
+        public void setBlacklist(String[] blacklist) {
+            this.blacklist = blacklist;
+        }
+
         @Override
         public synchronized WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            WebResourceResponse result = new WebResourceResponse("text/html", "utf-8", null);
+            WebResourceResponse result = new WebResourceResponse(
+                    "text/html",
+                    "utf-8",
+                    new ByteArrayInputStream("".getBytes())
+            );
 
             if (referer != null) {
                 client.setHeader(Client.HEADER_REFERER, referer);
             }
 
             if ("about:blank".equals(url)) return null;
+
+            for (String pattern : blacklist) {
+                if (url.contains(pattern)) {
+                    Logger.log(this, "Blocked: " + url);
+                    return result; // returns empty response
+                }
+            }
 
             try {
                 client.setCookies(url, getCookies(url));

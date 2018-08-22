@@ -80,6 +80,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Opening auth page") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                wv.setBlacklist(new String[]{"ads.adfox.ru", "mc.yandex.ru", "ac.yandex.ru", ".mp4"});
                 try {
                     wv.get("https://auth.wi-fi.ru/");
                 } catch (Exception ex) {
