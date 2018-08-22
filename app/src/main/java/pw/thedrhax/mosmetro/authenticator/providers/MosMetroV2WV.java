@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.SystemClock;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
@@ -81,13 +83,41 @@ public class MosMetroV2WV extends WebViewProvider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 wv.setBlacklist(new String[]{"ads.adfox.ru", "mc.yandex.ru", "ac.yandex.ru", ".mp4"});
+
                 try {
                     wv.get("https://auth.wi-fi.ru/");
                 } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     return false;
                 }
+
                 return true;
+            }
+        });
+
+        /**
+         * Detect ban (redirect to /auto_auth)
+         */
+        add(new Task() {
+            private boolean isCaptchaRequested() {
+                return wv.getUrl().contains("auto_auth");
+            }
+
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (!isCaptchaRequested()) return true;
+
+                Logger.log(context.getString(R.string.auth_ban_message));
+
+                // Increase ban counter
+                settings.edit()
+                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                        .apply();
+
+                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
+
+                vars.put("result", RESULT.ERROR);
+                return false;
             }
         });
 
@@ -97,6 +127,14 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Loading automated login script") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                if (!wv.getUrl().contains("auth.wi-fi.ru/auth")) { // TODO: Remove this hack
+                    Logger.log(Logger.LEVEL.DEBUG, "Unexpected URL: " + wv.getUrl());
+                    Logger.log(context.getString(R.string.error,
+                            "get() exited too early. Please try again..."
+                    ));
+                    return false;
+                }
+
                 try {
                     String script = Util.readAsset(context, "MosMetroV2.js");
                     String result = wv.js(script);
