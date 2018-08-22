@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @param <T> type of the stored variable
  */
 public class Listener<T> {
+    private Listener<T> master = null;
     private T value;
     private final Queue<Listener<T>> callbacks = new ConcurrentLinkedQueue<>();
 
@@ -54,11 +55,15 @@ public class Listener<T> {
 
     public void subscribe(Listener<T> master) {
         master.callbacks.add(this);
+        this.master = master;
         this.value = master.value;
     }
 
-    public void unsubscribe(Listener<T> master) {
-        master.callbacks.remove(this);
+    public void unsubscribe() {
+        if (master != null) {
+            master.callbacks.remove(this);
+            master = null;
+        }
     }
 
     public void onChange(T new_value) {

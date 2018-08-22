@@ -67,7 +67,7 @@ public abstract class WebViewProvider extends Provider {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             if (wv != null) {
-                wv.getRunningListener().unsubscribe(running);
+                wv.getRunningListener().unsubscribe();
                 wv = null;
             }
         }

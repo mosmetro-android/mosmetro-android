@@ -75,6 +75,7 @@ public class WebViewService extends Service {
             }
         }
     };
+
     private Listener<String> current_url = new Listener<String>("") {
         @Override
         public void onChange(String new_value) {
@@ -89,6 +90,7 @@ public class WebViewService extends Service {
     private ViewGroup view;
     private WindowManager wm;
     private WebView webview;
+    private FilteredWebViewClient webviewclient;
 
     @Override
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
@@ -96,12 +98,14 @@ public class WebViewService extends Service {
         super.onCreate();
         setContentView(R.layout.webview_activity);
         webview = (WebView)view.findViewById(R.id.webview);
+        webviewclient = new FilteredWebViewClient();
 
         Randomizer random = new Randomizer(this);
 
         js_interface = random.string("abcdef", 8);
         js_result = new JavascriptListener();
         webview.addJavascriptInterface(js_result, js_interface);
+        webview.setWebViewClient(webviewclient);
 
         clear();
 
@@ -185,33 +189,26 @@ public class WebViewService extends Service {
         new Synchronizer<Boolean>() {
             @Override
             public void handlerThread(final Listener<Boolean> result, final Listener<String> error) {
-                webview.setWebViewClient(new FilteredWebViewClient() {
+                new Listener<Boolean>(false) {
                     @Override
-                    public void onPageCompletelyFinished(WebView view, String url) {
-                        result.set(true);
+                    public void onChange(Boolean new_value) {
+                        if (new_value) {
+                            result.set(true);
+                            unsubscribe();
+                        }
                     }
+                }.subscribe(webviewclient.finished);
 
+                new Listener<String>(null) {
                     @Override
-                    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError err) {
-                        super.onReceivedError(view, request, err);
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            onReceivedError(view, err.getErrorCode(),
-                                            (String) err.getDescription(),
-                                            request.getUrl().toString());
+                    public void onChange(String new_value) {
+                        if (new_value != null) {
+                            error.set(new_value);
+                            unsubscribe();
                         }
                     }
+                }.subscribe(webviewclient.error);
 
-                    @Override
-                    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                        super.onReceivedError(view, errorCode, description, failingUrl);
-                        if (Build.VERSION.SDK_INT < 23) {
-                            Logger.log(WebViewService.this, description);
-                        }
-                        if (errorCode == ERROR_HOST_LOOKUP) {
-                            error.set(description);
-                        }
-                    }
-                });
                 webview.loadUrl(url);
             }
         }.run(webview.getHandler(), running);
@@ -226,7 +223,7 @@ public class WebViewService extends Service {
                     @Override
                     public void onChange(String new_value) {
                         result.set(new_value);
-                        unsubscribe(js_result);
+                        unsubscribe();
                     }
                 }.subscribe(js_result);
 
@@ -346,11 +343,10 @@ public class WebViewService extends Service {
     /**
      * Implementation of WebViewClient that ignores redirects in onPageFinished()
      * Inspired by https://stackoverflow.com/a/25547544
-     *
-     * TODO: Referer is not reliable. It has been tested only on JavaScript redirect
      */
-    private abstract class FilteredWebViewClient extends WebViewClient {
-        private boolean finished = true;
+    private class FilteredWebViewClient extends WebViewClient {
+        private Listener<Boolean> finished = new Listener<>(true);
+        private Listener<String> error = new Listener<>(null);
         private boolean redirecting = false;
 
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
@@ -444,10 +440,10 @@ public class WebViewService extends Service {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Logger.log(WebViewService.this, "shouldOverrideUrlLoading(" + url + ")");
-            if (!finished) {
+            if (!finished.get()) {
                 redirecting = true;
             } else {
-                finished = false;
+                finished.set(false);
             }
 
             // Schedule referer update
@@ -471,7 +467,7 @@ public class WebViewService extends Service {
             super.onPageStarted(view, url, favicon);
             Logger.log(WebViewService.this, "onPageStarted(" + url + ")");
             current_url.set(url);
-            finished = false;
+            finished.set(false);
         }
 
         @Override
@@ -480,18 +476,31 @@ public class WebViewService extends Service {
             Logger.log(WebViewService.this, "onPageFinished(" + url + ")");
 
             if (!redirecting) {
-                finished = true;
-            }
-
-            if (finished && !redirecting) {
-                onPageCompletelyFinished(view, url);
+                finished.set(true);
                 Logger.log(WebViewService.this, "onPageCompletelyFinished(" + url + ")");
             } else {
                 redirecting = false;
             }
         }
 
-        public abstract void onPageCompletelyFinished(WebView view, String url);
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError err) {
+            super.onReceivedError(view, request, err);
+            if (Build.VERSION.SDK_INT >= 23) {
+                onReceivedError(view, err.getErrorCode(),
+                        (String) err.getDescription(),
+                        request.getUrl().toString());
+            }
+        }
+
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            super.onReceivedError(view, errorCode, description, failingUrl);
+            Logger.log(WebViewService.this, description);
+            if (errorCode == ERROR_HOST_LOOKUP) {
+                error.set(description);
+            }
+        }
     }
 
     /*
