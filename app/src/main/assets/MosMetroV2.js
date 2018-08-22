@@ -24,12 +24,22 @@
     }
 
     function click(query) {
-        each(query, function(el) {el.click();});
+        each(query, function(el) {
+            if (el.offsetParent !== null) /* click only visible elements */
+                el.click();
+        });
     }
 
-    function onMutation() {
+    function onMutation(m, o) {
         click('.join');
+      	click('.cross');
         click('.mt-banner-fullscreen__button-close');
+        click('.interaction_button__joke');
+        click('.interaction_button');
+
+        each('video', function(el) {
+            el.pause();
+        });
     }
 
     var o = new MO(onMutation);
