@@ -131,7 +131,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Waiting for auth page to close") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                while (wv.getCurrentUrl().contains("auth.wi-fi.ru/auth")) {
+                while (wv.getUrl().contains("auth.wi-fi.ru/auth")) {
                     SystemClock.sleep(100);
                     if (!running.get()) {
                         return false;

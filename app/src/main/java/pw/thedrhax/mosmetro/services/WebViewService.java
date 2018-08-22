@@ -77,13 +77,6 @@ public class WebViewService extends Service {
         }
     };
 
-    private Listener<String> current_url = new Listener<String>("") {
-        @Override
-        public void onChange(String new_value) {
-            Logger.log(WebViewService.this, "URL | " + new_value);
-        }
-    };
-
     private String js_interface;
     private JavascriptListener js_result;
 
@@ -91,7 +84,7 @@ public class WebViewService extends Service {
     private ViewGroup view;
     private WindowManager wm;
     private WebView webview;
-    private FilteredWebViewClient webviewclient;
+    private InterceptedClient webviewclient;
 
     @Override
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
@@ -99,7 +92,7 @@ public class WebViewService extends Service {
         super.onCreate();
         setContentView(R.layout.webview_activity);
         webview = (WebView)view.findViewById(R.id.webview);
-        webviewclient = new FilteredWebViewClient();
+        webviewclient = new InterceptedClient();
 
         Randomizer random = new Randomizer(this);
 
@@ -237,8 +230,8 @@ public class WebViewService extends Service {
         }.run(webview.getHandler(), running);
     }
 
-    public String getCurrentUrl() {
-        return current_url.get();
+    public String getUrl() {
+        return webviewclient.current_url.get();
     }
 
     public void setCookies(String url, Map<String, String> cookies) {
@@ -349,8 +342,21 @@ public class WebViewService extends Service {
      * Implementation of WebViewClient that ignores redirects in onPageFinished()
      * Inspired by https://stackoverflow.com/a/25547544
      */
-    private class FilteredWebViewClient extends WebViewClient {
-        private Listener<Boolean> finished = new Listener<>(true);
+    private class InterceptedClient extends WebViewClient {
+        private Listener<String> current_url = new Listener<String>("") {
+            @Override
+            public void onChange(String new_value) {
+                Logger.log(InterceptedClient.this, "Current URL | " + new_value);
+            }
+        };
+
+        private final Listener<Boolean> finished = new Listener<Boolean>(true) {
+            @Override
+            public void onChange(Boolean new_value) {
+                Logger.log(InterceptedClient.this, "finished | " + new_value);
+            }
+        };
+
         private Listener<String> error = new Listener<>(null);
         private boolean redirecting = false;
 
@@ -392,10 +398,10 @@ public class WebViewService extends Service {
                 setCookies(url, client.getCookies(url));
 
                 if (response != null) {
-                    Logger.log(Logger.LEVEL.DEBUG, url);
+                    Logger.log(this, "Requesting: " + url);
 
                     if (response.getMimeType().contains("text/html")) {
-                        Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                        Logger.log(this, response.toString());
                     }
 
                     result = new WebResourceResponse(
@@ -438,14 +444,14 @@ public class WebViewService extends Service {
 
             // Apply scheduled referer update
             if (next_referer != null && next_referer.equals(url)) {
-                Logger.log(WebViewService.this, "Referer | Scheduled: " + next_referer);
+                Logger.log(this, "Referer | Scheduled: " + next_referer);
                 referer = next_referer;
                 next_referer = null;
             }
 
             // First request sets referer for others
             if (referer == null) {
-                Logger.log(WebViewService.this, "Referer | First: " + url);
+                Logger.log(this, "Referer | First: " + url);
                 referer = url;
             }
 
@@ -460,7 +466,7 @@ public class WebViewService extends Service {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Logger.log(WebViewService.this, "shouldOverrideUrlLoading(" + url + ")");
+            Logger.log(this, "shouldOverrideUrlLoading(" + url + ")");
             if (!finished.get()) {
                 redirecting = true;
             } else {
@@ -486,7 +492,7 @@ public class WebViewService extends Service {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
-            Logger.log(WebViewService.this, "onPageStarted(" + url + ")");
+            Logger.log(this, "onPageStarted(" + url + ")");
             current_url.set(url);
             finished.set(false);
         }
@@ -494,11 +500,11 @@ public class WebViewService extends Service {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            Logger.log(WebViewService.this, "onPageFinished(" + url + ")");
+            Logger.log(this, "onPageFinished(" + url + ")");
 
             if (!redirecting) {
                 finished.set(true);
-                Logger.log(WebViewService.this, "onPageCompletelyFinished(" + url + ")");
+                Logger.log(this, "onPageCompletelyFinished(" + url + ")");
             } else {
                 redirecting = false;
             }
@@ -517,7 +523,7 @@ public class WebViewService extends Service {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            Logger.log(WebViewService.this, description);
+            Logger.log(this, description);
             if (errorCode == ERROR_HOST_LOOKUP) {
                 error.set(description);
             }
