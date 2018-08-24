@@ -114,7 +114,7 @@
     <string name="auth_check">Checking auth status</string>
     <string name="auth_finish">Finishing auth procedure</string>
     <string name="auth_unknown_redirect">Unknown redirect. Trying to detect algorithm…</string>
-    <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
+    <string name="auth_algorithm_switch">Switching to another algorithm: %s (this is not an error)</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
@@ -136,6 +136,7 @@
         provider %s is not supported by application yet. Maybe the network is maintained by two providers
         one of which is not supported yet. We apologize for inconvenience.
     </string>
+    <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>
@@ -193,7 +194,7 @@
     <string name="pref_timeout">Connection timeout</string>
     <string name="pref_timeout_summary">Number of seconds to wait for server answer. If 0 is set, application will wait until connection error is caught (default: 5).</string>
     <string name="toast_unsupported_function">This function seems to be unsupported on your device. Sorry :(</string>
-    <string name="toast_view_exception">Looks like you don\'t have any browsers installed</string>
+    <string name="toast_view_exception">Looks like you don\'t have any apps suitable for this link.</string>
     <string name="auth_provider_assume">Trying MosMetroV2 anyway…</string>
     <string name="pref_notify_priority">Notification priority</string>
     <string name="pref_notify_priority_summary">A value between -2 and 2 that affects the priority of all notifications. (default: 0)</string>
@@ -224,6 +225,10 @@
     <string name="pref_debug_logcat_summary">Write log messages to system log to allow debugging in case of crash.</string>
     <string name="receiver_service_title">Background service is active</string>
     <string name="receiver_service_summary">Waiting for connection to one of supported Wi-Fi networks</string>
+    <string name="pref_debug_acra">Crash reports</string>
+    <string name="pref_debug_acra_summary">Automatically send crash reports to application developer.</string>
     <string name="pref_updater_branch_stable">Main branches</string>
     <string name="pref_updater_branch_experimental">Experimental branches</string>
+    <string name="pref_debug">Debug options</string>
+    <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
 </resources>

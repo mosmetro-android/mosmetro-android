@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="acra.enable"
+        android:title="@string/pref_debug_acra"
+        android:summary="@string/pref_debug_acra_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
+        android:key="pref_debug_logcat"
+        android:title="@string/pref_debug_logcat"
+        android:summary="@string/pref_debug_logcat_summary"
+        android:defaultValue="false" />
+
+</PreferenceScreen>

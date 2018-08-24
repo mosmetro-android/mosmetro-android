@@ -16,29 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.httpclient;
+package pw.thedrhax.mosmetro;
 
-import org.junit.Test;
+import android.app.Application;
+import android.content.Context;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.acra.ACRA;
+import org.acra.annotation.AcraCore;
+import org.acra.data.StringFormat;
 
-import static org.junit.Assert.*;
+import pw.thedrhax.mosmetro.acra.HockeySenderFactory;
 
-/**
- * A collection of the Client class tests
- * @author Dmitry Karikh <the.dr.hax@gmail.com>
- * @see pw.thedrhax.mosmetro.httpclient.Client
- */
-public class ClientTest {
-    @Test
-    public void requestToString() throws Exception {
-        Map<String,String> params = new HashMap<>();
+@AcraCore(buildConfigClass = BuildConfig.class,
+          reportSenderFactoryClasses = {HockeySenderFactory.class},
+          reportFormat = StringFormat.JSON)
+public class MosMetroApp extends Application {
 
-        params.put("test", "123");
-        assertEquals("?test=123", Client.requestToString(params));
-
-        params.put("foo", "bar");
-        assertEquals("?test=123&foo=bar", Client.requestToString(params));
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        ACRA.init(this);
     }
 }

@@ -16,29 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.httpclient;
+package pw.thedrhax.mosmetro.acra;
 
-import org.junit.Test;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.acra.config.CoreConfiguration;
+import org.acra.sender.ReportSender;
+import org.acra.sender.ReportSenderFactory;
 
-import static org.junit.Assert.*;
+public class HockeySenderFactory implements ReportSenderFactory {
 
-/**
- * A collection of the Client class tests
- * @author Dmitry Karikh <the.dr.hax@gmail.com>
- * @see pw.thedrhax.mosmetro.httpclient.Client
- */
-public class ClientTest {
-    @Test
-    public void requestToString() throws Exception {
-        Map<String,String> params = new HashMap<>();
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration coreConfiguration) {
+        return true;
+    }
 
-        params.put("test", "123");
-        assertEquals("?test=123", Client.requestToString(params));
-
-        params.put("foo", "bar");
-        assertEquals("?test=123&foo=bar", Client.requestToString(params));
+    @NonNull
+    @Override
+    public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
+        return new HockeySender();
     }
 }

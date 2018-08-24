@@ -128,7 +128,7 @@ public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         }
 
         // Check if selected branch is deleted
-        if (current_branch == null) { // Fallback to master
+        if (current_branch == null && !Version.getBranch().startsWith("_")) { // Fallback to master
             settings.edit().putInt("pref_updater_ignore", 0).apply();
 
             if (branches.containsKey("master")) {
@@ -179,7 +179,7 @@ public class UpdateCheckTask extends AsyncTask<Void,Void,Void> {
         if (hasUpdate || force_check) showDialog();
     }
 
-    public void result(Map<String, Branch> branches) {}
+    public void result(@Nullable Map<String, Branch> branches) {}
 
     public class Branch {
         public final String name;

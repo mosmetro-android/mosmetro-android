@@ -4,9 +4,10 @@
         android:title="@string/developer"
         android:summary="@string/developer_info">
 
-        <intent
-            android:action="android.intent.action.SENDTO"
-            android:data="mailto:mosmetro@thedrhax.pw" />
+        <intent android:action="pw.thedrhax.mosmetro.activities.SafeViewActivity">
+            <extra android:name="action" android:value="android.intent.action.SENDTO" />
+            <extra android:name="data" android:value="mailto:mosmetro@thedrhax.pw" />
+        </intent>
 
     </PreferenceScreen>
 

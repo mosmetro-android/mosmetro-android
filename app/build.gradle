@@ -20,6 +20,9 @@ android {
         buildConfigField "Integer", "BUILD_NUMBER", System.getenv("BUILD_NUMBER") ?: "0"
         resValue "string", "build_branch_name", "\"$branch_name\""
 
+        // ACRA Config
+        buildConfigField "String", "HOCKEYAPP_ID", "\"0305e2d4732d4ef9856c40b03b68426b\""
+
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
@@ -33,6 +36,10 @@ android {
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        jackOptions { // For ACRA
+            enabled true
+        }
     }
 
     def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -53,7 +60,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             if (keystorePropertiesFile.exists()) {
@@ -81,6 +88,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    compileOptions { // For ACRA
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 import fr.avianey.androidsvgdrawable.gradle.SvgDrawableTask
@@ -104,12 +116,15 @@ task svgToMipmapPng(type: SvgDrawableTask) {
 }
 
 dependencies {
+    def acraVersion = '5.0.2'
+    compile "ch.acra:acra-core:$acraVersion"
+
     // Runtime dependencies.
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-annotations:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'

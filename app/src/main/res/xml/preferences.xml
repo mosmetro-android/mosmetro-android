@@ -14,6 +14,7 @@
     </Preference>
 
     <Preference
+        android:key="pref_shortcut"
         android:title="@string/manual_connection_shortcut"
         android:summary="@string/manual_connection_shortcut_summary">
 
@@ -25,22 +26,19 @@
         android:title="@string/pref_category_main">
 
         <Preference
+            android:key="pref_conn"
             android:title="@string/pref_category_connection"
-            android:summary="@string/pref_category_connection_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.ConnectionPreferences" />
-        </Preference>
+            android:summary="@string/pref_category_connection_summary" />
 
         <Preference
+            android:key="pref_notify"
             android:title="@string/pref_category_notifications"
-            android:summary="@string/pref_category_notifications_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.NotificationPreferences" />
-        </Preference>
+            android:summary="@string/pref_category_notifications_summary" />
 
-        <CheckBoxPreference
-            android:key="pref_debug_logcat"
-            android:title="@string/pref_debug_logcat"
-            android:summary="@string/pref_debug_logcat_summary"
-            android:defaultValue="false" />
+        <Preference
+            android:key="pref_debug"
+            android:title="@string/pref_debug"
+            android:summary="@string/pref_debug_summary" />
 
     </PreferenceCategory>
 
@@ -76,9 +74,9 @@
             android:title="@string/app_name" />
 
         <Preference
+            android:key="pref_about"
             android:title="@string/more_information"
-            android:summary="@string/more_information_summary">
-            <intent android:action="pw.thedrhax.mosmetro.activities.AboutActivity" />
-        </Preference>
+            android:summary="@string/more_information_summary" />
+
     </PreferenceCategory>
 </PreferenceScreen>
