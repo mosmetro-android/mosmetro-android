@@ -14,6 +14,7 @@
     </Preference>
 
     <Preference
+        android:key="pref_shortcut"
         android:title="@string/manual_connection_shortcut"
         android:summary="@string/manual_connection_shortcut_summary">
 

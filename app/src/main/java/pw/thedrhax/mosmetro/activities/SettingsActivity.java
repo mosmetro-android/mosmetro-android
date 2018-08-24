@@ -416,6 +416,12 @@ public class SettingsActivity extends Activity {
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // Hide shortcut button on Android 8+ (issue #211)
+        if (Build.VERSION.SDK_INT >= 26) {
+            Preference pref_shortcut = fragment.findPreference("pref_shortcut");
+            fragment.getPreferenceScreen().removePreference(pref_shortcut);
+        }
+
         // Add version name and code
         Preference app_name = fragment.findPreference("app_name");
         app_name.setSummary(getString(R.string.version, Version.getFormattedVersion()));
