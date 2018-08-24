@@ -9,3 +9,6 @@
 -dontwarn okio.**
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
+
+# OkHttp
+-dontwarn okhttp3.internal.platform.*

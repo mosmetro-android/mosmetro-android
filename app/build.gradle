@@ -36,10 +36,6 @@ android {
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        jackOptions { // For ACRA
-            enabled true
-        }
     }
 
     def keystorePropertiesFile = rootProject.file("keystore.properties")
