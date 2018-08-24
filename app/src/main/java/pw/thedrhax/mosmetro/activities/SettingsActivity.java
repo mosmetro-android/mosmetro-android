@@ -381,9 +381,7 @@ public class SettingsActivity extends Activity {
                     .addToBackStack(id)
                     .commit();
         } catch (IllegalStateException ex) { // https://stackoverflow.com/q/7575921
-            ACRA.getErrorReporter().putCustomData("crash", "false");
             ACRA.getErrorReporter().handleException(ex);
-            ACRA.getErrorReporter().removeCustomData("crash");
         }
     }
 

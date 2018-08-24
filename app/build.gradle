@@ -18,6 +18,9 @@ android {
         buildConfigField "Integer", "BUILD_NUMBER", System.getenv("BUILD_NUMBER") ?: "0"
         resValue "string", "build_branch_name", "\"$branch_name\""
 
+        // ACRA Config
+        buildConfigField "String", "HOCKEYAPP_ID", "\"0305e2d4732d4ef9856c40b03b68426b\""
+
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
@@ -29,7 +32,6 @@ android {
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
-        buildConfigField "String", "API_REL_ACRA", "\"/acra/send\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -104,7 +106,7 @@ task svgToDrawablePng(type: SvgDrawableTask) {
 
 dependencies {
     def acraVersion = '5.0.2'
-    compile "ch.acra:acra-http:$acraVersion"
+    compile "ch.acra:acra-core:$acraVersion"
 
     // Runtime dependencies.
     compile fileTree(dir: 'libs', include: ['*.jar'])
