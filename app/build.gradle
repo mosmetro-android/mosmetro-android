@@ -116,8 +116,10 @@ task svgToMipmapPng(type: SvgDrawableTask) {
 }
 
 dependencies {
-    def acraVersion = '5.0.2'
-    compile "ch.acra:acra-core:$acraVersion"
+    def acraVersion = '5.2.0-rc1'
+    implementation "ch.acra:acra-core:$acraVersion"
+    implementation "ch.acra:acra-limiter:$acraVersion"
+    implementation "ch.acra:acra-advanced-scheduler:$acraVersion"
 
     // Runtime dependencies.
     implementation fileTree(dir: 'libs', include: ['*.jar'])

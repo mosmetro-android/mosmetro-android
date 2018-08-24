@@ -27,11 +27,6 @@ import org.acra.sender.ReportSenderFactory;
 
 public class HockeySenderFactory implements ReportSenderFactory {
 
-    @Override
-    public boolean enabled(@NonNull CoreConfiguration coreConfiguration) {
-        return true;
-    }
-
     @NonNull
     @Override
     public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
