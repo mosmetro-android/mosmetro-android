@@ -114,7 +114,7 @@
     <string name="auth_check">Checking auth status</string>
     <string name="auth_finish">Finishing auth procedure</string>
     <string name="auth_unknown_redirect">Unknown redirect. Trying to detect algorithm…</string>
-    <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
+    <string name="auth_algorithm_switch">Switching to another algorithm: %s (this is not an error)</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
@@ -136,6 +136,7 @@
         provider %s is not supported by application yet. Maybe the network is maintained by two providers
         one of which is not supported yet. We apologize for inconvenience.
     </string>
+    <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>

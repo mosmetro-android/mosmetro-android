@@ -146,7 +146,6 @@ public class MosMetroV3 extends Provider {
         /**
          * Checking auth status
          * ⇒ GET redirect + /auth/check?client_mac=mac&client_ip= < redirect, mac
-         * ⇐ TODO: 304 Not Modified?
          */
         add(new NamedTask(context.getString(R.string.auth_check)) {
             @Override
@@ -197,6 +196,7 @@ public class MosMetroV3 extends Provider {
          * ⇐ GOOD: 204 No Content
          * ⇐ BAD: Meta + Location redirect: http://welcome.wi-fi.ru/?client_mac=... > redirect, mac
          * ⇐ OKAY: Meta + Location redirect: http://auth.wi-fi.ru/?segment=... > redirect
+         * ⇐ WTF: https://gowifi.ru
          */
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
@@ -208,7 +208,9 @@ public class MosMetroV3 extends Provider {
                     Logger.log(context.getString(R.string.auth_connected));
                     vars.put("result", RESULT.CONNECTED);
                 } else if (provider instanceof MosMetroV3) {
-                    Logger.log(context.getString(R.string.error, "Infinite loop!"));
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_mosmetrov3_loop)
+                    ));
                 } else {
                     if (provider instanceof Unknown) {
                         Logger.log(context.getString(R.string.auth_unknown_redirect));

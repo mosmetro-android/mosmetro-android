@@ -105,7 +105,7 @@
     <string name="auth_check">Проверка состояния авторизации</string>
     <string name="auth_finish">Завершение процесса авторизации</string>
     <string name="auth_unknown_redirect">Получено неизвестное перенаправление. Пытаюсь определить алгоритм…</string>
-    <string name="auth_algorithm_switch">Переключаюсь на другой алгоритм: %s</string>
+    <string name="auth_algorithm_switch">Переключаюсь на другой алгоритм: %s (это не ошибка)</string>
     <string name="auth_redirect">Получение перенаправления</string>
     <string name="auth_auth_page">Получение страницы авторизации</string>
     <string name="auth_auth_form">Отправка формы авторизации</string>
@@ -128,6 +128,7 @@
         провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют
         два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
     </string>
+    <string name="auth_error_mosmetrov3_loop">ожидалось перенаправление на другой алгоритм, получено перенаправление на MosMetroV3 (бесконечный цикл)</string>
 
     <string name="notification_success">Успешно подключено</string>
     <string name="notification_success_log">Нажмите, чтобы узнать подробности</string>
