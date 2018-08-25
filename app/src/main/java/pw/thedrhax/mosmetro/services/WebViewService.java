@@ -197,7 +197,7 @@ public class WebViewService extends Service {
                             unsubscribe();
                         }
                     }
-                }.subscribe(webviewclient.finished);
+                }.debounce(100).subscribe(webviewclient.finished);
 
                 new Listener<String>(null) {
                     @Override
