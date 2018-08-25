@@ -76,13 +76,35 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Block some URL patterns for performance and stability
+         * Async: Block some URL patterns for performance and stability
          */
         add(new WebViewInterceptorTask(".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
                 return new ParsedResponse("");
+            }
+        });
+
+        /**
+         * Async: Parse CSRF token from https://auth.wi-fi.ru/auth
+         */
+        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+            @Nullable @Override
+            public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
+                ParsedResponse response = client.get(url, null, pref_retry_count);
+                try {
+                    String csrf_token = response.parseMetaContent("csrf-token");
+                    Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
+                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    stop();
+                }
+                return response;
             }
         });
 

@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.support.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -40,7 +41,7 @@ public abstract class WebViewInterceptorTask implements Task {
     }
 
     @Nullable
-    public abstract ParsedResponse request(WebViewService wv, Client client, String url);
+    public abstract ParsedResponse request(WebViewService wv, Client client, String url) throws IOException;
 
     public boolean match(String url) {
         return pattern.matcher(url).matches();
