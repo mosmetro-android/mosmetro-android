@@ -16,25 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro;
+package pw.thedrhax.mosmetro.acra;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
-import org.acra.ACRA;
-import org.acra.annotation.AcraCore;
-import org.acra.data.StringFormat;
+import org.acra.config.CoreConfiguration;
+import org.acra.sender.ReportSender;
+import org.acra.sender.ReportSenderFactory;
 
-import pw.thedrhax.mosmetro.acra.HockeySenderFactory;
-
-@AcraCore(buildConfigClass = BuildConfig.class,
-          reportSenderFactoryClasses = {HockeySenderFactory.class},
-          reportFormat = StringFormat.JSON)
-public class MosMetroApp extends Application {
+public class HockeySenderFactory implements ReportSenderFactory {
 
     @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        ACRA.init(this);
+    public boolean enabled(@NonNull CoreConfiguration coreConfiguration) {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
+        return new HockeySender();
     }
 }

@@ -58,7 +58,17 @@ public abstract class Provider extends LinkedList<Task> {
             "www.google.ru/generate_204",
             "www.google.ru/gen_204",
             "google.com/generate_204",
-            "gstatic.com/generate_204"
+            // "www.google.com/generate_204",
+            "gstatic.com/generate_204",
+            // "www.gstatic.com/generate_204",
+            // "connectivitycheck.android.com/generate_204",
+            // "connectivitycheck.gstatic.com/generate_204"
+            "clients1.google.com/generate_204",
+            "maps.google.com/generate_204",
+            "mt0.google.com/generate_204",
+            "mt1.google.com/generate_204",
+            "mt2.google.com/generate_204",
+            "mt3.google.com/generate_204"
     };
 
     /**
@@ -230,16 +240,16 @@ public abstract class Provider extends LinkedList<Task> {
         vars.put("result", RESULT.ERROR);
 
         int progress;
-        for (Task task : this) {
+        for (int i = 0; i < size(); i++) {
             if (isStopped()) return RESULT.INTERRUPTED;
-            progress = (indexOf(task) + 1) * 100 / size();
-            if (task instanceof NamedTask) {
-                Logger.log(((NamedTask)task).getName());
-                callback.onProgressUpdate(progress, ((NamedTask)task).getName());
+            progress = (i + 1) * 100 / size();
+            if (get(i) instanceof NamedTask) {
+                Logger.log(((NamedTask)get(i)).getName());
+                callback.onProgressUpdate(progress, ((NamedTask)get(i)).getName());
             } else {
                 callback.onProgressUpdate(progress);
             }
-            if (!task.run(vars)) break;
+            if (!get(i).run(vars)) break;
         }
 
         new StatisticsTask(this).run(vars);

@@ -1,3 +1,21 @@
+/**
+ * Wi-Fi в метро (pw.thedrhax.mosmetro, Moscow Wi-Fi autologin)
+ * Copyright © 2015 Dmitry Karikh <the.dr.hax@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
@@ -146,7 +164,6 @@ public class MosMetroV3 extends Provider {
         /**
          * Checking auth status
          * ⇒ GET redirect + /auth/check?client_mac=mac&client_ip= < redirect, mac
-         * ⇐ TODO: 304 Not Modified?
          */
         add(new NamedTask(context.getString(R.string.auth_check)) {
             @Override
@@ -197,6 +214,7 @@ public class MosMetroV3 extends Provider {
          * ⇐ GOOD: 204 No Content
          * ⇐ BAD: Meta + Location redirect: http://welcome.wi-fi.ru/?client_mac=... > redirect, mac
          * ⇐ OKAY: Meta + Location redirect: http://auth.wi-fi.ru/?segment=... > redirect
+         * ⇐ WTF: https://gowifi.ru
          */
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
@@ -208,7 +226,9 @@ public class MosMetroV3 extends Provider {
                     Logger.log(context.getString(R.string.auth_connected));
                     vars.put("result", RESULT.CONNECTED);
                 } else if (provider instanceof MosMetroV3) {
-                    Logger.log(context.getString(R.string.error, "Infinite loop!"));
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_mosmetrov3_loop)
+                    ));
                 } else {
                     if (provider instanceof Unknown) {
                         Logger.log(context.getString(R.string.auth_unknown_redirect));
@@ -217,8 +237,8 @@ public class MosMetroV3 extends Provider {
                     }
 
                     Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                    RESULT result = provider.start();
-                    vars.put("result", result);
+                    addAll(indexOf(this) + 1, provider);
+                    return true;
                 }
 
                 return false;

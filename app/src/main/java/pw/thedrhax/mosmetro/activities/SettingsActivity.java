@@ -381,9 +381,7 @@ public class SettingsActivity extends Activity {
                     .addToBackStack(id)
                     .commit();
         } catch (IllegalStateException ex) { // https://stackoverflow.com/q/7575921
-            ACRA.getErrorReporter().putCustomData("crash", "false");
             ACRA.getErrorReporter().handleException(ex);
-            ACRA.getErrorReporter().removeCustomData("crash");
         }
     }
 
@@ -417,6 +415,12 @@ public class SettingsActivity extends Activity {
         });
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Hide shortcut button on Android 8+ (issue #211)
+        if (Build.VERSION.SDK_INT >= 26) {
+            Preference pref_shortcut = fragment.findPreference("pref_shortcut");
+            fragment.getPreferenceScreen().removePreference(pref_shortcut);
+        }
 
         // Add version name and code
         Preference app_name = fragment.findPreference("app_name");
