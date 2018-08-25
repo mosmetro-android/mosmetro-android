@@ -21,6 +21,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -30,10 +31,12 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.services.WebViewService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -73,6 +76,17 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
+         * Block some URL patterns for performance and stability
+         */
+        add(new WebViewInterceptorTask(".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
+            @Nullable @Override
+            public ParsedResponse request(WebViewService wv, Client client, String url) {
+                Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
+                return new ParsedResponse("");
+            }
+        });
+
+        /**
          * Opening auth page
          * ⇒ GET https://auth.wi-fi.ru
          * ⇐ JavaScript redirect: /auth
@@ -82,15 +96,12 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Opening auth page") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                wv.setBlacklist(new String[]{"ads.adfox.ru", "mc.yandex.ru", "ac.yandex.ru", ".mp4"});
-
                 try {
                     wv.get("https://auth.wi-fi.ru/");
                 } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     return false;
                 }
-
                 return true;
             }
         });

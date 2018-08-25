@@ -62,6 +62,7 @@ public abstract class WebViewProvider extends Provider {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             wv = ((WebViewService.ScriptedWebViewBinder)iBinder).getService();
             wv.getRunningListener().subscribe(running);
+            wv.setInterceptors(WebViewProvider.this);
         }
 
         @Override

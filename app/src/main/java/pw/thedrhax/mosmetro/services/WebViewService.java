@@ -34,6 +34,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -54,11 +55,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
+import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -85,6 +90,7 @@ public class WebViewService extends Service {
     private WindowManager wm;
     private WebView webview;
     private InterceptedClient webviewclient;
+    private List<WebViewInterceptorTask> interceptors = new LinkedList<>();
 
     @Override
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
@@ -270,8 +276,13 @@ public class WebViewService extends Service {
         return result;
     }
 
-    public void setBlacklist(String[] blacklist) {
-        webviewclient.setBlacklist(blacklist);
+    public void setInterceptors(List<Task> tasks) {
+        interceptors.clear();
+        for (Task task : tasks) {
+            if (task instanceof WebViewInterceptorTask) {
+                interceptors.add((WebViewInterceptorTask)task);
+            }
+        }
     }
 
     private class JavascriptListener extends Listener<String> {
@@ -362,13 +373,65 @@ public class WebViewService extends Service {
 
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
         private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
-        private String[] blacklist = new String[]{};
 
         private String next_referer;
         private String referer;
 
-        public void setBlacklist(String[] blacklist) {
-            this.blacklist = blacklist;
+        @NonNull
+        private ParsedResponse request(String url) throws IOException {
+            ParsedResponse response = null;
+
+            for (WebViewInterceptorTask interceptor : interceptors) {
+                if (interceptor.match(url)) {
+                    response = interceptor.request(WebViewService.this, client, url);
+                    break;
+                }
+            }
+
+            if (response != null) {
+                return response;
+            } else {
+                return client.get(url, null, pref_retry_count);
+            }
+        }
+
+        private WebResourceResponse webresponse(@NonNull ParsedResponse response) {
+            if (response.getMimeType().contains("text/html")) {
+                Logger.log(this, response.toString());
+            }
+
+            WebResourceResponse result = new WebResourceResponse(
+                    response.getMimeType(),
+                    response.getEncoding(),
+                    response.getInputStream()
+            );
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                result.setResponseHeaders(new HashMap<String, String>() {{
+                    Map<String,List<String>> headers = response.getHeaders();
+                    for (String name : headers.keySet()) {
+                        if (headers.get(name) != null && headers.get(name).size() == 1) {
+                            put(name, headers.get(name).get(0));
+                        }
+                    }
+
+                    if (referer != null) {
+                        Uri uri = Uri.parse(referer);
+                        remove("access-control-allow-origin");
+                        put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
+                        put("access-control-allow-credentials", "true");
+                    }
+                }});
+
+                if (!response.getReason().isEmpty()) {
+                    result.setStatusCodeAndReasonPhrase(
+                            response.getResponseCode(),
+                            response.getReason()
+                    );
+                }
+            }
+
+            return result;
         }
 
         @Override
@@ -385,56 +448,10 @@ public class WebViewService extends Service {
 
             if ("about:blank".equals(url)) return null;
 
-            for (String pattern : blacklist) {
-                if (url.contains(pattern)) {
-                    Logger.log(this, "Blocked: " + url);
-                    return result; // returns empty response
-                }
-            }
-
             try {
                 client.setCookies(url, getCookies(url));
-                final ParsedResponse response = client.get(url, null, pref_retry_count);
+                result = webresponse(request(url));
                 setCookies(url, client.getCookies(url));
-
-                if (response != null) {
-                    Logger.log(this, "Requesting: " + url);
-
-                    if (response.getMimeType().contains("text/html")) {
-                        Logger.log(this, response.toString());
-                    }
-
-                    result = new WebResourceResponse(
-                            response.getMimeType(),
-                            response.getEncoding(),
-                            response.getInputStream()
-                    );
-
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        result.setResponseHeaders(new HashMap<String, String>() {{
-                            Map<String,List<String>> headers = response.getHeaders();
-                            for (String name : headers.keySet()) {
-                                if (headers.get(name) != null && headers.get(name).size() == 1) {
-                                    put(name, headers.get(name).get(0));
-                                }
-                            }
-
-                            if (referer != null) {
-                                Uri uri = Uri.parse(referer);
-                                remove("access-control-allow-origin");
-                                put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
-                                put("access-control-allow-credentials", "true");
-                            }
-                        }});
-
-                        if (!response.getReason().isEmpty()) {
-                            result.setStatusCodeAndReasonPhrase(
-                                    response.getResponseCode(),
-                                    response.getReason()
-                            );
-                        }
-                    }
-                }
             } catch (UnknownHostException ex) {
                 onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
                 return result;
