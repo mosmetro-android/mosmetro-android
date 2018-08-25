@@ -109,6 +109,16 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
+         * Async: Replace GET /auth/init with POST /auth/init
+         */
+        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
+            @Nullable @Override
+            public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
+                return client.post(url, null, pref_retry_count);
+            }
+        });
+
+        /**
          * Opening auth page
          * ⇒ GET https://auth.wi-fi.ru
          * ⇐ JavaScript redirect: /auth
