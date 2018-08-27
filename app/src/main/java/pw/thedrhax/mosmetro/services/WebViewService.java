@@ -285,6 +285,10 @@ public class WebViewService extends Service {
         }
     }
 
+    public void setClient(Client client) {
+        webviewclient.client = client;
+    }
+
     private class JavascriptListener extends Listener<String> {
         JavascriptListener() {
             super(null);

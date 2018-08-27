@@ -92,6 +92,7 @@ public abstract class WebViewProvider extends Provider {
             wv = ((WebViewService.ScriptedWebViewBinder)iBinder).getService();
             wv.getRunningListener().subscribe(running);
             wv.setInterceptors(WebViewProvider.this);
+            wv.setClient(client);
         }
 
         @Override
