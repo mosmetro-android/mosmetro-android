@@ -41,12 +41,13 @@ import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
 /**
- * The MosMetroV2VW class implements support for auth.wi-fi.ru and welcome.wi-fi.ru algorithms
- * using Android WebView component to create requests.
+ * The MosMetroV2VW class implements support for auth.wi-fi.ru algorithm using Android WebView
+ * component to create requests and interpret server answers.
  *
- * Detection: Meta-redirect contains ".wi-fi.ru" with any 3rd level domain (except "login").
+ * Detection: Meta-redirect contains ".wi-fi.ru" with any 3rd level domain (except "login"
+ * and "welcome").
  *
- * Overrides: MosMetroV2, MosMetroV3
+ * Overrides: MosMetroV2
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
@@ -282,6 +283,8 @@ public class MosMetroV2WV extends WebViewProvider {
             }
         }
 
-        return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
+        return redirect.contains(".wi-fi.ru")
+                && !redirect.contains("login.wi-fi.ru")
+                && !redirect.contains("welcome.wi-fi.ru");
     }
 }
