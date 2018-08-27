@@ -391,6 +391,7 @@ public class WebViewService extends Service {
             if (response != null) {
                 return response;
             } else {
+                Logger.log(this, "Requesting: " + url);
                 return client.get(url, null, pref_retry_count);
             }
         }
