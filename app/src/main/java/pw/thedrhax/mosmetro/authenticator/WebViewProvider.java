@@ -26,6 +26,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 
 import pw.thedrhax.mosmetro.services.WebViewService;
+import pw.thedrhax.util.Logger;
 
 /**
  * Base class for all WebView-specific providers.
@@ -49,7 +50,11 @@ public abstract class WebViewProvider extends Provider {
                 context, WebViewService.class
         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        if (!context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+            Logger.log(this, "Can't connect to WebViewService");
+            deinit();
+            return false;
+        }
 
         while (wv == null) {
             SystemClock.sleep(100);
