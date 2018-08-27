@@ -71,7 +71,13 @@ public abstract class WebViewProvider extends Provider {
     @Override
     public void deinit() {
         super.deinit();
-        context.unbindService(connection);
+
+        Logger.log(this, "Disconnecting from WebViewService");
+        try {
+            context.unbindService(connection);
+        } catch (IllegalArgumentException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+        }
     }
 
     /*
