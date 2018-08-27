@@ -42,7 +42,9 @@ public abstract class WebViewProvider extends Provider {
     }
 
     @Override
-    public RESULT start() {
+    public boolean init() {
+        if (!super.init()) return false;
+
         Intent intent = new Intent(
                 context, WebViewService.class
         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -53,19 +55,17 @@ public abstract class WebViewProvider extends Provider {
             SystemClock.sleep(100);
 
             if (!running.get()) {
-                stop();
-                return RESULT.INTERRUPTED;
+                deinit();
+                return false;
             }
         }
 
-        RESULT result = super.start();
-
-        stop();
-
-        return result;
+        return true;
     }
 
-    public void stop() {
+    @Override
+    public void deinit() {
+        super.deinit();
         context.unbindService(connection);
     }
 

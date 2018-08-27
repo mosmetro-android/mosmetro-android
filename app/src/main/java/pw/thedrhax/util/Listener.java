@@ -86,6 +86,7 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
+        unsubscribe();
         master.callbacks.add(this);
         this.master = master;
         this.value = master.value;

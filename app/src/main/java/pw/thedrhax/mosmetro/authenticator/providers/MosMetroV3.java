@@ -219,8 +219,7 @@ public class MosMetroV3 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Provider provider = Provider.find(context, client.response())
-                        .setCallback(callback).setClient(client);
+                Provider provider = Provider.find(context, client.response());
 
                 if (provider instanceof Unknown && isConnected()) {
                     Logger.log(context.getString(R.string.auth_connected));
@@ -232,12 +231,11 @@ public class MosMetroV3 extends Provider {
                 } else {
                     if (provider instanceof Unknown) {
                         Logger.log(context.getString(R.string.auth_unknown_redirect));
-                        provider = Provider.find(context, running)
-                                .setClient(client).setCallback(callback);
+                        provider = Provider.find(context, running);
                     }
 
                     Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                    addAll(indexOf(this) + 1, provider);
+                    add(indexOf(this) + 1, provider);
                     return true;
                 }
 

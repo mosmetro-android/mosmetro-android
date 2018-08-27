@@ -102,7 +102,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
-                    stop();
+                    running.set(false);
                 }
                 return response;
             }
