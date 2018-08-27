@@ -390,8 +390,6 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Logger.configure(this);
-
         // Populate preferences
         final FragmentManager fmanager = getFragmentManager();
         fragment = new SettingsFragment();
