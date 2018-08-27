@@ -54,6 +54,7 @@ import pw.thedrhax.util.Util;
  */
 
 public class MosMetroV2WV extends WebViewProvider {
+    private String redirect = "http://auth.wi-fi.ru/";
 
     public MosMetroV2WV(Context context) {
         super(context);
@@ -130,7 +131,7 @@ public class MosMetroV2WV extends WebViewProvider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
-                    wv.get("https://auth.wi-fi.ru/");
+                    wv.get(redirect);
                 } catch (Exception ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     return false;
@@ -254,7 +255,7 @@ public class MosMetroV2WV extends WebViewProvider {
         }
 
         try {
-            String redirect = client.response().parseMetaRedirect();
+            redirect = client.response().parseMetaRedirect();
             Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected
