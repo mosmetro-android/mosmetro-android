@@ -80,7 +80,10 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Block some URL patterns for performance and stability
          */
-        add(new WebViewInterceptorTask(".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
+        add(new WebViewInterceptorTask(".*(" +
+                "adfox(\\.ru|.*\\.js$)|(mail|yandex|tns-counter)\\.ru" +
+                "|(google(tagmanager|-analytics))\\.com|sync\\.1dmp\\.io|\\.mp4"
+        + ").*") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
