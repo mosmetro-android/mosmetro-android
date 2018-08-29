@@ -113,6 +113,26 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
+         * Async: Detect ban (redirect to /auto_auth)
+         */
+        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auto_auth.*?") {
+            @Nullable @Override
+            public ParsedResponse request(WebViewService wv, Client client, String url) {
+                Logger.log(context.getString(R.string.auth_ban_message));
+
+                // Increase ban counter
+                settings.edit()
+                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                        .apply();
+
+                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
+
+                running.set(false);
+                return new ParsedResponse("");
+            }
+        });
+
+        /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
         add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
@@ -139,32 +159,6 @@ public class MosMetroV2WV extends WebViewProvider {
                     return false;
                 }
                 return true;
-            }
-        });
-
-        /**
-         * Detect ban (redirect to /auto_auth)
-         */
-        add(new Task() {
-            private boolean isCaptchaRequested() {
-                return wv.getUrl().contains("auto_auth");
-            }
-
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (!isCaptchaRequested()) return true;
-
-                Logger.log(context.getString(R.string.auth_ban_message));
-
-                // Increase ban counter
-                settings.edit()
-                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                        .apply();
-
-                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-
-                vars.put("result", RESULT.ERROR);
-                return false;
             }
         });
 
