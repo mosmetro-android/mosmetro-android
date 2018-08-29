@@ -168,14 +168,6 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Loading automated login script") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (!wv.getUrl().contains("auth.wi-fi.ru/auth")) { // TODO: Remove this hack
-                    Logger.log(Logger.LEVEL.DEBUG, "Unexpected URL: " + wv.getUrl());
-                    Logger.log(context.getString(R.string.error,
-                            "get() exited too early. Please try again..."
-                    ));
-                    return false;
-                }
-
                 try {
                     String script = Util.readAsset(context, "MosMetroV2.js");
                     String result = wv.js(script);
