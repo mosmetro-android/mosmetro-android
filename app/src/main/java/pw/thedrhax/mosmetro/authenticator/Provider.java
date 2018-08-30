@@ -229,6 +229,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public RESULT start() {
         HashMap<String,Object> vars = new HashMap<>();
+        vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
         int progress;
@@ -244,7 +245,9 @@ public abstract class Provider extends LinkedList<Task> {
             if (!get(i).run(vars)) break;
         }
 
+        vars.put("time_end", System.currentTimeMillis());
         new StatisticsTask(this).run(vars);
+
         Logger.date("<<< ");
         return (RESULT)vars.get("result");
     }

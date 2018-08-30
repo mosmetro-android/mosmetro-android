@@ -18,6 +18,7 @@
 
 package pw.thedrhax.mosmetro.authenticator;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -31,6 +32,7 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
@@ -47,6 +49,48 @@ class StatisticsTask implements Task {
         this.p = provider;
     }
 
+    /**
+     * MosMetroV2 metrics factory
+     *
+     * segment: segment of network (example: metro, nbn, mcc)
+     * v3_bypass: if true, user disabled MosMetroV3 and welcome.wi-fi.ru was successfully bypassed
+     * ban_count: number of bans detected since the last successful connection
+     */
+    private void mosmetrov2(Map<String,String> params, Map<String,Object> vars) {
+        params.put("segment", (String) vars.get("segment"));
+        params.put("v3_bypass", "" + vars.containsKey("v3_bypass"));
+
+        int version = Version.getBuildNumber() * 100 + Version.getVersionCode();
+        int last_version = p.settings.getInt("metric_ban_last_version", 0);
+
+        if (last_version == version) { // filter bans from previous versions
+            params.put("ban_count", "" + p.settings.getInt("metric_ban_count", 0));
+        } else {
+            params.put("ban_count", "" + 0);
+        }
+
+        p.settings.edit()
+                .putInt("metric_ban_count", 0)
+                .putInt("metric_ban_last_version", version)
+                .apply();
+    }
+
+    /**
+     * MosMetroV3 metrics factory
+     *
+     * switch: name of nested provider
+     * override: if true, had to get redirect to new Provider manually
+     */
+    private void mosmetrov3(Map<String,String> params, Map<String,Object> vars) {
+        params.put("switch", (String) vars.get("switch"));
+        params.put("override", "" + vars.containsKey("override"));
+
+        if ("MosMetroV2".equals(vars.get("switch"))) {
+            mosmetrov2(params, vars);
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
     @Override
     public boolean run(HashMap<String, Object> vars) {
         boolean connected;
@@ -71,38 +115,18 @@ class StatisticsTask implements Task {
         params.put("provider", p.getName());
         params.put("bssid", wifi.getWifiInfo(null).getBSSID());
 
-        // MosMetroV2 metrics
-        if (p instanceof MosMetroV2) {
-            params.put("segment", (String) vars.get("segment"));
-
-            params.put("ban_bypass", (String) vars.get("captcha"));
-
-            int version = Version.getBuildNumber() * Version.getVersionCode();
-            int last_version = p.settings.getInt("metric_ban_last_version", 0);
-
-            if (last_version == version) { // filter bans from previous versions
-                params.put("ban_count", "" + p.settings.getInt("metric_ban_count", 0));
-            } else {
-                params.put("ban_count", "" + 0);
-            }
-
-            p.settings.edit()
-                    .putInt("metric_ban_count", 0)
-                    .putInt("metric_ban_last_version", version)
-                    .apply();
-
-            if (vars.get("captcha") != null && "entered".equals(vars.get("captcha"))) {
-                params.put("captcha_image", (String) vars.get("captcha_image"));
-                params.put("captcha_code", (String) vars.get("captcha_code"));
-            }
+        if (vars.containsKey("time_start") && vars.containsKey("time_end")) {
+            long duration = (Long)vars.get("time_end") - (Long)vars.get("time_start");
+            params.put("duration", "" + duration);
         }
 
-        final Randomizer random = new Randomizer(p.context);
+        if (p instanceof MosMetroV2) mosmetrov2(params, vars);
+        if (p instanceof MosMetroV3) mosmetrov3(params, vars);
 
         new AsyncTask<Void,Void,Void>() {
             @Override
             protected Void doInBackground(Void... none) {
-                random.delay(p.running);
+                p.random.delay(p.running);
 
                 String STATISTICS_URL = new CachedRetriever(p.context).get(
                         BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT,

@@ -123,6 +123,7 @@ public class MosMetroV2 extends Provider {
                             .authority("auth.wi-fi.ru")
                             .build().toString();
 
+                    vars.put("v3_bypass", "true");
                     Logger.log(Logger.LEVEL.DEBUG, redirect);
                 }
                 return true;
