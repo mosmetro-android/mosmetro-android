@@ -80,7 +80,12 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Block some URL patterns for performance and stability
          */
-        add(new WebViewInterceptorTask(".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
+        String def_pattern = context.getString(R.string.pref_mmv2wv_blacklist_default);
+        String pattern = settings.getString("pref_mmv2wv_blacklist", def_pattern);
+        if (!def_pattern.equals(pattern)) {
+            Logger.log(this, "Warning | Using custom blacklist RegExp: " + pattern);
+        }
+        add(new WebViewInterceptorTask(pattern) {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);

@@ -102,4 +102,12 @@
         android:title="pref_trust_all_certs"
         android:defaultValue="false" />
 
+    <PreferenceCategory android:title="MosMetroV2WV" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_mmv2wv_blacklist_default"
+        android:key="pref_mmv2wv_blacklist"
+        android:title="Override URL blacklist RegExp"
+        android:summary="Submit empty value to reset to defaults" />
+
 </PreferenceScreen>
