@@ -16,31 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.util;
+package pw.thedrhax.mosmetro.acra;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.test.InstrumentationRegistry;
+import android.support.annotation.NonNull;
 
-import org.junit.Test;
+import org.acra.config.CoreConfiguration;
+import org.acra.sender.ReportSender;
+import org.acra.sender.ReportSenderFactory;
 
-import static org.junit.Assert.*;
+public class HockeySenderFactory implements ReportSenderFactory {
 
-/**
- * A collection of the Util class tests
- * @author Dmitry Karikh <the.dr.hax@gmail.com>
- */
-public class UtilTest {
-    private Context context = InstrumentationRegistry.getContext();
-
-    @Test
-    public void getIntPreference() throws Exception {
-        assertEquals(123, Util.getIntPreference(context, "none", 123));
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration coreConfiguration) {
+        return true;
     }
 
-    @Test
-    public void wellDefinedClass() throws Exception {
-        UtilityClasses.assertUtilityClassWellDefined(Util.class);
+    @NonNull
+    @Override
+    public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
+        return new HockeySender();
     }
 }

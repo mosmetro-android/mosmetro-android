@@ -87,15 +87,17 @@
 
     <string name="developer">Developer</string>
     <string name="developer_info">Dmitry Karikh (mosmetro@thedrhax.pw)</string>
-    <string name="developer_site">Developer website</string>
-    <string name="developer_site_link" translatable="false">https://thedrhax.pw</string>
-    <string name="developer_github_repo">GitHub repository</string>
-    <string name="developer_github_repo_summary" translatable="false">mosmetro-android</string>
+    <string name="developer_github_repo">GitHub organization</string>
+    <string name="developer_github_repo_summary" translatable="false">github.com/mosmetro-android</string>
     <string name="developer_github_repo_link" translatable="false">https://github.com/mosmetro-android</string>
     <string name="developer_vkontakte">VK community</string>
     <string name="developer_vkontakte_summary" translatable="false">vk.com/wifi_v_metro</string>
     <string name="developer_vkontakte_link" translatable="false">https://vk.com/wifi_v_metro</string>
+    <string name="developer_telegram_channel">Telegram channel</string>
+    <string name="developer_telegram_channel_summary" translatable="false">t.me/wifi_v_metro</string>
+    <string name="developer_telegram_channel_link" translatable="false">https://t.me/wifi_v_metro</string>
     <string name="developer_telegram">Telegram group</string>
+    <string name="developer_telegram_group_summary" translatable="false">t.me/joinchat/BVgshUHjD3rzVCmguodb4Q</string>
     <string name="developer_telegram_link" translatable="false">https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q</string>
 
     <string name="manual_connection">Manual connection</string>
@@ -114,7 +116,7 @@
     <string name="auth_check">Checking auth status</string>
     <string name="auth_finish">Finishing auth procedure</string>
     <string name="auth_unknown_redirect">Unknown redirect. Trying to detect algorithm…</string>
-    <string name="auth_algorithm_switch">Switching to another algorithm: %s</string>
+    <string name="auth_algorithm_switch">Switching to another algorithm: %s (this is not an error)</string>
     <string name="auth_redirect">Getting redirection</string>
     <string name="auth_auth_page">Getting login page</string>
     <string name="auth_auth_form">Sending login form</string>
@@ -136,6 +138,7 @@
         provider %s is not supported by application yet. Maybe the network is maintained by two providers
         one of which is not supported yet. We apologize for inconvenience.
     </string>
+    <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>
 
     <string name="notification_success">Successfully connected</string>
     <string name="notification_success_log">Click for details</string>
@@ -169,8 +172,7 @@
         <item>Yandex.Money or credit card</item>
         <item>Bitcoin (copy the address)</item>
         <item>Ethereum (copy the address)</item>
-        <item>Help with development (GitHub)</item>
-        <item>Join the community (VK)</item>
+        <item>Join the community (VK, Telegram, GitHub)</item>
         <item>Cancel</item>
     </string-array>
     <string name="donate_bitcoin_data" translatable="false">1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m</string>
@@ -200,8 +202,6 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
-    <string name="pref_notify_reply">Inline reply</string>
-    <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
     <string name="auth_ban_message">You were temporary banned by provider :(</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
@@ -229,4 +229,6 @@
     <string name="pref_updater_branch_experimental">Experimental branches</string>
     <string name="pref_debug">Debug options</string>
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
+    <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
+    <string name="pref_mosmetro_v3_summary">This algorithm is required only in Saint Petersburg, but may become required in other regions in the future.</string>
 </resources>

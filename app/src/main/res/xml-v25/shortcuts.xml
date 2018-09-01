@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="debug"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher"
+        android:shortcutShortLabel="@string/connect">
+        <intent android:action="android.intent.action.VIEW"
+                android:targetPackage="pw.thedrhax.mosmetro"
+                android:targetClass="pw.thedrhax.mosmetro.activities.DebugActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="service"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher"
+        android:shortcutShortLabel="@string/in_background">
+        <intent android:action="android.intent.action.VIEW"
+                android:targetPackage="pw.thedrhax.mosmetro"
+                android:targetClass="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity">
+
+            <extra android:name="force" android:value="true" />
+        </intent>
+    </shortcut>
+</shortcuts>

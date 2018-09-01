@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="Алгоритмы" />
+
+    <CheckBoxPreference
+        android:key="pref_mosmetro_v3"
+        android:title="@string/pref_mosmetro_v3"
+        android:summary="@string/pref_mosmetro_v3_summary"
+        android:defaultValue="true" />
+
     <PreferenceCategory android:title="@string/pref_category_wifi" />
 
     <CheckBoxPreference
