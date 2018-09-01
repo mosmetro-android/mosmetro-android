@@ -54,7 +54,7 @@ import org.acra.ACRA;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.services.ConnectionService;
+import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -424,10 +424,12 @@ public class SettingsActivity extends Activity {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 Context context = SettingsActivity.this;
-                Intent service = new Intent(context, ConnectionService.class);
-                if (pref_autoconnect.isChecked())
-                    service.setAction("STOP");
-                context.startService(service);
+                Intent service = new Intent(context, ReceiverService.class);
+                if (pref_autoconnect.isChecked()) {
+                    context.stopService(service);
+                } else {
+                    context.startService(service);
+                }
                 return true;
             }
         });
@@ -497,5 +499,7 @@ public class SettingsActivity extends Activity {
         update_checker_setup();
         if (Build.VERSION.SDK_INT >= 23)
             energy_saving_setup();
+        if (pref_autoconnect.isChecked())
+            startService(new Intent(this, ReceiverService.class));
     }
 }

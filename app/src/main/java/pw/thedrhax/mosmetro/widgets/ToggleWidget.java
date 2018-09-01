@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.services.ConnectionService;
+import pw.thedrhax.mosmetro.services.ReceiverService;
 
 public class ToggleWidget extends AppWidgetProvider {
     @Override
@@ -71,10 +71,12 @@ public class ToggleWidget extends AppWidgetProvider {
                     .putBoolean("pref_autoconnect", pref_autoconnect)
                     .apply();
 
-            Intent service = new Intent(context, ConnectionService.class);
-            if (!pref_autoconnect)
-                service.setAction("STOP");
-            context.startService(service);
+            Intent service = new Intent(context, ReceiverService.class);
+            if (pref_autoconnect) {
+                context.startService(service);
+            } else {
+                context.stopService(service);
+            }
         }
 
         // Update widget

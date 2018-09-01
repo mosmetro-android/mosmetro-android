@@ -123,6 +123,9 @@ public class NetworkReceiver extends BroadcastReceiver {
      * Stop ConnectionService
      */
     private void stopService() {
-        context.startService(new Intent(context, ConnectionService.class).setAction("STOP"));
+        context.startService(
+                new Intent(context, ConnectionService.class)
+                        .setAction(ConnectionService.ACTION_STOP)
+        );
     }
 }

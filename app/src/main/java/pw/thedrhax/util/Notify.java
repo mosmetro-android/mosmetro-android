@@ -19,6 +19,7 @@
 package pw.thedrhax.util;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -28,18 +29,23 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import pw.thedrhax.mosmetro.R;
+
 public class Notify extends NotificationCompat.Builder {
+    private static final String channel_id = "wifi_v_metro";
+
     private Context context;
     private NotificationManager nm;
     private SharedPreferences settings;
 
     private int id = 0;
+    private int priority = 0;
     private boolean enabled = true;
     private boolean locked = false;
     private boolean big_text = true;
 
     public Notify(Context context) {
-        super(context);
+        super(context, channel_id);
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -72,7 +78,9 @@ public class Notify extends NotificationCompat.Builder {
     public Notify priority(int priority) {
         if (priority < -2) priority = -2;
         if (priority > 2) priority = 2;
-        setPriority(priority); return this;
+        setPriority(priority);
+        this.priority = priority;
+        return this;
     }
 
     public Notify icon(int colored, int white) {
@@ -117,6 +125,23 @@ public class Notify extends NotificationCompat.Builder {
 
     public Notify show() {
         if (!enabled) return this;
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (nm.getNotificationChannel(channel_id) != null &&
+                    priority != nm.getNotificationChannel(channel_id).getImportance() - 2) {
+                nm.deleteNotificationChannel(channel_id);
+            }
+
+            if (nm.getNotificationChannel(channel_id) == null) {
+                NotificationChannel channel = new NotificationChannel(
+                        channel_id,
+                        context.getString(R.string.app_name),
+                        priority + 2
+                );
+
+                nm.createNotificationChannel(channel);
+            }
+        }
 
         Notification notification = build();
 

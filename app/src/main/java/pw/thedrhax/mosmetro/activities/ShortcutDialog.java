@@ -81,7 +81,7 @@ public class ShortcutDialog extends Activity {
         );
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)
+                Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher)
         );
 
         if ("android.intent.action.CREATE_SHORTCUT".equals(getIntent().getAction())) {

@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="debug"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:shortcutShortLabel="@string/connect">
         <intent android:action="android.intent.action.VIEW"
                 android:targetPackage="pw.thedrhax.mosmetro"
@@ -12,7 +12,7 @@
     <shortcut
         android:shortcutId="service"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:shortcutShortLabel="@string/in_background">
         <intent android:action="android.intent.action.VIEW"
                 android:targetPackage="pw.thedrhax.mosmetro"

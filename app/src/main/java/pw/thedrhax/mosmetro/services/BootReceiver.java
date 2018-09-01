@@ -16,20 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pw.thedrhax.mosmetro.acra;
+package pw.thedrhax.mosmetro.services;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.content.Intent;
 
-import org.acra.config.CoreConfiguration;
-import org.acra.sender.ReportSender;
-import org.acra.sender.ReportSenderFactory;
-
-public class HockeySenderFactory implements ReportSenderFactory {
-
-    @NonNull
+public class BootReceiver extends BroadcastReceiver {
     @Override
-    public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
-        return new HockeySender();
+    public void onReceive(Context context, Intent intent) {
+        context.startService(new Intent(context, ReceiverService.class));
     }
 }

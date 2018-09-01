@@ -10,12 +10,14 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 
     <application
         android:name=".MosMetroApp"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppBaseTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
@@ -90,9 +92,17 @@
 
         <!-- Services -->
 
+        <service android:name=".services.ReceiverService" />
+
         <service android:name=".services.ConnectionService" />
 
         <!-- Receivers -->
+
+        <receiver android:name=".services.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <receiver android:name=".services.NetworkReceiver">
             <intent-filter>

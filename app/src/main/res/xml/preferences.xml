@@ -70,7 +70,7 @@
 
         <Preference
             android:key="app_name"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@mipmap/ic_launcher"
             android:title="@string/app_name" />
 
         <Preference
