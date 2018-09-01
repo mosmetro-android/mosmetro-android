@@ -32,20 +32,21 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:title="@string/developer_telegram">
+        android:title="@string/developer_telegram_channel"
+        android:summary="@string/developer_telegram_channel_summary">
 
         <intent android:action="pw.thedrhax.mosmetro.activities.SafeViewActivity">
-            <extra android:name="data" android:value="@string/developer_telegram_link" />
+            <extra android:name="data" android:value="@string/developer_telegram_channel_link" />
         </intent>
 
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:title="@string/developer_site"
-        android:summary="@string/developer_site_link">
+        android:title="@string/developer_telegram"
+        android:summary="@string/developer_telegram_group_summary">
 
         <intent android:action="pw.thedrhax.mosmetro.activities.SafeViewActivity">
-            <extra android:name="data" android:value="@string/developer_site_link" />
+            <extra android:name="data" android:value="@string/developer_telegram_link" />
         </intent>
 
     </PreferenceScreen>

@@ -40,6 +40,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.view.Menu;
@@ -97,7 +98,7 @@ public class SettingsActivity extends Activity {
     public static class BranchFragment extends NestedFragment {
         private Map<String,UpdateCheckTask.Branch> branches;
 
-        public BranchFragment branches(Map<String, UpdateCheckTask.Branch> branches) {
+        public BranchFragment branches(@NonNull Map<String, UpdateCheckTask.Branch> branches) {
             this.branches = branches; return this;
         }
 
@@ -284,16 +285,8 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 3: // GitHub
-                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                .putExtra("data", getString(R.string.developer_github_repo_link))
-                        );
-                        break;
-
-                    case 4: // VK
-                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                .putExtra("data", getString(R.string.developer_vkontakte_link))
-                        );
+                    case 3: // Communities
+                        replaceFragment("about", new AboutFragment());
                         break;
                 }
             }
@@ -405,8 +398,6 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Logger.configure(this);
-
         // Populate preferences
         final FragmentManager fmanager = getFragmentManager();
         fragment = new SettingsFragment();
@@ -462,7 +453,12 @@ public class SettingsActivity extends Activity {
         pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                replaceFragment("branch", new BranchFragment().branches(branches.get()));
+                Map<String,UpdateCheckTask.Branch> branch_list = branches.get();
+                if (branch_list != null) {
+                    replaceFragment("branch", new BranchFragment().branches(branch_list));
+                } else {
+                    preference.setEnabled(false);
+                }
                 return true;
             }
         });

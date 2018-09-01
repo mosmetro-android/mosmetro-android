@@ -70,8 +70,6 @@ public class DebugActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.debug_activity);
 
-		Logger.configure(this);
-
         button_connect = (Button) findViewById(R.id.button_connect);
         service_state = new BroadcastReceiver() {
             @Override
