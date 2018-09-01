@@ -269,16 +269,8 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 3: // GitHub
-                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                .putExtra("data", getString(R.string.developer_github_repo_link))
-                        );
-                        break;
-
-                    case 4: // VK
-                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
-                                .putExtra("data", getString(R.string.developer_vkontakte_link))
-                        );
+                    case 3: // Communities
+                        replaceFragment("about", new AboutFragment());
                         break;
                 }
             }
