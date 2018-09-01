@@ -202,8 +202,6 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
-    <string name="pref_notify_reply">Inline reply</string>
-    <string name="pref_notify_reply_summary">Allows to reply to some app requests (CAPTCHA) directly through notifications. Requires Android 7.0+.</string>
     <string name="auth_ban_message">You were temporary banned by provider :(</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>

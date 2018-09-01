@@ -181,8 +181,6 @@
     <string name="pref_notify_success">Успешное подключение</string>
     <string name="pref_notify_success_summary">Уведомлять об успешном подключении</string>
     <string name="error_log_file">не удалось записать лог в файл</string>
-    <string name="pref_notify_reply">Ответ через уведомление</string>
-    <string name="pref_notify_reply_summary">Позволяет отвечать на некоторые запросы приложения (например, капча) прямо через уведомление. Требуется Android 7.0+.</string>
     <string name="auth_ban_message">Вы были временно заблокированы провайдером :(</string>
     <string name="pref_internet_check_interval">Интервал проверок</string>
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
