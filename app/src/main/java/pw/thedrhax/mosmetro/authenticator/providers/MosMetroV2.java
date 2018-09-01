@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -44,8 +45,10 @@ import pw.thedrhax.util.Randomizer;
 /**
  * The MosMetroV2 class implements support for auth.wi-fi.ru algorithm.
  *
- * Detection: Meta-redirect contains ".wi-fi.ru" with any 3rd level domain
- * (except "login" or "welcome").
+ * Detection: Meta-redirect contains ".wi-fi.ru" with any 3rd level domain (except "login").
+ *
+ * When pref_mosmetro_v3 is disabled, welcome.wi-fi.ru will be handled and bypassed by MosMetroV2
+ * in all regions except Saint Petersburg (see MosMetroV3 instead).
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
@@ -93,6 +96,35 @@ public class MosMetroV2 extends Provider {
                     ));
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
+                }
+                return true;
+            }
+        });
+
+        /**
+         * Checking for bad redirect
+         * redirect ~= welcome.wi-fi.ru
+         */
+        if (!settings.getBoolean("pref_mosmetro_v3", true))
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (redirect.contains("welcome.wi-fi.ru")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
+
+                    try {
+                        client.get(redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                    } catch (IOException ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, ex);
+                    }
+
+                    redirect = Uri.parse(redirect).buildUpon()
+                            .authority("auth.wi-fi.ru")
+                            .build().toString();
+
+                    vars.put("v3_bypass", "true");
+                    Logger.log(Logger.LEVEL.DEBUG, redirect);
                 }
                 return true;
             }
@@ -358,8 +390,6 @@ public class MosMetroV2 extends Provider {
             }
         }
 
-        return redirect.contains(".wi-fi.ru")
-                && !redirect.contains("login.wi-fi.ru")
-                && !redirect.contains("welcome.wi-fi.ru");
+        return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
     }
 }

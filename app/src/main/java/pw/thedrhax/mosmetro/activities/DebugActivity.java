@@ -70,9 +70,7 @@ public class DebugActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.debug_activity);
 
-		Logger.configure(this);
-
-        button_connect = findViewById(R.id.button_connect);
+        button_connect = (Button) findViewById(R.id.button_connect);
         service_state = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -84,7 +82,7 @@ public class DebugActivity extends Activity {
         };
         service_filter = new IntentFilter(ConnectionService.ACTION_EVENT);
 
-        text_messages = findViewById(R.id.text_messages);
+        text_messages = (RecyclerView) findViewById(R.id.text_messages);
         text_messages_adapter = new LogAdapter();
         text_messages.setAdapter(text_messages_adapter);
         text_messages.setLayoutManager(new LinearLayoutManager(this));

@@ -30,6 +30,7 @@ import org.acra.annotation.AcraScheduler;
 import org.acra.data.StringFormat;
 
 import pw.thedrhax.mosmetro.acra.HockeySenderFactory;
+import pw.thedrhax.util.Logger;
 
 @AcraCore(buildConfigClass = BuildConfig.class,
           reportSenderFactoryClasses = {HockeySenderFactory.class},
@@ -43,5 +44,6 @@ public class MosMetroApp extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         ACRA.init(this);
+        Logger.configure(base);
     }
 }

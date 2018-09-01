@@ -105,7 +105,9 @@ public abstract class Provider extends LinkedList<Task> {
      * @see Client
      */
     @NonNull public static Provider find(Context context, ParsedResponse response) {
-        if (MosMetroV3.match(response)) return new MosMetroV3(context);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
         else if (Enforta.match(response)) return new Enforta(context);
@@ -227,6 +229,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public RESULT start() {
         HashMap<String,Object> vars = new HashMap<>();
+        vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
         int progress;
@@ -242,7 +245,9 @@ public abstract class Provider extends LinkedList<Task> {
             if (!get(i).run(vars)) break;
         }
 
+        vars.put("time_end", System.currentTimeMillis());
         new StatisticsTask(this).run(vars);
+
         Logger.date("<<< ");
         return (RESULT)vars.get("result");
     }

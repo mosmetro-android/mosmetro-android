@@ -9,8 +9,8 @@ android {
         applicationId 'pw.thedrhax.mosmetro'
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 70
-        versionName "1.8.3.2"
+        versionCode 71
+        versionName "1.9"
 
         vectorDrawables.useSupportLibrary = true
 
