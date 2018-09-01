@@ -40,11 +40,6 @@ public class UtilTest {
     }
 
     @Test
-    public void convertCyrillicSymbols() throws Exception {
-        assertEquals("abcdef", Util.convertCyrillicSymbols("абсдеф"));
-    }
-
-    @Test
     public void wellDefinedClass() throws Exception {
         UtilityClasses.assertUtilityClassWellDefined(Util.class);
     }

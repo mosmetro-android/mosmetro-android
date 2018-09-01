@@ -44,31 +44,4 @@ public final class Util {
 
         return def_value;
     }
-
-    public static String bitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-
-        byte[] bytes = baos.toByteArray();
-        try {
-            baos.close();
-        } catch (IOException ignored) {}
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
-    }
-
-    public static Bitmap base64ToBitmap(String base64) {
-        byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    }
-
-    public static String convertCyrillicSymbols(String s) {
-        s = s.toLowerCase();
-        s = s.replaceAll("а", "a");
-        s = s.replaceAll("б", "b");
-        s = s.replaceAll("с", "c");
-        s = s.replaceAll("д", "d");
-        s = s.replaceAll("е", "e");
-        s = s.replaceAll("ф", "f");
-        return s;
-    }
 }
