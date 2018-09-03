@@ -41,41 +41,33 @@ import pw.thedrhax.util.Logger;
 public class ParsedResponse {
     private String url;
     private byte[] bytes;
-    private String html;
-    private Document document;
     private int code;
     private String reason;
     private Map<String,List<String>> headers = new HashMap<>();
+
+    private String html;
+    private Document document;
 
     public ParsedResponse(@Nullable String url, @NonNull byte[] bytes, int code, String reason,
                           @Nullable Map<String,List<String>> headers) {
         this.url = url;
         this.bytes = bytes;
+        this.code = code;
+        this.reason = reason;
 
         if (headers != null){
             this.headers.putAll(headers);
         }
 
         try {
-            this.html = new String(bytes, getEncoding());
+            html = new String(bytes, getEncoding());
         } catch (UnsupportedEncodingException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
         }
 
-        if (html != null && !html.isEmpty()) {
+        if (html != null && !html.isEmpty() && getMimeType().contains("text/html")) {
             document = Jsoup.parse(html, url);
-
-            // Clean-up useless tags: <script> without src, <style>
-            for (Element element : document.getElementsByTag("script")) {
-                if (!element.hasAttr("src")) {
-                    element.remove();
-                }
-            }
-            document.getElementsByTag("style").remove();
         }
-
-        this.code = code;
-        this.reason = reason;
     }
 
     public ParsedResponse(String html) {
@@ -144,13 +136,18 @@ public class ParsedResponse {
         return "utf-8";
     }
 
+    @NonNull
+    public byte[] getBytes() {
+        if (document != null) {
+            return document.outerHtml().getBytes();
+        } else {
+            return bytes;
+        }
+    }
+
     @Nullable
     public InputStream getInputStream() {
-        if (html != null) {
-            return new ByteArrayInputStream(bytes);
-        } else {
-            return null;
-        }
+        return new ByteArrayInputStream(getBytes());
     }
 
     public String parseMetaContent (String name) throws ParseException {
