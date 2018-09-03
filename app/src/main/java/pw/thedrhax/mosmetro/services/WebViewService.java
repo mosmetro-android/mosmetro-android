@@ -29,9 +29,7 @@ import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -60,12 +58,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
-import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -195,54 +191,12 @@ public class WebViewService extends Service {
 
     // TODO: Return some information about the loaded page
     public void get(final String url) throws Exception {
-        new Synchronizer<Boolean>() {
+        webview.getHandler().post(new Runnable() {
             @Override
-            public void handlerThread(final Listener<Boolean> result, final Listener<String> error) {
-                new Listener<Boolean>(false) {
-                    @Override
-                    public void onChange(Boolean new_value) {
-                        if (new_value) {
-                            result.set(true);
-                            unsubscribe();
-                        }
-                    }
-                }.debounce(100).subscribe(webviewclient.finished);
-
-                new Listener<String>(null) {
-                    @Override
-                    public void onChange(String new_value) {
-                        if (new_value != null) {
-                            error.set(new_value);
-                            unsubscribe();
-                        }
-                    }
-                }.subscribe(webviewclient.error);
-
+            public void run() {
                 webview.loadUrl(url);
             }
-        }.run(webview.getHandler(), running);
-    }
-
-    @Nullable
-    public String js(final String script) throws Exception {
-        return new Synchronizer<String>(1000) {
-            @Override
-            public void handlerThread(final Listener<String> result, Listener<String> error) {
-                new Listener<String>(null) {
-                    @Override
-                    public void onChange(String new_value) {
-                        result.set(new_value);
-                        unsubscribe();
-                    }
-                }.subscribe(js_result);
-
-                if (Build.VERSION.SDK_INT >= 19) {
-                    webview.evaluateJavascript(js_interface + ".onResult(String(" + script + "));", null);
-                } else {
-                    webview.loadUrl("javascript:" + js_interface + ".onResult(String(" + script + "));");
-                }
-            }
-        }.run(webview.getHandler(), running);
+        });
     }
 
     public String getUrl() {
@@ -309,59 +263,6 @@ public class WebViewService extends Service {
         }
     }
 
-    public abstract class Synchronizer<T> {
-        private Listener<T> result = new Listener<>(null);
-        private Listener<String> error = new Listener<>(null);
-
-        private final int timeout;
-
-        public Synchronizer(int timeout) {
-            this.timeout = timeout;
-        }
-
-        public Synchronizer() {
-            this(60000);
-        }
-
-        /**
-         * This method will be executed on Handler's thread.
-         * It MUST call either result.set() or error.set()! Call can be asynchronous.
-         */
-        public abstract void handlerThread(Listener<T> result, Listener<String> error);
-
-        @Nullable
-        public T run(Handler handler, Listener<Boolean> running) throws Exception {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    handlerThread(result, error);
-                }
-            });
-
-            int counter = 0;
-            while (true) {
-                if (counter >= timeout) {
-                    throw new TimeoutException("Synchronizer timed out");
-                }
-
-                if (error.get() != null) {
-                    throw new Exception(error.get());
-                }
-
-                if (!running.get()) {
-                    throw new InterruptedException("Interrupted by Listener");
-                }
-
-                if (result.get() != null) {
-                    return result.get();
-                }
-
-                counter += 100;
-                SystemClock.sleep(100);
-            }
-        }
-    }
-
     /**
      * Implementation of WebViewClient that ignores redirects in onPageFinished()
      * Inspired by https://stackoverflow.com/a/25547544
@@ -373,16 +274,6 @@ public class WebViewService extends Service {
                 Logger.log(InterceptedClient.this, "Current URL | " + new_value);
             }
         };
-
-        private final Listener<Boolean> finished = new Listener<Boolean>(true) {
-            @Override
-            public void onChange(Boolean new_value) {
-                Logger.log(InterceptedClient.this, "finished | " + new_value);
-            }
-        };
-
-        private Listener<String> error = new Listener<>(null);
-        private boolean redirecting = false;
 
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
         private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
@@ -489,26 +380,15 @@ public class WebViewService extends Service {
             return result;
         }
 
-        @Override
-        @TargetApi(24)
+        @Override @TargetApi(24)
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return shouldOverrideUrlLoading(view, request.getUrl().toString());
         }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Logger.log(this, "shouldOverrideUrlLoading(" + url + ")");
-            if (!finished.get()) {
-                redirecting = true;
-            } else {
-                finished.set(false);
-            }
-
-            // Schedule referer update
-            next_referer = url;
-
-            view.loadUrl(url);
-            return true;
+            next_referer = url; // Schedule referer update
+            return false;
         }
 
         @Override
@@ -525,39 +405,26 @@ public class WebViewService extends Service {
             super.onPageStarted(view, url, favicon);
             Logger.log(this, "onPageStarted(" + url + ")");
             current_url.set(url);
-            finished.set(false);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             Logger.log(this, "onPageFinished(" + url + ")");
-
-            if (!redirecting) {
-                finished.set(true);
-                Logger.log(this, "onPageCompletelyFinished(" + url + ")");
-            } else {
-                redirecting = false;
-            }
-        }
-
-        @Override
-        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError err) {
-            super.onReceivedError(view, request, err);
-            if (Build.VERSION.SDK_INT >= 23) {
-                onReceivedError(view, err.getErrorCode(),
-                        (String) err.getDescription(),
-                        request.getUrl().toString());
-            }
         }
 
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            Logger.log(this, description);
-            if (errorCode == ERROR_HOST_LOOKUP) {
-                error.set(description);
+            if (Build.VERSION.SDK_INT < 23) {
+                Logger.log(this, "Error: " + description);
             }
+        }
+
+        @Override @TargetApi(23)
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            super.onReceivedError(view, request, error);
+            Logger.log(this, "Error: " + error.getDescription());
         }
     }
 

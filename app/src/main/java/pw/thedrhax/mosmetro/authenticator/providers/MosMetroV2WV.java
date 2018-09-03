@@ -20,8 +20,9 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
+
+import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
+import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -94,12 +95,15 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Async: Parse CSRF token from https://auth.wi-fi.ru/auth
+         * Async: https://auth.wi-fi.ru/auth
+         * * Parse CSRF token
+         * * Insert automation script into response
          */
         add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
                 ParsedResponse response = client.get(url, null, pref_retry_count);
+
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
@@ -110,6 +114,10 @@ public class MosMetroV2WV extends WebViewProvider {
                             context.getString(R.string.auth_error_server)
                     ));
                 }
+
+                Element script = response.getPageContent().body().appendElement("script");
+                script.text(Util.readAsset(context, "MosMetroV2.js"));
+
                 return response;
             }
         });
@@ -165,52 +173,22 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Loading automated login script from assets
+         * Waiting for auth page to load
          */
-        add(new NamedTask("Loading automated login script") {
+        add(new WaitTask(this, "Waiting for auth page to load") {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                try {
-                    String script = Util.readAsset(context, "MosMetroV2.js");
-                    String result = wv.js(script);
-                    Logger.log(Logger.LEVEL.DEBUG, result);
-
-                    if ("MosMetroV2.js loaded".equals(result)) {
-                        Logger.log("Script loaded successfully!");
-                    } else {
-                        Logger.log(context.getString(R.string.error,
-                                "Script didn't load correctly"
-                        ));
-                        return false;
-                    }
-                } catch (Exception ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            "Couldn't load the script"
-                    ));
-                    return false;
-                }
-
-                return true;
+            public boolean condition() {
+                return !wv.getUrl().contains("auth.wi-fi.ru/auth");
             }
         });
 
         /**
          * Waiting for WebView to try to load any other URL
-         *
-         * ⇒ GET https://wi-fi.ru
-         * ⇐ Don't wait for response
          */
-        add(new NamedTask("Waiting for auth page to close") {
+        add(new WaitTask(this, "Waiting for script") {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                while (wv.getUrl().contains("auth.wi-fi.ru/auth")) {
-                    SystemClock.sleep(100);
-                    if (!running.get()) {
-                        return false;
-                    }
-                }
-                return true;
+            public boolean condition() {
+                return wv.getUrl().contains("auth.wi-fi.ru/auth");
             }
         });
 

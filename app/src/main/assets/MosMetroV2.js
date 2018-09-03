@@ -43,7 +43,7 @@
     }
 
     if (document.location.pathname.lastIndexOf('/auth', 0) !== 0) {
-        return 'Wrong page: ' + document.location;
+        console.log('MosMetroV2.js | Wrong page: ' + document.location);
     }
 
     var o = new MO(onMutation);
@@ -55,5 +55,5 @@
 
     onMutation(); /* In case if Observer is loaded too late */
 
-    return "MosMetroV2.js loaded"; /* Do not touch this! */
+    console.log("MosMetroV2.js | Loaded successfully");
 })()
