@@ -39,10 +39,12 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -106,6 +108,13 @@ public class WebViewService extends Service {
         js_result = new JavascriptListener();
         webview.addJavascriptInterface(js_result, js_interface);
         webview.setWebViewClient(webviewclient);
+        webview.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                Logger.log(WebViewService.this, "Chrome | " + consoleMessage.message());
+                return super.onConsoleMessage(consoleMessage);
+            }
+        });
 
         clear();
 
