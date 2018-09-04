@@ -332,7 +332,9 @@ public class ConnectionService extends IntentService {
             notify.title(getString(R.string.notification_progress_waiting))
                     .progress(0, true)
                     .show();
+
             new Randomizer(this).delay(running);
+            if (!running.get()) return;
         }
 
         new Notify(this).id(2).hide(); // hide error notification
