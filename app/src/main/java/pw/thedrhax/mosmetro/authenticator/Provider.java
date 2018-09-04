@@ -113,10 +113,12 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, ParsedResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (settings.getBoolean("pref_webview_enabled", true))
-            if (MosMetroV2WV.match(response)) return new MosMetroV2WV(context);
+        if (settings.getBoolean("pref_mosmetro_v3", true) && MosMetroV3.match(response))
+            return new MosMetroV3(context);
 
-        if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context);
+        else if (settings.getBoolean("pref_webview_enabled", true) && MosMetroV2WV.match(response))
+            return new MosMetroV2WV(context);
+
         else if (MosMetroV2.match(response)) return new MosMetroV2(context);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context);
         else if (Enforta.match(response)) return new Enforta(context);
