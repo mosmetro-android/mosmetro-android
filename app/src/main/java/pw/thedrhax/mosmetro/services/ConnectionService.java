@@ -128,6 +128,14 @@ public class ConnectionService extends IntentService {
                     notify.locked(true);
                 }
 
+                if (from_shortcut) {
+                    // TODO: Do not start connection in DebugActivity after click on this notification
+                    // TODO: Auto cancel this notification after 30 seconds
+                    notify.id(2) // protect this notification from removing
+                            .cancelOnClick(true)
+                            .locked(false);
+                }
+
                 notify.title(getString(R.string.notification_success))
                         .text(getString(R.string.notification_success_log))
                         .icon(R.drawable.ic_notification_success_colored,
@@ -170,6 +178,7 @@ public class ConnectionService extends IntentService {
 
         notify // return to defaults
                 .id(1)
+                .cancelOnClick(false)
                 .locked(pref_notify_foreground)
                 .enabled(!from_shortcut);
     }
@@ -232,7 +241,7 @@ public class ConnectionService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
 
-        if ("STOP".equals(intent.getAction())) { // Stop by intent
+        if ("STOP".equals(intent.getAction()) || intent.getBooleanExtra("stop", false)) { // Stop by intent
             Logger.log(this, "Stopping by Intent");
             running.set(false);
             return START_NOT_STICKY;
@@ -294,10 +303,6 @@ public class ConnectionService extends IntentService {
             lock.unlock();
 
             notify.hide();
-            if (from_shortcut) {
-                // TODO: Do not start connection in DebugActivity after click on this notification
-                notify.cancelOnClick(true).locked(false).show();
-            }
 
             Logger.log(this, "Broadcast | ConnectionService (RUNNING = false)");
             sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
@@ -327,7 +332,9 @@ public class ConnectionService extends IntentService {
             notify.title(getString(R.string.notification_progress_waiting))
                     .progress(0, true)
                     .show();
+
             new Randomizer(this).delay(running);
+            if (!running.get()) return;
         }
 
         new Notify(this).id(2).hide(); // hide error notification

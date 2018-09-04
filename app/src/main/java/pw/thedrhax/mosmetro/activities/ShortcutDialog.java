@@ -21,8 +21,6 @@ package pw.thedrhax.mosmetro.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 
@@ -31,6 +29,7 @@ import pw.thedrhax.mosmetro.R;
 public class ShortcutDialog extends Activity {
     private CheckBox check_background;
     private CheckBox check_force;
+    private CheckBox check_stop;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -39,46 +38,54 @@ public class ShortcutDialog extends Activity {
 
         check_background = (CheckBox)findViewById(R.id.check_background);
         check_force = (CheckBox)findViewById(R.id.check_force);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Show back button in menu
-        try {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (NullPointerException ignored) {}
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        check_stop = (CheckBox)findViewById(R.id.check_stop);
     }
 
     public void check_background(View view) {
-        check_force.setEnabled(check_background.isChecked());
+        boolean checked = check_background.isChecked();
+        check_force.setEnabled(checked);
+
+        if (!checked)
+            check_force.setChecked(false);
+    }
+
+    public void check_stop(View view) {
+        boolean checked = check_stop.isChecked();
+        check_background.setEnabled(!checked);
+
+        if (checked) {
+            check_background.setChecked(false);
+            check_background(check_background);
+        }
+    }
+
+    private String getShortcutName() {
+        if (check_background.isChecked()) {
+            return getString(R.string.in_background);
+        } else if (check_stop.isChecked()) {
+            return getString(R.string.stop);
+        } else {
+            return getString(R.string.connect);
+        }
+    }
+
+    private Class getActivityClass() {
+        if (check_background.isChecked() || check_stop.isChecked()) {
+            return ConnectionServiceActivity.class;
+        } else {
+            return DebugActivity.class;
+        }
     }
 
     public void button_save(View view) {
         Intent result = new Intent();
 
-        boolean background = check_background.isChecked();
-
-        Intent shortcut_intent = new Intent(
-                this, background ? ConnectionServiceActivity.class : DebugActivity.class
-        ).putExtra("force", check_force.isChecked());
+        Intent shortcut_intent = new Intent(this, getActivityClass())
+                .putExtra("force", check_force.isChecked())
+                .putExtra("stop", check_stop.isChecked());
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
-        result.putExtra(
-                Intent.EXTRA_SHORTCUT_NAME,
-                background ? getString(R.string.in_background) : getString(R.string.connect)
-        );
+        result.putExtra(Intent.EXTRA_SHORTCUT_NAME, getShortcutName());
         result.putExtra(
                 Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)
