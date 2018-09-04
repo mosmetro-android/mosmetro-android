@@ -22,6 +22,15 @@
         android:layout_margin="5dp"
         android:enabled="false" />
 
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop"
+        android:id="@+id/check_stop"
+        android:layout_weight="0"
+        android:layout_margin="5dp"
+        android:onClick="check_stop" />
+
     <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

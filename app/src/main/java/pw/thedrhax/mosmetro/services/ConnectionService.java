@@ -241,7 +241,7 @@ public class ConnectionService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
 
-        if ("STOP".equals(intent.getAction())) { // Stop by intent
+        if ("STOP".equals(intent.getAction()) || intent.getBooleanExtra("stop", false)) { // Stop by intent
             Logger.log(this, "Stopping by Intent");
             running.set(false);
             return START_NOT_STICKY;

@@ -21,4 +21,16 @@
             <extra android:name="force" android:value="true" />
         </intent>
     </shortcut>
+    <shortcut
+        android:shortcutId="stop_service"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher"
+        android:shortcutShortLabel="@string/stop">
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="pw.thedrhax.mosmetro"
+            android:targetClass="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity">
+
+            <extra android:name="stop" android:value="true" />
+        </intent>
+    </shortcut>
 </shortcuts>
