@@ -78,6 +78,11 @@ public class MosMetroV2WV extends WebViewProvider {
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                     return false;
                 } else {
+                    if (redirect.contains("segment")) {
+                        vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                    } else {
+                        vars.put("segment", "metro");
+                    }
                     return true;
                 }
             }

@@ -32,6 +32,7 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2WV;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -120,7 +121,7 @@ class StatisticsTask implements Task {
             params.put("duration", "" + duration);
         }
 
-        if (p instanceof MosMetroV2) mosmetrov2(params, vars);
+        if (p instanceof MosMetroV2 || p instanceof MosMetroV2WV) mosmetrov2(params, vars);
         if (p instanceof MosMetroV3) mosmetrov3(params, vars);
 
         new AsyncTask<Void,Void,Void>() {
