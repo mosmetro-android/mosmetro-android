@@ -326,6 +326,9 @@ public class WebViewService extends Service {
                         put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
                         put("access-control-allow-credentials", "true");
                     }
+
+                    remove("x-content-type-options");
+                    remove("x-xss-protection");
                 }});
 
                 if (!response.getReason().isEmpty()) {
