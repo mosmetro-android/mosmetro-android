@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import org.json.simple.JSONObject;
@@ -274,7 +275,9 @@ public class MosMetroV3 extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(ParsedResponse response, SharedPreferences settings) {
+        if (!settings.getBoolean("pref_mosmetro_v3", true)) return false;
+
         try {
             return response.parseMetaRedirect().contains("welcome.wi-fi.ru");
         } catch (ParseException ex) {

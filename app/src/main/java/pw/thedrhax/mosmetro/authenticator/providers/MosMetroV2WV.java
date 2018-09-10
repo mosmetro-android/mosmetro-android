@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -278,7 +279,9 @@ public class MosMetroV2WV extends WebViewProvider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(ParsedResponse response, SharedPreferences settings) {
+        if (!settings.getBoolean("pref_webview_enabled", true)) return false;
+
         String redirect;
 
         try {
