@@ -126,7 +126,7 @@ public class MosMetroV2WV extends WebViewProvider {
         if (!def_pattern.equals(pattern)) {
             Logger.log(this, "Warning | Using custom blacklist RegExp: " + pattern);
         }
-        add(new WebViewInterceptorTask(pattern) {
+        add(new WebViewInterceptorTask(this, pattern) {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
@@ -139,7 +139,7 @@ public class MosMetroV2WV extends WebViewProvider {
          * * Parse CSRF token
          * * Insert automation script into response
          */
-        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
                 ParsedResponse response = client.get(url, null, pref_retry_count);
@@ -165,7 +165,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Detect ban (redirect to /auto_auth)
          */
-        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auto_auth.*?") {
+        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auto_auth.*?") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) {
                 Logger.log(context.getString(R.string.auth_ban_message));
@@ -185,7 +185,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
-        add(new WebViewInterceptorTask("https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
+        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
                 return client.post(url, null, pref_retry_count);

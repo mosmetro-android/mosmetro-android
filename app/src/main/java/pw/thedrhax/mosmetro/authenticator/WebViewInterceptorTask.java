@@ -23,20 +23,41 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
+import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.services.WebViewService;
+import pw.thedrhax.util.Logger;
 
 public abstract class WebViewInterceptorTask implements Task {
+    private Provider p;
+    private String regex;
+    private PatternSyntaxException ex = null;
     private Pattern pattern;
 
-    public WebViewInterceptorTask(String pattern) {
-        this.pattern = Pattern.compile(pattern);
+    public WebViewInterceptorTask(Provider p, String regex) {
+        this.p = p;
+        this.regex = regex;
+
+        try {
+            this.pattern = Pattern.compile(regex);
+        } catch (PatternSyntaxException ex) {
+            this.pattern = null;
+            this.ex = ex;
+        }
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
+        if (ex != null) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(p.context.getString(R.string.error,
+                    p.context.getString(R.string.auth_error_regex, regex)
+            ));
+            return false;
+        }
         return true;
     }
 
@@ -44,6 +65,6 @@ public abstract class WebViewInterceptorTask implements Task {
     public abstract ParsedResponse request(WebViewService wv, Client client, String url) throws IOException;
 
     public boolean match(String url) {
-        return pattern.matcher(url).matches();
+        return pattern != null && pattern.matcher(url).matches();
     }
 }
