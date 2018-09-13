@@ -117,6 +117,7 @@ public class SettingsActivity extends Activity {
             experimental.setTitle(R.string.pref_updater_branch_experimental);
             screen.addPreference(experimental);
 
+            if (branches == null) return;
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
             for (final UpdateCheckTask.Branch branch : branches.values()) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
