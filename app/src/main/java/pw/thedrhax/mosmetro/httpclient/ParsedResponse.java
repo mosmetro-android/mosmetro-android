@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +72,11 @@ public class ParsedResponse {
     }
 
     public ParsedResponse(String html) {
-        this("", html.getBytes(), 200, "OK", null);
+        this("", html.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
+            put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
+                add("text/html; charset=utf-8");
+            }});
+        }});
     }
 
     @NonNull

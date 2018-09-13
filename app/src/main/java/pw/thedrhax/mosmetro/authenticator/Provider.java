@@ -131,9 +131,6 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
 
-        boolean pref_webview_enabled = PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean("pref_webview_enabled", true);
-
         ParsedResponse response = generate_204(context, running);
         Provider result = Provider.find(context, response);
 
@@ -142,8 +139,12 @@ public abstract class Provider extends LinkedList<Task> {
             Logger.log(context.getString(R.string.error,
                     context.getString(R.string.auth_error_provider)
             ));
-            Logger.log(context.getString(R.string.auth_provider_assume));
-            return pref_webview_enabled ? new MosMetroV2WV(context) : new MosMetroV2(context);
+            Provider fallback = find(context, new ParsedResponse(
+                    "<meta http-equiv=\"refresh\" content=\"0; " +
+                            "URL=http://auth.wi-fi.ru/?segment=metro\" />"
+            ));
+            Logger.log(context.getString(R.string.auth_provider_assume, fallback.getName()));
+            return fallback;
         }
 
         return result;
