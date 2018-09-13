@@ -443,13 +443,13 @@ public class WebViewService extends Service {
      * Binding interface
      */
 
-    public class ScriptedWebViewBinder extends Binder {
+    public class WebViewBinder extends Binder {
         public WebViewService getService() {
             return WebViewService.this;
         }
     }
 
-    private final IBinder binder = new ScriptedWebViewBinder();
+    private final IBinder binder = new WebViewBinder();
 
     @Nullable @Override
     public IBinder onBind(Intent intent) {
