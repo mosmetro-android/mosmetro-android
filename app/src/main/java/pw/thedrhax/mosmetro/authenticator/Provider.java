@@ -122,6 +122,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return          New Provider instance.
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Logger.log(context.getString(R.string.auth_provider_check));
 
         ParsedResponse response = generate_204(context, running);
@@ -133,7 +134,12 @@ public abstract class Provider extends LinkedList<Task> {
                     context.getString(R.string.auth_error_provider)
             ));
             Logger.log(context.getString(R.string.auth_provider_assume));
-            return new MosMetroV2(context);
+
+            if (settings.getBoolean("pref_mosmetro_v3", true)) {
+                return new MosMetroV3(context);
+            } else {
+                return new MosMetroV2(context);
+            }
         }
 
         return result;
