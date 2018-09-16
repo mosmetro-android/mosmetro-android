@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -141,7 +140,7 @@ public abstract class Provider extends LinkedList<Task> {
             ));
             Provider fallback = find(context, new ParsedResponse(
                     "<meta http-equiv=\"refresh\" content=\"0; " +
-                            "URL=http://auth.wi-fi.ru/?segment=metro\" />"
+                            "URL=http://welcome.wi-fi.ru/\" />"
             ));
             Logger.log(context.getString(R.string.auth_provider_assume, fallback.getName()));
             return fallback;
