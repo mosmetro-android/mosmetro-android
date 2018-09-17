@@ -136,13 +136,33 @@ public class MosMetroV2WV extends WebViewProvider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
+         * * Detect ban (302 redirect to /auto_auth)
          * * Parse CSRF token
          * * Insert automation script into response
          */
         add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
-                ParsedResponse response = client.get(url, null, pref_retry_count);
+                ParsedResponse response = client
+                        .followRedirects(false)
+                        .get(url, null, pref_retry_count);
+                client.followRedirects(true);
+
+                try {
+                    if (response.get300Redirect().contains("auto_auth")) {
+                        Logger.log(context.getString(R.string.auth_ban_message));
+
+                        // Increase ban counter
+                        settings.edit()
+                                .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                                .apply();
+
+                        context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
+
+                        running.set(false);
+                        return new ParsedResponse("");
+                    }
+                } catch (ParseException ignored) {}
 
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
@@ -159,26 +179,6 @@ public class MosMetroV2WV extends WebViewProvider {
                 script.text(Util.readAsset(context, "MosMetroV2.js"));
 
                 return response;
-            }
-        });
-
-        /**
-         * Async: Detect ban (redirect to /auto_auth)
-         */
-        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auto_auth.*?") {
-            @Nullable @Override
-            public ParsedResponse request(WebViewService wv, Client client, String url) {
-                Logger.log(context.getString(R.string.auth_ban_message));
-
-                // Increase ban counter
-                settings.edit()
-                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                        .apply();
-
-                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-
-                running.set(false);
-                return new ParsedResponse("");
             }
         });
 
