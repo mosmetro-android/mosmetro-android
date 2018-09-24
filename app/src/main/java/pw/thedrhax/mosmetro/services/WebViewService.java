@@ -301,7 +301,7 @@ public class WebViewService extends Service {
         }
 
         private WebResourceResponse webresponse(@NonNull ParsedResponse response) {
-            if (response.getMimeType().contains("text/html")) {
+            if (response.getMimeType().contains("text/html") && !response.getURL().isEmpty()) {
                 Logger.log(this, response.toString());
             }
 

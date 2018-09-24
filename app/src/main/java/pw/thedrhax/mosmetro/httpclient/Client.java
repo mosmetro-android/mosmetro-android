@@ -126,7 +126,9 @@ public abstract class Client {
 
     private ParsedResponse saveResponse(ParsedResponse response) {
         this.last_response = response;
-        setHeader(Client.HEADER_REFERER, last_response.getURL());
+        if (!last_response.getURL().isEmpty()) {
+            setHeader(Client.HEADER_REFERER, last_response.getURL());
+        }
         return response;
     }
 

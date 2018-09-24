@@ -49,7 +49,7 @@ public class ParsedResponse {
     private String html;
     private Document document;
 
-    public ParsedResponse(@Nullable String url, @NonNull byte[] bytes, int code, String reason,
+    public ParsedResponse(@NonNull String url, @NonNull byte[] bytes, int code, String reason,
                           @Nullable Map<String,List<String>> headers) {
         this.url = url;
         this.bytes = bytes;
@@ -84,7 +84,7 @@ public class ParsedResponse {
         return html;
     }
 
-    @Nullable
+    @NonNull
     public String getURL() {
         return url;
     }
