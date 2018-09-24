@@ -169,6 +169,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
                 } catch (ParseException ex) {
+                    Logger.log(response.toString());
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
