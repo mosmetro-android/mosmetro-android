@@ -220,10 +220,20 @@ public class MosMetroV2WV extends WebViewProvider {
 
         /**
          * Waiting for WebView to try to load any other URL
+         * Also check internet connection once every internet_check_interval (10 seconds by default)
          */
         add(new WaitTask(this, "Waiting for script") {
+            private final boolean pref_internet_check = settings.getBoolean("pref_internet_check", true);
+            private final int interval = Util.getIntPreference(context, "pref_internet_check_interval", 10);
+            private int counter = 0;
+
             @Override
             public boolean condition() {
+                if (pref_internet_check && ++counter == interval * 10) {
+                    counter = 0;
+                    return !isConnected();
+                }
+
                 return wv.getURL().contains("auth.wi-fi.ru/auth");
             }
         });
