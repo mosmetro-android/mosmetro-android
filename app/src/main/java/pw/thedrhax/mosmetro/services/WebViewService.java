@@ -67,7 +67,6 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
-import pw.thedrhax.util.Util;
 
 public class WebViewService extends Service {
     private Listener<Boolean> running = new Listener<Boolean>(true) {
@@ -256,7 +255,6 @@ public class WebViewService extends Service {
         };
 
         private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
-        private int pref_retry_count = Util.getIntPreference(WebViewService.this, "pref_retry_count", 3);
 
         private String next_referer;
         private String referer;
@@ -276,7 +274,7 @@ public class WebViewService extends Service {
                 return response;
             } else {
                 Logger.log(this, "Requesting: " + url);
-                return client.get(url, null, pref_retry_count);
+                return client.get(url, null, 1);
             }
         }
 
