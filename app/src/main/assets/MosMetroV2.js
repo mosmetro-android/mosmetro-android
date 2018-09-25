@@ -19,6 +19,10 @@
 (function() {
     const MO = window.MutationObserver || window.WebKitMutationObserver;
 
+    function log(msg) {
+        console.log('MosMetroV2.js | ' + msg)
+    }
+
     function each(query, f) {
         [].forEach.call(document.querySelectorAll(query), f);
     }
@@ -30,7 +34,18 @@
         });
     }
 
-    function onMutation(m, o) {
+    function onMutation(ml, o) {
+        /* Log all childList mutations for debugging */
+        ml.forEach(function(m) {
+            if (m.type == 'childList') {
+                m.addedNodes.forEach(function(n) {
+                    if (n.outerHTML !== undefined) {
+                        log('Mutation | ' + n.outerHTML);
+                    }
+                });
+            }
+        });
+
         click('.join');
       	click('.cross');
         click('.mt-banner-fullscreen__button-close');
@@ -43,7 +58,7 @@
     }
 
     if (document.location.pathname.lastIndexOf('/auth', 0) !== 0) {
-        console.log('MosMetroV2.js | Wrong page: ' + document.location);
+        log('Wrong page: ' + document.location);
     }
 
     var o = new MO(onMutation);
@@ -55,5 +70,5 @@
 
     onMutation(); /* In case if Observer is loaded too late */
 
-    console.log("MosMetroV2.js | Loaded successfully");
+    log('Loaded successfully');
 })()
