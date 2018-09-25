@@ -50,7 +50,9 @@
       	click('.cross');
         click('.mt-banner-fullscreen__button-close');
         click('.interaction_button__joke');
+        click('.interaction_button_quiz');
         click('.interaction_button');
+        click('.button_blue');
 
         each('video', function(el) {
             el.pause();
