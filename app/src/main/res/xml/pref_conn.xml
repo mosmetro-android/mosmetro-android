@@ -4,6 +4,12 @@
     <PreferenceCategory android:title="Алгоритмы" />
 
     <CheckBoxPreference
+        android:key="pref_mosmetro_v2wv"
+        android:title="@string/pref_mosmetro_v2wv"
+        android:summary="@string/pref_mosmetro_v2wv_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
         android:key="pref_mosmetro_v3"
         android:title="@string/pref_mosmetro_v3"
         android:summary="@string/pref_mosmetro_v3_summary"
@@ -99,11 +105,6 @@
         android:defaultValue="false" />
 
     <PreferenceCategory android:title="pref_webview" />
-
-    <CheckBoxPreference
-        android:key="pref_webview_enabled"
-        android:title="pref_webview_enabled"
-        android:defaultValue="true" />
 
     <CheckBoxPreference
         android:key="pref_trust_all_certs"
