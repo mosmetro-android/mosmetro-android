@@ -40,7 +40,6 @@ import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -80,9 +79,6 @@ public class WebViewService extends Service {
         }
     };
 
-    private String js_interface;
-    private JavascriptListener js_result;
-
     private SharedPreferences settings;
     private ViewGroup view;
     private WindowManager wm;
@@ -100,9 +96,6 @@ public class WebViewService extends Service {
 
         Randomizer random = new Randomizer(this);
 
-        js_interface = random.string("abcdef", 8);
-        js_result = new JavascriptListener();
-        webview.addJavascriptInterface(js_result, js_interface);
         webview.setWebViewClient(webviewclient);
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -174,7 +167,6 @@ public class WebViewService extends Service {
     public void onDestroy() {
         super.onDestroy();
         webview.stopLoading();
-        webview.removeJavascriptInterface(js_interface);
 
         // Avoid WebView leaks
         // Source: https://stackoverflow.com/a/48596543
@@ -249,17 +241,6 @@ public class WebViewService extends Service {
 
     public void setClient(Client client) {
         webviewclient.client = client;
-    }
-
-    private class JavascriptListener extends Listener<String> {
-        JavascriptListener() {
-            super(null);
-        }
-
-        @JavascriptInterface
-        public void onResult(String result) {
-            set(result);
-        }
     }
 
     /**
