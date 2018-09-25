@@ -133,7 +133,7 @@ public abstract class Client {
 
     // Retry methods
     public ParsedResponse get(final String link, final Map<String,String> params,
-                      int retries) throws IOException {
+                      int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
@@ -142,10 +142,10 @@ public abstract class Client {
                 }
                 return saveResponse(get(link, params));
             }
-        }.run(retries);
+        }.run(tries);
     }
     public ParsedResponse post(final String link, final Map<String,String> params,
-                       int retries) throws IOException {
+                       int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
@@ -154,10 +154,10 @@ public abstract class Client {
                 }
                 return saveResponse(post(link, params));
             }
-        }.run(retries);
+        }.run(tries);
     }
     public ParsedResponse post(final String link, final String type, final String body,
-                               int retries) throws IOException {
+                               int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
@@ -166,7 +166,7 @@ public abstract class Client {
                 }
                 return saveResponse(post(link, type, body));
             }
-        }.run(retries);
+        }.run(tries);
     }
     public InputStream getInputStream(final String link, int retries) throws IOException {
         return new RetryOnException<InputStream>() {
@@ -209,31 +209,37 @@ public abstract class Client {
     }
 
     private abstract class RetryOnException<T> {
-        T run(int retries) throws IOException {
-            IOException last_ex = null;
-            for (int i = 0; i < retries; i++) {
-                try {
-                    return body();
-                } catch (IOException ex) {
-                    last_ex = ex;
+        T run(int tries) throws IOException {
+            IOException last_ex;
+
+            try {
+                return body();
+            } catch (IOException ex) {
+                last_ex = ex;
+                for (int i = 2; i <= tries; i++) {
                     if (running.get()) {
                         Logger.log(Logger.LEVEL.DEBUG, ex.toString());
                         Logger.log(Client.this,
-                                "Retrying request (try " + (i+1) + " out of " + retries + ")"
+                                "Retrying request (try " + i + " out of " + tries + ")"
                         );
+
                         SystemClock.sleep(1000);
+
+                        try {
+                            return body();
+                        } catch (IOException ex1) {
+                            last_ex = ex1;
+                        }
                     } else {
                         Logger.log(Client.this, "Giving up (interrupted)");
                         break;
                     }
                 }
             }
-            if (last_ex != null) {
-                throw last_ex;
-            } else {
-                throw new IOException("Unknown exception (retries=" + retries + ")");
-            }
+
+            throw last_ex;
         }
+
         public abstract T body() throws IOException;
     }
 }
