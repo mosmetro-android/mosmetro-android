@@ -29,8 +29,10 @@
 
     function click(query) {
         each(query, function(el) {
-            if (el.offsetParent !== null) /* click only visible elements */
+            if (el.offsetParent !== null) { /* click only visible elements */
+                log("Click | " + el.outerHTML);
                 el.click();
+            }
         });
     }
 
