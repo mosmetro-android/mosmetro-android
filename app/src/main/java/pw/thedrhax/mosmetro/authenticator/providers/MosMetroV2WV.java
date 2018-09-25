@@ -79,6 +79,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     vars.put("result", RESULT.ALREADY_CONNECTED);
                     return false;
                 } else {
+                    Logger.log(Logger.LEVEL.DEBUG, redirect);
                     if (redirect.contains("segment")) {
                         vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
                     } else {
@@ -270,7 +271,6 @@ public class MosMetroV2WV extends WebViewProvider {
 
         try {
             redirect = client.response().parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected
             return super.isConnected();
