@@ -32,14 +32,13 @@ public abstract class WaitTask extends NamedTask {
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        while (!until()) {
-            SystemClock.sleep(100);
-
-            if (!p.running.get()) {
-                return false;
+        while (p.running.get()) {
+            if (until()) {
+                return true;
             }
+            SystemClock.sleep(100);
         }
-        return true;
+        return false;
     }
 
     public abstract boolean until();
