@@ -203,12 +203,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new NamedTask("Opening auth page") {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                try {
-                    wv.get(redirect);
-                } catch (Exception ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    return false;
-                }
+                wv.get(redirect);
                 return true;
             }
         });
@@ -219,7 +214,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new WaitTask(this, "Waiting for auth page to load") {
             @Override
             public boolean condition() {
-                return !wv.getUrl().contains("auth.wi-fi.ru/auth");
+                return !wv.getURL().contains("auth.wi-fi.ru/auth");
             }
         });
 
@@ -229,7 +224,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new WaitTask(this, "Waiting for script") {
             @Override
             public boolean condition() {
-                return wv.getUrl().contains("auth.wi-fi.ru/auth");
+                return wv.getURL().contains("auth.wi-fi.ru/auth");
             }
         });
 

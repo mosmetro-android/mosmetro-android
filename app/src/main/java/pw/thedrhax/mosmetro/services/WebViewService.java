@@ -189,8 +189,7 @@ public class WebViewService extends Service {
         running.set(false);
     }
 
-    // TODO: Return some information about the loaded page
-    public void get(final String url) throws Exception {
+    public void get(final String url) {
         webview.getHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -199,7 +198,7 @@ public class WebViewService extends Service {
         });
     }
 
-    public String getUrl() {
+    public String getURL() {
         return webviewclient.current_url.get();
     }
 
