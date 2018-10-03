@@ -225,10 +225,10 @@ public class MosMetroV2WV extends WebViewProvider {
          */
         add(new WaitTask(this, "Waiting for auth page to load") {
             @Override
-            public boolean until() {
+            public boolean until(HashMap<String, Object> vars) {
                 return wv.getURL().contains("auth.wi-fi.ru/auth");
             }
-        });
+        }.timeout(60000));
 
         /**
          * Waiting for WebView to try to load any other URL
@@ -240,7 +240,7 @@ public class MosMetroV2WV extends WebViewProvider {
             private int counter = 0;
 
             @Override
-            public boolean until() {
+            public boolean until(HashMap<String, Object> vars) {
                 if (pref_internet_check && ++counter == interval * 10) {
                     counter = 0;
                     return isConnected();
@@ -248,7 +248,7 @@ public class MosMetroV2WV extends WebViewProvider {
 
                 return !wv.getURL().contains("auth.wi-fi.ru/auth");
             }
-        });
+        }.timeout(120000));
 
         /**
          * Checking Internet connection

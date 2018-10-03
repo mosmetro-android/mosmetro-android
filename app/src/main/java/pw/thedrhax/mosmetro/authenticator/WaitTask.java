@@ -24,6 +24,8 @@ import java.util.HashMap;
 
 public abstract class WaitTask extends NamedTask {
     private Provider p;
+    private int tries = 0;
+    private int interval = 100;
 
     public WaitTask(Provider p, String name) {
         super(name);
@@ -32,14 +34,31 @@ public abstract class WaitTask extends NamedTask {
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        while (p.running.get()) {
-            if (until()) {
+        for (int i = 0; i < tries || tries == 0; i++) {
+            if (until(vars)) {
                 return true;
             }
-            SystemClock.sleep(100);
+
+            if (!p.running.get()) {
+                return false;
+            }
+
+            SystemClock.sleep(interval);
         }
         return false;
     }
 
-    public abstract boolean until();
+    public WaitTask tries(int tries) {
+        this.tries = tries; return this;
+    }
+
+    public WaitTask interval(int interval) {
+        this.interval = interval; return this;
+    }
+
+    public WaitTask timeout(int timeout) {
+        tries(timeout / interval); return this;
+    }
+
+    public abstract boolean until(HashMap<String, Object> vars);
 }
