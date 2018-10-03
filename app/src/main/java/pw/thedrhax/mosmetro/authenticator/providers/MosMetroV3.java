@@ -278,10 +278,17 @@ public class MosMetroV3 extends Provider {
     public static boolean match(ParsedResponse response, SharedPreferences settings) {
         if (!settings.getBoolean("pref_mosmetro_v3", true)) return false;
 
+        String redirect;
         try {
-            return response.parseMetaRedirect().contains("welcome.wi-fi.ru");
-        } catch (ParseException ex) {
-            return false;
+            redirect = response.parseMetaRedirect();
+        } catch (ParseException ex1) {
+            try {
+                redirect = response.get300Redirect();
+            } catch (ParseException ex2) {
+                return false;
+            }
         }
+
+        return redirect.contains("welcome.wi-fi.ru");
     }
 }
