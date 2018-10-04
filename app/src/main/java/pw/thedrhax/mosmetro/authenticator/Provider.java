@@ -31,6 +31,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2mcc;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -109,6 +110,7 @@ public abstract class Provider extends LinkedList<Task> {
 
         if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
+        else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
         else if (Enforta.match(response)) return new Enforta(context);
         else return new Unknown(context, response);
