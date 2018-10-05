@@ -107,9 +107,9 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, ParsedResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context);
-        else if (MosMetroV2.match(response)) return new MosMetroV2(context);
-        else if (MosMetroV1.match(response)) return new MosMetroV1(context);
+        if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context, response);
+        else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
+        else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
         else if (Enforta.match(response)) return new Enforta(context);
         else return new Unknown(context, response);
     }
@@ -136,9 +136,9 @@ public abstract class Provider extends LinkedList<Task> {
             Logger.log(context.getString(R.string.auth_provider_assume));
 
             if (settings.getBoolean("pref_mosmetro_v3", true)) {
-                return new MosMetroV3(context);
+                return new MosMetroV3(context, response);
             } else {
-                return new MosMetroV2(context);
+                return new MosMetroV2(context, response);
             }
         }
 
@@ -213,7 +213,15 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return generate_204(context, running).getResponseCode() == 204;
+        return isConnected(generate_204(context, running));
+    }
+
+    /**
+     * Checks ParsedResponse to be a valid generate_204 response.
+     * @return True if generate_204 response is valid; otherwise, false is returned.
+     */
+    protected static boolean isConnected(ParsedResponse response) {
+        return response.getResponseCode() == 204;
     }
 
     /**

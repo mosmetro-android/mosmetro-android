@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
@@ -38,7 +39,7 @@ import pw.thedrhax.util.Logger;
 /**
  * The MosMetroV1 class supports the older version of the MosMetro algorithm.
  *
- * Detection: Meta-redirect contains "login.wi-fi.ru".
+ * Detection: Meta or Location redirect contains "login.wi-fi.ru".
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
@@ -47,25 +48,27 @@ import pw.thedrhax.util.Logger;
 public class MosMetroV1 extends Provider {
     protected String redirect;
 
-    public MosMetroV1(final Context context) {
+    public MosMetroV1(final Context context, final ParsedResponse res) {
         super(context);
 
         /**
-         * Checking Internet connection for a first time
+         * Checking Internet connection
          * ⇒ GET http://wi-fi.ru
          * ⇐ Meta-redirect: http://login.wi-fi.ru/am/UI/Login?... > redirect
-         * Note: Do not change id of this Task! (see MosMetroV2)
          */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+        add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_already_connected));
-                    vars.put("result", RESULT.ALREADY_CONNECTED);
+            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+                try {
+                    redirect = response.parseAnyRedirect();
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_redirect)
+                    ));
                     return false;
-                } else {
-                    return true;
                 }
+                return true;
             }
         });
 
@@ -152,29 +155,6 @@ public class MosMetroV1 extends Provider {
         });
     }
 
-    @Override
-    public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
-        try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
-        }
-
-        try {
-            redirect = client.response().parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
-            Logger.log(Logger.LEVEL.DEBUG, redirect);
-        } catch (ParseException ex) {
-            // Redirect not found => connected
-            return super.isConnected();
-        }
-
-        // Redirect found => not connected
-        return false;
-    }
-
     /**
      * Checks if current network is supported by this Provider implementation.
      * @param response  Instance of ParsedResponse.
@@ -182,7 +162,7 @@ public class MosMetroV1 extends Provider {
      */
     public static boolean match(ParsedResponse response) {
         try {
-            return response.parseMetaRedirect().contains("login.wi-fi.ru");
+            return response.parseAnyRedirect().contains("login.wi-fi.ru");
         } catch (ParseException ex) {
             return false;
         }

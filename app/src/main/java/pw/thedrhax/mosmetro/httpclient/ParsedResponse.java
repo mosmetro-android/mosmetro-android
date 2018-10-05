@@ -147,6 +147,15 @@ public class ParsedResponse {
     }
 
     @NonNull
+    public String parseAnyRedirect() throws ParseException {
+        try {
+            return parseMetaRedirect();
+        } catch (ParseException ex1) {
+            return get300Redirect();
+        }
+    }
+
+    @NonNull
     public JSONObject json() throws org.json.simple.parser.ParseException {
         return (JSONObject) new JSONParser().parse(getPage());
     }
