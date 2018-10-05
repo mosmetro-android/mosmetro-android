@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.net.Uri;
 
 import org.jsoup.nodes.Element;
 
@@ -27,6 +28,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
@@ -43,16 +45,37 @@ import pw.thedrhax.util.Logger;
  */
 
 public class MosMetroV2mcc extends Provider {
+    private String redirect;
 
     public MosMetroV2mcc(Context context, final ParsedResponse res) {
         super(context);
+
+        /**
+         * Checking Internet connection
+         * ⇒ GET generate_204 < res
+         * ⇐ Location redirect: http://10.x.x.x/www/login.chi?... > redirect
+         */
+        add(new InitialConnectionCheckTask(this, res) {
+            @Override
+            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+                try {
+                    redirect = response.parseAnyRedirect();
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_redirect)
+                    ));
+                    return false;
+                }
+                return true;
+            }
+        });
 
         /**
          * Follow all 300-redirects until first Provider is matched > provider
          */
         add(new WaitTask(this, context.getString(R.string.auth_redirect)) {
             private Provider provider = MosMetroV2mcc.this;
-            private ParsedResponse response = res;
 
             @Override
             public boolean run(HashMap<String, Object> vars) {
@@ -69,10 +92,9 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean until(HashMap<String, Object> vars) {
                 try {
-                    String redirect = response.get300Redirect();
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
+                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
 
-                    response = client.get(redirect, null, pref_retry_count);
+                    redirect = response.get300Redirect();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
 
                     provider = Provider.find(context, response);
