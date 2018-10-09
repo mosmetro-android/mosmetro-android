@@ -66,7 +66,6 @@ public class MosMetroV3 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
 
-                redirect = ParsedResponse.removePathFromUrl(redirect);
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
 
                 if (redirect.contains("client_mac")) {
@@ -74,6 +73,8 @@ public class MosMetroV3 extends Provider {
                 } else {
                     vars.put("mac", "00-00-00-00-00-00");
                 }
+
+                redirect = ParsedResponse.removePathFromUrl(redirect);
 
                 return true;
             }
