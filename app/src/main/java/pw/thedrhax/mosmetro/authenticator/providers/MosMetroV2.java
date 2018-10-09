@@ -178,10 +178,26 @@ public class MosMetroV2 extends Provider {
                       .setCookie("http://auth.wi-fi.ru", "_mts", prefix + random.string(11) + "~" + random.string(20))
                       .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
                 try {
-                    client.get(
+                    ParsedResponse response = client.followRedirects(false).get(
                             redirect + "/auth?segment=" + vars.get("segment"),
                             null, pref_retry_count
                     );
+                    client.followRedirects(true);
+
+                    try {
+                        String url = response.parseAnyRedirect();
+
+                        Logger.log(Logger.LEVEL.DEBUG, client.response().toString());
+                        Logger.log(Logger.LEVEL.DEBUG, "Redirected: " + url);
+
+                        client.get(url, null, pref_retry_count);
+
+                        if (url.contains("segment")) {
+                            vars.put("segment", Uri.parse(url).getQueryParameter("segment"));
+                            Logger.log(Logger.LEVEL.DEBUG, "New segment: " + vars.get("segment"));
+                        }
+                    } catch (ParseException ignored) {}
+
                     Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
                     return true;
                 } catch (IOException ex) {
