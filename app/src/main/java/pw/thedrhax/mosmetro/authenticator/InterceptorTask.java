@@ -63,10 +63,14 @@ public abstract class InterceptorTask implements Task {
     }
 
     @Nullable
-    public abstract ParsedResponse request(Client client, Client.METHOD method, String url, Map<String,String> params) throws IOException;
+    public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String,String> params) throws IOException {
+        return null;
+    }
 
     @NonNull
-    public abstract ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException;
+    public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
+        return response;
+    }
 
     public boolean match(String url) {
         return pattern != null && pattern.matcher(url).matches();
