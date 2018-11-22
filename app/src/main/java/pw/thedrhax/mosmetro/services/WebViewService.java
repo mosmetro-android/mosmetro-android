@@ -54,13 +54,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -83,7 +80,6 @@ public class WebViewService extends Service {
     private WindowManager wm;
     private WebView webview;
     private InterceptedClient webviewclient;
-    private List<WebViewInterceptorTask> interceptors = new LinkedList<>();
 
     @Override
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
@@ -229,15 +225,6 @@ public class WebViewService extends Service {
         return result;
     }
 
-    public void setInterceptors(List<Task> tasks) {
-        interceptors.clear();
-        for (Task task : tasks) {
-            if (task instanceof WebViewInterceptorTask) {
-                interceptors.add((WebViewInterceptorTask)task);
-            }
-        }
-    }
-
     public void setClient(Client client) {
         webviewclient.client = client;
     }
@@ -258,25 +245,6 @@ public class WebViewService extends Service {
 
         private String next_referer;
         private String referer;
-
-        @NonNull
-        private ParsedResponse request(String url) throws IOException {
-            ParsedResponse response = null;
-
-            for (WebViewInterceptorTask interceptor : interceptors) {
-                if (interceptor.match(url)) {
-                    response = interceptor.request(WebViewService.this, client, url);
-                    break;
-                }
-            }
-
-            if (response != null) {
-                return response;
-            } else {
-                Logger.log(this, "Requesting: " + url);
-                return client.get(url, null, 1);
-            }
-        }
 
         private WebResourceResponse webresponse(@NonNull ParsedResponse response) {
             if (response.getMimeType().contains("text/html") && !response.getURL().isEmpty()) {
@@ -336,7 +304,8 @@ public class WebViewService extends Service {
 
             try {
                 client.setCookies(url, getCookies(url));
-                result = webresponse(request(url));
+                Logger.log(this, "Requesting: " + url);
+                result = webresponse(client.get(url, null, 1));
                 setCookies(url, client.getCookies(url));
             } catch (UnknownHostException ex) {
                 onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);

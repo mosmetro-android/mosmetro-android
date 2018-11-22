@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.jsoup.nodes.Element;
@@ -29,18 +30,18 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
-import pw.thedrhax.mosmetro.authenticator.WebViewInterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.services.WebViewService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -127,9 +128,9 @@ public class MosMetroV2WV extends WebViewProvider {
         if (!def_pattern.equals(pattern)) {
             Logger.log(this, "Warning | Using custom blacklist RegExp: " + pattern);
         }
-        add(new WebViewInterceptorTask(this, pattern) {
+        add(new InterceptorTask(this, pattern) {
             @Nullable @Override
-            public ParsedResponse request(WebViewService wv, Client client, String url) {
+            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
                 return new ParsedResponse("");
             }
@@ -141,14 +142,17 @@ public class MosMetroV2WV extends WebViewProvider {
          * * Parse CSRF token
          * * Insert automation script into response
          */
-        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
             @Nullable @Override
-            public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
-                ParsedResponse response = client
-                        .followRedirects(false)
-                        .get(url, null, pref_retry_count);
+            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
+                client.followRedirects(false);
+                ParsedResponse response = client.get(url, null, pref_retry_count);
                 client.followRedirects(true);
+                return response;
+            }
 
+            @NonNull @Override
+            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 try {
                     if (response.get300Redirect().contains("auto_auth")) {
                         Logger.log(context.getString(R.string.auth_ban_message));
@@ -187,9 +191,9 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
-        add(new WebViewInterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
             @Nullable @Override
-            public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
+            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 return client.post(url, null, pref_retry_count);
             }
         });
@@ -197,10 +201,9 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Block loading of https://wi-fi.ru but send request anyway
          */
-        add(new WebViewInterceptorTask(this, "https?://wi-fi\\.ru/.*") {
-            @Nullable @Override
-            public ParsedResponse request(WebViewService wv, Client client, String url) throws IOException {
-                client.get(url, null, 1);
+        add(new InterceptorTask(this, "https?://wi-fi\\.ru/.*") {
+            @NonNull @Override
+            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 return new ParsedResponse("");
             }
         });

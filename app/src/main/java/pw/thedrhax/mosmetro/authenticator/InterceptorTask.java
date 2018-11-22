@@ -18,26 +18,27 @@
 
 package pw.thedrhax.mosmetro.authenticator;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.services.WebViewService;
 import pw.thedrhax.util.Logger;
 
-public abstract class WebViewInterceptorTask implements Task {
+public abstract class InterceptorTask implements Task {
     private Provider p;
     private String regex;
     private PatternSyntaxException ex = null;
     private Pattern pattern;
 
-    public WebViewInterceptorTask(Provider p, String regex) {
+    public InterceptorTask(Provider p, String regex) {
         this.p = p;
         this.regex = regex;
 
@@ -62,7 +63,14 @@ public abstract class WebViewInterceptorTask implements Task {
     }
 
     @Nullable
-    public abstract ParsedResponse request(WebViewService wv, Client client, String url) throws IOException;
+    public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String,String> params) throws IOException {
+        return null;
+    }
+
+    @NonNull
+    public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
+        return response;
+    }
 
     public boolean match(String url) {
         return pattern != null && pattern.matcher(url).matches();

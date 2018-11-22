@@ -172,9 +172,7 @@ public abstract class Provider extends LinkedList<Task> {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.random = new Randomizer(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        this.client = new OkHttp(context)
-                .setRunningListener(running)
-                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
+        setClient(new OkHttp(context));
     }
 
     /**
@@ -263,6 +261,12 @@ public abstract class Provider extends LinkedList<Task> {
             }
         }
 
+        for (Task task : this) {
+            if (task instanceof InterceptorTask) {
+                client.interceptors.add((InterceptorTask) task);
+            }
+        }
+
         initialized = true;
         return true;
     }
@@ -271,6 +275,8 @@ public abstract class Provider extends LinkedList<Task> {
      * Reverse effect of init()
      */
     protected void deinit() {
+        client.interceptors.clear();
+
         for (Provider p : children) {
             p.deinit();
         }
@@ -333,7 +339,10 @@ public abstract class Provider extends LinkedList<Task> {
      * Replace default Client
      */
     public Provider setClient(Client client) {
-        this.client = client; return this;
+        this.client = client
+                .setRunningListener(running)
+                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
+        return this;
     }
 
     /**
