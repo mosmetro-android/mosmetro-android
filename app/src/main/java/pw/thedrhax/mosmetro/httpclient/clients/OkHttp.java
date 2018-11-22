@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -187,39 +186,32 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public ParsedResponse get(String link, Map<String, String> params) throws IOException {
-        return parse(call(link + requestToString(params), null));
-    }
+    protected ParsedResponse request(METHOD method, String link, Map<String, String> params) throws IOException {
+        switch (method) {
+            case GET:
+                return parse(call(link + requestToString(params), null));
 
-    @Override
-    public ParsedResponse post(String link, Map<String, String> params) throws IOException {
-        FormBody.Builder body = new FormBody.Builder();
+            case POST:
+                FormBody.Builder body = new FormBody.Builder();
 
-        if (params != null) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                if (entry.getValue() != null)
-                    body.add(entry.getKey(), entry.getValue());
-            }
+                if (params != null) {
+                    for (Map.Entry<String, String> entry : params.entrySet()) {
+                        if (entry.getValue() != null)
+                            body.add(entry.getKey(), entry.getValue());
+                    }
+                }
+
+                return parse(call(link, body.build()));
+
+            case POST_RAW:
+                if (params == null || !params.containsKey("type") || !params.containsKey("body"))
+                    return null;
+                else
+                    return parse(call(link, RequestBody.create(
+                            MediaType.parse(params.get("type")), params.get("body")
+                    )));
         }
-
-        return parse(call(link, body.build()));
-    }
-
-    @Override
-    public ParsedResponse post(String link, String type, String body) throws IOException {
-        return parse(call(link, RequestBody.create(MediaType.parse(type), body)));
-    }
-
-    @Override
-    public InputStream getInputStream(String link) throws IOException {
-        Response response = call(link, null);
-        ResponseBody body = response.body();
-
-        if (body == null) {
-            throw new IOException("Empty response: " + response.code());
-        }
-
-        return body.byteStream();
+        return null;
     }
 
     @Override

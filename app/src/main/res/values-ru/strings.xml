@@ -208,4 +208,5 @@
     <string name="pref_debug">Отладка</string>
     <string name="pref_debug_summary">Автоматические отчёты, LogCat, и т.д.</string>
     <string name="pref_mosmetro_v3_summary">Этот алгоритм необходим для подключения только в Санкт-Петербурге, но в будущем может стать необходимым и в других регионах.</string>
+    <string name="auth_error_regex" formatted="false">не удалось скомпилировать RegEx: %s</string>
 </resources>
