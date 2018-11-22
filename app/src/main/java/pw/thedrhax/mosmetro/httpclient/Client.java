@@ -25,16 +25,20 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
 public abstract class Client {
+    public enum METHOD { GET, POST, POST_RAW }
+
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
     public static final String HEADER_USER_AGENT = "User-Agent";
@@ -43,6 +47,9 @@ public abstract class Client {
     public static final String HEADER_LOCATION = "Location";
     public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
 
+    public final List<InterceptorTask> interceptors = new LinkedList<>();
+
+    private boolean intercepting = false;
     protected Map<String,String> headers;
     protected Context context;
     protected Randomizer random;
@@ -109,21 +116,59 @@ public abstract class Client {
     public abstract Client setTimeout(int ms);
 
     // IO methods
-    public abstract ParsedResponse get(String link, Map<String,String> params) throws IOException;
-    public abstract ParsedResponse post(String link, Map<String,String> params) throws IOException;
-    public abstract ParsedResponse post(String link, String type, String body) throws IOException;
-    public abstract InputStream getInputStream(String link) throws IOException;
+    protected abstract ParsedResponse request(METHOD method, String link, Map<String,String> params) throws IOException;
 
-    private ParsedResponse saveResponse(ParsedResponse response) {
-        this.last_response = response;
+    private ParsedResponse interceptedRequest(METHOD method, String link, Map<String,String> params) throws IOException {
+        InterceptorTask interceptor = null;
+        ParsedResponse response = null;
 
-        setHeader(Client.HEADER_REFERER, last_response.getURL());
+        for (InterceptorTask i : interceptors) {
+            if (i.match(link) && !intercepting) {
+                interceptor = i;
+            }
+        }
 
-        if (settings.getBoolean("pref_load_resources", true)) {
-            last_response.loadResources(Client.this);
+        try {
+            if (interceptor != null) {
+                intercepting = true;
+                response = interceptor.request(this, method, link, params);
+            }
+
+            if (response == null) {
+                response = request(method, link, params);
+            }
+
+            if (interceptor != null) {
+                response = interceptor.response(this, link, response);
+            }
+        } finally {
+            intercepting = false;
+        }
+
+        if (last_response != null) {
+            this.last_response = response;
+
+            setHeader(Client.HEADER_REFERER, last_response.getURL());
+
+            if (settings.getBoolean("pref_load_resources", true)) {
+                last_response.loadResources(Client.this);
+            }
         }
 
         return response;
+    }
+
+    public ParsedResponse get(String link, Map<String,String> params) throws IOException {
+        return interceptedRequest(METHOD.GET, link, params);
+    }
+    public ParsedResponse post(String link, Map<String,String> params) throws IOException {
+        return interceptedRequest(METHOD.POST, link, params);
+    }
+    public ParsedResponse post(String link, String type, String body) throws IOException {
+        return interceptedRequest(METHOD.POST_RAW, link, new HashMap<String,String>() {{
+            put("type", type);
+            put("body", body);
+        }});
     }
 
     @NonNull
@@ -140,7 +185,7 @@ public abstract class Client {
                 if (random_delays) {
                     random.delay(running);
                 }
-                return saveResponse(get(link, params));
+                return get(link, params);
             }
         }.run(tries);
     }
@@ -152,7 +197,7 @@ public abstract class Client {
                 if (random_delays) {
                     random.delay(running);
                 }
-                return saveResponse(post(link, params));
+                return post(link, params);
             }
         }.run(tries);
     }
@@ -164,17 +209,9 @@ public abstract class Client {
                 if (random_delays) {
                     random.delay(running);
                 }
-                return saveResponse(post(link, type, body));
+                return post(link, type, body);
             }
         }.run(tries);
-    }
-    public InputStream getInputStream(final String link, int retries) throws IOException {
-        return new RetryOnException<InputStream>() {
-            @Override
-            public InputStream body() throws IOException {
-                return getInputStream(link);
-            }
-        }.run(retries);
     }
 
     // Cancel current request
