@@ -113,8 +113,8 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
 
                     try {
-                        client.get(redirect, null, pref_retry_count);
-                        Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                        ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                     }
@@ -143,8 +143,8 @@ public class MosMetroV2 extends Provider {
                         throw new ParseException("Invalid URL: " + redirect, 0);
                     }
 
-                    client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
+                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                     return true;
                 } catch (IOException | ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -173,16 +173,27 @@ public class MosMetroV2 extends Provider {
                       .setCookie("http://auth.wi-fi.ru", "_mts", prefix + random.string(11) + "~" + random.string(20))
                       .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
                 try {
-                    client.get(
+                    ParsedResponse response = client.get(
                             redirect + "/auth?segment=" + vars.get("segment"),
                             null, pref_retry_count
                     );
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
+                    vars.put("response", response);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
+
+                    String csrf_token = response.parseMetaContent("csrf-token");
+                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_auth_page)
+                    ));
+                    return false;
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
                     ));
                     return false;
                 }
@@ -193,13 +204,13 @@ public class MosMetroV2 extends Provider {
          * Detect ban (redirect to /auto_auth)
          */
         Task captcha_task = new Task() {
-            private boolean isCaptchaRequested() {
-                return client.response().getPageContent().location().contains("auto_auth");
+            private boolean isCaptchaRequested(ParsedResponse response) {
+                return response.getPageContent().location().contains("auto_auth");
             }
 
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (!isCaptchaRequested()) return true;
+                if (!isCaptchaRequested((ParsedResponse) vars.get("response"))) return true;
 
                 Logger.log(context.getString(R.string.auth_ban_message));
 
@@ -257,16 +268,14 @@ public class MosMetroV2 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
-                    String csrf_token = client.response().parseMetaContent("csrf-token");
-                    client.setHeader(Client.HEADER_CSRF, csrf_token);
-
-                    client.post(
+                    ParsedResponse response = client.post(
                             redirect + "/auth/init?mode=0&segment=" + vars.get("segment"),
                             null, pref_retry_count
                     );
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
+                    vars.put("response", response);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (ProtocolException ignored) { // Too many follow-up requests
-                } catch (IOException | ParseException ex) {
+                } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
@@ -336,8 +345,8 @@ public class MosMetroV2 extends Provider {
 
                             Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
 
-                            tmp_client.get(location, null, pref_retry_count);
-                            Logger.log(Logger.LEVEL.DEBUG, tmp_client.response().toString());
+                            ParsedResponse response = tmp_client.get(location, null, pref_retry_count);
+                            Logger.log(Logger.LEVEL.DEBUG, response.toString());
                         } catch (IOException|ParseException ex) {
                             Logger.log(Logger.LEVEL.DEBUG, ex);
                         }
@@ -353,15 +362,17 @@ public class MosMetroV2 extends Provider {
     @Override
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false);
+        ParsedResponse response;
+
         try {
-            client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
+            response = client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
         try {
-            redirect = client.response().parseMetaRedirect();
+            redirect = response.parseMetaRedirect();
             Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected

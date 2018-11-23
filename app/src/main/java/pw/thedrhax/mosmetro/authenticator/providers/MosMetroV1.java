@@ -72,15 +72,17 @@ public class MosMetroV1 extends Provider {
         /**
          * Getting auth page
          * ⇒ GET http://login.wi-fi.ru/am/UI/Login?... < redirect
-         * ⇐ Form: method="post" action=""
+         * ⇐ Form: method="post" action="" > form
+         * If there are two forms, registration is required.
          */
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                ParsedResponse response;
+
                 try {
-                    client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
-                    return true;
+                    response = client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -88,21 +90,12 @@ public class MosMetroV1 extends Provider {
                     ));
                     return false;
                 }
-            }
-        });
 
-        /**
-         * Parsing auth form > form
-         * If there are two forms, registration is required.
-         */
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                Elements forms = client.response().getPageContent().getElementsByTag("form");
+                Elements forms = response.getPageContent().getElementsByTag("form");
                 if (forms.size() > 1) {
                     Logger.log(context.getString(R.string.error,
-                                context.getString(R.string.auth_error_not_registered)
-                        ));
+                            context.getString(R.string.auth_error_not_registered)
+                    ));
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }
@@ -155,16 +148,18 @@ public class MosMetroV1 extends Provider {
     @Override
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false);
+        ParsedResponse response;
+
         try {
-            client.get("http://wi-fi.ru", null, pref_retry_count);
+            response = client.get("http://wi-fi.ru", null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
         try {
-            redirect = client.response().parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
+            redirect = response.parseMetaRedirect();
+            Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
             Logger.log(Logger.LEVEL.DEBUG, redirect);
         } catch (ParseException ex) {
             // Redirect not found => connected
