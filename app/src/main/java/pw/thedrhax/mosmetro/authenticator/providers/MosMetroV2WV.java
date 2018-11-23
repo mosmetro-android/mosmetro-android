@@ -103,8 +103,8 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
 
                     try {
-                        client.get(redirect, null, pref_retry_count);
-                        Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                        ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                     }
@@ -276,15 +276,17 @@ public class MosMetroV2WV extends WebViewProvider {
     @Override
     public boolean isConnected() {
         Client client = new OkHttp(context).followRedirects(false);
+        ParsedResponse response;
+
         try {
-            client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
+            response = client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return false;
         }
 
         try {
-            redirect = client.response().parseMetaRedirect();
+            redirect = response.parseMetaRedirect();
         } catch (ParseException ex) {
             // Redirect not found => connected
             return super.isConnected();
