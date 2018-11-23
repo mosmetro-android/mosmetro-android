@@ -75,15 +75,17 @@ public class MosMetroV1 extends Provider {
         /**
          * Getting auth page
          * ⇒ GET http://login.wi-fi.ru/am/UI/Login?... < redirect
-         * ⇐ Form: method="post" action=""
+         * ⇐ Form: method="post" action="" > form
+         * If there are two forms, registration is required.
          */
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                ParsedResponse response;
+
                 try {
-                    client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
-                    return true;
+                    response = client.get(redirect, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -91,21 +93,12 @@ public class MosMetroV1 extends Provider {
                     ));
                     return false;
                 }
-            }
-        });
 
-        /**
-         * Parsing auth form > form
-         * If there are two forms, registration is required.
-         */
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                Elements forms = client.response().getPageContent().getElementsByTag("form");
+                Elements forms = response.getPageContent().getElementsByTag("form");
                 if (forms.size() > 1) {
                     Logger.log(context.getString(R.string.error,
-                                context.getString(R.string.auth_error_not_registered)
-                        ));
+                            context.getString(R.string.auth_error_not_registered)
+                    ));
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }

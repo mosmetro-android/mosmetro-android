@@ -89,12 +89,14 @@ public class MosMetroV3 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                ParsedResponse response;
+
                 try {
                     Map<String,String> params = new HashMap<>();
                     params.put("client_mac", (String)vars.get("mac"));
 
-                    client.get(redirect, params, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPageContent().outerHtml());
+                    response = client.get(redirect, params, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -104,7 +106,7 @@ public class MosMetroV3 extends Provider {
                 }
 
                 try {
-                    vars.put("token", client.response().parseMetaContent("csrf-token"));
+                    vars.put("token", response.parseMetaContent("csrf-token"));
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -126,19 +128,21 @@ public class MosMetroV3 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_init)) {
             @Override @SuppressLint("HardwareIds")
             public boolean run(HashMap<String, Object> vars) {
+                ParsedResponse response;
+
                 try {
                     JSONObject body = new JSONObject();
                     body.put("authenticity_token", vars.get("token"));
                     body.put("client_mac", vars.get("mac"));
                     body.put("client_ip", "");
 
-                    client.post(
+                    response = client.post(
                             redirect + "/auth/init",
                             "application/json; charset=UTF-8",
                             body.toJSONString(),
                             pref_retry_count
                     );
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -148,7 +152,7 @@ public class MosMetroV3 extends Provider {
                 }
 
                 try {
-                    JSONObject answer = client.response().json();
+                    JSONObject answer = response.json();
                     boolean result = answer.containsKey("result") && answer.get("result").equals(true);
                     if (!result) {
                         throw new Exception("Unexpected answer: false");
@@ -177,8 +181,8 @@ public class MosMetroV3 extends Provider {
                     params.put("client_mac", (String)vars.get("mac"));
                     params.put("client_ip", "");
 
-                    client.get(redirect + "/auth/check", params, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                    ParsedResponse response = client.get(redirect + "/auth/check", params, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                 }
@@ -198,8 +202,9 @@ public class MosMetroV3 extends Provider {
                     Map<String,String> params = new HashMap<>();
                     params.put("client_mac", (String)vars.get("mac"));
 
-                    client.get(redirect + "/success", params, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, client.response().getPage());
+                    ParsedResponse response = client.get(redirect + "/success", params, pref_retry_count);
+                    vars.put("response", response);
+                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -223,7 +228,7 @@ public class MosMetroV3 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                Provider provider = Provider.find(context, client.response());
+                Provider provider = Provider.find(context, (ParsedResponse)vars.get("response"));
                 vars.put("switch", provider.getName());
 
                 if (provider instanceof Unknown && isConnected()) {

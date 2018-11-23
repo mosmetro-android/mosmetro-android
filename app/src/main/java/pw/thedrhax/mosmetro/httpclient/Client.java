@@ -45,6 +45,7 @@ public abstract class Client {
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
     public static final String HEADER_LOCATION = "Location";
+    public static final String HEADER_CONTENT_TYPE = "Content-Type";
     public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
 
     public final List<InterceptorTask> interceptors = new LinkedList<>();
@@ -55,7 +56,6 @@ public abstract class Client {
     protected Randomizer random;
     protected SharedPreferences settings;
     protected boolean random_delays = false;
-    protected ParsedResponse last_response = new ParsedResponse("", "", 200, null);
 
     protected Client(Context context) {
         this.context = context;
@@ -145,13 +145,17 @@ public abstract class Client {
             intercepting = false;
         }
 
-        if (last_response != null) {
-            this.last_response = response;
+        if (response == null) {
+            return new ParsedResponse(link, "", 500, null);
+        }
 
-            setHeader(Client.HEADER_REFERER, last_response.getURL());
+        String type = response.getResponseHeader(HEADER_CONTENT_TYPE.toLowerCase());
+
+        if (type != null && type.startsWith("text/html")) {
+            setHeader(Client.HEADER_REFERER, response.getURL());
 
             if (settings.getBoolean("pref_load_resources", true)) {
-                last_response.loadResources(Client.this);
+                response.loadResources(Client.this);
             }
         }
 
@@ -169,11 +173,6 @@ public abstract class Client {
             put("type", type);
             put("body", body);
         }});
-    }
-
-    @NonNull
-    public ParsedResponse response() {
-        return last_response;
     }
 
     // Retry methods
