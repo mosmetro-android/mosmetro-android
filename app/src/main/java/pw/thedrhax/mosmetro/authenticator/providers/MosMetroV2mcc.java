@@ -24,6 +24,7 @@ import android.net.Uri;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.text.ParseException;
 import java.util.HashMap;
 
@@ -31,6 +32,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Logger;
@@ -131,6 +133,67 @@ public class MosMetroV2mcc extends Provider {
                 Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
                 addAll(indexOf(this) + 1, provider.setClient(client).setCallback(callback));
                 return true;
+            }
+        });
+
+        /**
+         * Workaround for fake redirect with malformed HTTP response
+         */
+        add(new NamedTask("Обход сломанного этапа подключения") {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                vars.put("result", RESULT.ERROR);
+
+                ParsedResponse response = generate_204(context, running);
+
+                if (isConnected(response)) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                    return true;
+                }
+
+                try {
+                    String redirect = response.get300Redirect();
+                    response = client.get(redirect, null);
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                } catch (ParseException ex) {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return false;
+                } catch (ProtocolException ex) {
+                    Logger.log("Обнаружен неправильный ответ сервера (всё идёт по плану)");
+                    return true;
+                } catch (IOException ex) {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return false;
+                }
+
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_connection)
+                ));
+                return false;
+            }
+        });
+
+        /**
+         * Checking Internet connection
+         */
+        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (isConnected()) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                    return true;
+                } else {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_connection)
+                    ));
+                    return false;
+                }
             }
         });
     }
