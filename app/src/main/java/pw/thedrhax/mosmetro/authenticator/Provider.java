@@ -29,6 +29,7 @@ import java.util.LinkedList;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
+import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2mcc;
@@ -80,7 +81,8 @@ public abstract class Provider extends LinkedList<Task> {
             "MosGorTrans_Free",
             "MT_FREE", "MT_FREE_",
             "CPPK_Free",
-            "Air_WiFi_Free"
+            "Air_WiFi_Free",
+            "MAInet_public"
     };
 
     protected Context context;
@@ -112,6 +114,7 @@ public abstract class Provider extends LinkedList<Task> {
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
+        else if (MAInet.match(response)) return new MAInet(context, response);
         else if (Enforta.match(response)) return new Enforta(context);
         else return new Unknown(context, response);
     }
