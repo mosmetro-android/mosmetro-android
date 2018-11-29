@@ -21,7 +21,6 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Patterns;
@@ -42,7 +41,6 @@ import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
@@ -334,44 +332,6 @@ public class MosMetroV2 extends Provider {
                         context.getString(R.string.auth_error_connection)
                 ));
                 return false;
-            }
-        });
-
-        /**
-         * Try to disable midsession with non-blocking request
-         */
-        if (settings.getBoolean("pref_mosmetro_midsession", true))
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                new AsyncTask<Void,Void,Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Client tmp_client = new OkHttp(context)
-                                .setRunningListener(running)
-                                .followRedirects(false);
-
-                        random.delay(running);
-
-                        try {
-                            String location = tmp_client
-                                    .get("http://ya.ru", null, pref_retry_count)
-                                    .get300Redirect();
-
-                            if (!location.contains("midsession")) return null;
-
-                            Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
-
-                            ParsedResponse response = tmp_client.get(location, null, pref_retry_count);
-                            Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                        } catch (IOException|ParseException ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                        }
-
-                        return null;
-                    }
-                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                return true;
             }
         });
     }

@@ -214,8 +214,6 @@
     <string name="do_not_warn">Do not warn anymore</string>
     <string name="pref_share_warning">Be careful!</string>
     <string name="pref_share_warning_summary">Connection log may contain sensitive data such as your MAC-address or phone number. Do not send this file to public chats or social networks.</string>
-    <string name="pref_mosmetro_midsession">Try to disable midsession</string>
-    <string name="pref_mosmetro_midsession_summary">Midsession is a random redirect from any HTTP site to advertisement page.</string>
     <string name="pref_delay_always">Apply to all requests</string>
     <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests.</string>
     <string name="pref_category_delays">Random delays</string>
