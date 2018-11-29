@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
+import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
@@ -55,7 +56,7 @@ public class MosMetroV2mcc extends Provider {
         /**
          * Checking Internet connection
          * ⇒ GET generate_204 < res
-         * ⇐ Location redirect: http://10.x.x.x/www/login.chi?... > redirect
+         * ⇐ Location redirect: http://10.x.x.x/www/login.chi?... > redirect, mac
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
@@ -69,6 +70,19 @@ public class MosMetroV2mcc extends Provider {
                     ));
                     return false;
                 }
+
+                Uri uri = Uri.parse(redirect);
+                String url = uri.getQueryParameter("loginurl");
+                if (url != null && !url.isEmpty()) {
+                    uri = Uri.parse(url);
+                }
+                String mac = uri.getQueryParameter("mac");
+                if (mac != null && !mac.isEmpty()) {
+                    vars.put("mac", mac.toLowerCase());
+                } else {
+                    vars.put("mac", "00-00-00-00-00-00");
+                }
+
                 return true;
             }
         });
@@ -137,46 +151,86 @@ public class MosMetroV2mcc extends Provider {
         });
 
         /**
-         * Workaround for fake redirect with malformed HTTP response
+         * Sending yet another auth form
+         * ⇒ GET http://hotspot.maximatelecom/login?username=mac&password=placeholder < mac
+         * ⇐ Location redirect > redirect
          */
-        add(new NamedTask("Обход сломанного этапа подключения") {
+        add(new NamedTask(context.getString(R.string.auth_algorithm_continue, getName())) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                vars.put("result", RESULT.ERROR);
+                ParsedResponse response;
 
-                ParsedResponse response = generate_204(context, running);
+                vars.put("result", RESULT.ERROR); // Reset result after child algorithm
 
-                if (isConnected(response)) {
-                    Logger.log(context.getString(R.string.auth_connected));
-                    vars.put("result", RESULT.CONNECTED);
-                    return true;
+                try {
+                    client.followRedirects(false);
+
+                    response = client.get("http://hotspot.maximatelecom/login", new HashMap<String, String>() {{
+                        put("username", (String) vars.get("mac"));
+                        put("password", "placeholder");
+                    }}, pref_retry_count);
+
+                    client.followRedirects(true);
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return false;
                 }
 
                 try {
-                    String redirect = response.get300Redirect();
-                    response = client.get(redirect, null);
-                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                    redirect = response.get300Redirect();
                 } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_server)
-                    ));
-                    return false;
-                } catch (ProtocolException ex) {
-                    Logger.log("Обнаружен неправильный ответ сервера (всё идёт по плану)");
-                    return true;
-                } catch (IOException ex) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_server)
+                            context.getString(R.string.auth_error_redirect)
                     ));
                     return false;
                 }
 
-                Logger.log(context.getString(R.string.error,
-                        context.getString(R.string.auth_error_connection)
-                ));
-                return false;
+                return true;
             }
         });
+
+        /**
+         * Follow all Location redirects until the first 2xx response
+         */
+        add(new WaitTask(this, context.getString(R.string.auth_redirect)) {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                client.followRedirects(false);
+
+                boolean result = super.run(vars);
+
+                client.followRedirects(true);
+
+                return result;
+            }
+
+            @Override
+            public boolean until(HashMap<String, Object> vars) {
+                try {
+                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
+
+                    redirect = response.get300Redirect();
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
+
+                    return false;
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+
+                    stop();
+                    return false;
+                } catch (ParseException ex) {
+                    return true;
+                }
+            }
+        }.tries(5));
 
         /**
          * Checking Internet connection

@@ -229,4 +229,5 @@
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm is required only in Saint Petersburg, but may become required in other regions in the future.</string>
     <string name="auth_error_regex" formatted="false">can\'t compile RegEx: %s</string>
+    <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
 </resources>
