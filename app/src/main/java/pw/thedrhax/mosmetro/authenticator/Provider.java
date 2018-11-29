@@ -275,7 +275,11 @@ public abstract class Provider extends LinkedList<Task> {
      * Reverse effect of init()
      */
     protected void deinit() {
-        client.interceptors.clear();
+        for (Task task : this) {
+            if (task instanceof InterceptorTask && client.interceptors.contains(task)) {
+                client.interceptors.remove(task);
+            }
+        }
 
         for (Provider p : children) {
             p.deinit();
