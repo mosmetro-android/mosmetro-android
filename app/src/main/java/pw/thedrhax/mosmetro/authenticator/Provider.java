@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
@@ -85,6 +86,9 @@ public abstract class Provider extends LinkedList<Task> {
     protected Context context;
     protected SharedPreferences settings;
     protected Randomizer random;
+
+    private List<Provider> children = new LinkedList<>();
+    private boolean initialized = false;
 
     /**
      * Number of retries for each request
@@ -229,12 +233,33 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * Start the connection sequence defined in child classes.
+     * Add child Provider and run all it's Tasks after 'index'
      */
-    public RESULT start() {
-        HashMap<String,Object> vars = new HashMap<>();
-        vars.put("time_start", System.currentTimeMillis());
-        vars.put("result", RESULT.ERROR);
+    public boolean add(int index, Provider provider) {
+        children.add(provider);
+
+        provider.setRunningListener(running)
+                .setCallback(callback)
+                .setClient(client);
+
+        if (initialized) {
+            provider.init();
+        }
+
+        return super.addAll(index, provider);
+    }
+
+    /**
+     * Initialize this Provider and it's children
+     * @return true on success, false on error
+     */
+    protected boolean init() {
+        for (Provider p : children) {
+            if (!p.init()) {
+                Logger.log(p, "Initialization failed");
+                return false;
+            }
+        }
 
         for (Task task : this) {
             if (task instanceof InterceptorTask) {
@@ -242,9 +267,43 @@ public abstract class Provider extends LinkedList<Task> {
             }
         }
 
+        initialized = true;
+        return true;
+    }
+
+    /**
+     * Reverse effect of init()
+     */
+    protected void deinit() {
+        client.interceptors.clear();
+
+        for (Provider p : children) {
+            p.deinit();
+        }
+
+        initialized = false;
+    }
+
+    /**
+     * Start the connection sequence defined in child classes.
+     */
+    public RESULT start() {
+        HashMap<String,Object> vars = new HashMap<>();
+        vars.put("time_start", System.currentTimeMillis());
+        vars.put("result", RESULT.ERROR);
+
+        if (!init()) {
+            Logger.log(this, "Initialization failed");
+            return RESULT.ERROR;
+        }
+
         int progress;
         for (int i = 0; i < size(); i++) {
-            if (isStopped()) return RESULT.INTERRUPTED;
+            if (isStopped()) {
+                deinit();
+                return RESULT.INTERRUPTED;
+            }
+
             progress = (i + 1) * 100 / size();
             if (get(i) instanceof NamedTask) {
                 Logger.log(((NamedTask)get(i)).getName());
@@ -255,11 +314,10 @@ public abstract class Provider extends LinkedList<Task> {
             if (!get(i).run(vars)) break;
         }
 
-        client.interceptors.clear();
-
         vars.put("time_end", System.currentTimeMillis());
         new StatisticsTask(this).run(vars);
 
+        deinit();
         Logger.date("<<< ");
         return (RESULT)vars.get("result");
     }
