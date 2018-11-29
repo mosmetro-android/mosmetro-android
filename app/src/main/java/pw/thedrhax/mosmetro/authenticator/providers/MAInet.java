@@ -34,14 +34,14 @@ import pw.thedrhax.util.Logger;
 /**
  * The MAInet class implements support for the public Wi-Fi network of MAI (MAInet_public).
  *
- * Detection: Meta or Location redirect contains "wi-fi.mai.ru".
+ * Detection: Meta or Location redirect contains "wifi.mai.ru".
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
  */
 
 public class MAInet extends Provider {
-    private String redirect = "https://wi-fi.mai.ru/login.html";
+    private String redirect = "https://wifi.mai.ru/login.html";
 
     public MAInet(Context context, ParsedResponse res) {
         super(context);
@@ -49,7 +49,7 @@ public class MAInet extends Provider {
         /**
          * Checking Internet connection
          * ⇒ GET generate_204 < res
-         * ⇐ Meta or Location redirect: https://wi-fi.mai.ru/login.html?... > redirect
+         * ⇐ Meta or Location redirect: https://wifi.mai.ru/login.html?... > redirect
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
@@ -127,7 +127,7 @@ public class MAInet extends Provider {
      */
     public static boolean match(ParsedResponse response) {
         try {
-            return response.parseAnyRedirect().contains("wi-fi.mai.ru");
+            return response.parseAnyRedirect().contains("wifi.mai.ru");
         } catch (ParseException ex1) {
             return false;
         }
