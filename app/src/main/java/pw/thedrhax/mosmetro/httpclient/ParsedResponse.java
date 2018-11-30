@@ -143,7 +143,7 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return link;
+        return absolutePathToUrl(url, link);
     }
 
     @NonNull
@@ -173,7 +173,7 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return link;
+        return absolutePathToUrl(url, link);
     }
 
     public static String removePathFromUrl(String url) {
@@ -224,7 +224,7 @@ public class ParsedResponse {
         LinkedList<String> result = new LinkedList<>();
         for (String link : links) {
             try {
-                String url = absolutePathToUrl(document.location(), link);
+                String url = absolutePathToUrl(this.url, link);
                 if (!result.contains(url))
                     result.add(url);
             } catch (ParseException ignored) {}
