@@ -236,9 +236,14 @@ public class ParsedResponse {
     public void loadResources(Client client) {
         for (String link : parseResourceList()) {
             Logger.log(this, link);
+
             try {
                 client.get(link, null);
             } catch (IOException ignored) {}
+
+            if (!client.running.get()) {
+                break;
+            }
         }
     }
 
