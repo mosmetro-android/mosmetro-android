@@ -38,6 +38,8 @@ public abstract class InterceptorTask implements Task {
     private PatternSyntaxException ex = null;
     private Pattern pattern;
 
+    protected HashMap<String,Object> vars = null;
+
     public InterceptorTask(Provider p, String regex) {
         this.p = p;
         this.regex = regex;
@@ -59,6 +61,9 @@ public abstract class InterceptorTask implements Task {
             ));
             return false;
         }
+
+        this.vars = vars;
+
         return true;
     }
 
