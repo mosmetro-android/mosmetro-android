@@ -30,9 +30,11 @@ import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
+import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2WV;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2mcc;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -81,7 +83,8 @@ public abstract class Provider extends LinkedList<Task> {
             "MosGorTrans_Free",
             "MT_FREE", "MT_FREE_",
             "CPPK_Free",
-            "Air_WiFi_Free"
+            "Air_WiFi_Free",
+            "MAInet_public"
     };
 
     protected Context context;
@@ -112,10 +115,12 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, ParsedResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (MosMetroV3.match(response, settings)) return new MosMetroV3(context);
-        else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context);
-        else if (MosMetroV2.match(response)) return new MosMetroV2(context);
-        else if (MosMetroV1.match(response)) return new MosMetroV1(context);
+        if (MosMetroV3.match(response, settings) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context, response);
+        else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
+        else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
+        else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
+        else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
+        else if (MAInet.match(response)) return new MAInet(context, response);
         else if (Enforta.match(response)) return new Enforta(context);
         else return new Unknown(context, response);
     }
@@ -215,7 +220,15 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return generate_204(context, running).getResponseCode() == 204;
+        return isConnected(generate_204(context, running));
+    }
+
+    /**
+     * Checks ParsedResponse to be a valid generate_204 response.
+     * @return True if generate_204 response is valid; otherwise, false is returned.
+     */
+    protected static boolean isConnected(ParsedResponse response) {
+        return response.getResponseCode() == 204;
     }
 
     /**
@@ -275,7 +288,11 @@ public abstract class Provider extends LinkedList<Task> {
      * Reverse effect of init()
      */
     protected void deinit() {
-        client.interceptors.clear();
+        for (Task task : this) {
+            if (task instanceof InterceptorTask && client.interceptors.contains(task)) {
+                client.interceptors.remove(task);
+            }
+        }
 
         for (Provider p : children) {
             p.deinit();

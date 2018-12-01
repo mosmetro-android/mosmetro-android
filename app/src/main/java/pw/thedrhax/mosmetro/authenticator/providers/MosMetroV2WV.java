@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
@@ -41,7 +42,6 @@ import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -64,30 +64,33 @@ import pw.thedrhax.util.Util;
 public class MosMetroV2WV extends WebViewProvider {
     private String redirect = "http://auth.wi-fi.ru/";
 
-    public MosMetroV2WV(Context context) {
+    public MosMetroV2WV(Context context, ParsedResponse res) {
         super(context);
 
         /**
          * Checking Internet connection for a first time
-         * ⇒ GET generate_204
+         * ⇒ GET generate_204 < res
          * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect, segment
          */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+        add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_already_connected));
-                    vars.put("result", RESULT.ALREADY_CONNECTED);
-                    return false;
-                } else {
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
-                    if (redirect.contains("segment")) {
-                        vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
-                    } else {
-                        vars.put("segment", "metro");
-                    }
-                    return true;
+            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+                try {
+                    redirect = response.parseAnyRedirect();
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
+
+                if (redirect.contains("segment")) {
+                    vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                } else {
+                    vars.put("segment", "metro");
+                }
+
+                return true;
             }
         });
 
@@ -273,29 +276,6 @@ public class MosMetroV2WV extends WebViewProvider {
         });
     }
 
-    @Override
-    public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
-        ParsedResponse response;
-
-        try {
-            response = client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
-        }
-
-        try {
-            redirect = response.parseMetaRedirect();
-        } catch (ParseException ex) {
-            // Redirect not found => connected
-            return super.isConnected();
-        }
-
-        // Redirect found => not connected
-        return false;
-    }
-
     /**
      * Checks if current network is supported by this Provider implementation.
      * @param response  Instance of ParsedResponse.
@@ -307,13 +287,9 @@ public class MosMetroV2WV extends WebViewProvider {
         String redirect;
 
         try {
-            redirect = response.parseMetaRedirect();
+            redirect = response.parseAnyRedirect();
         } catch (ParseException ex1) {
-            try {
-                redirect = response.get300Redirect();
-            } catch (ParseException ex2) {
-                return false;
-            }
+            return false;
         }
 
         return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");

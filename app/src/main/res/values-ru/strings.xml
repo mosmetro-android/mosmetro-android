@@ -194,8 +194,6 @@
     <string name="do_not_warn">Больше не предупреждать</string>
     <string name="pref_share_warning">Будьте осторожны!</string>
     <string name="pref_share_warning_summary">Лог подключения может содержать информацию, которую вы не хотели бы публиковать, например MAC-адрес устройства или номер телефона. Не отправляйте этот файл в чаты или социальные сети.</string>
-    <string name="pref_mosmetro_midsession">Пытаться отключить midsession</string>
-    <string name="pref_mosmetro_midsession_summary">Midsession — это случайное перенаправление с любого HTTP-сайта на страницу с рекламой.</string>
     <string name="pref_delay_always">Применить ко всем запросам</string>
     <string name="pref_delay_always_summary">Добавлять задержки ко всем запросам. По умолчанию задержки добавляются только в некоторых местах.</string>
     <string name="pref_category_delays">Случайные задержки</string>
@@ -212,4 +210,5 @@
     <string name="pref_mosmetro_v3_summary">Этот алгоритм необходим для подключения только в Санкт-Петербурге, но в будущем может стать необходимым и в других регионах.</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (бета)</string>
     <string name="pref_mosmetro_v2wv_summary">Расширение алгоритма MosMetroV2, использующее браузер в фоновом режиме для ускоренного просмотра рекламы с целью избежания блокировок.</string>
+    <string name="auth_algorithm_continue" formatted="false">Переключаюсь обратно на алгоритм %s</string>
 </resources>

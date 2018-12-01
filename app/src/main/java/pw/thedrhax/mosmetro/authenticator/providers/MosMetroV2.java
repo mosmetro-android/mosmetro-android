@@ -21,7 +21,8 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -30,14 +31,16 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
+import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
@@ -56,29 +59,33 @@ import pw.thedrhax.util.Randomizer;
 public class MosMetroV2 extends Provider {
     private String redirect = "http://auth.wi-fi.ru/";
 
-    public MosMetroV2(final Context context) {
+    public MosMetroV2(final Context context, final ParsedResponse res) {
         super(context);
 
         /**
-         * Checking Internet connection for a first time
-         * ⇒ GET generate_204
+         * Checking Internet connection
+         * ⇒ GET generate_204 < res
          * ⇐ Meta-redirect: http://auth.wi-fi.ru/?segment=... > redirect, segment
          */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+        add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_already_connected));
-                    vars.put("result", RESULT.ALREADY_CONNECTED);
-                    return false;
-                } else {
-                    if (redirect.contains("segment")) {
-                        vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
-                    } else {
-                        vars.put("segment", "metro");
-                    }
-                    return true;
+            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+                try {
+                    redirect = response.parseAnyRedirect();
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
+
+                if (redirect.contains("segment")) {
+                    vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                } else {
+                    vars.put("segment", "metro");
+                }
+
+                return true;
             }
         });
 
@@ -156,6 +163,55 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
+         * Async: https://auth.wi-fi.ru/auth
+         * - Detect ban (302 redirect to /auto_auth)
+         * - Parse CSRF token
+         */
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+            @Nullable @Override
+            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
+                client.followRedirects(false);
+                ParsedResponse response = client.get(url, null, pref_retry_count);
+                client.followRedirects(true);
+                return response;
+            }
+
+            @NonNull @Override
+            public ParsedResponse response(Client client, String url, ParsedResponse response) {
+                try {
+                    if (response.get300Redirect().contains("auto_auth")) {
+                        Logger.log(context.getString(R.string.auth_ban_message));
+
+                        // Increase ban counter
+                        settings.edit()
+                                .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
+                                .apply();
+
+                        context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
+
+                        running.set(false);
+                        return new ParsedResponse("");
+                    }
+                } catch (ParseException ignored) {}
+
+                try {
+                    String csrf_token = response.parseMetaContent("csrf-token");
+                    Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
+                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+                } catch (ParseException ex) {
+                    Logger.log(response.toString());
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    running.set(false);
+                }
+
+                return response;
+            }
+        });
+
+        /**
          * Following JavaScript redirect to the auth page
          * redirect = "scheme://host"
          * ⇒ GET http://auth.wi-fi.ru/auth?segment= < redirect + "/auth?segment=" + segment
@@ -179,9 +235,6 @@ public class MosMetroV2 extends Provider {
                     vars.put("response", response);
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
 
-                    String csrf_token = response.parseMetaContent("csrf-token");
-                    client.setHeader(Client.HEADER_CSRF, csrf_token);
-
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -189,41 +242,9 @@ public class MosMetroV2 extends Provider {
                             context.getString(R.string.auth_error_auth_page)
                     ));
                     return false;
-                } catch (ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_server)
-                    ));
-                    return false;
                 }
             }
         });
-
-        /**
-         * Detect ban (redirect to /auto_auth)
-         */
-        Task captcha_task = new Task() {
-            private boolean isCaptchaRequested(ParsedResponse response) {
-                return response.getPageContent().location().contains("auto_auth");
-            }
-
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (!isCaptchaRequested((ParsedResponse) vars.get("response"))) return true;
-
-                Logger.log(context.getString(R.string.auth_ban_message));
-
-                // Increase ban counter
-                settings.edit()
-                        .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                        .apply();
-
-                context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-                vars.put("result", RESULT.ERROR);
-                return false;
-            }
-        };
-        add(captcha_task);
 
         /**
          * Setting auth token
@@ -286,11 +307,6 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
-         * Expect delayed CAPTCHA request on Moscow Central Circle
-         */
-        add(captcha_task);
-
-        /**
          * Checking Internet connection
          * JSON result > status
          */
@@ -318,68 +334,6 @@ public class MosMetroV2 extends Provider {
                 return false;
             }
         });
-
-        /**
-         * Try to disable midsession with non-blocking request
-         */
-        if (settings.getBoolean("pref_mosmetro_midsession", true))
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                new AsyncTask<Void,Void,Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Client tmp_client = new OkHttp(context)
-                                .setRunningListener(running)
-                                .followRedirects(false);
-
-                        random.delay(running);
-
-                        try {
-                            String location = tmp_client
-                                    .get("http://ya.ru", null, pref_retry_count)
-                                    .get300Redirect();
-
-                            if (!location.contains("midsession")) return null;
-
-                            Logger.log(Logger.LEVEL.DEBUG, "Detected midsession: " + location);
-
-                            ParsedResponse response = tmp_client.get(location, null, pref_retry_count);
-                            Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                        } catch (IOException|ParseException ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, ex);
-                        }
-
-                        return null;
-                    }
-                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
-        ParsedResponse response;
-
-        try {
-            response = client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
-        }
-
-        try {
-            redirect = response.parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, redirect);
-        } catch (ParseException ex) {
-            // Redirect not found => connected
-            return super.isConnected();
-        }
-
-        // Redirect found => not connected
-        return false;
     }
 
     /**
@@ -391,13 +345,9 @@ public class MosMetroV2 extends Provider {
         String redirect;
 
         try {
-            redirect = response.parseMetaRedirect();
-        } catch (ParseException ex1) {
-            try {
-                redirect = response.get300Redirect();
-            } catch (ParseException ex2) {
-                return false;
-            }
+            redirect = response.parseAnyRedirect();
+        } catch (ParseException ex) {
+            return false;
         }
 
         return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");

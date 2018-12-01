@@ -199,7 +199,16 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return link;
+        return absolutePathToUrl(url, link);
+    }
+
+    @NonNull
+    public String parseAnyRedirect() throws ParseException {
+        try {
+            return parseMetaRedirect();
+        } catch (ParseException ex1) {
+            return get300Redirect();
+        }
     }
 
     @NonNull
@@ -220,12 +229,26 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return link;
+        return absolutePathToUrl(url, link);
     }
 
     public static String removePathFromUrl(String url) {
         Uri base_uri = Uri.parse(url);
         return base_uri.getScheme() + "://" + base_uri.getHost();
+    }
+
+    private static String absolutePathToUrl(String base_url, String path) throws ParseException {
+        String base = removePathFromUrl(base_url);
+
+        if (path.startsWith("//")) {
+            return Uri.parse(base_url).getScheme() + ":" + path;
+        } else if (path.startsWith("/")) {
+            return base + path;
+        } else if (path.startsWith("http")) {
+            return path;
+        } else {
+            throw new ParseException("Malformed URL: " + path, 0);
+        }
     }
 
     public static Map<String,String> parseForm (Element form) {

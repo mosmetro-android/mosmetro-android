@@ -31,11 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -50,30 +49,35 @@ import pw.thedrhax.util.Logger;
 public class MosMetroV3 extends Provider {
     private String redirect = "http://welcome.wi-fi.ru/?client_mac=00-00-00-00-00-00";
 
-    public MosMetroV3(final Context context) {
+    public MosMetroV3(final Context context, final ParsedResponse res) {
         super(context);
 
         /**
-         * Checking Internet connection for a first time
-         * ⇒ GET generate_204
+         * Checking Internet connection
+         * ⇒ GET generate_204 < res
          * ⇐ Meta + Location redirect: http://welcome.wi-fi.ru/?client_mac=... > redirect, mac
          */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+        add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_already_connected));
-                    vars.put("result", RESULT.ALREADY_CONNECTED);
-                    return false;
-                } else {
-                    if (redirect.contains("client_mac")) {
-                        vars.put("mac", Uri.parse(redirect).getQueryParameter("client_mac"));
-                    } else {
-                        vars.put("mac", "00-00-00-00-00-00");
-                    }
-                    redirect = ParsedResponse.removePathFromUrl(redirect);
-                    return true;
+            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+                try {
+                    redirect = response.parseAnyRedirect();
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, redirect);
+
+                if (redirect.contains("client_mac")) {
+                    vars.put("mac", Uri.parse(redirect).getQueryParameter("client_mac"));
+                } else {
+                    vars.put("mac", "00-00-00-00-00-00");
+                }
+
+                redirect = ParsedResponse.removePathFromUrl(redirect);
+
+                return true;
             }
         });
 
@@ -253,30 +257,6 @@ public class MosMetroV3 extends Provider {
         });
     }
 
-    @Override
-    public boolean isConnected() {
-        Client client = new OkHttp(context).followRedirects(false);
-        ParsedResponse response;
-
-        try {
-            response = client.get("http://" + random.choose(GENERATE_204), null, pref_retry_count);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
-        }
-
-        try {
-            redirect = response.parseMetaRedirect();
-            Logger.log(Logger.LEVEL.DEBUG, redirect);
-        } catch (ParseException ex) {
-            // Redirect not found => connected
-            return super.isConnected();
-        }
-
-        // Redirect found => not connected
-        return false;
-    }
-
     /**
      * Checks if current network is supported by this Provider implementation.
      * @param response  Instance of ParsedResponse.
@@ -287,13 +267,9 @@ public class MosMetroV3 extends Provider {
 
         String redirect;
         try {
-            redirect = response.parseMetaRedirect();
-        } catch (ParseException ex1) {
-            try {
-                redirect = response.get300Redirect();
-            } catch (ParseException ex2) {
-                return false;
-            }
+            redirect = response.parseAnyRedirect();
+        } catch (ParseException ex) {
+            return false;
         }
 
         return redirect.contains("welcome.wi-fi.ru");

@@ -80,12 +80,6 @@
         android:title="@string/pref_user_agent"
         android:summary="@string/pref_user_agent_summary" />
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_mosmetro_midsession"
-        android:title="@string/pref_mosmetro_midsession"
-        android:summary="@string/pref_mosmetro_midsession_summary" />
-
     <PreferenceCategory android:title="@string/pref_category_delays" />
 
     <pw.thedrhax.mosmetro.preferences.RangeBarPreference

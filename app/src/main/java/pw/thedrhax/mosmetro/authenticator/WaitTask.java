@@ -60,5 +60,9 @@ public abstract class WaitTask extends NamedTask {
         tries(timeout / interval); return this;
     }
 
+    protected void stop() {
+        tries(-1);
+    }
+
     public abstract boolean until(HashMap<String, Object> vars);
 }

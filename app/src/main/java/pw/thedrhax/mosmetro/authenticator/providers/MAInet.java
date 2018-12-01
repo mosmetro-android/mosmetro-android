@@ -20,8 +20,6 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 
-import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -30,94 +28,66 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 
 /**
- * The MosMetroV1 class supports the older version of the MosMetro algorithm.
+ * The MAInet class implements support for the public Wi-Fi network of MAI (MAInet_public).
  *
- * Detection: Meta or Location redirect contains "login.wi-fi.ru".
+ * Detection: Meta or Location redirect contains "wifi.mai.ru".
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
  */
 
-public class MosMetroV1 extends Provider {
-    protected String redirect;
+public class MAInet extends Provider {
+    private String redirect = "https://wifi.mai.ru/login.html";
 
-    public MosMetroV1(final Context context, final ParsedResponse res) {
+    public MAInet(Context context, ParsedResponse res) {
         super(context);
 
         /**
          * Checking Internet connection
-         * ⇒ GET http://wi-fi.ru
-         * ⇐ Meta-redirect: http://login.wi-fi.ru/am/UI/Login?... > redirect
+         * ⇒ GET generate_204 < res
+         * ⇐ Meta or Location redirect: https://wifi.mai.ru/login.html?... > redirect
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
                 try {
                     redirect = response.parseAnyRedirect();
+                    Logger.log(Logger.LEVEL.DEBUG, redirect);
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_redirect)
-                    ));
-                    return false;
+                    Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
+
                 return true;
             }
         });
 
         /**
-         * Getting auth page
-         * ⇒ GET http://login.wi-fi.ru/am/UI/Login?... < redirect
-         * ⇐ Form: method="post" action="" > form
-         * If there are two forms, registration is required.
-         */
-        add(new NamedTask(context.getString(R.string.auth_auth_page)) {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                ParsedResponse response;
-
-                try {
-                    response = client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_auth_page)
-                    ));
-                    return false;
-                }
-
-                Elements forms = response.getPageContent().getElementsByTag("form");
-                if (forms.size() > 1) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_not_registered)
-                    ));
-                    vars.put("result", RESULT.NOT_REGISTERED);
-                    return false;
-                }
-                vars.put("form", ParsedResponse.parseForm(forms.first()));
-                return true;
-            }
-        });
-
-        /**
-         * Sending login form
-         * ⇒ POST http://login.wi-fi.ru/am/UI/Login?... < redirect, form
+         * Sending auth form
+         * ⇒ POST https://wifi.mai.ru/login.html < redirect
+         * ⇐ ???
          */
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
-                    HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
-                    client.post(redirect, form, pref_retry_count);
-                    return true;
+                    ParsedResponse response = client.post(redirect, new HashMap<String, String>() {{
+                        put("buttonClicked", "4");
+                        put("err_flag", "0");
+                        put("err_msg", "");
+                        put("info_flag", "0");
+                        put("info_msg", "");
+                        put("redirect_url", "http://google.com/generate_204");
+                        put("network_name", "Guest+Network");
+                        put("username", "MAI");
+                        put("password", "1930");
+                    }}, pref_retry_count);
+
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -125,6 +95,8 @@ public class MosMetroV1 extends Provider {
                     ));
                     return false;
                 }
+
+                return true;
             }
         });
 
@@ -155,8 +127,8 @@ public class MosMetroV1 extends Provider {
      */
     public static boolean match(ParsedResponse response) {
         try {
-            return response.parseAnyRedirect().contains("login.wi-fi.ru");
-        } catch (ParseException ex) {
+            return response.parseAnyRedirect().contains("wifi.mai.ru");
+        } catch (ParseException ex1) {
             return false;
         }
     }

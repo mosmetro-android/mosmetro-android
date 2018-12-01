@@ -215,8 +215,6 @@
     <string name="do_not_warn">Do not warn anymore</string>
     <string name="pref_share_warning">Be careful!</string>
     <string name="pref_share_warning_summary">Connection log may contain sensitive data such as your MAC-address or phone number. Do not send this file to public chats or social networks.</string>
-    <string name="pref_mosmetro_midsession">Try to disable midsession</string>
-    <string name="pref_mosmetro_midsession_summary">Midsession is a random redirect from any HTTP site to advertisement page.</string>
     <string name="pref_delay_always">Apply to all requests</string>
     <string name="pref_delay_always_summary">Add random delay to every request. By default delays are applied only to specific requests.</string>
     <string name="pref_category_delays">Random delays</string>
@@ -232,6 +230,7 @@
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm is required only in Saint Petersburg, but may become required in other regions in the future.</string>
+    <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
 
     <string name="pref_mmv2wv_blacklist_default" translatable="false">.*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>
