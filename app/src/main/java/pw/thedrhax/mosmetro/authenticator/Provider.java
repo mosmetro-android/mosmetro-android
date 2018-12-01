@@ -57,14 +57,11 @@ public abstract class Provider extends LinkedList<Task> {
      * URL used to detect if Captive Portal is present in the current network.
      */
     protected static final String[] GENERATE_204 = {
-            "www.google.ru/generate_204",
-            "www.google.ru/gen_204",
+            "connectivitycheck.android.com/generate_204",
+            "google.ru/generate_204",
+            "google.ru/gen_204",
             "google.com/generate_204",
-            // "www.google.com/generate_204",
             "gstatic.com/generate_204",
-            // "www.gstatic.com/generate_204",
-            // "connectivitycheck.android.com/generate_204",
-            // "connectivitycheck.gstatic.com/generate_204"
             "clients1.google.com/generate_204",
             "maps.google.com/generate_204",
             "mt0.google.com/generate_204",
