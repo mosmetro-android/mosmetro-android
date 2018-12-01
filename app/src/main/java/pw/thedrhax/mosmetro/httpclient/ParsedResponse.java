@@ -204,6 +204,13 @@ public class ParsedResponse {
 
         // <link href="..." />
         for (Element element : document.getElementsByTag("link")) {
+            if (element.hasAttr("rel")) {
+                String rel = element.attr("rel");
+
+                if (!("icon".equals(rel) || "stylesheet".equals(rel)))
+                    continue;
+            }
+
             if (element.hasAttr("href"))
                 links.add(element.attr("href"));
         }
