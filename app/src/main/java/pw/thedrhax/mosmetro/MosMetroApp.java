@@ -28,9 +28,17 @@ import org.acra.data.StringFormat;
 import pw.thedrhax.mosmetro.acra.HockeySenderFactory;
 import pw.thedrhax.util.Logger;
 
+import static org.acra.ReportField.*;
+
 @AcraCore(buildConfigClass = BuildConfig.class,
           reportSenderFactoryClasses = {HockeySenderFactory.class},
-          reportFormat = StringFormat.JSON)
+          reportFormat = StringFormat.JSON,
+          reportContent = {
+                   INSTALLATION_ID, USER_EMAIL, USER_COMMENT, PACKAGE_NAME,
+                   ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG
+          },
+          applicationLogFile = Logger.FILE_LAST_LOG,
+          applicationLogFileLines = 2000)
 public class MosMetroApp extends Application {
 
     @Override

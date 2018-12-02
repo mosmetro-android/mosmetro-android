@@ -42,7 +42,7 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 
 public class Logger {
-    public static final String FILE_LAST_LOG = "last_log.txt";
+    public static final String FILE_LAST_LOG = "last.log";
 
     public enum LEVEL {INFO, DEBUG}
 
