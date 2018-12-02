@@ -42,6 +42,8 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 
 public class Logger {
+    public static final String FILE_LAST_LOG = "last_log.txt";
+
     public enum LEVEL {INFO, DEBUG}
 
     private static final Map<LEVEL,LinkedList<String>> logs = new HashMap<LEVEL,LinkedList<String>>() {{
@@ -63,10 +65,32 @@ public class Logger {
      */
 
     private static boolean logcat = false;
+    private static File last_log = null;
+    private static FileWriter last_log_writer = null;
 
     public static void configure(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         logcat = settings.getBoolean("pref_debug_logcat", false);
+
+        if (settings.getBoolean("pref_debug_last_log", true)) {
+            if (last_log_writer == null) {
+                try {
+                    last_log = new File(context.getFilesDir(), FILE_LAST_LOG);
+                    last_log_writer = new FileWriter(last_log, false);
+                } catch (IOException ignored) {}
+            }
+        } else {
+            if (last_log_writer != null) {
+                try {
+                    last_log_writer.flush();
+                    last_log_writer.close();
+                    last_log_writer = null;
+                    last_log = null;
+                } catch (IOException ignored) {
+                    ignored.printStackTrace();
+                }
+            }
+        }
     }
 
     /*
@@ -80,6 +104,12 @@ public class Logger {
         synchronized (logs) {
             if (logcat && level == LEVEL.DEBUG) {
                 Log.d("pw.thedrhax.mosmetro", message);
+                if (last_log_writer != null) {
+                    try {
+                        last_log_writer.write(message + "\n");
+                        last_log_writer.flush();
+                    } catch (IOException ignored) {}
+                }
             }
             logs.get(level).add(message);
         }
@@ -119,6 +149,13 @@ public class Logger {
             for (LEVEL level : LEVEL.values()) {
                 logs.get(level).clear();
             }
+        }
+        if (last_log != null && last_log_writer != null) {
+            try {
+                last_log_writer.flush();
+                last_log_writer.close();
+                last_log_writer = new FileWriter(last_log, false);
+            } catch (IOException ignored) {}
         }
     }
 

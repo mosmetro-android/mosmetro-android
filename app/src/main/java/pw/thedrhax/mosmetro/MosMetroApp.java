@@ -37,6 +37,9 @@ public class MosMetroApp extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         ACRA.init(this);
-        Logger.configure(base);
+
+        if (!ACRA.isACRASenderServiceProcess()) {
+            Logger.configure(base);
+        }
     }
 }

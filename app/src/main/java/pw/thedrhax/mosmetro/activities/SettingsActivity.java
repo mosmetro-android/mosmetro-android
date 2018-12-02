@@ -207,15 +207,25 @@ public class SettingsActivity extends Activity {
             setTitle(getString(R.string.pref_debug));
             addPreferencesFromResource(R.xml.pref_debug);
 
-            CheckBoxPreference pref_debug_logcat =
-                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
-            pref_debug_logcat.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            Preference.OnPreferenceChangeListener reload_logger = new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    PreferenceManager.getDefaultSharedPreferences(getActivity())
+                            .edit()
+                            .putBoolean(preference.getKey(), (Boolean) newValue)
+                            .apply();
                     Logger.configure(getActivity());
                     return true;
                 }
-            });
+            };
+
+            CheckBoxPreference pref_debug_logcat =
+                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
+            pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
+
+            CheckBoxPreference pref_debug_last_log =
+                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_last_log");
+            pref_debug_last_log.setOnPreferenceChangeListener(reload_logger);
         }
     }
 

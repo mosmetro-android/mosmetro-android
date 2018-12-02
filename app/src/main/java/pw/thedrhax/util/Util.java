@@ -25,8 +25,11 @@ import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public final class Util {
     private Util() {}
@@ -43,5 +46,17 @@ public final class Util {
         } catch (ClassCastException ignored) {}
 
         return def_value;
+    }
+
+    // Source: https://stackoverflow.com/a/13357785
+    public static String streamToString(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        reader.close();
+        return sb.toString();
     }
 }

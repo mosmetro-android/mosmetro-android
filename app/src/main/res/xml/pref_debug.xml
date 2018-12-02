@@ -8,6 +8,12 @@
         android:defaultValue="true" />
 
     <CheckBoxPreference
+        android:key="pref_debug_last_log"
+        android:title="@string/pref_debug_last_log"
+        android:summary="@string/pref_debug_last_log_summary"
+        android:defaultValue="true" />
+
+    <CheckBoxPreference
         android:key="pref_debug_logcat"
         android:title="@string/pref_debug_logcat"
         android:summary="@string/pref_debug_logcat_summary"
