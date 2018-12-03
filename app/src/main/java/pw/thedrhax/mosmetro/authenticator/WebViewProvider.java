@@ -42,42 +42,49 @@ public abstract class WebViewProvider extends Provider {
         super(context);
     }
 
+    private boolean initialized = false;
+
     @Override
     public boolean init() {
         if (!super.init()) return false;
 
-        Intent intent = new Intent(
-                context, WebViewService.class
-        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (!initialized) {
+            Intent intent = new Intent(
+                    context, WebViewService.class
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (!context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
-            Logger.log(this, "Can't connect to WebViewService");
-            deinit();
-            return false;
-        }
-
-        while (wv == null) {
-            SystemClock.sleep(100);
-
-            if (!running.get()) {
+            if (!context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+                Logger.log(this, "Can't connect to WebViewService");
                 deinit();
                 return false;
             }
+
+            while (wv == null) {
+                SystemClock.sleep(100);
+
+                if (!running.get()) {
+                    deinit();
+                    return false;
+                }
+            }
         }
 
+        initialized = true;
         return true;
     }
 
     @Override
     public void deinit() {
-        super.deinit();
-
-        Logger.log(this, "Disconnecting from WebViewService");
-        try {
-            context.unbindService(connection);
-        } catch (IllegalArgumentException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
+        if (initialized) {
+            Logger.log(this, "Disconnecting from WebViewService");
+            try {
+                context.unbindService(connection);
+            } catch (IllegalArgumentException ex) {
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+            }
         }
+
+        super.deinit();
     }
 
     /*

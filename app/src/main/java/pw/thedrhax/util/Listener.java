@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
  *   - Allow to retrieve and change the value of variable at any time
  *   - Notify about every change using the onChange() callback
  *   - Debounce value changes (Source: https://stackoverflow.com/a/38296055)
+ *   - Stack Overflow protection by checking if child is the master at the same time
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @param <T> type of the stored variable
@@ -77,7 +78,12 @@ public class Listener<T> {
         }
 
         for (Listener<T> callback : callbacks) {
-            callback.set(new_value);
+            if (callback.callbacks.contains(this)) {
+                callback.value = new_value;
+                callback.onChange(new_value);
+            } else {
+                callback.set(new_value);
+            }
         }
     }
 
@@ -86,8 +92,12 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
-        master.callbacks.add(this);
-        masters.add(master);
+        if (!master.callbacks.contains(this)) {
+            master.callbacks.add(this);
+        }
+        if (!masters.contains(master)) {
+            masters.add(master);
+        }
         this.value = master.value;
     }
 
