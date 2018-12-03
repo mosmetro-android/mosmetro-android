@@ -144,6 +144,11 @@ public class MosMetroV2mcc extends Provider {
                 Provider provider = (Provider)vars.get("provider");
                 vars.put("switch", provider.getName());
 
+                // Ignore internet connection check in child provider
+                if (provider instanceof MosMetroV2 || provider instanceof MosMetroV2WV) {
+                    provider.removeLast();
+                }
+
                 Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
                 add(indexOf(this) + 1, provider);
                 return true;
@@ -159,8 +164,6 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 ParsedResponse response;
-
-                vars.put("result", RESULT.ERROR); // Reset result after child algorithm
 
                 try {
                     client.followRedirects(false);

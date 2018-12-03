@@ -302,8 +302,9 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
-         * Checking Internet connection
-         * JSON result > status
+         * Checking auth state
+         * ⇒ GET http://auth.wi-fi.ru/auth/check?segment=... < redirect, segment
+         * ⇐ JSON result == true
          */
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
@@ -314,19 +315,39 @@ public class MosMetroV2 extends Provider {
                             null, pref_retry_count
                     ).json();
 
-                    if ((Boolean) response.get("result")) {
-                        Logger.log(context.getString(R.string.auth_connected));
-                        vars.put("result", RESULT.CONNECTED);
-                        return true;
+                    Logger.log(Logger.LEVEL.DEBUG, response.toJSONString());
+
+                    if (!((Boolean) response.get("result"))) {
+                        throw new ParseException("Unexpected answer: false", 0);
                     }
-                } catch (IOException|org.json.simple.parser.ParseException ex) {
+                } catch (IOException|org.json.simple.parser.ParseException|ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return false;
                 }
 
-                Logger.log(context.getString(R.string.error,
-                        context.getString(R.string.auth_error_connection)
-                ));
-                return false;
+                return true;
+            }
+        });
+
+        /**
+         * Checking Internet connection
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (isConnected()) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                    return true;
+                } else {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_connection)
+                    ));
+                    return false;
+                }
             }
         });
     }
