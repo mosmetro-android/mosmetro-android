@@ -115,7 +115,7 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, ParsedResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (MosMetroV3.match(response, settings) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context, response);
+        if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
         else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
