@@ -246,36 +246,33 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * Add child Provider and run all it's Tasks after 'index'
+     * Add child Provider and run all it's Tasks after 'index'.
+     * If parent Provider is already initialized, child will be initialized as well.
+     * @return True if all Tasks are added to master and master.init() returns True
      */
-    public boolean add(int index, Provider provider) {
-        children.add(provider);
-
-        provider.setRunningListener(running)
-                .setCallback(callback)
-                .setClient(client);
-
-        if (initialized) {
-            provider.init();
-        }
-
-        return super.addAll(index, provider);
+    public boolean add(int index, Provider p) {
+        children.add(p.setRunningListener(running).setCallback(callback).setClient(client));
+        return super.addAll(index, p) && (!initialized || init());
     }
 
     /**
-     * Initialize this Provider and it's children
+     * Initialize this Provider and it's children.
+     * Warning: May be called more than once!
      * @return true on success, false on error
      */
     protected boolean init() {
         for (Provider p : children) {
             if (!p.init()) {
-                Logger.log(p, "Initialization failed");
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_algorithm_failure)
+                ));
                 return false;
             }
+            running.subscribe(p.running);
         }
 
         for (Task task : this) {
-            if (task instanceof InterceptorTask) {
+            if (task instanceof InterceptorTask && !client.interceptors.contains(task)) {
                 client.interceptors.add((InterceptorTask) task);
             }
         }
@@ -285,7 +282,8 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
-     * Reverse effect of init()
+     * Reverse effect of init().
+     * Warning: May be called more than once!
      */
     protected void deinit() {
         for (Task task : this) {
@@ -295,6 +293,7 @@ public abstract class Provider extends LinkedList<Task> {
         }
 
         for (Provider p : children) {
+            running.unsubscribe(p.running);
             p.deinit();
         }
 

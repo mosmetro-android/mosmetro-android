@@ -28,6 +28,7 @@ import java.util.List;
  *   - Subscribe to already existing Listeners of the same type
  *   - Allow to retrieve and change the value of variable at any time
  *   - Notify about every change using the onChange() callback
+ *   - Stack Overflow protection by checking if callback is the master
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @param <T> type of the stored variable
@@ -45,7 +46,12 @@ public class Listener<T> {
         onChange(new_value);
         synchronized (callbacks) {
             for (Listener<T> callback : callbacks) {
-                callback.set(new_value);
+                if (callback.callbacks.contains(this)) {
+                    callback.value = new_value;
+                    callback.onChange(new_value);
+                } else {
+                    callback.set(new_value);
+                }
             }
         }
     }
@@ -56,9 +62,19 @@ public class Listener<T> {
 
     public void subscribe(Listener<T> master) {
         synchronized (master.callbacks) {
-            master.callbacks.add(this);
+            if (!master.callbacks.contains(this)) {
+                master.callbacks.add(this);
+            }
         }
         this.value = master.value;
+    }
+
+    public void unsubscribe(Listener<T> master) {
+        synchronized (master.callbacks) {
+            if (master.callbacks.contains(this)) {
+                master.callbacks.remove(this);
+            }
+        }
     }
 
     public void onChange(T new_value) {

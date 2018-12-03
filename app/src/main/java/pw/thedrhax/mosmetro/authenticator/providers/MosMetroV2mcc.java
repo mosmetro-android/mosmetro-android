@@ -145,8 +145,7 @@ public class MosMetroV2mcc extends Provider {
                 vars.put("switch", provider.getName());
 
                 Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                add(indexOf(this) + 1, provider);
-                return true;
+                return add(indexOf(this) + 1, provider);
             }
         });
 
