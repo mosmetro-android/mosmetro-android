@@ -90,24 +90,6 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
-         * Checking if device is not registered
-         * redirect ~= auth.wi-fi.ru/identification?segment=...
-         */
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (redirect.contains(".wi-fi.ru/identification")) {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_not_registered)
-                    ));
-                    vars.put("result", RESULT.NOT_REGISTERED);
-                    return false;
-                }
-                return true;
-            }
-        });
-
-        /**
          * Checking for bad redirect
          * redirect ~= welcome.wi-fi.ru
          */
@@ -165,13 +147,15 @@ public class MosMetroV2 extends Provider {
         /**
          * Async: https://auth.wi-fi.ru/auth
          * - Detect ban (302 redirect to /auto_auth)
+         * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
          */
         add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
-            @Nullable @Override
+            @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
                 ParsedResponse response = client.get(url, null, pref_retry_count);
+                Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 client.followRedirects(true);
                 return response;
             }
@@ -179,7 +163,9 @@ public class MosMetroV2 extends Provider {
             @NonNull @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) {
                 try {
-                    if (response.get300Redirect().contains("auto_auth")) {
+                    String redirect = response.get300Redirect();
+
+                    if (redirect.contains("/auto_auth")) { // banned
                         Logger.log(context.getString(R.string.auth_ban_message));
 
                         // Increase ban counter
@@ -189,6 +175,16 @@ public class MosMetroV2 extends Provider {
 
                         context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
 
+                        running.set(false);
+                        return new ParsedResponse("");
+                    }
+
+                    if (redirect.contains("/identification")) { // not registered
+                        Logger.log(context.getString(R.string.error,
+                                context.getString(R.string.auth_error_not_registered)
+                        ));
+
+                        vars.put("result", RESULT.NOT_REGISTERED);
                         running.set(false);
                         return new ParsedResponse("");
                     }
@@ -233,7 +229,6 @@ public class MosMetroV2 extends Provider {
                             null, pref_retry_count
                     );
                     vars.put("response", response);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
 
                     return true;
                 } catch (IOException ex) {

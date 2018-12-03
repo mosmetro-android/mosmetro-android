@@ -63,6 +63,8 @@ public class HockeySender implements ReportSender {
                "Model: " + report.get(ReportField.PHONE_MODEL.toString()) + '\n' +
                "Date: " + new Date() + '\n' +
                '\n' +
-               report.get(ReportField.STACK_TRACE.toString());
+               report.get(ReportField.STACK_TRACE.toString()) + '\n' +
+               "----\n\n" +
+               report.get(ReportField.APPLICATION_LOG.toString());
     }
 }

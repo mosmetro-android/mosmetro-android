@@ -141,15 +141,17 @@ public class MosMetroV2WV extends WebViewProvider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
-         * * Detect ban (302 redirect to /auto_auth)
-         * * Parse CSRF token
-         * * Insert automation script into response
+         * - Detect ban (302 redirect to /auto_auth)
+         * - Detect if device is not registered in the network (302 redirect to /identification)
+         * - Parse CSRF token
+         * - Insert automation script into response
          */
         add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
                 ParsedResponse response = client.get(url, null, pref_retry_count);
+                Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 client.followRedirects(true);
                 return response;
             }
@@ -157,7 +159,9 @@ public class MosMetroV2WV extends WebViewProvider {
             @NonNull @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 try {
-                    if (response.get300Redirect().contains("auto_auth")) {
+                    String redirect = response.get300Redirect();
+
+                    if (redirect.contains("auto_auth")) {
                         Logger.log(context.getString(R.string.auth_ban_message));
 
                         // Increase ban counter
@@ -167,6 +171,16 @@ public class MosMetroV2WV extends WebViewProvider {
 
                         context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
 
+                        running.set(false);
+                        return new ParsedResponse("");
+                    }
+
+                    if (redirect.contains("/identification")) { // not registered
+                        Logger.log(context.getString(R.string.error,
+                                context.getString(R.string.auth_error_not_registered)
+                        ));
+
+                        vars.put("result", RESULT.NOT_REGISTERED);
                         running.set(false);
                         return new ParsedResponse("");
                     }
