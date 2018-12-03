@@ -38,9 +38,9 @@ import java.util.concurrent.TimeUnit;
  * @param <T> type of the stored variable
  */
 public class Listener<T> {
-    private Listener<T> master = null;
-    private T value;
+    private final Queue<Listener<T>> masters = new ConcurrentLinkedQueue<>();
     private final Queue<Listener<T>> callbacks = new ConcurrentLinkedQueue<>();
+    private T value;
 
     private int debounce_ms = 0;
     private Future<?> last_call = null;
@@ -86,16 +86,23 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
-        unsubscribe();
         master.callbacks.add(this);
-        this.master = master;
+        masters.add(master);
         this.value = master.value;
     }
 
     public void unsubscribe() {
-        if (master != null) {
+        for (Listener<T> master : masters) {
+            unsubscribe(master);
+        }
+    }
+
+    public void unsubscribe(Listener<T> master) {
+        if (master.callbacks.contains(this)) {
             master.callbacks.remove(this);
-            master = null;
+        }
+        if (masters.contains(master)) {
+            masters.remove(master);
         }
     }
 
