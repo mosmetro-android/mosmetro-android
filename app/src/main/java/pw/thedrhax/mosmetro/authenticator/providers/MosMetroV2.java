@@ -151,10 +151,11 @@ public class MosMetroV2 extends Provider {
          * - Parse CSRF token
          */
         add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
-            @Nullable @Override
+            @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
                 ParsedResponse response = client.get(url, null, pref_retry_count);
+                Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 client.followRedirects(true);
                 return response;
             }
@@ -228,7 +229,6 @@ public class MosMetroV2 extends Provider {
                             null, pref_retry_count
                     );
                     vars.put("response", response);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
 
                     return true;
                 } catch (IOException ex) {
