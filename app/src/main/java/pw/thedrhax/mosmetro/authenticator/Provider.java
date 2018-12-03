@@ -318,7 +318,11 @@ public abstract class Provider extends LinkedList<Task> {
         for (int i = 0; i < size(); i++) {
             if (isStopped()) {
                 deinit();
-                return RESULT.INTERRUPTED;
+                if (vars.get("result") != RESULT.ERROR) {
+                    return (RESULT) vars.get("result");
+                } else {
+                    return RESULT.INTERRUPTED;
+                }
             }
 
             progress = (i + 1) * 100 / size();
