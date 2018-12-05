@@ -381,7 +381,7 @@ public class SettingsActivity extends Activity {
                 dialog.show();
     }
 
-    @RequiresApi(27)
+    @RequiresApi(28)
     private void location_permission_setup() {
         Context context = this;
         boolean location_denied = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -554,7 +554,7 @@ public class SettingsActivity extends Activity {
         update_checker_setup();
         if (Build.VERSION.SDK_INT >= 23)
             energy_saving_setup();
-        if (Build.VERSION.SDK_INT >= 27)
+        if (Build.VERSION.SDK_INT >= 28)
             location_permission_setup();
     }
 }
