@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.activities;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -32,8 +31,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -42,11 +39,9 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -383,43 +378,36 @@ public class SettingsActivity extends Activity {
 
     @RequiresApi(28)
     private void location_permission_setup() {
-        Context context = this;
-        boolean location_denied = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_DENIED;
+        final PermissionUtils pu = new PermissionUtils(this);
+
         AlertDialog.Builder dialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.location_permission_saving)
-                .setMessage(R.string.location_permission_saving_summary)
+                .setTitle(R.string.location_permission)
+                .setMessage(R.string.location_permission_saving)
                 .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (location_denied){
-                            ((SettingsActivity) context)
-                                    .requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-                        }
+                        pu.requestCoarseLocation();
                     }
                 })
                 .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent();
-                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
+                        pu.openAppSettings();
                     }
                 })
                 .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         settings.edit()
-                                .putBoolean("pref_location_settings_ignore", true)
+                                .putBoolean("pref_location_ignore", true)
                                 .apply();
                         dialog.dismiss();
                     }
                 });
 
-        if (!settings.getBoolean("pref_location_settings_ignore", false) && location_denied)
-            dialog.show();
+        if (!settings.getBoolean("pref_location_ignore", false))
+            if (!pu.isCoarseLocationGranted())
+                dialog.show();
     }
 
     private void replaceFragment(String id, Fragment fragment) {

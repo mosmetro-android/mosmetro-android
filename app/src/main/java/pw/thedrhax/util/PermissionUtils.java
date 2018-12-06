@@ -18,10 +18,12 @@
 
 package pw.thedrhax.util;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
@@ -29,6 +31,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import pw.thedrhax.mosmetro.BuildConfig;
@@ -50,6 +53,31 @@ public final class PermissionUtils {
             IGNORE_BATTERY_OPTIMIZATION_SETTINGS = new Intent()
                     .setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
         }
+    }
+
+    public void openAppSettings() {
+        try {
+            context.startActivity(new Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.getPackageName(), null)
+            ));
+        } catch (ActivityNotFoundException ex) {
+            Toast.makeText(context, R.string.toast_unsupported_function, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Location permissions
+     */
+
+    public boolean isCoarseLocationGranted() {
+        int p = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+        return p == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @RequiresApi(23)
+    public void requestCoarseLocation() {
+        context.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
     }
 
     /**

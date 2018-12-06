@@ -211,6 +211,6 @@
     <string name="pref_debug_last_log">Хранить последний лог</string>
     <string name="pref_debug_last_log_summary">Лог будет записываться во внутреннее хранилище приложения и отправляться вместе с отчетами ACRA в случае сбоя.</string>
     <string name="auth_algorithm_failure">не удалось инициализировать алгоритм</string>
-    <string name="location_permission_saving">Определение местоположения</string>
-    <string name="location_permission_saving_summary">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на использование местоположения. В противном случае будет работать только ручное подключение</string>
+    <string name="location_permission">Определение местоположения</string>
+    <string name="location_permission_saving">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на определение местоположения. В противном случае будет работать только ручное подключение.</string>
 </resources>
