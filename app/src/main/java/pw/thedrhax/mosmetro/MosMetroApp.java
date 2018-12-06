@@ -38,7 +38,7 @@ import static org.acra.ReportField.*;
                    ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG
           },
           applicationLogFile = Logger.FILE_LAST_LOG,
-          applicationLogFileLines = 2000)
+          applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
 
     @Override
