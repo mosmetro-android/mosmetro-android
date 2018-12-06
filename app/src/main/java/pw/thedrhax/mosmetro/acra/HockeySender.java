@@ -31,6 +31,7 @@ import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
@@ -43,12 +44,17 @@ public class HockeySender implements ReportSender {
 
         try {
             Client client = new OkHttp(context);
-            client.post(url, new HashMap<String, String>() {{
+
+            ParsedResponse res = client.post(url, new HashMap<String, String>() {{
                 put("raw", log);
                 put("userID", (String)report.get(ReportField.INSTALLATION_ID.toString()));
                 put("contact", (String)report.get(ReportField.USER_EMAIL.toString()));
                 put("description", (String)report.get(ReportField.USER_COMMENT.toString()));
             }});
+
+            if (res.getResponseCode() != 201 && res.getResponseCode() != 400) {
+                throw new Exception("Wrong response");
+            }
         } catch (Exception ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             throw new ReportSenderException("Unable to send report", ex);
