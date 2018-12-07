@@ -234,6 +234,8 @@
     <string name="pref_debug_last_log">Store the last log</string>
     <string name="pref_debug_last_log_summary">Log will be written into internal storage of the application. It will be sent along with ACRA reports in case of crash.</string>
     <string name="auth_algorithm_failure">algorithm initialization failed</string>
+    <string name="location_permission">Location permission</string>
+    <string name="location_permission_saving">Starting with Android 9.0, you need to grant location permission to this application, so that it can automatically connect to network. Otherwise, only manual connection will be available.</string>
 
     <string name="pref_mmv2wv_blacklist_default" translatable="false">.*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>

@@ -392,6 +392,40 @@ public class SettingsActivity extends Activity {
                 dialog.show();
     }
 
+    @RequiresApi(28)
+    private void location_permission_setup() {
+        final PermissionUtils pu = new PermissionUtils(this);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.location_permission)
+                .setMessage(R.string.location_permission_saving)
+                .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pu.requestCoarseLocation();
+                    }
+                })
+                .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pu.openAppSettings();
+                    }
+                })
+                .setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settings.edit()
+                                .putBoolean("pref_location_ignore", true)
+                                .apply();
+                        dialog.dismiss();
+                    }
+                });
+
+        if (!settings.getBoolean("pref_location_ignore", false))
+            if (!pu.isCoarseLocationGranted())
+                dialog.show();
+    }
+
     private void replaceFragment(String id, Fragment fragment) {
         try {
             getFragmentManager()
@@ -524,5 +558,7 @@ public class SettingsActivity extends Activity {
         update_checker_setup();
         if (Build.VERSION.SDK_INT >= 23)
             energy_saving_setup();
+        if (Build.VERSION.SDK_INT >= 28)
+            location_permission_setup();
     }
 }
