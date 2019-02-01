@@ -16,47 +16,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function () {
     const MO = window.MutationObserver || window.WebKitMutationObserver;
 
+    const IGNORE = [
+        'img.pixel'
+    ];
+
+    const CLICK = [
+        '.join',
+        '.cross',
+        '.mt-banner-fullscreen__button-close',
+        '.interaction_button__joke',
+        '.interaction_button_quiz',
+        '.interaction_button',
+        '.button_blue'
+    ];
+
     function log(msg) {
-        console.log('MosMetroV2.js | ' + msg)
+        console.log('MosMetroV2.js | ' + msg.replace(/\n/, ''))
     }
 
     function each(query, f) {
         [].forEach.call(document.querySelectorAll(query), f);
     }
 
-    function click(query) {
-        each(query, function(el) {
-            if (el.offsetParent !== null) { /* click only visible elements */
-                log("Click | " + el.outerHTML);
-                el.click();
-            }
+    function click(el) {
+        /* click only visible elements */
+        if (el.offsetParent !== null) {
+            log("Click | " + el.outerHTML);
+            el.click();
+        }
+    }
+
+    function onNodeChange(el) {
+        if (el.matches(IGNORE)) {
+            return;
+        }
+
+        if (el.matches(CLICK)) {
+            setTimeout(function () { click(el); }, 500);
+        }
+
+        el.querySelectorAll(CLICK).forEach(function (child) {
+            setTimeout(function () { click(child); }, 500);
         });
     }
 
     function onMutation(ml, o) {
-        /* Log all childList mutations for debugging */
-        ml.forEach(function(m) {
-            if (m.type == 'childList') {
-                m.addedNodes.forEach(function(n) {
-                    if (n.outerHTML !== undefined) {
-                        log('Mutation | ' + n.outerHTML);
-                    }
-                });
+        ml.forEach(function (m) {
+            if (m.target.outerHTML !== undefined) {
+                log('Mutation (' + m.type + ') | ' + m.target.outerHTML);
             }
+            onNodeChange(m.target);
         });
 
-        click('.join');
-      	click('.cross');
-        click('.mt-banner-fullscreen__button-close');
-        click('.interaction_button__joke');
-        click('.interaction_button_quiz');
-        click('.interaction_button');
-        click('.button_blue');
-
-        each('video', function(el) {
+        each('video', function (el) {
             el.pause();
         });
     }
@@ -71,8 +86,6 @@
         attributes: true,
         subtree: true
     });
-
-    onMutation(); /* In case if Observer is loaded too late */
 
     log('Loaded successfully');
 })()
