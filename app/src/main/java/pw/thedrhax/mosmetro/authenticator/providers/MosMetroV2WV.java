@@ -198,8 +198,9 @@ public class MosMetroV2WV extends WebViewProvider {
                     ));
                 }
 
-                Element script = response.getPageContent().body().appendElement("script");
-                script.text(Util.readAsset(context, "MosMetroV2.js"));
+                String mosmetro_js = Util.readAsset(context, "MosMetroV2.js");
+                mosmetro_js = "<script>" + mosmetro_js + "</script>";
+                response.getPageContent().body().append(mosmetro_js);
 
                 return response;
             }
