@@ -43,7 +43,8 @@
 
     function click(el) {
         /* click only visible elements */
-        if (el.offsetParent !== null) {
+        var style = window.getComputedStyle(el);
+        if (el.offsetParent !== null && style.visibility != 'hidden') {
             log("Click | " + el.outerHTML);
             el.click();
         }
