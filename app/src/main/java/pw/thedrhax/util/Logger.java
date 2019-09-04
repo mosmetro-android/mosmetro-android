@@ -32,6 +32,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -119,7 +120,12 @@ public class Logger {
     }
 
     public static void log (LEVEL level, Throwable ex) {
-        log(level, Log.getStackTraceString(ex));
+        // getStackTraceString ignores DNS errors
+        if (ex instanceof UnknownHostException) {
+            log(level, ex.toString());
+        } else {
+            log(level, Log.getStackTraceString(ex));
+        }
     }
 
     public static void log (String message) {
