@@ -111,6 +111,7 @@ dependencies {
         exclude module: 'junit'
     }
     implementation 'com.edmodo:rangebar:1.0.0'
+    implementation 'dnsjava:dnsjava:2.1.9'
 }
 
 /*
