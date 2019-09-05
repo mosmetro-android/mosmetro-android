@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -89,6 +90,13 @@ public class WifiUtils {
     // Get main Wi-Fi state
     public boolean isEnabled() {
         return wm.isWifiEnabled();
+    }
+
+    // Get Private DNS state (API 28+)
+    public boolean isPrivateDnsActive() {
+        if (Build.VERSION.SDK_INT < 28) return false;
+        LinkProperties props = cm.getLinkProperties(getNetwork());
+        return props.isPrivateDnsActive();
     }
 
     // Get Network by type

@@ -57,14 +57,22 @@ import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
+    private WifiUtils wifi;
     private Call last_call = null;
 
     public OkHttp(Context context) {
         super(context);
-        client = new OkHttpClient.Builder()
-                .cookieJar(new InterceptedCookieJar())
-                .dns(DnsClient.INSTANCE)
-                .build();
+        wifi = new WifiUtils(context);
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.cookieJar(new InterceptedCookieJar());
+
+        if (wifi.isPrivateDnsActive()) {
+            builder.dns(DnsClient.INSTANCE);
+        }
+
+        client = builder.build();
+
         configure();
     }
 
@@ -182,7 +190,7 @@ public class OkHttp extends Client {
         }
 
         if (context != null && context.getApplicationContext() != null) {
-            new WifiUtils(context).bindToWifi();
+            wifi.bindToWifi();
         }
 
         last_call = client.newCall(builder.build());
