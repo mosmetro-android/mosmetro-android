@@ -95,7 +95,10 @@ public class WifiUtils {
     // Get Private DNS state (API 28+)
     public boolean isPrivateDnsActive() {
         if (Build.VERSION.SDK_INT < 28) return false;
-        LinkProperties props = cm.getLinkProperties(getNetwork());
+        Network network = getNetwork();
+        if (network == null) return false;
+        LinkProperties props = cm.getLinkProperties(network);
+        if (props == null) return false; // MiUI
         return props.isPrivateDnsActive();
     }
 
