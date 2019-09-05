@@ -118,10 +118,12 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                if (!pref_notify_foreground &&
-                        !settings.getBoolean("pref_notify_success", true)) {
+                boolean enabled = !pref_notify_foreground;
+                enabled &= !settings.getBoolean("pref_notify_success", true);
+
+                if (enabled || from_debug) {
                     notify.hide();
-                    return;
+                    break;
                 }
 
                 if (settings.getBoolean("pref_notify_success_lock", true)) {
@@ -174,13 +176,17 @@ public class ConnectionService extends IntentService {
                               R.drawable.ic_notification_register)
                         .enabled(!from_debug && settings.getBoolean("pref_notify_fail", false))
                         .id(2).locked(false).show();
+                break;
+
+            case INTERRUPTED: // impossible, but IDE thinks otherwise
+                notify.hide();
+                break;
         }
 
         notify // return to defaults
                 .id(1)
                 .cancelOnClick(false)
-                .locked(pref_notify_foreground)
-                .enabled(!from_shortcut);
+                .locked(pref_notify_foreground);
     }
 
     private boolean waitForIP() {
@@ -251,18 +257,16 @@ public class ConnectionService extends IntentService {
             Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
             from_debug = true;
-            notify.enabled(false);
         } else if (intent.getBooleanExtra("force", false)) {
             Logger.log(this, "Started from shortcut");
             from_shortcut = true;
             from_debug = false;
-            notify.enabled(true);
         } else {
             Logger.log(this, "Started by system");
             from_shortcut = false;
             from_debug = false;
-            notify.enabled(true);
         }
+
         SSID = wifi.getSSID(intent);
 
         if (!running.get() && lock.isLocked()) {
