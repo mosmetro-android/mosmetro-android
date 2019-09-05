@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'androidsvgdrawable'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 71
         versionName "1.9"
@@ -105,14 +105,12 @@ task svgToDrawablePng(type: SvgDrawableTask) {
 }
 
 dependencies {
-    def acraVersion = '5.0.2'
-    compile "ch.acra:acra-core:$acraVersion"
-
     // Runtime dependencies.
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-annotations:25.4.0'
-    compile 'com.android.support:appcompat-v7:25.4.0'
-    compile 'com.android.support:recyclerview-v7:25.4.0'
+    compile 'com.android.support:support-annotations:28.0.0'
+    compile 'com.android.support:appcompat-v7:28.0.0'
+    compile 'com.android.support:recyclerview-v7:28.0.0'
+    compile "ch.acra:acra-core:5.0.2"
     compile 'com.squareup.okhttp3:okhttp:3.11.0'
     compile 'org.jsoup:jsoup:1.8.3'
     compile ('com.googlecode.json-simple:json-simple:1.1.1') {
@@ -125,6 +123,6 @@ dependencies {
 
     // Needed because there is a conflict in 'com.android.support.test:runner' package.
     // Here we explicitly define the version for the 'androidTest' sources build variant.
-    androidTestCompile 'com.android.support:support-annotations:25.4.0'
+    androidTestCompile 'com.android.support:support-annotations:28.0.0'
     androidTestCompile 'com.android.support.test:runner:1.0.2'
 }
