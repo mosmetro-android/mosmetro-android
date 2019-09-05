@@ -7,3 +7,8 @@ gradle
 gradlew
 gradlew.bat
 *.iml
+**/.classpath
+.settings
+.project
+bin
+.vscode

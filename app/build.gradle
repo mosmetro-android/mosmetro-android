@@ -128,3 +128,34 @@ dependencies {
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
+
+/*
+ * Compatibility with Eclipse and Visual Studio Code
+ */
+
+apply plugin: 'com.greensopinion.gradle-android-eclipse'
+apply plugin: 'eclipse'
+
+buildscript {
+    dependencies {
+        classpath fileTree(dir: 'libs', includes: ['gradle-android-eclipse-1.1.1.jar'])
+    }
+}
+
+// https://github.com/greensopinion/gradle-android-eclipse/issues/9
+configurations {
+    eclipseConfig.extendsFrom implementation
+    eclipseTestConfig.extendsFrom testImplementation
+}
+
+eclipse {
+    classpath {
+        plusConfigurations += [
+            configurations.compile,
+            configurations.testCompile,
+            configurations.eclipseConfig,
+            configurations.eclipseTestConfig,
+        ]
+        downloadSources = true
+    }
+}
