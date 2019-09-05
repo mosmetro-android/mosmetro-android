@@ -3,11 +3,12 @@ apply plugin: 'androidsvgdrawable'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
         minSdkVersion 14
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 25
         versionCode 71
         versionName "1.9"
@@ -34,10 +35,11 @@ android {
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
 
-        jackOptions { // For ACRA
-            enabled true
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -81,15 +83,15 @@ android {
                 exclude 'test/**'
             }
         }
-
-        lintOptions {
-            abortOnError false
-        }
     }
 
     compileOptions { // For ACRA
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -106,23 +108,23 @@ task svgToDrawablePng(type: SvgDrawableTask) {
 
 dependencies {
     // Runtime dependencies.
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-annotations:28.0.0'
-    compile 'com.android.support:appcompat-v7:28.0.0'
-    compile 'com.android.support:recyclerview-v7:28.0.0'
-    compile "ch.acra:acra-core:5.0.2"
-    compile 'com.squareup.okhttp3:okhttp:3.11.0'
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile ('com.googlecode.json-simple:json-simple:1.1.1') {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation "ch.acra:acra-core:5.0.2"
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'org.jsoup:jsoup:1.8.3'
+    implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
-    compile 'com.edmodo:rangebar:1.0.0'
+    implementation 'com.edmodo:rangebar:1.0.0'
 
     // Test dependencies.
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 
     // Needed because there is a conflict in 'com.android.support.test:runner' package.
     // Here we explicitly define the version for the 'androidTest' sources build variant.
-    androidTestCompile 'com.android.support:support-annotations:28.0.0'
-    androidTestCompile 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
