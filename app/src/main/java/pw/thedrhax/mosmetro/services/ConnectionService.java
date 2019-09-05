@@ -99,9 +99,12 @@ public class ConnectionService extends IntentService {
             }
         };
 
+        Intent debug = new Intent(this, DebugActivity.class);
+        debug.putExtra(DebugActivity.INTENT_VIEW_ONLY, true);
+
         notify.id(1)
-                .onClick(PendingIntent.getActivity(this, 1,
-                        new Intent(this, DebugActivity.class),
+                .onClick(PendingIntent.getActivity(
+                        this, 1, debug,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 ))
                 .onDelete(stop_intent)
@@ -131,7 +134,6 @@ public class ConnectionService extends IntentService {
                 }
 
                 if (from_shortcut) {
-                    // TODO: Do not start connection in DebugActivity after click on this notification
                     // TODO: Auto cancel this notification after 30 seconds
                     notify.id(2) // protect this notification from removing
                             .cancelOnClick(true)

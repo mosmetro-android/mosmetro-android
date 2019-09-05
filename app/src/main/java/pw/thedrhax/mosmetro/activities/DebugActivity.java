@@ -49,6 +49,8 @@ import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
 public class DebugActivity extends Activity {
+    public static final String INTENT_VIEW_ONLY = "view_only";
+
     // UI Elements
     private RecyclerView text_messages;
     private LogAdapter text_messages_adapter;
@@ -104,7 +106,14 @@ public class DebugActivity extends Activity {
             }
         };
 
-        if (!ConnectionService.isRunning()) {
+        Intent intent = getIntent();
+
+        boolean view_only = false;
+        if (intent != null) {
+            view_only = intent.getBooleanExtra(INTENT_VIEW_ONLY, false);
+        }
+
+        if (!ConnectionService.isRunning() && !view_only){
             button_connect(null);
         }
     }
