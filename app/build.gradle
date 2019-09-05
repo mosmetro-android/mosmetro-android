@@ -33,8 +33,6 @@ android {
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -70,17 +68,11 @@ android {
     }
 
     sourceSets {
-        // Test sources.
-        test.java.srcDir 'src/test/java'
-        androidTest.java.srcDir 'src/androidTest/java'
-
         main {
             res.srcDirs = ['src/main/res', 'build/generated/res/main']
             jniLibs.srcDirs = ['libs']
             java {
                 srcDir 'src'
-                exclude 'androidTest/**'
-                exclude 'test/**'
             }
         }
     }
@@ -119,14 +111,6 @@ dependencies {
         exclude module: 'junit'
     }
     implementation 'com.edmodo:rangebar:1.0.0'
-
-    // Test dependencies.
-    testImplementation 'junit:junit:4.12'
-
-    // Needed because there is a conflict in 'com.android.support.test:runner' package.
-    // Here we explicitly define the version for the 'androidTest' sources build variant.
-    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
 
 /*
