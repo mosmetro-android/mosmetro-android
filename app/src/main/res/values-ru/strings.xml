@@ -213,4 +213,5 @@
     <string name="auth_algorithm_failure">не удалось инициализировать алгоритм</string>
     <string name="location_permission">Определение местоположения</string>
     <string name="location_permission_saving">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на определение местоположения. В противном случае будет работать только ручное подключение.</string>
+    <string name="log_wipe_confirmation">Очистить файл лога?</string>
 </resources>

@@ -187,8 +187,22 @@ public class DebugActivity extends Activity {
                 return true;
 
             case R.id.action_clear:
-                Logger.wipe();
-                text_messages_adapter.refresh();
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.log_wipe_confirmation)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Logger.wipe();
+                                text_messages_adapter.refresh();
+                            }
+                        })
+                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        })
+                        .show();
                 return true;
 
             default:
