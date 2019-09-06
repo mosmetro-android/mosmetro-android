@@ -42,6 +42,7 @@ import javax.net.ssl.X509TrustManager;
 import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.Dns;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -64,14 +65,9 @@ public class OkHttp extends Client {
         super(context);
         wifi = new WifiUtils(context);
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.cookieJar(new InterceptedCookieJar());
-
-        if (wifi.isPrivateDnsActive()) {
-            builder.dns(DnsClient.INSTANCE);
-        }
-
-        client = builder.build();
+        client = new OkHttpClient.Builder()
+                .cookieJar(new InterceptedCookieJar())
+                .build();
 
         configure();
     }
@@ -159,6 +155,23 @@ public class OkHttp extends Client {
                 .followRedirects(follow)
                 .followSslRedirects(follow)
                 .build();
+
+        return this;
+    }
+
+    @Override
+    public Client customDnsEnabled(boolean enabled) {
+        Dns dns;
+
+        if (enabled && wifi.isPrivateDnsActive()) {
+            dns = DnsClient.INSTANCE;
+        } else {
+            dns = Dns.SYSTEM;
+        }
+
+        client = client.newBuilder()
+                 .dns(dns)
+                 .build();
 
         return this;
     }

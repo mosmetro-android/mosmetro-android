@@ -177,7 +177,10 @@ public abstract class Provider extends LinkedList<Task> {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.random = new Randomizer(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        setClient(new OkHttp(context));
+        this.client = new OkHttp(context)
+                .customDnsEnabled(true)
+                .setRunningListener(running)
+                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
     }
 
     /**
@@ -189,9 +192,10 @@ public abstract class Provider extends LinkedList<Task> {
         Randomizer random  = new Randomizer(context);
 
         Client client = new OkHttp(context)
+                .customDnsEnabled(true)
+                .setRunningListener(running)
                 .trustAllCerts()
-                .followRedirects(false)
-                .setRunningListener(running);
+                .followRedirects(false);
 
         ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 
@@ -359,9 +363,7 @@ public abstract class Provider extends LinkedList<Task> {
      * Replace default Client
      */
     public Provider setClient(Client client) {
-        this.client = client
-                .setRunningListener(running)
-                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
+        this.client = client.setRunningListener(running);
         return this;
     }
 
