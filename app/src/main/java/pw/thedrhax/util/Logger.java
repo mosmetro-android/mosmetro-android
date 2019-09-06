@@ -29,7 +29,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -65,33 +67,51 @@ public class Logger {
      * Configuration
      */
 
-    private static boolean logcat = false;
-    private static File last_log = null;
-    private static FileWriter last_log_writer = null;
+    private static boolean pref_debug_logcat = false;
+    private static File log_file = null;
+    private static FileWriter log_writer = null;
+
+    private static void init_writer(Context context) {
+        log_file = new File(context.getFilesDir(), FILE_LAST_LOG);
+
+        LinkedList<String> history = new LinkedList<>();
+        if (log_file.exists()) {
+            try (FileReader is = new FileReader(log_file)) {
+                BufferedReader reader = new BufferedReader(is);
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    history.add(line);
+                }
+            } catch (IOException ignored) {}
+
+            // Trim to 1000 lines
+            if (history.size() > 1000) {
+                int start = history.size() - 1000, end = history.size();
+                history = (LinkedList<String>) history.subList(start, end);
+            }
+        }
+
+        wipe(); // replaces or initializes the writer
+
+        // Restore last log
+        synchronized(logs) {
+            for (String line : history) {
+                LEVEL level = line.startsWith("[+") ? LEVEL.DEBUG : LEVEL.INFO;
+                logs.get(level).add(line);
+            }
+        }
+    }
 
     public static void configure(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        logcat = settings.getBoolean("pref_debug_logcat", false);
+        pref_debug_logcat = settings.getBoolean("pref_debug_logcat", false);
 
-        if (settings.getBoolean("pref_debug_last_log", true)) {
-            if (last_log_writer == null) {
-                try {
-                    last_log = new File(context.getFilesDir(), FILE_LAST_LOG);
-                    last_log_writer = new FileWriter(last_log, false);
-                } catch (IOException ignored) {}
-            }
-        } else {
-            if (last_log_writer != null) {
-                try {
-                    last_log_writer.flush();
-                    last_log_writer.close();
-                    last_log_writer = null;
-                    last_log = null;
-                } catch (IOException ignored) {
-                    ignored.printStackTrace();
-                }
-            }
+        if (log_writer == null) {
+            init_writer(context);
         }
+
+        log(LEVEL.DEBUG, "Logger initialized");
     }
 
     /*
@@ -103,20 +123,18 @@ public class Logger {
             message = timestamp() + " " + message;
         }
         synchronized (logs) {
-            if (logcat && level == LEVEL.DEBUG) {
+            if (pref_debug_logcat && level == LEVEL.DEBUG) {
                 Log.d("pw.thedrhax.mosmetro", message);
-                if (last_log_writer != null) {
-                    try {
-                        last_log_writer.write(message + "\n");
-                        last_log_writer.flush();
-                    } catch (IOException ignored) {}
-                }
+            }
+            if (log_writer != null) {
+                try {
+                    log_writer.write(message + "\n");
+                    log_writer.flush();
+                } catch (IOException ignored) {}
             }
             logs.get(level).add(message);
         }
-        for (Callback callback : callbacks.values()) {
-            callback.call(level, message);
-        }
+        onUpdate(level, message);
     }
 
     public static void log (LEVEL level, Throwable ex) {
@@ -156,13 +174,18 @@ public class Logger {
                 logs.get(level).clear();
             }
         }
-        if (last_log != null && last_log_writer != null) {
-            try {
-                last_log_writer.flush();
-                last_log_writer.close();
-                last_log_writer = new FileWriter(last_log, false);
-            } catch (IOException ignored) {}
-        }
+
+        try {
+            if (log_writer != null) {
+                log_writer.flush();
+                log_writer.close();
+                log_writer = null;
+            }
+
+            if (log_file != null) {
+                log_writer = new FileWriter(log_file, false);
+            }
+        } catch (IOException ignored) {}
     }
 
     /*
@@ -300,5 +323,11 @@ public class Logger {
      */
     public static Callback getCallback(Object key) {
         return callbacks.get(key);
+    }
+
+    private static void onUpdate(LEVEL level, String message) {
+        for (Callback callback : callbacks.values()) {
+            callback.call(level, message);
+        }
     }
 }

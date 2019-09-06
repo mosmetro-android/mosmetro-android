@@ -222,10 +222,6 @@ public class SettingsActivity extends Activity {
             CheckBoxPreference pref_debug_logcat =
                     (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
             pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
-
-            CheckBoxPreference pref_debug_last_log =
-                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_last_log");
-            pref_debug_last_log.setOnPreferenceChangeListener(reload_logger);
         }
     }
 
