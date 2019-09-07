@@ -70,6 +70,11 @@ public class DnsClient implements Dns {
 
         Record[] res = req.run();
         List<InetAddress> result = new LinkedList<>();
+
+        if (res == null || res.length == 0) {
+            throw new UnknownHostException(hostname);
+        }
+
         for (Record record : res) {
             if (record instanceof ARecord) {
                 result.add(((ARecord) record).getAddress());
