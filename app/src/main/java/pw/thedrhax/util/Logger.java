@@ -39,6 +39,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class Logger {
     private static void init_writer(Context context) {
         log_file = new File(context.getFilesDir(), FILE_LAST_LOG);
 
-        LinkedList<String> history = new LinkedList<>();
+        List<String> history = new LinkedList<>();
         if (log_file.exists()) {
             try (FileReader is = new FileReader(log_file)) {
                 BufferedReader reader = new BufferedReader(is);
@@ -88,7 +89,7 @@ public class Logger {
             // Trim to 1000 lines
             if (history.size() > 1000) {
                 int start = history.size() - 1000, end = history.size();
-                history = (LinkedList<String>) history.subList(start, end);
+                history = history.subList(start, end);
             }
         }
 
