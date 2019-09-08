@@ -100,7 +100,14 @@ public class Logger {
             for (String line : history) {
                 LEVEL level = line.startsWith("[+") ? LEVEL.DEBUG : LEVEL.INFO;
                 logs.get(level).add(line);
+                try {
+                    if (log_writer != null) log_writer.write(line + "\n");
+                } catch (IOException ignored) {}
             }
+
+            try {
+                if (log_writer != null) log_writer.flush();
+            } catch (IOException ignored) {}
         }
     }
 
