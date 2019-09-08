@@ -26,6 +26,7 @@
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
     <string name="about">About</string>
+    <string name="log">Log</string>
 
     <string name="pref_category_main">Main preferences</string>
     <string name="pref_category_connection">Connection preferences</string>
@@ -103,6 +104,9 @@
     <string name="manual_connection">Manual connection</string>
     <string name="manual_connection_summary">You can connect here if this application is ignoring Wi-Fi state</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
+
+    <string name="view_log">View log</string>
+    <string name="view_log_summary">Press here to view logs of previous runs.</string>
 
     <string name="shortcut_background">Connect in the background</string>
     <string name="shortcut_force">Even if network name is unknown</string>

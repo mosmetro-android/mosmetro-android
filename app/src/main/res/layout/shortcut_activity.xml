@@ -25,6 +25,15 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="@string/view_log"
+        android:id="@+id/check_log"
+        android:layout_weight="0"
+        android:layout_margin="5dp"
+        android:onClick="check_log" />
+
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:text="@string/stop"
         android:id="@+id/check_stop"
         android:layout_weight="0"
