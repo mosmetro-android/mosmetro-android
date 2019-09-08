@@ -164,7 +164,7 @@ public class OkHttp extends Client {
         Dns dns;
 
         if (enabled && wifi.isPrivateDnsActive()) {
-            dns = DnsClient.INSTANCE;
+            dns = new DnsClient();
         } else {
             dns = Dns.SYSTEM;
         }

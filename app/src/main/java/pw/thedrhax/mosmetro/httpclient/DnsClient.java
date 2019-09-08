@@ -34,8 +34,6 @@ import okhttp3.Dns;
 import pw.thedrhax.util.Logger;
 
 public class DnsClient implements Dns {
-    public static final DnsClient INSTANCE = new DnsClient();
-
     private SimpleResolver dns = null;
 
     public DnsClient(String hostname) {
