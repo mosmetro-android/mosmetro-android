@@ -37,7 +37,7 @@ import static org.acra.ReportField.*;
                    INSTALLATION_ID, USER_EMAIL, USER_COMMENT, PACKAGE_NAME,
                    ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG
           },
-          applicationLogFile = Logger.FILE_LAST_LOG,
+          applicationLogFile = "log-debug.txt",
           applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
 
