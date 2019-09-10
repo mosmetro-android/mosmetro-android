@@ -54,17 +54,21 @@ import pw.thedrhax.util.Util;
 
 public abstract class Provider extends LinkedList<Task> {
     /**
-     * URL used to detect if Captive Portal is present in the current network.
+     * URLs used to detect if Captive Portal is present in the current network.
      */
-    protected static final String[] GENERATE_204 = {
+
+    protected static final String[] GENERATE_204_HTTP = {
+        "connectivitycheck.gstatic.com/generate_204"
+        // "www.google.com/generate_204",
+        // "www.gstatic.com/generate_204",
+        // "connectivitycheck.android.com/generate_204"
+    };
+
+    protected static final String[] GENERATE_204_HTTPS = {
             "www.google.ru/generate_204",
             "www.google.ru/gen_204",
             "google.com/generate_204",
-            // "www.google.com/generate_204",
             "gstatic.com/generate_204",
-            // "www.gstatic.com/generate_204",
-            // "connectivitycheck.android.com/generate_204",
-            // "connectivitycheck.gstatic.com/generate_204"
             "clients1.google.com/generate_204",
             "maps.google.com/generate_204",
             "mt0.google.com/generate_204",
@@ -196,8 +200,8 @@ public abstract class Provider extends LinkedList<Task> {
         ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
 
         try {
-            String url = "http://" + random.choose(GENERATE_204);
-            Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | URL: " + url);
+            String url = "http://" + random.choose(GENERATE_204_HTTP);
+            Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | HTTP: " + url);
             response = client.get(url, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -206,7 +210,9 @@ public abstract class Provider extends LinkedList<Task> {
         if (response.getResponseCode() != 204) return response;
 
         try {
-            response = client.get("https://" + random.choose(GENERATE_204), null);
+            String url = "https://" + random.choose(GENERATE_204_HTTPS);
+            Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | HTTPS: " + url);
+            response = client.get(url, null);
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return response;
