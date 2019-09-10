@@ -19,6 +19,34 @@
 (function () {
     const MO = window.MutationObserver || window.WebKitMutationObserver;
 
+    /* https://stackoverflow.com/a/4588211 */
+    function fullPath(el) {
+        var names = [];
+        while (el.parentNode) {
+            if (el.id) {
+                names.unshift('#' + el.id);
+            } else {
+                if (el == el.ownerDocument.documentElement) {
+                    names.unshift(el.tagName.toLowerCase());
+                } else {
+                    var sel = el.tagName.toLowerCase();
+                    var siblings = Array.apply([], el.parentElement.children).filter(function (e) {
+                        return e.tagName == el.tagName;
+                    }).length;
+                    if (el.className) {
+                        sel += "." + el.className.replace(/\s+/g, '.');
+                    } else if (siblings > 1) {
+                        for (var c = 1, e = el; e.previousElementSibling; e = e.previousElementSibling, c++);
+                        sel += ":nth-child(" + c + ")";
+                    }
+                    names.unshift(sel);
+                }
+            }
+            el = el.parentNode;
+        }
+        return names.join(" > ");
+    }
+
     const IGNORE = [
         'img.pixel'
     ];
@@ -45,7 +73,7 @@
         /* click only visible elements */
         var style = window.getComputedStyle(el);
         if (el.offsetParent !== null && style.visibility != 'hidden') {
-            log("Click | " + el.outerHTML);
+            log("Click | " + fullPath(el));
             el.click();
         }
     }
@@ -67,7 +95,13 @@
     function onMutation(ml, o) {
         ml.forEach(function (m) {
             if (m.target.outerHTML !== undefined) {
-                log('Mutation (' + m.type + ') | ' + m.target.outerHTML);
+                if (m.type == 'attributes') {
+                    log('Mutation (' + m.type + ') | ' + fullPath(m.target) +
+                        ' | "' + m.attributeName + '": "' + m.oldValue + '" > "' +
+                        m.target.getAttribute(m.attributeName) + '"');
+                } else {
+                    log('Mutation (' + m.type + ') | ' + fullPath(m.target));
+                }
             }
             onNodeChange(m.target);
         });
@@ -85,8 +119,9 @@
     o.observe(document.body, {
         childList: true,
         attributes: true,
-        subtree: true
+        subtree: true,
+        attributeOldValue: true
     });
 
     log('Loaded successfully');
-})()
+})();
