@@ -21,7 +21,9 @@ package pw.thedrhax.mosmetro.httpclient;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
 import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 
@@ -34,20 +36,29 @@ import okhttp3.Dns;
 import pw.thedrhax.util.Logger;
 
 public class DnsClient implements Dns {
-    private SimpleResolver dns = null;
+    private ExtendedResolver dns = null;
 
-    public DnsClient(String hostname) {
+    public DnsClient() {
         try {
-            dns = new SimpleResolver(hostname);
-            Logger.log(this, "Custom resolver initialized: " + dns.getAddress());
+            dns = new ExtendedResolver();
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Initialized: ");
+            boolean first = true;
+            for (Resolver resolver : dns.getResolvers()) {
+                if (!(resolver instanceof SimpleResolver)) continue;
+                if (first) {
+                    first = false;
+                } else {
+                    msg.append(", ");
+                }
+                msg.append(((SimpleResolver) resolver).getAddress());
+            }
+            Logger.log(this, msg.toString());
         } catch (UnknownHostException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             Logger.log(this, "Unable to initialize custom resolver");
         }
-    }
-
-    public DnsClient() {
-        this(null);
     }
 
     @Override
