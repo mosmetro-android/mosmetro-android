@@ -26,6 +26,9 @@
     <string name="about">О программе</string>
     <string name="log">Лог</string>
 
+    <string name="form_login">Логин:</string>
+    <string name="form_password">Пароль:</string>
+
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
     <string name="pref_category_connection_summary">Настройки автоматического фонового подключения</string>
@@ -127,6 +130,9 @@
         нормально работать.\n Примечание: Разработчик этого приложения не имеет никакого отношения к регистрации.
         Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).
     </string>
+    <string name="auth_error_mainet_credentials">
+        Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"Настройки MAInet\" в меню \"Настройки подключения\".
+    </string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
     <string name="auth_error_provider_unsupported" formatted="false">
@@ -210,6 +216,9 @@
     <string name="pref_debug">Отладка</string>
     <string name="pref_debug_summary">Автоматические отчёты, LogCat, и т.д.</string>
     <string name="pref_mosmetro_v3_summary">Этот алгоритм необходим для подключения только в Санкт-Петербурге, но в будущем может стать необходимым и в других регионах.</string>
+    <string name="pref_mainet_summary">Этот алгоритм используется для авторизации в сети MAInet_public Московского авиационного института.</string>
+    <string name="pref_mainet_credentials">Настройки MAInet</string>
+    <string name="pref_mainet_credentials_summary">Здесь вы можете настроить данные для входа в сеть MAInet_public.</string>
     <string name="auth_error_regex" formatted="false">не удалось скомпилировать RegEx: %s</string>
     <string name="auth_algorithm_continue" formatted="false">Переключаюсь обратно на алгоритм %s</string>
     <string name="pref_debug_last_log">Отправлять последний лог</string>
