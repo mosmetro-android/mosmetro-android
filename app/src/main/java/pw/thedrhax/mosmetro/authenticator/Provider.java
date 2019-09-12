@@ -194,7 +194,7 @@ public abstract class Provider extends LinkedList<Task> {
         try {
             return client.get(url, null);
         } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
+            Logger.log(Logger.LEVEL.DEBUG, ex.toString());
             return null;
         }
     }
@@ -258,13 +258,13 @@ public abstract class Provider extends LinkedList<Task> {
         state.append('[');
         state.append(unrel.getResponseCode()).append(", ");
         if (rel_https == null) {
-            state.append("\"null\"");
+            state.append("null");
         } else {
             state.append(rel_https.getResponseCode());
         }
         state.append(", ");
         if (rel_http == null) {
-            state.append("\"null\"");
+            state.append("null");
         } else {
             state.append(rel_http.getResponseCode());
         }
