@@ -5,15 +5,30 @@
         android:enabled="true"
         android:icon="@drawable/ic_launcher"
         android:shortcutShortLabel="@string/connect">
+
         <intent android:action="android.intent.action.VIEW"
                 android:targetPackage="pw.thedrhax.mosmetro"
                 android:targetClass="pw.thedrhax.mosmetro.activities.DebugActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="log"
+        android:enabled="true"
+        android:icon="@drawable/ic_launcher"
+        android:shortcutShortLabel="@string/log">
+
+        <intent android:action="android.intent.action.VIEW"
+                android:targetPackage="pw.thedrhax.mosmetro"
+                android:targetClass="pw.thedrhax.mosmetro.activities.DebugActivity">
+
+            <extra android:name="view_only" android:value="true" />
+        </intent>
     </shortcut>
     <shortcut
         android:shortcutId="service"
         android:enabled="true"
         android:icon="@drawable/ic_launcher"
         android:shortcutShortLabel="@string/in_background">
+
         <intent android:action="android.intent.action.VIEW"
                 android:targetPackage="pw.thedrhax.mosmetro"
                 android:targetClass="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity">
@@ -26,6 +41,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_launcher"
         android:shortcutShortLabel="@string/stop">
+
         <intent android:action="android.intent.action.VIEW"
             android:targetPackage="pw.thedrhax.mosmetro"
             android:targetClass="pw.thedrhax.mosmetro.activities.ConnectionServiceActivity">

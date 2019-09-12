@@ -29,6 +29,7 @@ import pw.thedrhax.mosmetro.R;
 public class ShortcutDialog extends Activity {
     private CheckBox check_background;
     private CheckBox check_force;
+    private CheckBox check_log;
     private CheckBox check_stop;
 
     @Override
@@ -38,25 +39,33 @@ public class ShortcutDialog extends Activity {
 
         check_background = (CheckBox)findViewById(R.id.check_background);
         check_force = (CheckBox)findViewById(R.id.check_force);
+        check_log = (CheckBox)findViewById(R.id.check_log);
         check_stop = (CheckBox)findViewById(R.id.check_stop);
     }
 
     public void check_background(View view) {
         boolean checked = check_background.isChecked();
         check_force.setEnabled(checked);
+        check_log.setEnabled(!checked);
+        check_stop.setEnabled(!checked);
 
-        if (!checked)
+        if (!checked) {
             check_force.setChecked(false);
+        }
+    }
+
+    public void check_log(View view) {
+        boolean checked = check_log.isChecked();
+        check_force.setEnabled(!checked);
+        check_background.setEnabled(!checked);
+        check_stop.setEnabled(!checked);
     }
 
     public void check_stop(View view) {
         boolean checked = check_stop.isChecked();
+        check_force.setEnabled(!checked);
+        check_log.setEnabled(!checked);
         check_background.setEnabled(!checked);
-
-        if (checked) {
-            check_background.setChecked(false);
-            check_background(check_background);
-        }
     }
 
     private String getShortcutName() {
@@ -64,6 +73,8 @@ public class ShortcutDialog extends Activity {
             return getString(R.string.in_background);
         } else if (check_stop.isChecked()) {
             return getString(R.string.stop);
+        } else if (check_log.isChecked()) {
+            return getString(R.string.log);
         } else {
             return getString(R.string.connect);
         }
@@ -82,7 +93,8 @@ public class ShortcutDialog extends Activity {
 
         Intent shortcut_intent = new Intent(this, getActivityClass())
                 .putExtra("force", check_force.isChecked())
-                .putExtra("stop", check_stop.isChecked());
+                .putExtra("stop", check_stop.isChecked())
+                .putExtra("view_only", check_log.isChecked());
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);
         result.putExtra(Intent.EXTRA_SHORTCUT_NAME, getShortcutName());

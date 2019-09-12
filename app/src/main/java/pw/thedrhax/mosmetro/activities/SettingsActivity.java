@@ -55,6 +55,7 @@ import org.acra.ACRA;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
 import pw.thedrhax.util.Listener;
@@ -183,6 +184,21 @@ public class SettingsActivity extends Activity {
                     return true;
                 }
             });
+
+            PreferenceScreen screen = getPreferenceScreen();
+
+            final CheckBoxPreference pref_mainet = (CheckBoxPreference)
+                    screen.findPreference("pref_mainet");
+            final LoginFormPreference pref_mainet_creds = (LoginFormPreference)
+                    screen.findPreference("pref_mainet_credentials");
+            pref_mainet_creds.setEnabled(pref_mainet.isChecked());
+            pref_mainet.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    pref_mainet_creds.setEnabled((Boolean) newValue);
+                    return true;
+                }
+            });
         }
     }
 
@@ -238,10 +254,6 @@ public class SettingsActivity extends Activity {
             CheckBoxPreference pref_debug_logcat =
                     (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
             pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
-
-            CheckBoxPreference pref_debug_last_log =
-                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_last_log");
-            pref_debug_last_log.setOnPreferenceChangeListener(reload_logger);
         }
     }
 

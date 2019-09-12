@@ -74,6 +74,17 @@ public class MAInet extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                String login = settings.getString("pref_mainet_credentials_login", "");
+                String password = settings.getString("pref_mainet_credentials_password", "");
+
+                if (login.isEmpty() || password.isEmpty()) {
+                    Logger.log(context.getString(R.string.error, 
+                            context.getString(R.string.auth_error_mainet_credentials)
+                    ));
+                    vars.put("result", RESULT.ERROR);
+                    return false;
+                }
+
                 try {
                     ParsedResponse response = client.post(redirect, new HashMap<String, String>() {{
                         put("buttonClicked", "4");
@@ -83,8 +94,8 @@ public class MAInet extends Provider {
                         put("info_msg", "");
                         put("redirect_url", "http://google.com/generate_204");
                         put("network_name", "Guest+Network");
-                        put("username", "MAI");
-                        put("password", "1930");
+                        put("username", login);
+                        put("password", password);
                     }}, pref_retry_count);
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());

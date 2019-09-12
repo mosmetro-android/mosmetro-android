@@ -19,6 +19,8 @@
 package pw.thedrhax.mosmetro.acra;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import org.acra.ReportField;
@@ -39,7 +41,7 @@ import pw.thedrhax.util.Version;
 public class HockeySender implements ReportSender {
     @Override
     public void send(@NonNull Context context, @NonNull CrashReportData report) throws ReportSenderException {
-        String log = createCrashLog(report);
+        String log = createCrashLog(context, report);
         String url = "https://rink.hockeyapp.net/api/2/apps/" + BuildConfig.HOCKEYAPP_ID + "/crashes";
 
         try {
@@ -61,7 +63,10 @@ public class HockeySender implements ReportSender {
         }
     }
 
-    private String createCrashLog(CrashReportData report) {
+    private String createCrashLog(Context context, CrashReportData report) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean send_log = settings.getBoolean("pref_debug_last_log", true);
+
         return "Package: " + report.get(ReportField.PACKAGE_NAME.toString()) + '\n' +
                "Version: " + Version.getFormattedVersion() + '\n' +
                "Android: " + report.get(ReportField.ANDROID_VERSION.toString()) + '\n' +
@@ -71,6 +76,6 @@ public class HockeySender implements ReportSender {
                '\n' +
                report.get(ReportField.STACK_TRACE.toString()) + '\n' +
                "----\n\n" +
-               report.get(ReportField.APPLICATION_LOG.toString());
+               (send_log ? report.get(ReportField.APPLICATION_LOG.toString()) : "log disabled");
     }
 }

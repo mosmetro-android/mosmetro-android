@@ -26,6 +26,10 @@
     <string name="clipboard_copy">Text copied to clipboard</string>
     <string name="screen_clear">Clear screen</string>
     <string name="about">About</string>
+    <string name="log">Log</string>
+
+    <string name="form_login">Login:</string>
+    <string name="form_password">Password:</string>
 
     <string name="pref_category_main">Main preferences</string>
     <string name="pref_category_connection">Connection preferences</string>
@@ -104,6 +108,9 @@
     <string name="manual_connection_summary">You can connect here if this application is ignoring Wi-Fi state</string>
     <string name="manual_connection_shortcut">Create shortcut</string>
 
+    <string name="view_log">View log</string>
+    <string name="view_log_summary">Press here to view logs of previous runs.</string>
+
     <string name="shortcut_background">Connect in the background</string>
     <string name="shortcut_force">Even if network name is unknown</string>
 
@@ -131,6 +138,9 @@
         It is only required the first time, after that application will work normally.\n
         Disclaimer: This application developer has nothing to do with registration.
         Registration is required by MaximaTelecom ISP (http://maximatelecom.ru).
+    </string>
+    <string name="auth_error_mainet_credentials">
+        Login and password are required to connect to this network. Please check \"MAInet settings\" in \"Connection settings\" menu.
     </string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
@@ -230,12 +240,17 @@
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm is required only in Saint Petersburg, but may become required in other regions in the future.</string>
+    <string name="pref_mainet">MAInet (wifi.mai.ru)</string>
+    <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
+    <string name="pref_mainet_credentials">MAInet settings</string>
+    <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
     <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
-    <string name="pref_debug_last_log">Store the last log</string>
-    <string name="pref_debug_last_log_summary">Log will be written into internal storage of the application. It will be sent along with ACRA reports in case of crash.</string>
+    <string name="pref_debug_last_log">Send the last log</string>
+    <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>
     <string name="auth_algorithm_failure">algorithm initialization failed</string>
     <string name="location_permission">Location permission</string>
     <string name="location_permission_saving">Starting with Android 9.0, you need to grant location permission to this application, so that it can automatically connect to network. Otherwise, only manual connection will be available.</string>
+    <string name="log_wipe_confirmation">Clear log file?</string>
 
     <string name="pref_mmv2wv_blacklist_default" translatable="false">.*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>

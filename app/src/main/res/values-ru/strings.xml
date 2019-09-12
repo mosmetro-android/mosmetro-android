@@ -24,6 +24,10 @@
     <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
     <string name="screen_clear">Очистить экран</string>
     <string name="about">О программе</string>
+    <string name="log">Лог</string>
+
+    <string name="form_login">Логин:</string>
+    <string name="form_password">Пароль:</string>
 
     <string name="pref_category_main">Основные настройки</string>
     <string name="pref_category_connection">Настройки подключения</string>
@@ -94,6 +98,9 @@
     <string name="manual_connection_summary">Вы можете подключиться здесь, если приложение игнорирует состояние Wi-Fi</string>
     <string name="manual_connection_shortcut">Создать ярлык</string>
 
+    <string name="view_log">Посмотреть лог</string>
+    <string name="view_log_summary">Нажмите сюда, чтобы посмотреть логи предыдущих запусков.</string>
+
     <string name="shortcut_background">Подключаться в фоне</string>
     <string name="shortcut_force">Даже если название сети неизвестно</string>
 
@@ -122,6 +129,9 @@
         дальнейшими инструкциями. Это необходимо сделать только один раз, после чего приложение начнет
         нормально работать.\n Примечание: Разработчик этого приложения не имеет никакого отношения к регистрации.
         Регистрацией, как и самой сетью, занимается компания МаксимаТелеком (http://maximatelecom.ru).
+    </string>
+    <string name="auth_error_mainet_credentials">
+        Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"Настройки MAInet\" в меню \"Настройки подключения\".
     </string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
@@ -210,10 +220,14 @@
     <string name="pref_mosmetro_v3_summary">Этот алгоритм необходим для подключения только в Санкт-Петербурге, но в будущем может стать необходимым и в других регионах.</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (бета)</string>
     <string name="pref_mosmetro_v2wv_summary">Расширение алгоритма MosMetroV2, использующее браузер в фоновом режиме для ускоренного просмотра рекламы с целью избежания блокировок.</string>
+    <string name="pref_mainet_summary">Этот алгоритм используется для авторизации в сети MAInet_public Московского авиационного института.</string>
+    <string name="pref_mainet_credentials">Настройки MAInet</string>
+    <string name="pref_mainet_credentials_summary">Здесь вы можете настроить данные для входа в сеть MAInet_public.</string>
     <string name="auth_algorithm_continue" formatted="false">Переключаюсь обратно на алгоритм %s</string>
-    <string name="pref_debug_last_log">Хранить последний лог</string>
-    <string name="pref_debug_last_log_summary">Лог будет записываться во внутреннее хранилище приложения и отправляться вместе с отчетами ACRA в случае сбоя.</string>
+    <string name="pref_debug_last_log">Отправлять последний лог</string>
+    <string name="pref_debug_last_log_summary">Лог будет отправляться вместе с отчетами ACRA в случае сбоя.</string>
     <string name="auth_algorithm_failure">не удалось инициализировать алгоритм</string>
     <string name="location_permission">Определение местоположения</string>
     <string name="location_permission_saving">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на определение местоположения. В противном случае будет работать только ручное подключение.</string>
+    <string name="log_wipe_confirmation">Очистить файл лога?</string>
 </resources>

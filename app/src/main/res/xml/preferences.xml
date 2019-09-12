@@ -14,6 +14,15 @@
     </Preference>
 
     <Preference
+        android:title="@string/view_log"
+        android:summary="@string/view_log_summary">
+
+        <intent android:action="pw.thedrhax.mosmetro.activities.DebugActivity">
+            <extra android:name="view_only" android:value="true" />
+        </intent>
+    </Preference>
+
+    <Preference
         android:key="pref_shortcut"
         android:title="@string/manual_connection_shortcut"
         android:summary="@string/manual_connection_shortcut_summary">
