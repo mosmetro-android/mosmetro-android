@@ -355,15 +355,6 @@ public class WebViewService extends Service {
         }
 
         @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-            if (settings.getBoolean("pref_trust_all_certs", false)) {
-                handler.proceed();
-            } else {
-                super.onReceivedSslError(view, handler, error);
-            }
-        }
-
-        @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             Logger.log(this, "onPageStarted(" + url + ")");

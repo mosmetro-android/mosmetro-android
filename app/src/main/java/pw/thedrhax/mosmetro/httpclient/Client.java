@@ -74,14 +74,8 @@ public abstract class Client {
 
     public Client configure() {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
-
         setHeader(HEADER_USER_AGENT, random.cached_useragent());
         setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-
-        if (settings.getBoolean("pref_trust_all_certs", false)) {
-            trustAllCerts();
-        }
-
         return this;
     }
 

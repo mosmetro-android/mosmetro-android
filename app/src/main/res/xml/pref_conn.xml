@@ -109,13 +109,6 @@
         android:summary="@string/pref_delay_always_summary"
         android:defaultValue="false" />
 
-    <PreferenceCategory android:title="pref_webview" />
-
-    <CheckBoxPreference
-        android:key="pref_trust_all_certs"
-        android:title="pref_trust_all_certs"
-        android:defaultValue="false" />
-
     <PreferenceCategory android:title="MosMetroV2WV" />
 
     <EditTextPreference
