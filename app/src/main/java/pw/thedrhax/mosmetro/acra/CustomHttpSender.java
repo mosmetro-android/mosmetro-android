@@ -25,16 +25,15 @@ class CustomHttpSender extends HttpSender {
     @Override
     public void send(Context context, CrashReportData report) throws ReportSenderException {
         JSONObject build_config = (JSONObject) report.get(ReportField.BUILD_CONFIG.toString());
+        if (build_config == null) return;
 
         try {
-            if (build_config != null) {
-                Object branch = build_config.get("BRANCH_NAME");
-                Object build = build_config.get("BUILD_NUMBER");
+            Object branch = build_config.get("BRANCH_NAME");
+            Object build = build_config.get("BUILD_NUMBER");
 
-                if (branch != null && build != null) {
-                    report.put(ReportField.APP_VERSION_NAME, branch.toString() + " #" + build.toString());
-                    report.put(ReportField.APP_VERSION_CODE, Integer.parseInt(build.toString()));
-                }
+            if (branch != null && build != null) {
+                report.put(ReportField.APP_VERSION_NAME, branch.toString() + " #" + build.toString());
+                report.put(ReportField.APP_VERSION_CODE, Integer.parseInt(build.toString()));
             }
         } catch (JSONException|NumberFormatException ignored) {}
 
