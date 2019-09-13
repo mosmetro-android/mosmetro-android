@@ -140,26 +140,9 @@ public abstract class Provider extends LinkedList<Task> {
      * @return          New Provider instance.
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Logger.log(context.getString(R.string.auth_provider_check));
-
         ParsedResponse response = generate_204(context, running, true);
         Provider result = Provider.find(context, response);
-
-        if (result instanceof Unknown && response.getResponseCode() != 204) {
-            Logger.log(Logger.LEVEL.DEBUG, response.toString());
-            Logger.log(context.getString(R.string.error,
-                    context.getString(R.string.auth_error_provider)
-            ));
-            Logger.log(context.getString(R.string.auth_provider_assume));
-
-            if (settings.getBoolean("pref_mosmetro_v3", true)) {
-                return new MosMetroV3(context, response);
-            } else {
-                return new MosMetroV2(context, response);
-            }
-        }
-
         return result;
     }
 
