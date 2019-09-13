@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.edmodo:rangebar:1.0.0'
 
     // ACRA
-    def acraVersion = '5.0.2'
+    def acraVersion = '5.4.0'
     implementation "ch.acra:acra-core:$acraVersion"
     implementation "ch.acra:acra-http:$acraVersion"
 }
