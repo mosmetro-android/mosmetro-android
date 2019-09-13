@@ -27,6 +27,8 @@ import org.acra.ReportField;
 import org.acra.data.CrashReportData;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +38,6 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.Version;
 
 public class HockeySender implements ReportSender {
     @Override
@@ -67,8 +68,24 @@ public class HockeySender implements ReportSender {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         boolean send_log = settings.getBoolean("pref_debug_last_log", true);
 
+        String version = "unknown";
+        try {
+            JSONObject build_config = (JSONObject) report.get(ReportField.BUILD_CONFIG.toString());
+
+            if (build_config != null) {
+                Object branch = build_config.get("BRANCH_NAME");
+                Object build = build_config.get("BUILD_NUMBER");
+
+                if (branch != null && build != null) {
+                    version = branch.toString() + " #" + build.toString();
+                }
+            }
+        } catch (JSONException ignored) {}
+
+        System.out.println(version);
+
         return "Package: " + report.get(ReportField.PACKAGE_NAME.toString()) + '\n' +
-               "Version: " + Version.getFormattedVersion() + '\n' +
+               "Version: " + version + '\n' +
                "Android: " + report.get(ReportField.ANDROID_VERSION.toString()) + '\n' +
                "Manufacturer: " + android.os.Build.MANUFACTURER + '\n' +
                "Model: " + report.get(ReportField.PHONE_MODEL.toString()) + '\n' +

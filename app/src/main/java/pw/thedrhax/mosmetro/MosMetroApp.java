@@ -34,8 +34,9 @@ import static org.acra.ReportField.*;
           reportSenderFactoryClasses = {HockeySenderFactory.class},
           reportFormat = StringFormat.JSON,
           reportContent = {
-                   INSTALLATION_ID, USER_EMAIL, USER_COMMENT, PACKAGE_NAME,
-                   ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG
+                   INSTALLATION_ID, USER_EMAIL, USER_COMMENT, BUILD_CONFIG,
+                   PACKAGE_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE,
+                   APPLICATION_LOG
           },
           applicationLogFile = "log-debug.txt",
           applicationLogFileLines = 1000)
