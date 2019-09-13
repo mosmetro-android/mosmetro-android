@@ -214,9 +214,9 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Async: Block loading of https://wi-fi.ru but send request anyway
+         * Async: Block loading of https://(spb.)wi-fi.ru but send request anyway
          */
-        add(new InterceptorTask(this, "https?://wi-fi\\.ru/.*") {
+        add(new InterceptorTask(this, "https?://(spb.)?wi-fi\\.ru/.*") {
             @NonNull @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 return new ParsedResponse("");
