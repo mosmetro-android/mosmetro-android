@@ -152,6 +152,8 @@ public class OkHttp extends Client {
     }
 
     private Response call(String url, RequestBody data) throws IOException {
+        interrupt();
+
         Request.Builder builder = new Request.Builder().url(url);
 
         // Choose appropriate request method
@@ -211,6 +213,7 @@ public class OkHttp extends Client {
                             MediaType.parse(params.get("type")), params.get("body")
                     )));
         }
+
         return null;
     }
 

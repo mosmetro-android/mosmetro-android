@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -188,6 +189,7 @@ public abstract class Client {
             }
         }.run(tries);
     }
+
     public ParsedResponse post(final String link, final Map<String,String> params,
                        int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
@@ -200,6 +202,7 @@ public abstract class Client {
             }
         }.run(tries);
     }
+
     public ParsedResponse post(final String link, final String type, final String body,
                                int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
@@ -244,6 +247,12 @@ public abstract class Client {
         running.subscribe(master); return this;
     }
 
+    protected void interrupt() throws InterruptedIOException {
+        if (!running.get()) {
+            throw new InterruptedIOException();
+        }
+    }
+
     private abstract class RetryOnException<T> {
         T run(int tries) throws IOException {
             IOException last_ex;
@@ -252,23 +261,24 @@ public abstract class Client {
                 return body();
             } catch (IOException ex) {
                 last_ex = ex;
+
                 for (int i = 2; i <= tries; i++) {
-                    if (running.get()) {
-                        Logger.log(Logger.LEVEL.DEBUG, ex.toString());
-                        Logger.log(Client.this,
-                                "Retrying request (try " + i + " out of " + tries + ")"
-                        );
+                    Logger.log(Logger.LEVEL.DEBUG, ex.toString());
 
-                        SystemClock.sleep(1000);
+                    // Wait 1 second
+                    for (int j = 0; i < 10; i++) {
+                        interrupt();
+                        SystemClock.sleep(100);
+                    }
 
-                        try {
-                            return body();
-                        } catch (IOException ex1) {
-                            last_ex = ex1;
-                        }
-                    } else {
-                        Logger.log(Client.this, "Giving up (interrupted)");
-                        break;
+                    Logger.log(Client.this,
+                            "Retrying request (try " + i + " out of " + tries + ")"
+                    );
+
+                    try {
+                        return body();
+                    } catch (IOException ex1) {
+                        last_ex = ex1;
                     }
                 }
             }
