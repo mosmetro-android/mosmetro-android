@@ -31,6 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLException;
+
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -264,6 +266,10 @@ public abstract class Client {
 
                 for (int i = 2; i <= tries; i++) {
                     Logger.log(Logger.LEVEL.DEBUG, ex.toString());
+
+                    if (last_ex instanceof SSLException) {
+                        throw last_ex;
+                    }
 
                     // Wait 1 second
                     for (int j = 0; i < 10; i++) {
