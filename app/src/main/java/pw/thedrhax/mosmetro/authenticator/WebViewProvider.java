@@ -74,11 +74,15 @@ public abstract class WebViewProvider extends Provider {
     public void deinit() {
         if (initialized) {
             Logger.log(this, "Disconnecting from WebViewService");
+
             try {
                 context.unbindService(connection);
             } catch (IllegalArgumentException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
             }
+
+            wv = null;
+            initialized = false;
         }
 
         super.deinit();
@@ -104,10 +108,7 @@ public abstract class WebViewProvider extends Provider {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            if (wv != null) {
-                wv.getRunningListener().unsubscribe();
-                wv = null;
-            }
+            wv = null;
         }
     };
 }

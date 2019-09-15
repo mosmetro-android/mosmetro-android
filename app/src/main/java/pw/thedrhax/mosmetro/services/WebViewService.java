@@ -173,7 +173,6 @@ public class WebViewService extends Service {
         if (view != null && wm != null) {
             wm.removeView(view);
         }
-        running.set(false);
     }
 
     public void get(final String url) {
@@ -401,5 +400,12 @@ public class WebViewService extends Service {
     @Nullable @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        running.unsubscribe();
+        running.set(false);
+        return false;
     }
 }
