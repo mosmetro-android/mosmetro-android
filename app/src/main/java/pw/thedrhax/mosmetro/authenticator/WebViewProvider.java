@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.SystemClock;
 
 import pw.thedrhax.mosmetro.services.WebViewService;
 import pw.thedrhax.util.Logger;
@@ -60,9 +59,7 @@ public abstract class WebViewProvider extends Provider {
             }
 
             while (wv == null) {
-                SystemClock.sleep(100);
-
-                if (!running.get()) {
+                if (!running.sleep(100)) {
                     deinit();
                     return false;
                 }
