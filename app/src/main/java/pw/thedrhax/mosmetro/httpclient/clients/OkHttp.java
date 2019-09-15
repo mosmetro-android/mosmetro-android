@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -152,6 +153,8 @@ public class OkHttp extends Client {
     }
 
     private Response call(String url, RequestBody data) throws IOException {
+        if (!running.get()) throw new InterruptedIOException();
+
         Request.Builder builder = new Request.Builder().url(url);
 
         // Choose appropriate request method
@@ -211,6 +214,7 @@ public class OkHttp extends Client {
                             MediaType.parse(params.get("type")), params.get("body")
                     )));
         }
+
         return null;
     }
 

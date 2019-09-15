@@ -20,15 +20,17 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.SSLException;
 
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.util.Listener;
@@ -191,31 +193,39 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return get(link, params);
             }
         }.run(tries);
     }
+
     public ParsedResponse post(final String link, final Map<String,String> params,
                        int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return post(link, params);
             }
         }.run(tries);
     }
+
     public ParsedResponse post(final String link, final String type, final String body,
                                int tries) throws IOException {
         return new RetryOnException<ParsedResponse>() {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return post(link, type, body);
             }
@@ -261,23 +271,26 @@ public abstract class Client {
                 return body();
             } catch (IOException ex) {
                 last_ex = ex;
+
                 for (int i = 2; i <= tries; i++) {
-                    if (running.get()) {
-                        Logger.log(Logger.LEVEL.DEBUG, ex.toString());
-                        Logger.log(Client.this,
-                                "Retrying request (try " + i + " out of " + tries + ")"
-                        );
+                    Logger.log(Logger.LEVEL.DEBUG, ex.toString());
 
-                        SystemClock.sleep(1000);
+                    if (last_ex instanceof SSLException) {
+                        throw last_ex;
+                    }
 
-                        try {
-                            return body();
-                        } catch (IOException ex1) {
-                            last_ex = ex1;
-                        }
-                    } else {
-                        Logger.log(Client.this, "Giving up (interrupted)");
-                        break;
+                    if (!running.sleep(1000)) {
+                        throw new InterruptedIOException();
+                    }
+
+                    Logger.log(Client.this,
+                            "Retrying request (try " + i + " out of " + tries + ")"
+                    );
+
+                    try {
+                        return body();
+                    } catch (IOException ex1) {
+                        last_ex = ex1;
                     }
                 }
             }

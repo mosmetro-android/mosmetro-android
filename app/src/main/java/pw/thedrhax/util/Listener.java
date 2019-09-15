@@ -25,6 +25,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import android.os.SystemClock;
+
 /**
  * Util class used to monitor every change of the stored variable.
  *
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  *   - Allow to retrieve and change the value of variable at any time
  *   - Notify about every change using the onChange() callback
  *   - Debounce value changes (Source: https://stackoverflow.com/a/38296055)
+ *   - Interruptible delays
  *   - Stack Overflow protection by checking if child is the master at the same time
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
@@ -88,6 +91,33 @@ public class Listener<T> {
     }
 
     public final T get() {
+        return value;
+    }
+
+    /**
+     * Delay execution for N milliseconds, but return as quick as possible if stored
+     * value has changed.
+     * 
+     * @param ms Number of milliseconds to delay for.
+     * @return Stored value.
+     */
+    public T sleep(int ms) {
+        T initial_value = value;
+
+        while (ms > 0) {
+            if (ms > 100) {
+                SystemClock.sleep(100);
+                ms -= 100;
+            } else {
+                SystemClock.sleep(ms);
+                ms = 0;
+            }
+
+            if (value != initial_value) {
+                return value;
+            }
+        }
+
         return value;
     }
 

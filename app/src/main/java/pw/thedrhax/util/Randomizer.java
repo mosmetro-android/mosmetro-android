@@ -21,7 +21,6 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
 import java.security.SecureRandom;
@@ -48,19 +47,11 @@ public class Randomizer {
         }
     }
 
-    public void delay(Listener<Boolean> running) {
+    public boolean delay(Listener<Boolean> running) {
         double a = (delay_max + delay_min) / 2;
         double s = Math.sqrt((delay_max - a)) / 3;
         int delay = (int) ((random.nextGaussian() * s + a) * 1000);
-
-        while (delay >= 100 && running.get()) {
-            delay -= 100;
-            SystemClock.sleep(100);
-        }
-
-        if (delay > 0 && running.get()) {
-            SystemClock.sleep(delay);
-        }
+        return running.sleep(delay);
     }
 
     // grep download.php access.log | grep -Eo '(Mozilla|Opera)[^"]*' | \

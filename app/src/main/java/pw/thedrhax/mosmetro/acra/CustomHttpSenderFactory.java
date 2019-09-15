@@ -20,12 +20,15 @@ package pw.thedrhax.mosmetro.acra;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import pw.thedrhax.mosmetro.BuildConfig;
 
 import org.acra.config.CoreConfiguration;
+import org.acra.data.StringFormat;
 import org.acra.sender.ReportSender;
 import org.acra.sender.ReportSenderFactory;
+import org.acra.sender.HttpSender.Method;
 
-public class HockeySenderFactory implements ReportSenderFactory {
+public class CustomHttpSenderFactory implements ReportSenderFactory {
 
     @Override
     public boolean enabled(@NonNull CoreConfiguration coreConfiguration) {
@@ -35,6 +38,11 @@ public class HockeySenderFactory implements ReportSenderFactory {
     @NonNull
     @Override
     public ReportSender create(@NonNull Context context, @NonNull CoreConfiguration config) {
-        return new HockeySender();
+        return new CustomHttpSender(
+                config,
+                Method.POST,
+                StringFormat.JSON, 
+                "https://collector.tracepot.com/" + BuildConfig.TRACEPOT_ID
+        );
     }
 }

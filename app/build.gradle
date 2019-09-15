@@ -20,7 +20,7 @@ android {
         resValue "string", "build_branch_name", "\"$branch_name\""
 
         // ACRA Config
-        buildConfigField "String", "HOCKEYAPP_ID", "\"0305e2d4732d4ef9856c40b03b68426b\""
+        buildConfigField "String", "TRACEPOT_ID", "\"7c36f095\""
 
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
@@ -104,13 +104,17 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation "ch.acra:acra-core:5.0.2"
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
         exclude module: 'junit'
     }
     implementation 'com.edmodo:rangebar:1.0.0'
+
+    // ACRA
+    def acraVersion = '5.4.0'
+    implementation "ch.acra:acra-core:$acraVersion"
+    implementation "ch.acra:acra-http:$acraVersion"
 }
 
 /*
