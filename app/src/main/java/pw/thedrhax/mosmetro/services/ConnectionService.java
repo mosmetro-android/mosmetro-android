@@ -224,12 +224,13 @@ public class ConnectionService extends IntentService {
 
         do {
             if (count > 0) {
-                notify.text(String.format("%s (%s)",
+                String msg = String.format("%s (%s)",
                                 getString(R.string.notification_progress_waiting),
                                 getString(R.string.try_out_of, count + 1, pref_retry_count)
-                        ))
-                        .progress(0, true)
-                        .show();
+                );
+
+                Logger.log(msg);
+                notify.text(msg).progress(0, true).show();
 
                 if (!running.sleep(pref_retry_delay)) {
                     result = Provider.RESULT.INTERRUPTED;
@@ -315,6 +316,8 @@ public class ConnectionService extends IntentService {
             sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                     .putExtra("RUNNING", false)
             );
+
+            Logger.date("<<< ");
         } else {
             Logger.log(this, "Already running");
         }
