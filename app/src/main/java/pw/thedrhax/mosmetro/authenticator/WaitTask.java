@@ -18,8 +18,6 @@
 
 package pw.thedrhax.mosmetro.authenticator;
 
-import android.os.SystemClock;
-
 import java.util.HashMap;
 
 public abstract class WaitTask extends NamedTask {
@@ -39,11 +37,9 @@ public abstract class WaitTask extends NamedTask {
                 return true;
             }
 
-            if (!p.running.get()) {
+            if (!p.running.sleep(interval)) {
                 return false;
             }
-
-            SystemClock.sleep(interval);
         }
         return false;
     }

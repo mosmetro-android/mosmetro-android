@@ -20,7 +20,6 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
@@ -185,7 +184,9 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return get(link, params);
             }
@@ -198,7 +199,9 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return post(link, params);
             }
@@ -211,7 +214,9 @@ public abstract class Client {
             @Override
             public ParsedResponse body() throws IOException {
                 if (random_delays) {
-                    random.delay(running);
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
                 }
                 return post(link, type, body);
             }
@@ -249,12 +254,6 @@ public abstract class Client {
         running.subscribe(master); return this;
     }
 
-    protected void interrupt() throws InterruptedIOException {
-        if (!running.get()) {
-            throw new InterruptedIOException();
-        }
-    }
-
     private abstract class RetryOnException<T> {
         T run(int tries) throws IOException {
             IOException last_ex;
@@ -271,10 +270,8 @@ public abstract class Client {
                         throw last_ex;
                     }
 
-                    // Wait 1 second
-                    for (int j = 0; i < 10; i++) {
-                        interrupt();
-                        SystemClock.sleep(100);
+                    if (!running.sleep(1000)) {
+                        throw new InterruptedIOException();
                     }
 
                     Logger.log(Client.this,
