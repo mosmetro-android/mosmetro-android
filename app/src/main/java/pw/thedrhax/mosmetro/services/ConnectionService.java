@@ -315,6 +315,8 @@ public class ConnectionService extends IntentService {
             sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                     .putExtra("RUNNING", false)
             );
+
+            Logger.date("<<< ");
         } else {
             Logger.log(this, "Already running");
         }
