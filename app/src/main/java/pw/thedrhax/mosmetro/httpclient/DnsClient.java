@@ -67,8 +67,6 @@ public class DnsClient implements Dns {
             return Dns.SYSTEM.lookup(hostname);
         }
 
-        SimpleResolver dns = new SimpleResolver();
-
         Lookup req;
         try {
             req = new Lookup(hostname, Type.A);
