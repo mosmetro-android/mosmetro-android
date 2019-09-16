@@ -25,6 +25,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import pw.thedrhax.mosmetro.services.WebViewService;
+import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -73,7 +74,9 @@ public abstract class WebViewProvider extends Provider {
     @Override
     public void deinit() {
         if (initialized) {
-            Logger.log(this, "Disconnecting from WebViewService");
+            Logger.log(this, "Stopping WebViewService");
+
+            Listener<Boolean> destroyed = wv.onDestroyListener();
 
             try {
                 context.unbindService(connection);
@@ -81,8 +84,12 @@ public abstract class WebViewProvider extends Provider {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
             }
 
+            while (running.sleep(50) && !destroyed.sleep(50));
+
             wv = null;
             initialized = false;
+
+            Logger.log(this, "WebViewService disconnected");
         }
 
         super.deinit();

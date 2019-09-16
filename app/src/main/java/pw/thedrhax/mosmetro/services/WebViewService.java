@@ -173,6 +173,20 @@ public class WebViewService extends Service {
         if (view != null && wm != null) {
             wm.removeView(view);
         }
+
+        destroyed.set(true);
+    }
+
+    private final Listener<Boolean> destroyed = new Listener<Boolean>(false);
+
+    /**
+     * @return Read-only Listener that will be updated as soon as service is
+     *         destroyed.
+     */
+    public Listener<Boolean> onDestroyListener() {
+        Listener<Boolean> result = new Listener<Boolean>(false);
+        result.subscribe(destroyed);
+        return result;
     }
 
     public void get(final String url) {
