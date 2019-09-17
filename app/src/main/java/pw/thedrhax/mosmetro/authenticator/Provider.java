@@ -216,7 +216,7 @@ public abstract class Provider extends LinkedList<Task> {
         ParsedResponse rel_http = null;
 
         if (unrel.getResponseCode() == 204) {
-            if (rel_https == null) {
+            if (rel_https == null || rel_https.getResponseCode() != 204) {
                 rel_http = generate_204(client,
                         "http://" + random.choose(GENERATE_204_RELIABLE)
                 );
@@ -226,7 +226,7 @@ public abstract class Provider extends LinkedList<Task> {
                 } else if (rel_http.getResponseCode() != 204) {
                     return rel_http; // false positive
                 }
-            } else if (rel_https.getResponseCode() == 204) {
+            } else {
                 return rel_https; // confirmed positive
             }
         } else {
