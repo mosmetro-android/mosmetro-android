@@ -172,35 +172,36 @@ public abstract class Provider extends LinkedList<Task> {
         setClient(new OkHttp(context));
     }
 
-    @Nullable private static ParsedResponse generate_204(Client client, String url) {
-        Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | " + url);
-        try {
-            return client.get(url, null);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex.toString());
-            return null;
-        }
-    }
-
     /**
      * Checks network connection state without binding to a specific provider.
      * This implementation uses generate_204 method, that is default for Android.
      * @return ParsedResponse that contains response code to be compared with 204.
      */
-    public static ParsedResponse generate_204(Context context, Listener<Boolean> running,
-                                              boolean false_negatives) {
+    public static ParsedResponse generate_204(
+            Context context, Listener<Boolean> running, boolean false_negatives
+    ) {
+        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
         Randomizer random  = new Randomizer(context);
-
         Client client = new OkHttp(context)
                 .followRedirects(false)
                 .setRunningListener(running);
 
         ParsedResponse empty = new ParsedResponse("<b>Empty response</b>");
+        ParsedResponse unrel = null, rel_https = null, rel_http = null;
+        String url;
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
-        ParsedResponse unrel = generate_204(client,
-                "http://" + random.choose(GENERATE_204_DEFAULT)
-        );
+        url = "http://" + random.choose(GENERATE_204_DEFAULT);
+        try {
+            unrel = client.get(url, null, pref_retry_count);
+            Logger.log(Logger.LEVEL.DEBUG,
+                    "Provider | gen_204 | " + url + " | " + unrel.getResponseCode()
+            );
+        } catch (IOException ex) {
+            Logger.log(Logger.LEVEL.DEBUG,
+                    "Provider | gen_204 | " + url + " | " + ex.toString()
+            );
+        }
 
         if (unrel == null) {
             // network is most probably unreachable
@@ -208,18 +209,32 @@ public abstract class Provider extends LinkedList<Task> {
         }
         
         // Reliable HTTPS check
-        ParsedResponse rel_https = generate_204(client,
-                "https://" + random.choose(GENERATE_204_RELIABLE)
-        );
-
-        // Reliable HTTP check
-        ParsedResponse rel_http = null;
-
+        url = "https://" + random.choose(GENERATE_204_RELIABLE);
+        try {
+            rel_https = client.get(url, null, pref_retry_count);
+            Logger.log(Logger.LEVEL.DEBUG,
+                    "Provider | gen_204 | " + url + " | " + rel_https.getResponseCode()
+            );
+        } catch (IOException ex) {
+            Logger.log(Logger.LEVEL.DEBUG,
+                    "Provider | gen_204 | " + url + " | " + ex.toString()
+            );
+        }
+        
         if (unrel.getResponseCode() == 204) {
             if (rel_https == null || rel_https.getResponseCode() != 204) {
-                rel_http = generate_204(client,
-                        "http://" + random.choose(GENERATE_204_RELIABLE)
-                );
+                // Reliable HTTP check
+                url = "http://" + random.choose(GENERATE_204_RELIABLE);
+                try {
+                    rel_http = client.get(url, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG,
+                            "Provider | gen_204 | " + url + " | " + rel_http.getResponseCode()
+                    );
+                } catch (IOException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG,
+                            "Provider | gen_204 | " + url + " | " + ex.toString()
+                    );
+                }
 
                 if (rel_http == null) {
                     return empty; // error
@@ -237,25 +252,7 @@ public abstract class Provider extends LinkedList<Task> {
             }
         }
 
-        StringBuilder state = new StringBuilder();
-        state.append('[');
-        state.append(unrel.getResponseCode()).append(", ");
-        if (rel_https == null) {
-            state.append("null");
-        } else {
-            state.append(rel_https.getResponseCode());
-        }
-        state.append(", ");
-        if (rel_http == null) {
-            state.append("null");
-        } else {
-            state.append(rel_http.getResponseCode());
-        }
-        state.append(']');
-
-        Logger.log(Logger.LEVEL.DEBUG,
-                "Provider | generate_204() | Unexpected state: " + state.toString()
-        );
+        Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | Unexpected state" );
         return empty;
     }
 
