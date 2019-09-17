@@ -239,6 +239,7 @@ public abstract class Provider extends LinkedList<Task> {
                 if (rel_http == null) {
                     return empty; // error
                 } else if (rel_http.getResponseCode() != 204) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | False positive detected");
                     return rel_http; // false positive
                 }
             } else {
@@ -248,6 +249,7 @@ public abstract class Provider extends LinkedList<Task> {
             if (rel_https == null) {
                 return unrel; // confirmed negative
             } else if (rel_https.getResponseCode() == 204) {
+                Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | False negative detected");
                 return false_negatives ? unrel : rel_https; // false negative
             }
         }
