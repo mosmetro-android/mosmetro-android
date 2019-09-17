@@ -67,13 +67,21 @@ public class DnsClient implements Dns {
     public DnsClient(Context context) {
         wifi = new WifiUtils(context);
 
+        String[] servers = getServers();
+
+        if (servers.length == 0) {
+            Logger.log(this, "No servers found, using fallback resolver");
+            dns = null;
+            return;
+        }
+
+        Logger.log(this, String.join(", ", servers));
+
         try {
-            String[] servers = getServers();
             dns = new ExtendedResolver(servers);
-            Logger.log(this, String.join(", ", servers));
         } catch (UnknownHostException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            Logger.log(this, "Unable to initialize custom resolver");
+            Logger.log(this, "Unable to initialize, using fallback resolver");
             dns = null;
         }
     }
