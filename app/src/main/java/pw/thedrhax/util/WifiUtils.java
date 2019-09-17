@@ -94,7 +94,7 @@ public class WifiUtils {
     @Nullable
     public LinkProperties getLinkProperies() {
         if (Build.VERSION.SDK_INT < 28) return null;
-        Network network = getNetwork();
+        Network network = getNetwork(ConnectivityManager.TYPE_WIFI);
         if (network == null) return null;
         return cm.getLinkProperties(network);
     }
