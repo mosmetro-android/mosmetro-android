@@ -21,43 +21,60 @@ package pw.thedrhax.mosmetro.httpclient;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
-import org.xbill.DNS.Resolver;
-import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.ResolverConfig;
 import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 
+import android.content.Context;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import okhttp3.Dns;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.WifiUtils;
 
 public class DnsClient implements Dns {
-    private ExtendedResolver dns = null;
+    private WifiUtils wifi;
+    private ExtendedResolver dns;
 
-    public DnsClient() {
-        try {
-            dns = new ExtendedResolver();
+    private String[] getServers() {
+        Set<String> servers = new HashSet<String>();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Initialized: ");
-            boolean first = true;
-            for (Resolver resolver : dns.getResolvers()) {
-                if (!(resolver instanceof SimpleResolver)) continue;
-                if (first) {
-                    first = false;
-                } else {
-                    msg.append(", ");
-                }
-                msg.append(((SimpleResolver) resolver).getAddress());
+        wifi.getDns().forEach(new Consumer<InetAddress>() {
+            @Override
+            public void accept(InetAddress t) {
+                servers.add(t.getHostAddress());
             }
-            Logger.log(this, msg.toString());
+        });
+
+        String[] config = ResolverConfig.getCurrentConfig().servers();
+        if (config != null) {
+            for (String addr : config) {
+                servers.add(addr);
+            }
+        }
+
+        return servers.toArray(new String[servers.size()]);
+    }
+
+    public DnsClient(Context context) {
+        wifi = new WifiUtils(context);
+
+        try {
+            String[] servers = getServers();
+            dns = new ExtendedResolver(servers);
+            Logger.log(this, String.join(", ", servers));
         } catch (UnknownHostException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             Logger.log(this, "Unable to initialize custom resolver");
+            dns = null;
         }
     }
 

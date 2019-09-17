@@ -18,6 +18,10 @@
 
 package pw.thedrhax.util;
 
+import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,6 +91,21 @@ public class WifiUtils {
         return wm.getConnectionInfo().getIpAddress();
     }
 
+    @Nullable
+    public LinkProperties getLinkProperies() {
+        if (Build.VERSION.SDK_INT < 28) return null;
+        Network network = getNetwork();
+        if (network == null) return null;
+        return cm.getLinkProperties(network);
+    }
+
+    // Get IP addresses of DNS servers from DHCP
+    public List<InetAddress> getDns() {
+        LinkProperties props = getLinkProperies();
+        if (props == null) return new LinkedList<InetAddress>();
+        return new LinkedList<InetAddress>(props.getDnsServers());
+    }
+
     // Get main Wi-Fi state
     public boolean isEnabled() {
         return wm.isWifiEnabled();
@@ -95,10 +114,8 @@ public class WifiUtils {
     // Get Private DNS state (API 28+)
     public boolean isPrivateDnsActive() {
         if (Build.VERSION.SDK_INT < 28) return false;
-        Network network = getNetwork();
-        if (network == null) return false;
-        LinkProperties props = cm.getLinkProperties(network);
-        if (props == null) return false; // MiUI
+        LinkProperties props = getLinkProperies();
+        if (props == null) return false;
         return props.isPrivateDnsActive();
     }
 
