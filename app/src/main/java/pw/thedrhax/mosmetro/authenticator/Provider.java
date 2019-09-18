@@ -22,9 +22,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,34 +53,6 @@ import pw.thedrhax.util.Util;
 
 public abstract class Provider extends LinkedList<Task> {
     /**
-     * Unreliable generate_204 endpoints (might be intercepted by provider)
-     */
-    protected static final String[] GENERATE_204_DEFAULT = {
-        // "www.google.com/generate_204",
-        // "www.google.com/gen_204",
-        "connectivitycheck.gstatic.com/generate_204",
-        "www.gstatic.com/generate_204",
-        "connectivitycheck.android.com/generate_204"
-    };
-
-    /**
-     * Reliable generate_204 endpoints (confirmed to not be intercepted)
-     */
-    protected static final String[] GENERATE_204_RELIABLE = {
-            "www.google.ru/generate_204",
-            "www.google.ru/gen_204",
-            "google.com/generate_204",
-            "gstatic.com/generate_204",
-            "clients1.google.com/generate_204",
-            "maps.google.com/generate_204",
-            "mt0.google.com/generate_204",
-            "mt1.google.com/generate_204",
-            "mt2.google.com/generate_204",
-            "mt3.google.com/generate_204",
-            "play.googleapis.com/generate_204"
-    };
-
-    /**
      * List of supported SSIDs
      */
     public static final String[] SSIDs = {
@@ -98,6 +68,7 @@ public abstract class Provider extends LinkedList<Task> {
     protected Context context;
     protected SharedPreferences settings;
     protected Randomizer random;
+    protected Gen204 gen_204;
 
     private List<Provider> children = new LinkedList<>();
     private boolean initialized = false;
@@ -141,7 +112,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-        ParsedResponse response = generate_204(context, running, true);
+        ParsedResponse response = new Gen204(context, running).check(true);
         Provider result = Provider.find(context, response);
         return result;
     }
@@ -169,93 +140,8 @@ public abstract class Provider extends LinkedList<Task> {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.random = new Randomizer(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
+        this.gen_204 = new Gen204(context, running);
         setClient(new OkHttp(context));
-    }
-
-    /**
-     * Checks network connection state without binding to a specific provider.
-     * This implementation uses generate_204 method, that is default for Android.
-     * @return ParsedResponse that contains response code to be compared with 204.
-     */
-    public static ParsedResponse generate_204(
-            Context context, Listener<Boolean> running, boolean false_negatives
-    ) {
-        int pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
-        Randomizer random  = new Randomizer(context);
-        Client client = new OkHttp(context)
-                .followRedirects(false)
-                .setRunningListener(running);
-
-        ParsedResponse empty = new ParsedResponse("<b>Empty response</b>");
-        ParsedResponse unrel = null, rel_https = null, rel_http = null;
-        String url;
-
-        // Unreliable HTTP check (needs to be rechecked by HTTPS)
-        url = "http://" + random.choose(GENERATE_204_DEFAULT);
-        try {
-            unrel = client.get(url, null, pref_retry_count);
-            Logger.log(Logger.LEVEL.DEBUG,
-                    "Provider | gen_204 | " + url + " | " + unrel.getResponseCode()
-            );
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG,
-                    "Provider | gen_204 | " + url + " | " + ex.toString()
-            );
-        }
-
-        if (unrel == null) {
-            // network is most probably unreachable
-            return empty;
-        }
-        
-        // Reliable HTTPS check
-        url = "https://" + random.choose(GENERATE_204_RELIABLE);
-        try {
-            rel_https = client.get(url, null, pref_retry_count);
-            Logger.log(Logger.LEVEL.DEBUG,
-                    "Provider | gen_204 | " + url + " | " + rel_https.getResponseCode()
-            );
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG,
-                    "Provider | gen_204 | " + url + " | " + ex.toString()
-            );
-        }
-        
-        if (unrel.getResponseCode() == 204) {
-            if (rel_https == null || rel_https.getResponseCode() != 204) {
-                // Reliable HTTP check
-                url = "http://" + random.choose(GENERATE_204_RELIABLE);
-                try {
-                    rel_http = client.get(url, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG,
-                            "Provider | gen_204 | " + url + " | " + rel_http.getResponseCode()
-                    );
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG,
-                            "Provider | gen_204 | " + url + " | " + ex.toString()
-                    );
-                }
-
-                if (rel_http == null) {
-                    return empty; // error
-                } else if (rel_http.getResponseCode() != 204) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | False positive detected");
-                    return rel_http; // false positive
-                }
-            } else {
-                return rel_https; // confirmed positive
-            }
-        } else {
-            if (rel_https == null) {
-                return unrel; // confirmed negative
-            } else if (rel_https.getResponseCode() == 204) {
-                Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | False negative detected");
-                return false_negatives ? unrel : rel_https; // false negative
-            }
-        }
-
-        Logger.log(Logger.LEVEL.DEBUG, "Provider | gen_204 | Unexpected state" );
-        return empty;
     }
 
     /**
@@ -265,7 +151,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected(boolean false_negatives) {
-        return isConnected(generate_204(context, running, false_negatives));
+        return isConnected(gen_204.check(false_negatives));
     }
 
     /**

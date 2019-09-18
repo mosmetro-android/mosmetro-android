@@ -26,15 +26,11 @@ import pw.thedrhax.util.Logger;
 
 public abstract class InitialConnectionCheckTask implements Task {
     private Provider p;
-    private ParsedResponse res = null;
+    private ParsedResponse res;
     private boolean first_start = true;
 
-    public InitialConnectionCheckTask(Provider p) {
-        this.p = p;
-    }
-
     public InitialConnectionCheckTask(Provider p, ParsedResponse res) {
-        this(p);
+        this.p = p;
         this.res = res;
     }
 
@@ -42,9 +38,9 @@ public abstract class InitialConnectionCheckTask implements Task {
     public boolean run(HashMap<String, Object> vars) {
         ParsedResponse response = res;
 
-        if (response == null || !first_start) {
+        if (!first_start) {
             Logger.log(p.context.getString(R.string.auth_checking_connection));
-            response = Provider.generate_204(p.context, p.running, true);
+            response = p.gen_204.check(true);
         }
 
         first_start = false;
