@@ -48,7 +48,8 @@
     }
 
     const IGNORE = [
-        'img.pixel'
+        'img.pixel',
+        '.disabled'
     ];
 
     const CLICK = [
