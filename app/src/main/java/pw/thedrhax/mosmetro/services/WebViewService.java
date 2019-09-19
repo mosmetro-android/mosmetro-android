@@ -324,7 +324,7 @@ public class WebViewService extends Service {
                 onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
                 return result;
             } catch (IOException ex) {
-                Logger.log(Logger.LEVEL.DEBUG, ex);
+                Logger.log(this, ex.toString());
             }
 
             // Apply scheduled referer update
