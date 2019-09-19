@@ -83,6 +83,9 @@
             return;
         }
 
+        var text = el.innerText.replace(/\n/g, ' ').trim();
+        if (text.length > 0) log(text);
+
         if (el.matches(CLICK)) {
             setTimeout(function () { click(el); }, 500);
         }
