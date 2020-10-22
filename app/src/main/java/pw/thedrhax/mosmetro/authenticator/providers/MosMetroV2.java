@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
@@ -59,6 +58,17 @@ import pw.thedrhax.util.Randomizer;
 public class MosMetroV2 extends Provider {
     private String redirect = "http://auth.wi-fi.ru/";
 
+    /**
+     * Saint-Petersburg branch mode. Replaces hard-coded URLs.
+     *
+     * auth.wi-fi.ru → auth.wi-fi.ru/spb/new
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification
+     */
+    private Boolean spb = false;
+
     public MosMetroV2(final Context context, final ParsedResponse res) {
         super(context);
 
@@ -79,11 +89,20 @@ public class MosMetroV2 extends Provider {
 
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
 
-                if (redirect.contains("segment")) {
-                    vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                Uri uri = Uri.parse(redirect);
+
+                if (uri.getPath().startsWith("/spb/new")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Saint-Petersburg branch detected. Replacing URLs");
+                    spb = true;
+                }
+
+                if (uri.getQueryParameter("segment") != null) {
+                    vars.put("segment", uri.getQueryParameter("segment"));
                 } else {
                     vars.put("segment", "metro");
                 }
+
+                redirect = ParsedResponse.removePathFromUrl(redirect);
 
                 return true;
             }
@@ -150,12 +169,11 @@ public class MosMetroV2 extends Provider {
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/gapi/auth/start)(\\?.*)?") {
             @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
                 ParsedResponse response = client.get(url, null, pref_retry_count);
-                Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 client.followRedirects(true);
                 return response;
             }
@@ -176,7 +194,7 @@ public class MosMetroV2 extends Provider {
                         context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
 
                         running.set(false);
-                        return new ParsedResponse("");
+                        return response;
                     }
 
                     if (redirect.contains("/identification")) { // not registered
@@ -186,7 +204,7 @@ public class MosMetroV2 extends Provider {
 
                         vars.put("result", RESULT.NOT_REGISTERED);
                         running.set(false);
-                        return new ParsedResponse("");
+                        return response;
                     }
                 } catch (ParseException ignored) {}
 
@@ -213,19 +231,22 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                redirect = ParsedResponse.removePathFromUrl(redirect);
+                String url = redirect;
+
+                if (!spb) {
+                    url += "/auth?segment=" + vars.get("segment");
+                } else {
+                    url += "/spb/gapi/auth/start?segment=" + vars.get("segment");
+                }
 
                 String prefix = "0:" + random.string(8) + ":";
                 client.setCookie("http://auth.wi-fi.ru", "_ym_uid", random.string("0123456789", 19))
                       .setCookie("http://auth.wi-fi.ru", "_mts", prefix + random.string(11) + "~" + random.string(20))
                       .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
-                try {
-                    ParsedResponse response = client.get(
-                            redirect + "/auth?segment=" + vars.get("segment"),
-                            null, pref_retry_count
-                    );
-                    vars.put("response", response);
 
+                try {
+                    ParsedResponse response = client.get(url, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -245,13 +266,16 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                if (spb) return true;
+
                 String token = new Randomizer(context).string(6);
                 Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
 
+                String url = ParsedResponse.removePathFromUrl(redirect);
+                url += "/auth/set_token?token=" + token;
+
                 try {
-                    ParsedResponse response = client.get(
-                            redirect + "/auth/set_token?token=" + token, null
-                    );
+                    ParsedResponse response = client.get(url, null);
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -278,12 +302,16 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                String url = ParsedResponse.removePathFromUrl(redirect);
+
+                if (!spb) {
+                    url += "/auth/init?mode=0&segment=" + vars.get("segment");
+                } else {
+                    url += "/spb/gapi/auth/init?mode=0&segment=" + vars.get("segment");
+                }
+
                 try {
-                    ParsedResponse response = client.post(
-                            redirect + "/auth/init?mode=0&segment=" + vars.get("segment"),
-                            null, pref_retry_count
-                    );
-                    vars.put("response", response);
+                    ParsedResponse response = client.post(url, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (ProtocolException ignored) { // Too many follow-up requests
                 } catch (IOException ex) {
@@ -304,11 +332,16 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
+                String url = ParsedResponse.removePathFromUrl(redirect);
+
+                if (!spb) {
+                    url += "/auth/check?segment=" + vars.get("segment");
+                } else {
+                    url += "/spb/gapi/auth/check?segment=" + vars.get("segment");
+                }
+
                 try {
-                    JSONObject response = client.get(
-                            redirect + "/auth/check?segment=" + vars.get("segment"),
-                            null, pref_retry_count
-                    ).json();
+                    JSONObject response = client.get(url, null, pref_retry_count).json();
 
                     if ((Boolean) response.get("result")) {
                         Logger.log(context.getString(R.string.auth_connected));
