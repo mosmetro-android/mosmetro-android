@@ -62,7 +62,18 @@ import pw.thedrhax.util.Util;
  */
 
 public class MosMetroV2WV extends WebViewProvider {
-    private String redirect = "http://auth.wi-fi.ru/";
+    private String redirect = "http://auth.wi-fi.ru/?segment=metro";
+
+    /**
+     * Saint-Petersburg branch mode. Replaces hard-coded URLs.
+     *
+     * auth.wi-fi.ru → auth.wi-fi.ru/spb/new
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification
+     */
+    private Boolean spb = false;
 
     public MosMetroV2WV(Context context, ParsedResponse res) {
         super(context);
@@ -84,8 +95,15 @@ public class MosMetroV2WV extends WebViewProvider {
 
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
 
-                if (redirect.contains("segment")) {
-                    vars.put("segment", Uri.parse(redirect).getQueryParameter("segment"));
+                Uri uri = Uri.parse(redirect);
+
+                if (uri.getPath().startsWith("/spb/new")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Saint-Petersburg branch detected. Replacing URLs");
+                    spb = true;
+                }
+
+                if (uri.getQueryParameter("segment") != null) {
+                    vars.put("segment", uri.getQueryParameter("segment"));
                 } else {
                     vars.put("segment", "metro");
                 }
@@ -146,7 +164,7 @@ public class MosMetroV2WV extends WebViewProvider {
          * - Parse CSRF token
          * - Insert automation script into response
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/gapi/auth/start)(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
@@ -191,8 +209,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
                 } catch (ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }
 
                 String mosmetro_js = Util.readAsset(context, "MosMetroV2.js");
@@ -206,7 +223,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/auth/init(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(spb/gapi/)?auth/init(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 return client.post(url, null, pref_retry_count);
@@ -244,7 +261,11 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new WaitTask(this, "Waiting for auth page to load") {
             @Override
             public boolean until(HashMap<String, Object> vars) {
-                return wv.getURL().contains("auth.wi-fi.ru/auth");
+                if (!spb) {
+                    return wv.getURL().contains("auth.wi-fi.ru/auth");
+                } else {
+                    return wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/start");
+                }
             }
         }.timeout(60000));
 
@@ -264,7 +285,11 @@ public class MosMetroV2WV extends WebViewProvider {
                     return isConnected();
                 }
 
-                return !wv.getURL().contains("auth.wi-fi.ru/auth");
+                if (!spb) {
+                    return !wv.getURL().contains("auth.wi-fi.ru/auth");
+                } else {
+                    return !wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/start");
+                }
             }
         }.timeout(120000));
 
