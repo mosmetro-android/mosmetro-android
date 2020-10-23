@@ -56,7 +56,7 @@ import pw.thedrhax.util.Randomizer;
  */
 
 public class MosMetroV2 extends Provider {
-    private String redirect = "http://auth.wi-fi.ru/";
+    private String redirect = "http://auth.wi-fi.ru/?segment=metro";
 
     /**
      * Saint-Petersburg branch mode. Replaces hard-coded URLs.
@@ -101,8 +101,6 @@ public class MosMetroV2 extends Provider {
                 } else {
                     vars.put("segment", "metro");
                 }
-
-                redirect = ParsedResponse.removePathFromUrl(redirect);
 
                 return true;
             }
@@ -230,7 +228,7 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String url = redirect;
+                String url = ParsedResponse.removePathFromUrl(redirect);
 
                 if (!spb) {
                     url += "/auth?segment=" + vars.get("segment");
