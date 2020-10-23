@@ -59,7 +59,8 @@
         '.interaction_button__joke',
         '.interaction_button_quiz',
         '.interaction_button',
-        '.button_blue'
+        '.button_blue',
+        '.btn--primary'
     ];
 
     function log(msg) {
