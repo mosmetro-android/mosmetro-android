@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,26 +54,6 @@ import pw.thedrhax.util.Util;
 
 public abstract class Provider extends LinkedList<Task> {
     /**
-     * URL used to detect if Captive Portal is present in the current network.
-     */
-    protected static final String[] GENERATE_204 = {
-            "www.google.ru/generate_204",
-            "www.google.ru/gen_204",
-            "google.com/generate_204",
-            // "www.google.com/generate_204",
-            "gstatic.com/generate_204",
-            // "www.gstatic.com/generate_204",
-            // "connectivitycheck.android.com/generate_204",
-            // "connectivitycheck.gstatic.com/generate_204"
-            "clients1.google.com/generate_204",
-            "maps.google.com/generate_204",
-            "mt0.google.com/generate_204",
-            "mt1.google.com/generate_204",
-            "mt2.google.com/generate_204",
-            "mt3.google.com/generate_204"
-    };
-
-    /**
      * List of supported SSIDs
      */
     public static final String[] SSIDs = {
@@ -90,6 +69,7 @@ public abstract class Provider extends LinkedList<Task> {
     protected Context context;
     protected SharedPreferences settings;
     protected Randomizer random;
+    protected Gen204 gen_204;
 
     private List<Provider> children = new LinkedList<>();
     private boolean initialized = false;
@@ -134,23 +114,8 @@ public abstract class Provider extends LinkedList<Task> {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-
-        ParsedResponse response = generate_204(context, running);
+        ParsedResponse response = new Gen204(context, running).check(true);
         Provider result = Provider.find(context, response);
-
-        if (result instanceof Unknown && response.getResponseCode() != 204) {
-            Logger.log(Logger.LEVEL.DEBUG, response.toString());
-            Logger.log(context.getString(R.string.error,
-                    context.getString(R.string.auth_error_provider)
-            ));
-            Provider fallback = find(context, new ParsedResponse(
-                    "<meta http-equiv=\"refresh\" content=\"0; " +
-                            "URL=http://welcome.wi-fi.ru/\" />"
-            ));
-            Logger.log(context.getString(R.string.auth_provider_assume, fallback.getName()));
-            return fallback;
-        }
-
         return result;
     }
 
@@ -177,50 +142,28 @@ public abstract class Provider extends LinkedList<Task> {
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.random = new Randomizer(context);
         this.pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
+        this.gen_204 = new Gen204(context, running);
         setClient(new OkHttp(context));
     }
 
     /**
-     * Checks network connection state without binding to a specific provider.
-     * This implementation uses generate_204 method, that is default for Android.
-     * @return ParsedResponse that contains response code to be compared with 204.
+     * Checks network connection state for a specific provider.
+     * 
+     * @param false_negatives If true, false negatives will be treated as real ones.
+     * @return True if internet access is available; otherwise, false is returned.
      */
-    public static ParsedResponse generate_204(Context context, Listener<Boolean> running) {
-        Randomizer random  = new Randomizer(context);
-
-        Client client = new OkHttp(context)
-                .trustAllCerts()
-                .followRedirects(false)
-                .setRunningListener(running);
-
-        ParsedResponse response = new ParsedResponse("<b>Empty response</b>");
-
-        try {
-            String url = "http://" + random.choose(GENERATE_204);
-            Logger.log(Logger.LEVEL.DEBUG, "Provider | generate_204() | URL: " + url);
-            response = client.get(url, null);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return response;
-        }
-        if (response.getResponseCode() != 204) return response;
-
-        try {
-            response = client.get("https://" + random.choose(GENERATE_204), null);
-        } catch (IOException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            return response;
-        }
-
-        return response;
+    public boolean isConnected(boolean false_negatives) {
+        return isConnected(gen_204.check(false_negatives));
     }
 
     /**
      * Checks network connection state for a specific provider.
+     * This method ignores false negatives by default.
+     * 
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return isConnected(generate_204(context, running));
+        return isConnected(false);
     }
 
     /**
@@ -362,6 +305,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public Provider setClient(Client client) {
         this.client = client
+                .customDnsEnabled(true)
                 .setRunningListener(running)
                 .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
         return this;

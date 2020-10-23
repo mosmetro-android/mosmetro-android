@@ -69,6 +69,7 @@ public abstract class Client {
     // Settings methods
     public abstract Client trustAllCerts();
     public abstract Client followRedirects(boolean follow);
+    public abstract Client customDnsEnabled(boolean enabled);
 
     public Client configure() {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
