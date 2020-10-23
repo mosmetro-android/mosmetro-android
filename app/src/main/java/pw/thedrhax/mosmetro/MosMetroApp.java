@@ -23,22 +23,26 @@ import android.content.Context;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
-import org.acra.data.StringFormat;
 
-import pw.thedrhax.mosmetro.acra.HockeySenderFactory;
+import pw.thedrhax.mosmetro.acra.CustomHttpSenderFactory;
 import pw.thedrhax.util.Logger;
 
 import static org.acra.ReportField.*;
 
-@AcraCore(buildConfigClass = BuildConfig.class,
-          reportSenderFactoryClasses = {HockeySenderFactory.class},
-          reportFormat = StringFormat.JSON,
-          reportContent = {
-                   INSTALLATION_ID, USER_EMAIL, USER_COMMENT, PACKAGE_NAME,
-                   ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG
-          },
-          applicationLogFile = "log-debug.txt",
-          applicationLogFileLines = 1000)
+@AcraCore(
+        reportContent = {
+            // Required by Tracepot
+            ANDROID_VERSION, APP_VERSION_CODE, APP_VERSION_NAME,
+            PACKAGE_NAME, REPORT_ID, STACK_TRACE, USER_APP_START_DATE,
+            USER_CRASH_DATE,
+
+            // Additional info
+            INSTALLATION_ID, BUILD_CONFIG, PHONE_MODEL, CUSTOM_DATA,
+            APPLICATION_LOG
+        },
+        reportSenderFactoryClasses = {CustomHttpSenderFactory.class},
+        applicationLogFile = "log-debug.txt",
+        applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
 
     @Override

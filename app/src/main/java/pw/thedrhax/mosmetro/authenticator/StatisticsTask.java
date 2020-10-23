@@ -126,7 +126,7 @@ class StatisticsTask implements Task {
         new AsyncTask<Void,Void,Void>() {
             @Override
             protected Void doInBackground(Void... none) {
-                p.random.delay(p.running);
+                if (!p.random.delay(p.running)) return null;
 
                 String STATISTICS_URL = new CachedRetriever(p.context).get(
                         BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT,

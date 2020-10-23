@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -202,7 +201,7 @@ public class ConnectionService extends IntentService {
                 .show();
 
         while (wifi.getIP() == 0) {
-            SystemClock.sleep(1000);
+            if (!running.sleep(1000)) return false;
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
                 Logger.log(getString(R.string.error,
@@ -212,8 +211,6 @@ public class ConnectionService extends IntentService {
                 ));
                 return false;
             }
-
-            if (!running.get()) return false;
         }
 
         Logger.log(getString(R.string.ip_wait_result, "", count/2));
@@ -223,17 +220,22 @@ public class ConnectionService extends IntentService {
     private Provider.RESULT connect() {
         Provider.RESULT result;
         int count = 0;
+        int pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5) * 1000;
 
         do {
             if (count > 0) {
-                notify.text(String.format("%s (%s)",
+                String msg = String.format("%s (%s)",
                                 getString(R.string.notification_progress_waiting),
                                 getString(R.string.try_out_of, count + 1, pref_retry_count)
-                        ))
-                        .progress(0, true)
-                        .show();
+                );
 
-                SystemClock.sleep(Util.getIntPreference(this, "pref_retry_delay", 5) * 1000);
+                Logger.log(msg);
+                notify.text(msg).progress(0, true).show();
+
+                if (!running.sleep(pref_retry_delay)) {
+                    result = Provider.RESULT.INTERRUPTED;
+                    break;
+                }
             }
 
             result = provider.start();
@@ -314,6 +316,8 @@ public class ConnectionService extends IntentService {
             sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
                     .putExtra("RUNNING", false)
             );
+
+            Logger.date("<<< ");
         } else {
             Logger.log(this, "Already running");
         }
@@ -339,8 +343,7 @@ public class ConnectionService extends IntentService {
                     .progress(0, true)
                     .show();
 
-            new Randomizer(this).delay(running);
-            if (!running.get()) return;
+            if (!new Randomizer(this).delay(running)) return;
         }
 
         new Notify(this).id(2).hide(); // hide error notification
@@ -397,9 +400,7 @@ public class ConnectionService extends IntentService {
 
         // Wait while internet connection is available
         int count = 0;
-        while (running.get()) {
-            SystemClock.sleep(1000);
-
+        while (running.sleep(1000)) {
             // Check internet connection each 10 seconds
             int check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
             if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {

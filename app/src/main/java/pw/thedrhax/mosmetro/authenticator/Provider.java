@@ -131,7 +131,6 @@ public abstract class Provider extends LinkedList<Task> {
      * @return          New Provider instance.
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Logger.log(context.getString(R.string.auth_provider_check));
 
         ParsedResponse response = generate_204(context, running);
@@ -144,11 +143,7 @@ public abstract class Provider extends LinkedList<Task> {
             ));
             Logger.log(context.getString(R.string.auth_provider_assume));
 
-            if (settings.getBoolean("pref_mosmetro_v3", true)) {
-                return new MosMetroV3(context, response);
-            } else {
-                return new MosMetroV2(context, response);
-            }
+            return new MosMetroV2(context, response);
         }
 
         return result;
@@ -312,6 +307,8 @@ public abstract class Provider extends LinkedList<Task> {
         vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
+        Logger.date(">> ");
+
         if (!init()) {
             Logger.log(this, "Initialization failed");
             return RESULT.ERROR;
@@ -342,7 +339,7 @@ public abstract class Provider extends LinkedList<Task> {
         new StatisticsTask(this).run(vars);
 
         deinit();
-        Logger.date("<<< ");
+        Logger.date("<< ");
         return (RESULT)vars.get("result");
     }
 
