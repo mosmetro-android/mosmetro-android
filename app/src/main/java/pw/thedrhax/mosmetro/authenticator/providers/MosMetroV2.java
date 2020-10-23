@@ -213,8 +213,7 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
                     client.setHeader(Client.HEADER_CSRF, csrf_token);
                 } catch (ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }
 
                 return response;
