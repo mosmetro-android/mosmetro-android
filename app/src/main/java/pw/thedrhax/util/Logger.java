@@ -47,6 +47,8 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 
 public class Logger {
+    public static final String CUT = "--------[ cut here ]--------";
+
     public enum LEVEL {INFO, DEBUG}
 
     private static final Map<LEVEL,LogWriter> logs = new HashMap<LEVEL,LogWriter>() {{
@@ -88,7 +90,7 @@ public class Logger {
             logs.put(level, writer);
         }
 
-        log(LEVEL.DEBUG, "Logger initialized");
+        log(LEVEL.DEBUG, CUT);
     }
 
     /*
@@ -97,7 +99,7 @@ public class Logger {
 
     public static void log (LEVEL level, String message) {
         synchronized (logs) {
-            if (level == LEVEL.DEBUG) {
+            if (level == LEVEL.DEBUG && message != CUT) {
                 if (pref_debug_logcat) {
                     Log.d("pw.thedrhax.mosmetro", message);
                 }

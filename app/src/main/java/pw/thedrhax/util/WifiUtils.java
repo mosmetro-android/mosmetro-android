@@ -18,10 +18,15 @@
 
 package pw.thedrhax.util;
 
+import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -86,9 +91,32 @@ public class WifiUtils {
         return wm.getConnectionInfo().getIpAddress();
     }
 
+    @Nullable
+    public LinkProperties getLinkProperies() {
+        if (Build.VERSION.SDK_INT < 28) return null;
+        Network network = getNetwork(ConnectivityManager.TYPE_WIFI);
+        if (network == null) return null;
+        return cm.getLinkProperties(network);
+    }
+
+    // Get IP addresses of DNS servers from DHCP
+    public List<InetAddress> getDns() {
+        LinkProperties props = getLinkProperies();
+        if (props == null) return new LinkedList<InetAddress>();
+        return new LinkedList<InetAddress>(props.getDnsServers());
+    }
+
     // Get main Wi-Fi state
     public boolean isEnabled() {
         return wm.isWifiEnabled();
+    }
+
+    // Get Private DNS state (API 28+)
+    public boolean isPrivateDnsActive() {
+        if (Build.VERSION.SDK_INT < 28) return false;
+        LinkProperties props = getLinkProperies();
+        if (props == null) return false;
+        return props.isPrivateDnsActive();
     }
 
     // Get Network by type

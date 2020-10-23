@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -42,6 +43,7 @@ import javax.net.ssl.X509TrustManager;
 import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.Dns;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -51,16 +53,23 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.util.WifiUtils;
+import pw.thedrhax.mosmetro.httpclient.DnsClient;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
     private OkHttpClient client;
+    private WifiUtils wifi;
     private Call last_call = null;
 
     public OkHttp(Context context) {
         super(context);
-        client = new OkHttpClient.Builder().cookieJar(new InterceptedCookieJar()).build();
+        wifi = new WifiUtils(context);
+
+        client = new OkHttpClient.Builder()
+                .cookieJar(new InterceptedCookieJar())
+                .build();
+
         configure();
     }
 
@@ -151,7 +160,26 @@ public class OkHttp extends Client {
         return this;
     }
 
+    @Override
+    public Client customDnsEnabled(boolean enabled) {
+        Dns dns;
+
+        if (enabled && wifi.isPrivateDnsActive()) {
+            dns = new DnsClient(context);
+        } else {
+            dns = Dns.SYSTEM;
+        }
+
+        client = client.newBuilder()
+                 .dns(dns)
+                 .build();
+
+        return this;
+    }
+
     private Response call(String url, RequestBody data) throws IOException {
+        if (!running.get()) throw new InterruptedIOException();
+
         Request.Builder builder = new Request.Builder().url(url);
 
         // Choose appropriate request method
@@ -178,7 +206,7 @@ public class OkHttp extends Client {
         }
 
         if (context != null && context.getApplicationContext() != null) {
-            new WifiUtils(context).bindToWifi();
+            wifi.bindToWifi();
         }
 
         last_call = client.newCall(builder.build());
@@ -211,6 +239,7 @@ public class OkHttp extends Client {
                             MediaType.parse(params.get("type")), params.get("body")
                     )));
         }
+
         return null;
     }
 

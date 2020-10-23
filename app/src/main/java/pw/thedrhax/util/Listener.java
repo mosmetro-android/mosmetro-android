@@ -21,6 +21,8 @@ package pw.thedrhax.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.os.SystemClock;
+
 /**
  * Util class used to monitor every change of the stored variable.
  *
@@ -28,6 +30,7 @@ import java.util.List;
  *   - Subscribe to already existing Listeners of the same type
  *   - Allow to retrieve and change the value of variable at any time
  *   - Notify about every change using the onChange() callback
+ *   - Interruptible delays
  *   - Stack Overflow protection by checking if callback is the master
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
@@ -57,6 +60,33 @@ public class Listener<T> {
     }
 
     public final T get() {
+        return value;
+    }
+
+    /**
+     * Delay execution for N milliseconds, but return as quick as possible if stored
+     * value has changed.
+     * 
+     * @param ms Number of milliseconds to delay for.
+     * @return Stored value.
+     */
+    public T sleep(int ms) {
+        T initial_value = value;
+
+        while (ms > 0) {
+            if (ms > 100) {
+                SystemClock.sleep(100);
+                ms -= 100;
+            } else {
+                SystemClock.sleep(ms);
+                ms = 0;
+            }
+
+            if (value != initial_value) {
+                return value;
+            }
+        }
+
         return value;
     }
 

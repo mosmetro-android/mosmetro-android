@@ -249,6 +249,8 @@ public abstract class Provider extends LinkedList<Task> {
         vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
+        Logger.date(">> ");
+
         if (!init()) {
             Logger.log(this, "Initialization failed");
             return RESULT.ERROR;
@@ -279,7 +281,7 @@ public abstract class Provider extends LinkedList<Task> {
         new StatisticsTask(this).run(vars);
 
         deinit();
-        Logger.date("<<< ");
+        Logger.date("<< ");
         return (RESULT)vars.get("result");
     }
 
@@ -301,6 +303,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     public Provider setClient(Client client) {
         this.client = client
+                .customDnsEnabled(true)
                 .setRunningListener(running)
                 .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
         return this;

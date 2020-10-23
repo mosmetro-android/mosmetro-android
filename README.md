@@ -1,4 +1,4 @@
-# Wi-Fi в метро [![Build Status](https://local.thedrhax.pw/jenkins/job/mosmetro-android-pipeline/branch/master/badge/icon)](https://local.thedrhax.pw/jenkins/job/mosmetro-android-pipeline/branch/master/) [![ВКонтакте](.github/resources/vk-box.png)](https://vk.com/wifi_v_metro) [![Telegram](.github/resources/telegram.png)](https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q)
+# Wi-Fi в метро [![Build Status](https://jenkins.thedrhax.pw/job/mosmetro-android-pipeline/branch/master/badge/icon)](https://jenkins.thedrhax.pw/job/mosmetro-android-pipeline/branch/master/) [![ВКонтакте](.github/resources/vk-box.png)](https://vk.com/wifi_v_metro) [![Telegram](.github/resources/telegram.png)](https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q)
 
 Данное приложение предназначено для автоматической авторизации Android-устройств в сетях Wi-Fi общественного транспорта Москвы, Санкт-Петербурга и других городов России, в которых действует провайдер МаксимаТелеком и его партнёры. Поддерживаются версии Android 3.0 (SDK 11) и выше.
 
