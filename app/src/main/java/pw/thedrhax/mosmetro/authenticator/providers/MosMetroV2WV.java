@@ -224,7 +224,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(spb/gapi/)?auth/init(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(spb/gapi/)?auth/init(_smart)?(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 return client.post(url, null, pref_retry_count);
