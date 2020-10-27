@@ -57,10 +57,13 @@
         '.cross',
         '.mt-banner-fullscreen__button-close',
         '.interaction_button__joke',
+        '.interaction_button_joke',
         '.interaction_button_quiz',
         '.interaction_button',
         '.button_blue',
-        '.btn--primary'
+        '.btn-join',
+        '.mtt-fullscreen-skip',
+        '.mtt-fullscreen-skip-btn'
     ];
 
     function log(msg) {
