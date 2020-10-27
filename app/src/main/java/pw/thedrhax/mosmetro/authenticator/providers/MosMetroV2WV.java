@@ -170,7 +170,6 @@ public class MosMetroV2WV extends WebViewProvider {
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
                 ParsedResponse response = client.get(url, null, pref_retry_count);
-                Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 client.followRedirects(true);
                 return response;
             }
