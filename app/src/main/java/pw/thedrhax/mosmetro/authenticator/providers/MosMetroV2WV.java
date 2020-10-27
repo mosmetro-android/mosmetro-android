@@ -67,8 +67,9 @@ public class MosMetroV2WV extends WebViewProvider {
     /**
      * Saint-Petersburg branch mode. Replaces hard-coded URLs.
      *
-     * auth.wi-fi.ru → auth.wi-fi.ru/spb/new
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/gapi/auth/start
+     * auth.wi-fi.ru → none
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/new
+     * none → auth.wi-fi.ru/spb/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
      * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification
@@ -164,7 +165,7 @@ public class MosMetroV2WV extends WebViewProvider {
          * - Parse CSRF token
          * - Insert automation script into response
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/gapi/auth/start)(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/new)(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
