@@ -237,6 +237,11 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(spb/gapi/)?auth/init(_smart)?(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
+                if (url.contains("auth/init_smart")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Replacing \"init_smart\" with \"init\"");
+                    url = url.replace("auth/init_smart", "auth/init");
+                }
+
                 return client.post(url, null, pref_retry_count);
             }
         });
