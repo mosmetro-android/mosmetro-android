@@ -119,10 +119,6 @@
         });
     }
 
-    if (document.location.pathname.lastIndexOf('/auth', 0) !== 0) {
-        log('Wrong page: ' + document.location);
-    }
-
     var o = new MO(onMutation);
     o.observe(document.body, {
         childList: true,
