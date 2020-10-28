@@ -25,11 +25,11 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.jsoup.nodes.Element;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
@@ -42,6 +42,7 @@ import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.Client.METHOD;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -159,6 +160,19 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
+         * Async: Fake response with MosMetroV2.js script
+         */
+        add(new InterceptorTask(this, "https://mosmetro/MosMetroV2\\.js") {
+            @Override
+            public ParsedResponse request(Client client, METHOD method, String url, Map<String, String> params) throws IOException {
+                return new ParsedResponse(
+                    Util.readAsset(context, "MosMetroV2.js"),
+                    "text/javascript"
+                );
+            }
+        });
+
+        /**
          * Async: https://auth.wi-fi.ru/auth
          * - Detect ban (302 redirect to /auto_auth)
          * - Detect if device is not registered in the network (302 redirect to /identification)
@@ -212,10 +226,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }
 
-                String mosmetro_js = Util.readAsset(context, "MosMetroV2.js");
-                mosmetro_js = "<script>" + mosmetro_js + "</script>";
-                response.getPageContent().body().append(mosmetro_js);
-
+                response.getPageContent().body().append("<script src=\"https://mosmetro/MosMetroV2.js\"></script>");
                 return response;
             }
         });

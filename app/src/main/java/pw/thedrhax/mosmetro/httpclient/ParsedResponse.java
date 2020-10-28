@@ -71,12 +71,19 @@ public class ParsedResponse {
         }
     }
 
-    public ParsedResponse(String html) {
-        this("", html.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
+    public ParsedResponse(String content, String content_type) {
+        this("", content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
             put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
-                add("text/html; charset=utf-8");
+                add(content_type);
+            }});
+            put(Client.HEADER_ACAO.toLowerCase(), new LinkedList<String>() {{
+                add("*");
             }});
         }});
+    }
+
+    public ParsedResponse(String html) {
+        this(html, "text/html; charset=utf-8");
     }
 
     @NonNull
