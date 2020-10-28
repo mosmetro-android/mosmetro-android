@@ -275,7 +275,7 @@ public class MosMetroV2WV extends WebViewProvider {
                 if (!spb) {
                     return wv.getURL().contains("auth.wi-fi.ru/auth");
                 } else {
-                    return wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/start");
+                    return wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/init");
                 }
             }
         }.timeout(60000));
@@ -299,7 +299,7 @@ public class MosMetroV2WV extends WebViewProvider {
                 if (!spb) {
                     return !wv.getURL().contains("auth.wi-fi.ru/auth");
                 } else {
-                    return !wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/start");
+                    return !wv.getURL().contains("auth.wi-fi.ru/spb/gapi/auth/init");
                 }
             }
         }.timeout(120000));
