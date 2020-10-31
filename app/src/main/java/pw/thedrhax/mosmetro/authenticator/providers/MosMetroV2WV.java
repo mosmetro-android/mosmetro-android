@@ -77,6 +77,13 @@ public class MosMetroV2WV extends WebViewProvider {
      */
     private Boolean spb = false;
 
+    /**
+     * Moscow Trains branch (MCC, CPPK, MCD)
+     * 
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/new
+     */
+    private Boolean mcc = false;
+
     public MosMetroV2WV(Context context, ParsedResponse res) {
         super(context);
 
@@ -102,6 +109,9 @@ public class MosMetroV2WV extends WebViewProvider {
                 if (uri.getPath().startsWith("/spb/new")) {
                     Logger.log(Logger.LEVEL.DEBUG, "Saint-Petersburg branch detected. Replacing URLs");
                     spb = true;
+                } else if (uri.getPath().startsWith("/new")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Trains branch detected. Replacing URLs");
+                    mcc = true;
                 }
 
                 if (uri.getQueryParameter("segment") != null) {
@@ -179,7 +189,7 @@ public class MosMetroV2WV extends WebViewProvider {
          * - Parse CSRF token
          * - Insert automation script into response
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/new)(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|(spb/)?new)(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
@@ -277,10 +287,12 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new WaitTask(this, "Waiting for auth page to load") {
             @Override
             public boolean until(HashMap<String, Object> vars) {
-                if (!spb) {
-                    return wv.getURL().contains("auth.wi-fi.ru/auth");
-                } else {
+                if (spb) {
                     return wv.getURL().contains("auth.wi-fi.ru/spb/new");
+                } else if (mcc) {
+                    return wv.getURL().contains("auth.wi-fi.ru/new");
+                } else {
+                    return wv.getURL().contains("auth.wi-fi.ru/auth");
                 }
             }
         }.timeout(60000));
@@ -301,10 +313,12 @@ public class MosMetroV2WV extends WebViewProvider {
                     return isConnected();
                 }
 
-                if (!spb) {
-                    return !wv.getURL().contains("auth.wi-fi.ru/auth");
-                } else {
+                if (spb) {
                     return !wv.getURL().contains("auth.wi-fi.ru/spb/new");
+                } else if (mcc) {
+                    return !wv.getURL().contains("auth.wi-fi.ru/new");
+                } else {
+                    return !wv.getURL().contains("auth.wi-fi.ru/auth");
                 }
             }
         }.timeout(120000));
