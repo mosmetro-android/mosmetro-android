@@ -59,15 +59,28 @@ public class MosMetroV2 extends Provider {
     private String redirect = "http://auth.wi-fi.ru/?segment=metro";
 
     /**
-     * Saint-Petersburg branch mode. Replaces hard-coded URLs.
+     * Saint-Petersburg branch mode. Replaces hardcoded URLs.
      *
-     * auth.wi-fi.ru → auth.wi-fi.ru/spb/new
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/gapi/auth/start
+     * auth.wi-fi.ru → none
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/new
+     * none → auth.wi-fi.ru/spb/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
-     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification (?)
      */
     private Boolean spb = false;
+
+    /**
+     * Moscow Trains branch mode. Replaces hardcoded URLs.
+     *
+     * auth.wi-fi.ru → none
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/new
+     * none → auth.wi-fi.ru/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
+     */
+    private Boolean mcc = false;
 
     public MosMetroV2(final Context context, final ParsedResponse res) {
         super(context);
@@ -94,12 +107,19 @@ public class MosMetroV2 extends Provider {
                 if (uri.getPath().startsWith("/spb/new")) {
                     Logger.log(Logger.LEVEL.DEBUG, "Saint-Petersburg branch detected. Replacing URLs");
                     spb = true;
+                } else if (uri.getPath().startsWith("/new")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Trains branch detected. Replacing URLs");
+                    mcc = true;
                 }
 
                 if (uri.getQueryParameter("segment") != null) {
                     vars.put("segment", uri.getQueryParameter("segment"));
                 } else {
                     vars.put("segment", "metro");
+                }
+
+                if (uri.getQueryParameter("mac") != null) {
+                    vars.put("mac", uri.getQueryParameter("mac"));
                 }
 
                 return true;
@@ -163,11 +183,13 @@ public class MosMetroV2 extends Provider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
+         *        https://auth.wi-fi.ru/new
+         *        https://auth.wi-fi.ru/spb/new
          * - Detect ban (302 redirect to /auto_auth)
          * - Detect if device is not registered in the network (302 redirect to /identification)
-         * - Parse CSRF token
+         * - Parse CSRF token (if present)
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|spb/gapi/auth/start)(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|(spb/)?new)(\\?.*)?") {
             @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
@@ -230,10 +252,18 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb) {
+                if (!spb && !mcc) {
                     url += "/auth?segment=" + vars.get("segment");
                 } else {
-                    url += "/spb/gapi/auth/start?segment=" + vars.get("segment");
+                    if (spb) {
+                        url += "/spb";
+                    }
+
+                    url += "/gapi/auth/start?segment=" + vars.get("segment");
+
+                    if (vars.containsKey("mac")) {
+                        url += "&clientMac=" + vars.get("mac");
+                    }
                 }
 
                 String prefix = "0:" + random.string(8) + ":";
@@ -263,7 +293,7 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (spb) return true;
+                if (spb || mcc) return true;
 
                 String token = new Randomizer(context).string(6);
                 Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
@@ -301,10 +331,18 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb) {
+                if (!spb && !mcc) {
                     url += "/auth/init?mode=0&segment=" + vars.get("segment");
                 } else {
-                    url += "/spb/gapi/auth/init?mode=0&segment=" + vars.get("segment");
+                    if (spb) {
+                        url += "/spb";
+                    }
+
+                    url += "/gapi/auth/init?mode=0&segment=" + vars.get("segment");
+
+                    if (vars.containsKey("mac")) {
+                        url += "&clientMac=" + vars.get("mac");
+                    }
                 }
 
                 try {
@@ -331,10 +369,14 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb) {
+                if (!spb && !mcc) {
                     url += "/auth/check?segment=" + vars.get("segment");
                 } else {
-                    url += "/spb/gapi/auth/check?segment=" + vars.get("segment");
+                    if (spb) {
+                        url += "/spb";
+                    }
+
+                    url += "/gapi/auth/check?segment=" + vars.get("segment");
                 }
 
                 try {
