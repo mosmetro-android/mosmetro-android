@@ -28,8 +28,6 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
@@ -80,7 +78,12 @@ public class MosMetroV2WV extends WebViewProvider {
     /**
      * Moscow Trains branch (MCC, CPPK, MCD)
      * 
+     * auth.wi-fi.ru → none
      * auth.wi-fi.ru/auth → auth.wi-fi.ru/new
+     * none → auth.wi-fi.ru/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
      */
     private Boolean mcc = false;
 
@@ -184,6 +187,8 @@ public class MosMetroV2WV extends WebViewProvider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
+         *        https://auth.wi-fi.ru/new
+         *        https://auth.wi-fi.ru/spb/new
          * - Detect ban (302 redirect to /auto_auth)
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
@@ -244,7 +249,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Replace GET /auth/init with POST /auth/init
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(spb/gapi/)?auth/init(_smart)?(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/((spb/)?gapi/)?auth/init(_smart)?(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 if (url.contains("auth/init_smart")) {
