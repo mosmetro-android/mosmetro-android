@@ -7,7 +7,7 @@
         android:key="pref_mosmetro_v2wv"
         android:title="@string/pref_mosmetro_v2wv"
         android:summary="@string/pref_mosmetro_v2wv_summary"
-        android:defaultValue="true" />
+        android:defaultValue="false" />
 
     <CheckBoxPreference
         android:key="pref_mosmetro_v3"
