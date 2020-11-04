@@ -250,8 +250,6 @@
     <string name="location_permission">Location permission</string>
     <string name="location_permission_saving">Starting with Android 9.0, you need to grant location permission to this application, so that it can automatically connect to network. Otherwise, only manual connection will be available.</string>
     <string name="log_wipe_confirmation">Clear log file?</string>
-
-    <string name="pref_mmv2wv_blacklist_default" translatable="false">.*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>
     <string name="pref_mosmetro_v2wv_summary">Extension of MosMetroV2 that triggers ad scripts in the headless browser to avoid ban from provider.</string>
 </resources>

@@ -34,7 +34,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -169,21 +168,6 @@ public class SettingsActivity extends Activity {
 
             setTitle(getString(R.string.pref_category_connection));
             addPreferencesFromResource(R.xml.pref_conn);
-
-            findPreference("pref_mmv2wv_blacklist").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object o) {
-                    if (((String)o).isEmpty()) {
-                        preference.getEditor().putString(
-                                preference.getKey(),
-                                getString(R.string.pref_mmv2wv_blacklist_default)
-                        ).apply();
-                        ((EditTextPreference)preference).setText(getString(R.string.pref_mmv2wv_blacklist_default));
-                        return false;
-                    }
-                    return true;
-                }
-            });
 
             PreferenceScreen screen = getPreferenceScreen();
 
