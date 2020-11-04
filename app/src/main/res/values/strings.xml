@@ -249,4 +249,7 @@
     <string name="log_wipe_confirmation">Clear log file?</string>
     <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>
     <string name="pref_mosmetro_v2wv_summary">Extension of MosMetroV2 that uses headless browser and JavaScript instead of hardcoded HTTP requests. Slower but safer if the provider would start to take action against this app\'s users again.</string>
+    <string name="auth_webview_page">Opening auth page</string>
+    <string name="auth_webview_page_wait">Waiting for page to load</string>
+    <string name="auth_webview_script">Waiting for script</string>
 </resources>
