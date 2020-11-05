@@ -244,7 +244,6 @@ public class MosMetroV3 extends Provider {
                         Logger.log(context.getString(R.string.auth_unknown_redirect));
                         provider = Provider.find(context, running);
                         vars.put("switch", provider.getName());
-                        vars.put("override", "true");
                     }
 
                     Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));

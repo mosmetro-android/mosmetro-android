@@ -247,8 +247,8 @@ public abstract class Provider extends LinkedList<Task> {
      * Start the connection sequence defined in child classes.
      */
     public RESULT start() {
+        ProviderMetrics metrics = new ProviderMetrics(this).start();
         HashMap<String,Object> vars = new HashMap<>();
-        vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
         Logger.date(">> ");
@@ -261,12 +261,9 @@ public abstract class Provider extends LinkedList<Task> {
         int progress;
         for (int i = 0; i < size(); i++) {
             if (isStopped()) {
-                deinit();
-                if (vars.get("result") != RESULT.ERROR) {
-                    return (RESULT) vars.get("result");
-                } else {
-                    return RESULT.INTERRUPTED;
-                }
+                if (vars.get("result") == RESULT.ERROR)
+                    vars.put("result", RESULT.INTERRUPTED);
+                break;
             }
 
             progress = (i + 1) * 100 / size();
@@ -279,8 +276,7 @@ public abstract class Provider extends LinkedList<Task> {
             if (!get(i).run(vars)) break;
         }
 
-        vars.put("time_end", System.currentTimeMillis());
-        new StatisticsTask(this).run(vars);
+        metrics.end(vars);
 
         deinit();
         Logger.date("<< ");

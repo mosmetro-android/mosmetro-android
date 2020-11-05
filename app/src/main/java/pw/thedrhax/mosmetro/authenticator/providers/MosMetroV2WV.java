@@ -19,7 +19,6 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -184,7 +183,6 @@ public class MosMetroV2WV extends WebViewProvider {
          * Async: https://auth.wi-fi.ru/auth
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
-         * - Detect ban (302 redirect to /auto_auth)
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
          * - Insert automation script into response
@@ -202,20 +200,6 @@ public class MosMetroV2WV extends WebViewProvider {
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 try {
                     String redirect = response.get300Redirect();
-
-                    if (redirect.contains("auto_auth")) {
-                        Logger.log(context.getString(R.string.auth_ban_message));
-
-                        // Increase ban counter
-                        settings.edit()
-                                .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                                .apply();
-
-                        context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-
-                        running.set(false);
-                        return new ParsedResponse("");
-                    }
 
                     if (redirect.contains("/identification")) { // not registered
                         Logger.log(context.getString(R.string.error,
