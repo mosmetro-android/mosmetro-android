@@ -18,8 +18,12 @@
 
 package pw.thedrhax.util;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import android.os.SystemClock;
 
@@ -30,31 +34,58 @@ import android.os.SystemClock;
  *   - Subscribe to already existing Listeners of the same type
  *   - Allow to retrieve and change the value of variable at any time
  *   - Notify about every change using the onChange() callback
+ *   - Debounce value changes (Source: https://stackoverflow.com/a/38296055)
  *   - Interruptible delays
- *   - Stack Overflow protection by checking if callback is the master
+ *   - Stack Overflow protection by checking if child is the master at the same time
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @param <T> type of the stored variable
  */
 public class Listener<T> {
+    private final Queue<Listener<T>> masters = new ConcurrentLinkedQueue<>();
+    private final Queue<Listener<T>> callbacks = new ConcurrentLinkedQueue<>();
     private T value;
-    private final List<Listener<T>> callbacks = new LinkedList<>();
+
+    private int debounce_ms = 0;
+    private Future<?> last_call = null;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
 
     public Listener(T initial_value) {
         value = initial_value;
     }
 
+    public final Listener<T> debounce(int time_ms) {
+        debounce_ms = time_ms; return this;
+    }
+
     public final synchronized void set(T new_value) {
         value = new_value;
-        onChange(new_value);
-        synchronized (callbacks) {
-            for (Listener<T> callback : callbacks) {
-                if (callback.callbacks.contains(this)) {
-                    callback.value = new_value;
-                    callback.onChange(new_value);
-                } else {
-                    callback.set(new_value);
+
+        if (debounce_ms == 0) {
+            onChange(new_value);
+        } else {
+            Future<?> prev_call = last_call;
+
+            last_call = scheduler.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    onChange(new_value);
+                    last_call = null;
                 }
+            }, debounce_ms, TimeUnit.MILLISECONDS);
+
+            if (prev_call != null) {
+                prev_call.cancel(true);
+            }
+        }
+
+        for (Listener<T> callback : callbacks) {
+            if (callback.callbacks.contains(this)) {
+                callback.value = new_value;
+                callback.onChange(new_value);
+            } else {
+                callback.set(new_value);
             }
         }
     }
@@ -91,23 +122,29 @@ public class Listener<T> {
     }
 
     public void subscribe(Listener<T> master) {
-        synchronized (master.callbacks) {
-            if (!master.callbacks.contains(this)) {
-                master.callbacks.add(this);
-            }
+        if (!master.callbacks.contains(this)) {
+            master.callbacks.add(this);
+        }
+        if (!masters.contains(master)) {
+            masters.add(master);
         }
         this.value = master.value;
     }
 
-    public void unsubscribe(Listener<T> master) {
-        synchronized (master.callbacks) {
-            if (master.callbacks.contains(this)) {
-                master.callbacks.remove(this);
-            }
+    public void unsubscribe() {
+        for (Listener<T> master : masters) {
+            unsubscribe(master);
         }
     }
 
-    public void onChange(T new_value) {
-
+    public void unsubscribe(Listener<T> master) {
+        if (master.callbacks.contains(this)) {
+            master.callbacks.remove(this);
+        }
+        if (masters.contains(master)) {
+            masters.remove(master);
+        }
     }
+
+    public void onChange(T new_value) {}
 }

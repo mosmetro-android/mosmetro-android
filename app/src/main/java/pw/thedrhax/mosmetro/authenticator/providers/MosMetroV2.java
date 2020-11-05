@@ -19,7 +19,6 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Patterns;
@@ -185,7 +184,6 @@ public class MosMetroV2 extends Provider {
          * Async: https://auth.wi-fi.ru/auth
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
-         * - Detect ban (302 redirect to /auto_auth)
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token (if present)
          */
@@ -202,20 +200,6 @@ public class MosMetroV2 extends Provider {
             public ParsedResponse response(Client client, String url, ParsedResponse response) {
                 try {
                     String redirect = response.get300Redirect();
-
-                    if (redirect.contains("/auto_auth")) { // banned
-                        Logger.log(context.getString(R.string.auth_ban_message));
-
-                        // Increase ban counter
-                        settings.edit()
-                                .putInt("metric_ban_count", settings.getInt("metric_ban_count", 0) + 1)
-                                .apply();
-
-                        context.sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.MosMetroV2.BANNED"));
-
-                        running.set(false);
-                        return response;
-                    }
 
                     if (redirect.contains("/identification")) { // not registered
                         Logger.log(context.getString(R.string.error,
@@ -361,8 +345,9 @@ public class MosMetroV2 extends Provider {
         });
 
         /**
-         * Checking Internet connection
-         * JSON result > status
+         * Checking auth state
+         * ⇒ GET http://auth.wi-fi.ru/auth/check?segment=... < redirect, segment
+         * ⇐ JSON result == true
          */
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
@@ -382,19 +367,39 @@ public class MosMetroV2 extends Provider {
                 try {
                     JSONObject response = client.get(url, null, pref_retry_count).json();
 
-                    if ((Boolean) response.get("result")) {
-                        Logger.log(context.getString(R.string.auth_connected));
-                        vars.put("result", RESULT.CONNECTED);
-                        return true;
+                    Logger.log(Logger.LEVEL.DEBUG, response.toJSONString());
+
+                    if (!((Boolean) response.get("result"))) {
+                        throw new ParseException("Unexpected answer: false", 0);
                     }
-                } catch (IOException|org.json.simple.parser.ParseException ex) {
+                } catch (IOException|org.json.simple.parser.ParseException|ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_server)
+                    ));
+                    return false;
                 }
 
-                Logger.log(context.getString(R.string.error,
-                        context.getString(R.string.auth_error_connection)
-                ));
-                return false;
+                return true;
+            }
+        });
+
+        /**
+         * Checking Internet connection
+         */
+        add(new Task() {
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                if (isConnected()) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                    return true;
+                } else {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_connection)
+                    ));
+                    return false;
+                }
             }
         });
     }

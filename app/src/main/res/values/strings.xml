@@ -148,6 +148,7 @@
         provider %s is not supported by application yet. Maybe the network is maintained by two providers
         one of which is not supported yet. We apologize for inconvenience.
     </string>
+    <string name="auth_error_regex" formatted="false">can\'t compile RegEx: %s</string>
     <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>
 
     <string name="notification_success">Successfully connected</string>
@@ -216,8 +217,6 @@
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
     <string name="pref_delay">Delay range (seconds)</string>
     <string name="pref_delay_summary">Set the range of random delays applied for every request.</string>
-    <string name="pref_load_resources">Emulate resource loading (beta)</string>
-    <string name="pref_load_resources_summary">Download all resources included into HTML page to emulate browser activity.</string>
     <string name="pref_user_agent">User-Agent header</string>
     <string name="pref_user_agent_summary">Set the User-Agent HTTP header to disguise this app as browser. The random one is chosen by default.</string>
     <string name="do_not_warn">Do not warn anymore</string>
@@ -241,7 +240,6 @@
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
     <string name="pref_mainet_credentials">MAInet settings</string>
     <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
-    <string name="auth_error_regex" formatted="false">can\'t compile RegEx: %s</string>
     <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
     <string name="pref_debug_last_log">Send the last log</string>
     <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>
@@ -249,4 +247,9 @@
     <string name="location_permission">Location permission</string>
     <string name="location_permission_saving">Starting with Android 9.0, you need to grant location permission to this application, so that it can automatically connect to network. Otherwise, only manual connection will be available.</string>
     <string name="log_wipe_confirmation">Clear log file?</string>
+    <string name="pref_mosmetro_v2wv">MosMetroV2WV (beta)</string>
+    <string name="pref_mosmetro_v2wv_summary">Extension of MosMetroV2 that uses headless browser and JavaScript instead of hardcoded HTTP requests. Slower but safer if the provider would start to take action against this app\'s users again.</string>
+    <string name="auth_webview_page">Opening auth page</string>
+    <string name="auth_webview_page_wait">Waiting for page to load</string>
+    <string name="auth_webview_script">Waiting for script</string>
 </resources>

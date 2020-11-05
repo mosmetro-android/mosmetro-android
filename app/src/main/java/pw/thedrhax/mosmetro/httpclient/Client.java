@@ -43,6 +43,7 @@ public abstract class Client {
 
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
+    public static final String HEADER_ACAO = "Access-Control-Allow-Origin";
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
@@ -73,10 +74,8 @@ public abstract class Client {
 
     public Client configure() {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
-
         setHeader(HEADER_USER_AGENT, random.cached_useragent());
         setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-
         return this;
     }
 
@@ -116,6 +115,13 @@ public abstract class Client {
     public abstract Client setCookie(String url, String name, String value);
     public abstract Map<String,String> getCookies(String url);
 
+    public Client setCookies(String url, Map<String,String> cookies) {
+        for (String name : cookies.keySet()) {
+            setCookie(url, name, cookies.get(name));
+        }
+        return this;
+    }
+
     public abstract Client setTimeout(int ms);
 
     // IO methods
@@ -149,16 +155,14 @@ public abstract class Client {
         }
 
         if (response == null) {
-            return new ParsedResponse(link, "", 500, null);
+            return new ParsedResponse("");
         }
 
         String type = response.getResponseHeader(HEADER_CONTENT_TYPE.toLowerCase());
 
         if (type != null && type.startsWith("text/html")) {
-            setHeader(Client.HEADER_REFERER, response.getURL());
-
-            if (settings.getBoolean("pref_load_resources", true)) {
-                response.loadResources(Client.this);
+            if (!response.getURL().isEmpty()) {
+                setHeader(Client.HEADER_REFERER, response.getURL());
             }
         }
 

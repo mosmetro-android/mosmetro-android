@@ -139,6 +139,7 @@
         провайдер %s ещё не поддерживается приложением. Возможно, что одной и той же сетью управляют
         два провайдера, поддержка одного из которых ещё не реализована. Извините за возможные неудобства.
     </string>
+    <string name="auth_error_regex" formatted="false">не удалось скомпилировать RegEx: %s</string>
     <string name="auth_error_mosmetrov3_loop">ожидалось перенаправление на другой алгоритм, получено перенаправление на MosMetroV3 (бесконечный цикл)</string>
 
     <string name="notification_success">Успешно подключено</string>
@@ -195,8 +196,6 @@
     <string name="pref_internet_check_interval_summary">Количество секунд между проверками. Влияет на трафик и потребление энергии.</string>
     <string name="pref_delay">Диапазон задержек (в секундах)</string>
     <string name="pref_delay_summary">Диапазон значений случайной задержки, добавляемой к каждому запросу.</string>
-    <string name="pref_load_resources">Имитация загрузки ресурсов (бета)</string>
-    <string name="pref_load_resources_summary">Скачивать все ресурсы, включённые в HTML-страницу, для более точной имитации поведения браузера.</string>
     <string name="pref_user_agent">Заголовок User-Agent</string>
     <string name="pref_user_agent_summary">Заголовок HTTP User-Agent используется для маскировки приложения под браузер. По умолчанию выбирается случайное значение.</string>
     <string name="do_not_warn">Больше не предупреждать</string>
@@ -215,10 +214,11 @@
     <string name="pref_debug">Отладка</string>
     <string name="pref_debug_summary">Автоматические отчёты, LogCat, и т.д.</string>
     <string name="pref_mosmetro_v3_summary">Этот алгоритм необходим для подключения только в Санкт-Петербурге, но в будущем может стать необходимым и в других регионах.</string>
+    <string name="pref_mosmetro_v2wv">MosMetroV2WV (бета)</string>
+    <string name="pref_mosmetro_v2wv_summary">Расширение алгоритма MosMetroV2, использующее браузер в фоновом режиме вместо заранее заданных HTTP запросов. Медленнее, но безопаснее, если провайдер снова начнёт принимать меры против пользователей данного приложения.</string>
     <string name="pref_mainet_summary">Этот алгоритм используется для авторизации в сети MAInet_public Московского авиационного института.</string>
     <string name="pref_mainet_credentials">Настройки MAInet</string>
     <string name="pref_mainet_credentials_summary">Здесь вы можете настроить данные для входа в сеть MAInet_public.</string>
-    <string name="auth_error_regex" formatted="false">не удалось скомпилировать RegEx: %s</string>
     <string name="auth_algorithm_continue" formatted="false">Переключаюсь обратно на алгоритм %s</string>
     <string name="pref_debug_last_log">Отправлять последний лог</string>
     <string name="pref_debug_last_log_summary">Лог будет отправляться вместе с отчетами ACRA в случае сбоя.</string>
@@ -226,4 +226,7 @@
     <string name="location_permission">Определение местоположения</string>
     <string name="location_permission_saving">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на определение местоположения. В противном случае будет работать только ручное подключение.</string>
     <string name="log_wipe_confirmation">Очистить файл лога?</string>
+    <string name="auth_webview_page">Получение страницы авторизации</string>
+    <string name="auth_webview_page_wait">Ожидание загрузки страницы</string>
+    <string name="auth_webview_script">Ожидание завершения скрипта</string>
 </resources>

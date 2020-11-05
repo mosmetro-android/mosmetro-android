@@ -258,8 +258,8 @@ public class OkHttp extends Client {
         }
 
         return new ParsedResponse(
-                response.request().url().toString(), body.string(),
-                response.code(), response.headers().toMultimap()
+                response.request().url().toString(), body.bytes(),
+                response.code(), response.message(), response.headers().toMultimap()
         );
     }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:orientation="vertical">
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="visible">
+
+    </WebView>
+</LinearLayout>

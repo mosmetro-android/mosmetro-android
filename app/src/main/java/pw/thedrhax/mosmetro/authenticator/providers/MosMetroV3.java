@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import org.json.simple.JSONObject;
@@ -243,7 +244,6 @@ public class MosMetroV3 extends Provider {
                         Logger.log(context.getString(R.string.auth_unknown_redirect));
                         provider = Provider.find(context, running);
                         vars.put("switch", provider.getName());
-                        vars.put("override", "true");
                     }
 
                     Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
@@ -260,9 +260,10 @@ public class MosMetroV3 extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
-        String redirect;
+    public static boolean match(ParsedResponse response, SharedPreferences settings) {
+        if (!settings.getBoolean("pref_mosmetro_v3", true)) return false;
 
+        String redirect;
         try {
             redirect = response.parseAnyRedirect();
         } catch (ParseException ex) {

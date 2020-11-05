@@ -4,6 +4,12 @@
     <PreferenceCategory android:title="Алгоритмы" />
 
     <CheckBoxPreference
+        android:key="pref_mosmetro_v2wv"
+        android:title="@string/pref_mosmetro_v2wv"
+        android:summary="@string/pref_mosmetro_v2wv_summary"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
         android:key="pref_mosmetro_v3"
         android:title="@string/pref_mosmetro_v3"
         android:summary="@string/pref_mosmetro_v3_summary"
@@ -84,12 +90,6 @@
         android:key="pref_user_agent"
         android:title="@string/pref_user_agent"
         android:summary="@string/pref_user_agent_summary" />
-
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_load_resources"
-        android:title="@string/pref_load_resources"
-        android:summary="@string/pref_load_resources_summary" />
 
     <PreferenceCategory android:title="@string/pref_category_delays" />
 

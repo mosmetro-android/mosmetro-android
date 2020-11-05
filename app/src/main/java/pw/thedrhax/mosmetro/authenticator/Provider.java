@@ -32,6 +32,7 @@ import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
+import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2WV;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2mcc;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
@@ -94,7 +95,8 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, ParsedResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (MosMetroV3.match(response) && settings.getBoolean("pref_mosmetro_v3", true)) return new MosMetroV3(context, response);
+        if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
+        else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
@@ -245,8 +247,8 @@ public abstract class Provider extends LinkedList<Task> {
      * Start the connection sequence defined in child classes.
      */
     public RESULT start() {
+        ProviderMetrics metrics = new ProviderMetrics(this).start();
         HashMap<String,Object> vars = new HashMap<>();
-        vars.put("time_start", System.currentTimeMillis());
         vars.put("result", RESULT.ERROR);
 
         Logger.date(">> ");
@@ -259,12 +261,9 @@ public abstract class Provider extends LinkedList<Task> {
         int progress;
         for (int i = 0; i < size(); i++) {
             if (isStopped()) {
-                deinit();
-                if (vars.get("result") != RESULT.ERROR) {
-                    return (RESULT) vars.get("result");
-                } else {
-                    return RESULT.INTERRUPTED;
-                }
+                if (vars.get("result") == RESULT.ERROR)
+                    vars.put("result", RESULT.INTERRUPTED);
+                break;
             }
 
             progress = (i + 1) * 100 / size();
@@ -277,8 +276,7 @@ public abstract class Provider extends LinkedList<Task> {
             if (!get(i).run(vars)) break;
         }
 
-        vars.put("time_end", System.currentTimeMillis());
-        new StatisticsTask(this).run(vars);
+        metrics.end(vars);
 
         deinit();
         Logger.date("<< ");

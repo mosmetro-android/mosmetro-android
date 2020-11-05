@@ -28,7 +28,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,37 +41,49 @@ import pw.thedrhax.util.Logger;
 
 public class ParsedResponse {
     private String url;
-    private String html;
-    private Document document;
+    private byte[] bytes;
     private int code;
+    private String reason;
     private Map<String,List<String>> headers = new HashMap<>();
 
-    public ParsedResponse(@Nullable String url, @Nullable String html, int code,
+    private String html;
+    private Document document;
+
+    public ParsedResponse(@NonNull String url, @NonNull byte[] bytes, int code, String reason,
                           @Nullable Map<String,List<String>> headers) {
         this.url = url;
-        this.html = html;
-
-        if (html != null && !html.isEmpty()) {
-            document = Jsoup.parse(html, url);
-
-            // Clean-up useless tags: <script> without src, <style>
-            for (Element element : document.getElementsByTag("script")) {
-                if (!element.hasAttr("src")) {
-                    element.remove();
-                }
-            }
-            document.getElementsByTag("style").remove();
-        }
-
+        this.bytes = bytes;
         this.code = code;
+        this.reason = reason;
 
         if (headers != null){
             this.headers.putAll(headers);
         }
+
+        try {
+            html = new String(bytes, getEncoding());
+        } catch (UnsupportedEncodingException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+        }
+
+        if (html != null && !html.isEmpty() && getMimeType().contains("text/html")) {
+            document = Jsoup.parse(html, url);
+        }
+    }
+
+    public ParsedResponse(String content, String content_type) {
+        this("", content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
+            put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
+                add(content_type);
+            }});
+            put(Client.HEADER_ACAO.toLowerCase(), new LinkedList<String>() {{
+                add("*");
+            }});
+        }});
     }
 
     public ParsedResponse(String html) {
-        this("", html, 200, null);
+        this(html, "text/html; charset=utf-8");
     }
 
     @NonNull
@@ -77,13 +91,21 @@ public class ParsedResponse {
         return html;
     }
 
-    @Nullable
+    @NonNull
     public String getURL() {
         return url;
     }
 
     public int getResponseCode() {
         return code;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public Map<String,List<String>> getHeaders() {
+        return headers;
     }
 
     @Nullable
@@ -97,6 +119,47 @@ public class ParsedResponse {
 
     public Document getPageContent() {
         return document != null ? document : Jsoup.parse("<html></html>");
+    }
+
+    @NonNull
+    public String getContentType() {
+        if (headers.containsKey(Client.HEADER_CONTENT_TYPE.toLowerCase())) {
+            return headers.get(Client.HEADER_CONTENT_TYPE.toLowerCase()).get(0);
+        } else {
+            return "text/plain";
+        }
+    }
+
+    @NonNull
+    public String getMimeType() {
+        return getContentType().split("; ")[0];
+    }
+
+    @NonNull
+    public String getEncoding() {
+        String content_type = getContentType();
+
+        for (String param : content_type.split(";")) {
+            if (param.contains("charset")) {
+                return param.split("charset=")[1];
+            }
+        }
+
+        return "utf-8";
+    }
+
+    @NonNull
+    public byte[] getBytes() {
+        if (document != null) {
+            return document.outerHtml().getBytes();
+        } else {
+            return bytes;
+        }
+    }
+
+    @Nullable
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(getBytes());
     }
 
     public String parseMetaContent (String name) throws ParseException {
@@ -195,65 +258,6 @@ public class ParsedResponse {
         }
     }
 
-    public List<String> parseResourceList() {
-        LinkedList<String> links = new LinkedList<>();
-
-        if (document == null) {
-            return links;
-        }
-
-        // <link href="..." />
-        for (Element element : document.getElementsByTag("link")) {
-            if (element.hasAttr("rel")) {
-                String rel = element.attr("rel");
-
-                if (!("icon".equals(rel) || "stylesheet".equals(rel)))
-                    continue;
-            }
-
-            if (element.hasAttr("href"))
-                links.add(element.attr("href"));
-        }
-
-        // <script src="..." />
-        for (Element element : document.getElementsByTag("script")) {
-            if (element.hasAttr("src"))
-                links.add(element.attr("src"));
-        }
-
-        // <img src="..." />
-        for (Element element : document.getElementsByTag("img")) {
-            if (element.hasAttr("src"))
-                links.add(element.attr("src"));
-        }
-
-        // Absolute path to full URL
-        LinkedList<String> result = new LinkedList<>();
-        for (String link : links) {
-            try {
-                String url = absolutePathToUrl(this.url, link);
-                if (!result.contains(url))
-                    result.add(url);
-            } catch (ParseException ignored) {}
-        }
-
-        return result;
-    }
-
-    public void loadResources(Client client) {
-        for (String link : parseResourceList()) {
-            Logger.log(this, link);
-
-            try {
-                client.get(link, null);
-            } catch (IOException ignored) {}
-
-            if (!client.running.get()) {
-                break;
-            }
-        }
-    }
-
     public static Map<String,String> parseForm (Element form) {
         Map<String,String> result = new HashMap<>();
 
@@ -272,6 +276,7 @@ public class ParsedResponse {
 
         builder.append("URL: ").append(" ").append(url).append("\n");
         builder.append("Response code: ").append(code).append("\n");
+        builder.append("Response reason: ").append(reason).append("\n");
 
         for (String header : headers.keySet()) {
             for (String value : headers.get(header)) {
