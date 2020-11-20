@@ -57,8 +57,10 @@ import pw.thedrhax.util.Randomizer;
 public class MosMetroV2 extends Provider {
     private String redirect = "http://auth.wi-fi.ru/?segment=metro";
 
+    // TODO: Split branches into sub-providers
+
     /**
-     * Saint-Petersburg branch mode. Replaces hardcoded URLs.
+     * Saint-Petersburg branch
      *
      * auth.wi-fi.ru → none
      * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/new
@@ -70,7 +72,7 @@ public class MosMetroV2 extends Provider {
     private Boolean spb = false;
 
     /**
-     * Moscow Trains branch mode. Replaces hardcoded URLs.
+     * Moscow Trains branch (MCC, CPPK, MCD)
      *
      * auth.wi-fi.ru → none
      * auth.wi-fi.ru/auth → auth.wi-fi.ru/new
@@ -80,6 +82,18 @@ public class MosMetroV2 extends Provider {
      * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
      */
     private Boolean mcc = false;
+
+    /**
+     * Moscow Metro branch
+     * 
+     * auth.wi-fi.ru → none
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/metro
+     * none → auth.wi-fi.ru/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
+     */
+    private Boolean mosmetro = false;
 
     public MosMetroV2(final Context context, final ParsedResponse res) {
         super(context);
@@ -109,6 +123,9 @@ public class MosMetroV2 extends Provider {
                 } else if (uri.getPath().startsWith("/new")) {
                     Logger.log(Logger.LEVEL.DEBUG, "Moscow Trains branch detected. Replacing URLs");
                     mcc = true;
+                } else if (uri.getPath().startsWith("/metro")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Metro branch detected. Replacing URLs");
+                    mosmetro = true;
                 }
 
                 if (uri.getQueryParameter("segment") != null) {
@@ -182,12 +199,13 @@ public class MosMetroV2 extends Provider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
+         *        https://auth.wi-fi.ru/metro
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token (if present)
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|(spb/)?new)(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
             @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
@@ -236,7 +254,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc) {
+                if (!spb && !mcc && !mosmetro) {
                     url += "/auth?segment=" + vars.get("segment");
                 } else {
                     if (spb) {
@@ -277,7 +295,7 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (spb || mcc) return true;
+                if (spb || mcc || mosmetro) return true;
 
                 String token = new Randomizer(context).string(6);
                 Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
@@ -315,7 +333,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc) {
+                if (!spb && !mcc && !mosmetro) {
                     url += "/auth/init?mode=0&segment=" + vars.get("segment");
                 } else {
                     if (spb) {
@@ -354,7 +372,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc) {
+                if (!spb && !mcc && !mosmetro) {
                     url += "/auth/check?segment=" + vars.get("segment");
                 } else {
                     if (spb) {

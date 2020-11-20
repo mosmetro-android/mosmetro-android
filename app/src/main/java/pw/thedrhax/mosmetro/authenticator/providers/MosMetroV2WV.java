@@ -62,8 +62,10 @@ import pw.thedrhax.util.Util;
 public class MosMetroV2WV extends WebViewProvider {
     private String redirect = "http://auth.wi-fi.ru/?segment=metro";
 
+    // TODO: Split branches into sub-providers
+
     /**
-     * Saint-Petersburg branch mode. Replaces hard-coded URLs.
+     * Saint-Petersburg branch
      *
      * auth.wi-fi.ru → none
      * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/new
@@ -85,6 +87,18 @@ public class MosMetroV2WV extends WebViewProvider {
      * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
      */
     private Boolean mcc = false;
+
+    /**
+     * Moscow Metro branch
+     * 
+     * auth.wi-fi.ru → none
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/metro
+     * none → auth.wi-fi.ru/gapi/auth/start
+     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
+     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
+     */
+    private Boolean mosmetro = false;
 
     public MosMetroV2WV(Context context, ParsedResponse res) {
         super(context);
@@ -114,6 +128,9 @@ public class MosMetroV2WV extends WebViewProvider {
                 } else if (uri.getPath().startsWith("/new")) {
                     Logger.log(Logger.LEVEL.DEBUG, "Moscow Trains branch detected. Replacing URLs");
                     mcc = true;
+                } else if (uri.getPath().startsWith("/metro")) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Metro branch detected. Replacing URLs");
+                    mosmetro = true;
                 }
 
                 if (uri.getQueryParameter("segment") != null) {
@@ -181,13 +198,14 @@ public class MosMetroV2WV extends WebViewProvider {
 
         /**
          * Async: https://auth.wi-fi.ru/auth
+         *        https://auth.wi-fi.ru/metro
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
          * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
          * - Insert automation script into response
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|(spb/)?new)(\\?.*)?") {
+        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
@@ -275,6 +293,8 @@ public class MosMetroV2WV extends WebViewProvider {
                     return wv.getURL().contains("auth.wi-fi.ru/spb/new");
                 } else if (mcc) {
                     return wv.getURL().contains("auth.wi-fi.ru/new");
+                } else if (mosmetro) {
+                    return wv.getURL().contains("auth.wi-fi.ru/metro");
                 } else {
                     return wv.getURL().contains("auth.wi-fi.ru/auth");
                 }
@@ -301,6 +321,8 @@ public class MosMetroV2WV extends WebViewProvider {
                     return !wv.getURL().contains("auth.wi-fi.ru/spb/new");
                 } else if (mcc) {
                     return !wv.getURL().contains("auth.wi-fi.ru/new");
+                } else if (mosmetro) {
+                    return !wv.getURL().contains("auth.wi-fi.ru/metro");
                 } else {
                     return !wv.getURL().contains("auth.wi-fi.ru/auth");
                 }
