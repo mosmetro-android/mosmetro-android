@@ -235,7 +235,7 @@
     <string name="pref_debug">Debug options</string>
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
-    <string name="pref_mosmetro_v3_summary">This algorithm is required only in Saint Petersburg, but may become required in other regions in the future.</string>
+    <string name="pref_mosmetro_v3_summary">This algorithm was used during the 2018 FIFA World Cup in Moscow and St. Petersburg. It is currently disabled, so most likely this setting will not affect anything.</string>
     <string name="pref_mainet">MAInet (wifi.mai.ru)</string>
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
     <string name="pref_mainet_credentials">MAInet settings</string>
