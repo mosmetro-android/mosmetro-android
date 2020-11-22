@@ -30,7 +30,6 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
-import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
@@ -82,16 +81,17 @@ class ProviderMetrics {
             params.put("duration", "" + (System.currentTimeMillis() - start_ts));
         }
 
-        if (p instanceof MosMetroV3) {
+        if (vars.containsKey("switch")) {
             provider = (String) vars.get("switch");
             params.put("switch", provider);
         }
 
-        switch (provider) {
-            case "MosMetroV2":
-            case "MosMetroV2mcc":
-            case "MosMetroV2WV":
-                params.put("segment", (String)vars.get("segment"));
+        if (vars.containsKey("segment")) {
+            params.put("segment", (String) vars.get("segment"));
+        }
+
+        if (vars.containsKey("branch")) {
+            params.put("branch", (String) vars.get("branch"));
         }
 
         new AsyncTask<Void,Void,Void>() {

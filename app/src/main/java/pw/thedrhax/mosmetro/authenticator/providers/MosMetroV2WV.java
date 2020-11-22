@@ -123,21 +123,27 @@ public class MosMetroV2WV extends WebViewProvider {
                 Uri uri = Uri.parse(redirect);
 
                 if (uri.getPath().startsWith("/spb/new")) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Saint-Petersburg branch detected. Replacing URLs");
+                    vars.put("branch", "spb");
                     spb = true;
                 } else if (uri.getPath().startsWith("/new")) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Trains branch detected. Replacing URLs");
+                    vars.put("branch", "mcc");
                     mcc = true;
                 } else if (uri.getPath().startsWith("/metro")) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Moscow Metro branch detected. Replacing URLs");
+                    vars.put("branch", "metro");
                     mosmetro = true;
+                } else {
+                    vars.put("branch", "default");
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, "Branch: " + vars.get("branch"));
 
                 if (uri.getQueryParameter("segment") != null) {
                     vars.put("segment", uri.getQueryParameter("segment"));
                 } else {
                     vars.put("segment", "metro");
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, "Segment: " + vars.get("segment"));
 
                 return true;
             }
