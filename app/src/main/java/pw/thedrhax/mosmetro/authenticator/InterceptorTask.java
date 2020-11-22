@@ -41,15 +41,12 @@ public abstract class InterceptorTask implements Task {
     protected HashMap<String,Object> vars = null;
 
     public InterceptorTask(Provider p, String regex) {
-        this.p = p;
-        this.regex = regex;
+        this(p, Pattern.compile(regex));
+    }
 
-        try {
-            this.pattern = Pattern.compile(regex);
-        } catch (PatternSyntaxException ex) {
-            this.pattern = null;
-            this.ex = ex;
-        }
+    public InterceptorTask(Provider p, Pattern pattern) {
+        this.p = p;
+        this.pattern = pattern;
     }
 
     @Override
