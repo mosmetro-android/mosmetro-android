@@ -234,6 +234,9 @@ public class MosMetroV2WV extends WebViewProvider {
                         running.set(false);
                         return new ParsedResponse("");
                     }
+
+                    // Follow 3xx redirect because it can not be passed to WebView
+                    response = client.get(redirect, null, pref_retry_count);
                 } catch (ParseException ignored) {}
 
                 try {

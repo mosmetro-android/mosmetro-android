@@ -221,7 +221,7 @@ public class MosMetroV2 extends Provider {
             }
 
             @NonNull @Override
-            public ParsedResponse response(Client client, String url, ParsedResponse response) {
+            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 try {
                     String redirect = response.get300Redirect();
 
@@ -234,6 +234,9 @@ public class MosMetroV2 extends Provider {
                         running.set(false);
                         return response;
                     }
+
+                    // Follow 3xx redirect
+                    response = client.get(redirect, null, pref_retry_count);
                 } catch (ParseException ignored) {}
 
                 try {
