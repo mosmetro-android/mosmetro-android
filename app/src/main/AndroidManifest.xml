@@ -118,7 +118,7 @@
         <!-- Content Providers -->
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="pw.thedrhax.mosmetro.provider"
             android:exported="false"
             android:grantUriPermissions="true">

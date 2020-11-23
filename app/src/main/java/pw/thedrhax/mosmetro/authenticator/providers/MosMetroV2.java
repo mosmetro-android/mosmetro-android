@@ -20,7 +20,7 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;

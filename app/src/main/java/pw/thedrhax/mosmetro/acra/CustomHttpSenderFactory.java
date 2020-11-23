@@ -19,7 +19,7 @@
 package pw.thedrhax.mosmetro.acra;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import pw.thedrhax.mosmetro.BuildConfig;
 
 import org.acra.config.CoreConfiguration;
