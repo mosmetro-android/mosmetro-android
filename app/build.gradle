@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'androidsvgdrawable'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
