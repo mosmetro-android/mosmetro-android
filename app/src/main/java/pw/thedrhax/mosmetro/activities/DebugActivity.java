@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,6 +30,8 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
@@ -48,7 +49,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 
-public class DebugActivity extends Activity {
+public class DebugActivity extends AppCompatActivity {
     public static final String INTENT_VIEW_ONLY = "view_only";
 
     // UI Elements
@@ -145,11 +146,11 @@ public class DebugActivity extends Activity {
         inflater.inflate(R.menu.debug_activity, menu);
 
         // Show back button in menu
-        if (getActionBar() != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

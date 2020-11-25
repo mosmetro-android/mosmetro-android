@@ -18,15 +18,16 @@
 
 package pw.thedrhax.mosmetro.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import pw.thedrhax.mosmetro.R;
 
-public class ShortcutDialog extends Activity {
+public class ShortcutDialog extends AppCompatActivity {
     private CheckBox check_background;
     private CheckBox check_force;
     private CheckBox check_log;
