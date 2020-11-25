@@ -19,8 +19,6 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -42,6 +40,9 @@ import android.preference.PreferenceScreen;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,7 +64,7 @@ import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Version;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
     private SettingsFragment fragment;
     private Listener<Map<String,UpdateCheckTask.Branch>> branches;
     private SharedPreferences settings;
@@ -78,7 +79,7 @@ public class SettingsActivity extends Activity {
 
     public static class NestedFragment extends PreferenceFragment {
         protected void setTitle(String title) {
-            ActionBar bar = getActivity().getActionBar();
+            ActionBar bar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (bar != null) bar.setTitle(title);
         }
 
@@ -254,7 +255,7 @@ public class SettingsActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings_activity, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void donate_dialog() {
@@ -451,7 +452,7 @@ public class SettingsActivity extends Activity {
             public void onBackStackChanged() {
                 boolean root = fmanager.getBackStackEntryCount() == 0;
 
-                ActionBar bar = getActionBar();
+                ActionBar bar = getSupportActionBar();
                 if (bar != null) {
                     bar.setDisplayHomeAsUpEnabled(!root);
 
