@@ -113,7 +113,7 @@ dependencies {
     implementation 'dnsjava:dnsjava:2.1.9'
 
     // ACRA
-    def acraVersion = '5.4.0'
+    def acraVersion = '5.7.0'
     implementation "ch.acra:acra-core:$acraVersion"
     implementation "ch.acra:acra-http:$acraVersion"
 }
