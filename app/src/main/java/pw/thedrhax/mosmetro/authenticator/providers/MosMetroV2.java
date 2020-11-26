@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import android.util.Patterns;
 
 import org.json.simple.JSONObject;
+import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.net.ProtocolException;
@@ -192,6 +193,14 @@ public class MosMetroV2 extends Provider {
 
                     ParsedResponse response = client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
+
+                    Element script = response.getPageContent().body().getElementsByTag("script").last();
+                    if (mosmetro && script != null && script.html().contains("auth.wi-fi.ru/auth")) {
+                        Logger.log(Logger.LEVEL.DEBUG, "Falling back to default branch");
+                        vars.put("branch", "metro-fallback");
+                        mosmetro = false;
+                    }
+
                     return true;
                 } catch (IOException | ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
