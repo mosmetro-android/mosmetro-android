@@ -114,7 +114,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-        ParsedResponse response = new Gen204(context, running).check(true);
+        ParsedResponse response = new Gen204(context, running).check(true).response;
         Provider result = Provider.find(context, response);
         return result;
     }
@@ -148,22 +148,12 @@ public abstract class Provider extends LinkedList<Task> {
 
     /**
      * Checks network connection state for a specific provider.
-     * 
-     * @param false_negatives If true, false negatives will be treated as real ones.
-     * @return True if internet access is available; otherwise, false is returned.
-     */
-    public boolean isConnected(boolean false_negatives) {
-        return isConnected(gen_204.check(false_negatives));
-    }
-
-    /**
-     * Checks network connection state for a specific provider.
      * This method ignores false negatives by default.
      * 
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return isConnected(false);
+        return isConnected(gen_204.check(false).response);
     }
 
     /**

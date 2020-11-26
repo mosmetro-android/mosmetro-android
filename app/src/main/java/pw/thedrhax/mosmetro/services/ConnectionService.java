@@ -25,12 +25,15 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
+import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -55,9 +58,6 @@ public class ConnectionService extends IntentService {
 
     // Notifications
     private Notify notify;
-
-    // Authenticator
-    private Provider provider;
 
     public ConnectionService () {
 		super("ConnectionService");
@@ -217,7 +217,7 @@ public class ConnectionService extends IntentService {
         return true;
     }
 
-    private Provider.RESULT connect() {
+    private Provider.RESULT connect(Provider provider) {
         Provider.RESULT result;
         int count = 0;
         int pref_retry_delay = Util.getIntPreference(this, "pref_retry_delay", 5) * 1000;
@@ -299,6 +299,7 @@ public class ConnectionService extends IntentService {
 
             running.set(true);
             boolean first_iteration = true;
+            HashMap<String,Object> vars = new HashMap<String,Object>();
             while (running.get()) {
                 if (!first_iteration) {
                     Logger.log(this, "Still alive!");
@@ -306,7 +307,7 @@ public class ConnectionService extends IntentService {
                     first_iteration = false;
                 }
 
-                main();
+                main(vars);
             }
             lock.unlock();
 
@@ -323,7 +324,7 @@ public class ConnectionService extends IntentService {
         }
     }
 
-    private void main() {
+    private void main(HashMap<String,Object> vars) {
         notify.icon(R.drawable.ic_notification_connecting_colored,
                     R.drawable.ic_notification_connecting);
 
@@ -353,7 +354,7 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
-        provider = Provider.find(this, running)
+        Provider provider = Provider.find(this, running)
                 .setRunningListener(running)
                 .setCallback(new Provider.ICallback() {
                     @Override
@@ -371,7 +372,7 @@ public class ConnectionService extends IntentService {
 
         // Try to connect
         Logger.log(getString(R.string.algorithm_name, provider.getName()));
-        Provider.RESULT result = connect();
+        Provider.RESULT result = connect(provider);
 
         // Notify user if not interrupted
         if (running.get()) {
@@ -399,6 +400,8 @@ public class ConnectionService extends IntentService {
         );
 
         // Wait while internet connection is available
+        Gen204 gen_204 = new Gen204(this, running);
+        Gen204Result res_204;
         int count = 0;
         while (running.sleep(1000)) {
             // Check internet connection each 10 seconds
@@ -406,8 +409,27 @@ public class ConnectionService extends IntentService {
             if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
                 Logger.log(this, "Checking internet connection");
                 count = 0;
-                if (!provider.isConnected(true))
+
+                res_204 = gen_204.check(true); // TODO: Add preference here
+
+                if (res_204.isFalseNegative()) {
+                    if (!vars.containsKey("midsession")) {
+                        Logger.log(this, "Midsession | Detected. Attempting to solve");
+                        vars.put("midsession", true);
+                        break;
+                    } else {
+                        Logger.log(this, "Midsession | Failed to solve");
+                    }
+                } else {
+                    if (vars.containsKey("midsession")) {
+                        Logger.log(this, "Midsession | Solved successfully");
+                        vars.remove("midsession");
+                    }
+                }
+
+                if (!res_204.connected) {
                     break;
+                }
             }
         }
 
