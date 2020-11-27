@@ -25,9 +25,20 @@ import android.preference.PreferenceManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 
 public final class Util {
     private Util() {}
+
+    // Source: https://stackoverflow.com/a/26779342
+    public static int countLines(String input) {
+        LineNumberReader reader = new LineNumberReader(new StringReader(input));
+        try {
+            reader.skip(Long.MAX_VALUE);
+        } catch (IOException ignored) {}
+        return reader.getLineNumber();
+    }
 
     // TODO: Store Integers instead of Strings in SharedPreferences
     public static int getIntPreference (Context context, String name, int def_value) {

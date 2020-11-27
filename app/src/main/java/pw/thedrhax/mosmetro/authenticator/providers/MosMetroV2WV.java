@@ -230,16 +230,6 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Async: Block loading of https://(spb.)wi-fi.ru but send request anyway
-         */
-        add(new InterceptorTask(this, "https?://(spb.)?wi-fi\\.ru/.*") {
-            @NonNull @Override
-            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
-                return new ParsedResponse("");
-            }
-        });
-
-        /**
          * Opening auth page
          * ⇒ GET https://auth.wi-fi.ru
          * ⇐ JavaScript redirect: /auth

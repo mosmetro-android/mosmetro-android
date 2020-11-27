@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Util;
 
 public class ParsedResponse {
     private String url;
@@ -285,7 +286,12 @@ public class ParsedResponse {
         }
 
         if (document != null) {
-            builder.append(document.outerHtml());
+            String html = document.outerHtml();
+            if (Util.countLines(html) < 512) {
+                builder.append(html);
+            } else {
+                builder.append("<!-- file is too long -->");
+            }
         }
 
         return builder.toString();
