@@ -19,7 +19,6 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -41,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.Menu;
@@ -62,6 +62,7 @@ import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Randomizer;
+import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -439,6 +440,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Util.getTheme(this, false));
 
         // Populate preferences
         final FragmentManager fmanager = getFragmentManager();

@@ -11,4 +11,18 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="AppBaseTheme.OLED">
+        <item name="colorPrimary">@color/colorPrimaryOLED</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkOLED</item>
+        <item name="android:background">@color/colorBackgroundOLED</item>
+        <item name="android:colorBackground">@color/colorBackgroundOLED</item>
+    </style>
+
+    <style name="AppBaseTheme.OLED.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/colorPrimaryOLED</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkOLED</item>
+        <item name="android:background">@color/colorBackgroundOLED</item>
+        <item name="android:colorBackground">@color/colorBackgroundOLED</item>
+    </style>
 </resources>
