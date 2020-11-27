@@ -45,6 +45,13 @@
             android:summary="@string/pref_category_notifications_summary" />
 
         <Preference
+            android:key="pref_theme"
+            android:title="@string/pref_theme">
+
+            <intent android:action="pw.thedrhax.mosmetro.activities.ThemeDialog" />
+        </Preference>
+
+        <Preference
             android:key="pref_debug"
             android:title="@string/pref_debug"
             android:summary="@string/pref_debug_summary" />

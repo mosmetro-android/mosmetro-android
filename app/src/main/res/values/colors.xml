@@ -3,4 +3,8 @@
     <color name="colorPrimary">#E51C23</color>
     <color name="colorPrimaryDark">#D01716</color>
     <color name="colorAccent">#FF6E40</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorPrimaryOLED">#000000</color>
+    <color name="colorPrimaryDarkOLED">#000000</color>
+    <color name="colorBackgroundOLED">#000000</color>
 </resources>

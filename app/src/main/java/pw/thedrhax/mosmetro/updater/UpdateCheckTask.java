@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.updater;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +25,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

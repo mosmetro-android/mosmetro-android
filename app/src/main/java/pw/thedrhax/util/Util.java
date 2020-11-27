@@ -21,6 +21,10 @@ package pw.thedrhax.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import androidx.appcompat.app.AppCompatDelegate;
+
+import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.ThemeDialog;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -66,5 +70,32 @@ public final class Util {
         }
         reader.close();
         return sb.toString();
+    }
+
+    public static int getTheme(Context context, boolean dialog) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        int theme = settings.getInt("pref_theme", 0);
+
+        if (theme == ThemeDialog.THEME_DARK || theme == ThemeDialog.THEME_OLED) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else if (theme == ThemeDialog.THEME_LIGHT) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
+
+        if (!dialog) {
+            if (theme == ThemeDialog.THEME_OLED) {
+                return R.style.AppBaseTheme_OLED;
+            } else {
+                return R.style.AppBaseTheme;
+            }
+        } else {
+            if (theme == ThemeDialog.THEME_OLED) {
+                return R.style.AppBaseTheme_OLED_Dialog;
+            } else {
+                return R.style.AppBaseTheme_Dialog;
+            }
+        }
     }
 }

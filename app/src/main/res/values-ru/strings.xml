@@ -229,4 +229,9 @@
     <string name="auth_webview_page">Получение страницы авторизации</string>
     <string name="auth_webview_page_wait">Ожидание загрузки страницы</string>
     <string name="auth_webview_script">Ожидание завершения скрипта</string>
+    <string name="pref_theme_default">По умолчанию</string>
+    <string name="pref_theme_light">Светлая</string>
+    <string name="pref_theme_dark">Тёмная</string>
+    <string name="pref_theme_black">Чёрная (OLED)</string>
+    <string name="pref_theme">Тема оформления</string>
 </resources>

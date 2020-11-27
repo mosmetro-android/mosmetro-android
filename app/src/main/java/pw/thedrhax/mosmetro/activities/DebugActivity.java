@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.activities;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,7 +29,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,6 +47,7 @@ import java.util.LinkedList;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Util;
 
 public class DebugActivity extends AppCompatActivity {
     public static final String INTENT_VIEW_ONLY = "view_only";
@@ -70,7 +70,8 @@ public class DebugActivity extends AppCompatActivity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+        setTheme(Util.getTheme(this, false));
 		setContentView(R.layout.debug_activity);
 
         button_connect = (Button) findViewById(R.id.button_connect);
@@ -251,7 +252,6 @@ public class DebugActivity extends AppCompatActivity {
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             TextView view = new TextView(parent.getContext());
             view.setTypeface(Typeface.MONOSPACE);
-            view.setTextColor(Color.BLACK);
             view.setTextSize(14);
             return new ViewHolder(view);
         }
