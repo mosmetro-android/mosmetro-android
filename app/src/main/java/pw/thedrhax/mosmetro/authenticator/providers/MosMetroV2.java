@@ -194,11 +194,13 @@ public class MosMetroV2 extends Provider {
                     ParsedResponse response = client.get(redirect, null, pref_retry_count);
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
 
-                    Element script = response.getPageContent().body().getElementsByTag("script").last();
-                    if (mosmetro && script != null && script.html().contains("auth.wi-fi.ru/auth")) {
-                        Logger.log(Logger.LEVEL.DEBUG, "Falling back to default branch");
-                        vars.put("branch", "metro-fallback");
-                        mosmetro = false;
+                    if (mosmetro || mcc || spb) {
+                        Element script = response.getPageContent().body().getElementsByTag("script").last();
+                        if (script != null && script.html().contains("auth.wi-fi.ru/auth")) {
+                            Logger.log(Logger.LEVEL.DEBUG, "Falling back to default branch");
+                            vars.put("branch", vars.get("branch") + "-fallback");
+                            mosmetro = mcc = spb = false;
+                        }
                     }
 
                     return true;
