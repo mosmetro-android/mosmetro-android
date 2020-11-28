@@ -223,20 +223,57 @@ public class SettingsActivity extends Activity {
             setTitle(getString(R.string.pref_debug));
             addPreferencesFromResource(R.xml.pref_debug);
 
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
             Preference.OnPreferenceChangeListener reload_logger = new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    PreferenceManager.getDefaultSharedPreferences(getActivity())
-                            .edit()
-                            .putBoolean(preference.getKey(), (Boolean) newValue)
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    settings.edit()
+                            .putBoolean(pref.getKey(), (Boolean) new_value)
                             .apply();
                     Logger.configure(getActivity());
                     return true;
                 }
             };
 
-            CheckBoxPreference pref_debug_logcat =
-                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
+            CheckBoxPreference pref_debug_acra = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("acra.enable");
+            CheckBoxPreference pref_debug_last_log = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_last_log");
+            CheckBoxPreference pref_debug_testing = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_testing");
+            CheckBoxPreference pref_debug_logcat = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_logcat");
+
+            pref_debug_last_log.setEnabled(pref_debug_acra.isChecked());
+            pref_debug_testing.setEnabled(pref_debug_last_log.isChecked());
+
+            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+                @Override
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    if (!(Boolean)new_value) {
+                        pref_debug_last_log.setChecked(false);
+                        pref_debug_testing.setChecked(false);
+                        pref_debug_testing.setEnabled(false);
+                    }
+
+                    pref_debug_last_log.setEnabled((Boolean) new_value);
+                    return true;
+                }
+            });
+            
+            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    if (!(Boolean)new_value) {
+                        pref_debug_testing.setChecked(false);
+                    }
+
+                    pref_debug_testing.setEnabled((Boolean) new_value);
+                    return true;
+                };
+            });
+
+            pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
             pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
         }
     }
