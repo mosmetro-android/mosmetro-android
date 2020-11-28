@@ -229,4 +229,6 @@
     <string name="auth_webview_page">Получение страницы авторизации</string>
     <string name="auth_webview_page_wait">Ожидание загрузки страницы</string>
     <string name="auth_webview_script">Ожидание завершения скрипта</string>
+    <string name="pref_internet_check_midsession">Отключать midsession</string>
+    <string name="pref_internet_check_midsession_summary">Если у вас появляется уведомление \"Требуется вход в сеть\" или Android считает, что доступа в интернет нет, когда он на самом деле есть, то эта опция может помочь.</string>
 </resources>

@@ -236,7 +236,7 @@
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm was used during the 2018 FIFA World Cup in Moscow and St. Petersburg. It is currently disabled, so most likely this setting will not affect anything.</string>
-    <string name="pref_mainet">MAInet (wifi.mai.ru)</string>
+    <string name="pref_mainet" translatable="false">MAInet (wifi.mai.ru)</string>
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
     <string name="pref_mainet_credentials">MAInet settings</string>
     <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
@@ -252,4 +252,6 @@
     <string name="auth_webview_page">Opening auth page</string>
     <string name="auth_webview_page_wait">Waiting for page to load</string>
     <string name="auth_webview_script">Waiting for script</string>
+    <string name="pref_internet_check_midsession">Disable midsession</string>
+    <string name="pref_internet_check_midsession_summary">If you are seeing \"Sign into Wi-Fi network\" in your notifications, or Android thinks that internet is not available even if it is, this option might help.</string>
 </resources>

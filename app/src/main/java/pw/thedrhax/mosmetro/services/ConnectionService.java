@@ -25,7 +25,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
@@ -34,6 +35,8 @@ import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
+import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -54,7 +57,13 @@ public class ConnectionService extends IntentService {
     private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_ip_wait;
+    private int pref_internet_check_interval;
+    private boolean pref_internet_check;
+    private boolean pref_midsession;
     private boolean pref_notify_foreground;
+
+    // Internet check
+    private Gen204 gen_204;
 
     // Notifications
     private Notify notify;
@@ -77,12 +86,17 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
+        pref_internet_check = settings.getBoolean("pref_internet_check", true);
+        pref_midsession = settings.getBoolean("pref_internet_check_midsession", true);
+        pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
                 new Intent(this, ConnectionService.class).setAction("STOP"),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
+
+        gen_204 = new Gen204(this, running);
 
         notify = new Notify(this) {
             @Override
@@ -299,7 +313,6 @@ public class ConnectionService extends IntentService {
 
             running.set(true);
             boolean first_iteration = true;
-            HashMap<String,Object> vars = new HashMap<String,Object>();
             while (running.get()) {
                 if (!first_iteration) {
                     Logger.log(this, "Still alive!");
@@ -307,7 +320,7 @@ public class ConnectionService extends IntentService {
                     first_iteration = false;
                 }
 
-                main(vars);
+                main();
             }
             lock.unlock();
 
@@ -324,7 +337,69 @@ public class ConnectionService extends IntentService {
         }
     }
 
-    private void main(HashMap<String,Object> vars) {
+    private boolean ignore_midsession = false;
+
+    private boolean isConnected() {
+        Logger.log(this, "Checking internet connection");
+        Gen204Result res_204 = gen_204.check(pref_midsession && !ignore_midsession);
+
+        if (res_204.isFalseNegative()) {
+            Provider midsession = Provider.find(this, res_204.response)
+                    .setRunningListener(running);
+
+            Logger.log(Logger.LEVEL.DEBUG,
+                "Midsession | Detected (" + midsession.getName() + ")"
+            );
+
+            if (midsession instanceof Unknown) {
+                Logger.log(Logger.LEVEL.DEBUG,
+                    "Midsession | Attempting to solve without algorithm"
+                );
+
+                try {
+                    ParsedResponse res = res_204.response;
+                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                    String next_redirect = res.parseAnyRedirect();
+
+                    while (next_redirect != null) {
+                        Logger.log(Logger.LEVEL.DEBUG,
+                            "Midsession | Requesting " + next_redirect
+                        );
+
+                        res = midsession.getClient().get(
+                            res_204.response.parseAnyRedirect(),
+                            null, pref_retry_count
+                        );
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                        next_redirect = res.parseAnyRedirect();
+                    }
+                } catch (IOException | ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                }
+            } else {
+                Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
+                Logger.log(getString(R.string.algorithm_name, midsession.getName()));
+                midsession.start();
+            }
+
+            running.sleep(3000);
+            res_204 = gen_204.check(true);
+
+            if (!res_204.isFalseNegative()) {
+                Logger.log(this, "Midsession | Solved successfully");
+            } else {
+                Logger.log(this, "Midsession | Unable to solve, ignoring...");
+                ignore_midsession = true;
+                return true;
+            }
+        }
+
+        return res_204.connected;
+    }
+
+    private void main() {
         notify.icon(R.drawable.ic_notification_connecting_colored,
                     R.drawable.ic_notification_connecting);
 
@@ -400,36 +475,12 @@ public class ConnectionService extends IntentService {
         );
 
         // Wait while internet connection is available
-        Gen204 gen_204 = new Gen204(this, running);
-        Gen204Result res_204;
         int count = 0;
+        ignore_midsession = false;
         while (running.sleep(1000)) {
-            // Check internet connection each 10 seconds
-            int check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
-            if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
-                Logger.log(this, "Checking internet connection");
+            if (pref_internet_check && ++count == pref_internet_check_interval) {
                 count = 0;
-
-                res_204 = gen_204.check(true); // TODO: Add preference here
-
-                if (res_204.isFalseNegative()) {
-                    if (!vars.containsKey("midsession")) {
-                        Logger.log(this, "Midsession | Detected. Attempting to solve");
-                        vars.put("midsession", true);
-                        break;
-                    } else {
-                        Logger.log(this, "Midsession | Failed to solve");
-                    }
-                } else {
-                    if (vars.containsKey("midsession")) {
-                        Logger.log(this, "Midsession | Solved successfully");
-                        vars.remove("midsession");
-                    }
-                }
-
-                if (!res_204.connected) {
-                    break;
-                }
+                if (!isConnected()) break;
             }
         }
 

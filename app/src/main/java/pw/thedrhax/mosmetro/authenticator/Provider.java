@@ -297,6 +297,10 @@ public abstract class Provider extends LinkedList<Task> {
         return this;
     }
 
+    public Client getClient() {
+        return client;
+    }
+
     /**
      * Method used to check if Provider must finish as soon as possible.
      * @return true is Provider must stop, otherwise false.
