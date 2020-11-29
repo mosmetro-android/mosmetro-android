@@ -159,12 +159,12 @@
     <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
     <string name="contributor_Igor_Dyatlov_summary">Графическое оформление, логотип</string>
 
-    <string name="action_donate">Поддержать проект (не влияет на функциональность)</string>
+    <string name="action_donate">Поддержать проект</string>
     <string name="action_donate_cond">Поддержать</string>
 
     <string-array name="donate_options">
-        <item>Яндекс.Деньги или карта</item>
-        <item>Bitcoin (скопировать адрес)</item>
+        <item>Яндекс.Деньги / ЮMoney</item>
+        <item>Сбербанк (скопировать номер карты)</item>
         <item>Ethereum (скопировать адрес)</item>
         <item>Вступить в сообщество (Вконтакте, Telegram, GitHub)</item>
         <item>Отмена</item>

@@ -176,19 +176,20 @@
     <string name="contributor_Igor_Dyatlov_summary">Graphic design, logo</string>
     <string name="contributor_Igor_Dyatlov_link" translatable="false">https://github.com/igor-dyatlov</string>
 
-    <string name="action_donate">Support the project (doesn\'t affect the functionality)</string>
-    <string name="action_donate_cond">Support</string>
+    <string name="action_donate">Support the project</string>
+    <string name="action_donate_cond">Donate</string>
 
     <string-array name="donate_options">
-        <item>Yandex.Money or credit card</item>
-        <item>Bitcoin (copy the address)</item>
+        <item>Yandex.Money / YooMoney</item>
+        <item>Sberbank (copy the card number)</item>
         <item>Ethereum (copy the address)</item>
         <item>Join the community (VK, Telegram, GitHub)</item>
         <item>Cancel</item>
     </string-array>
-    <string name="donate_bitcoin_data" translatable="false">1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m</string>
+    <string name="donate_sberbank_data" translatable="false">4274320057156229</string>
     <string name="donate_ethereum_data" translatable="false">0x949aecb10ae89673a9574f53bda04baffddabff7</string>
-    <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>
+    <string name="donate_yandex_data" translatable="false">https://yoomoney.ru/to/410014087156910</string>
+    <string name="donate_paypal_data" translatable="false">https://paypal.me/thedrhax</string>
     <string name="pref_category_wifi">Wi-Fi control</string>
     <string name="pref_category_internet">Internet checks</string>
     <string name="open_settings">Open settings</string>

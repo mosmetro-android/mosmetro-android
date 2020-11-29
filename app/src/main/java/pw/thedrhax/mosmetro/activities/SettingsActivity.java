@@ -303,14 +303,14 @@ public class SettingsActivity extends Activity {
                 ClipData clip;
 
                 switch (i) {
-                    case 0: // Yandex.Money
+                    case 0: // Yandex.Money / YooMoney
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
                                 .putExtra("data", getString(R.string.donate_yandex_data))
                         );
                         break;
 
-                    case 1: // Bitcoin
-                        clip = ClipData.newPlainText("", getString(R.string.donate_bitcoin_data));
+                    case 1: // Sberbank
+                        clip = ClipData.newPlainText("", getString(R.string.donate_sberbank_data));
                         clipboard.setPrimaryClip(clip);
 
                         Toast.makeText(SettingsActivity.this,
