@@ -341,10 +341,10 @@ public class ConnectionService extends IntentService {
 
     private boolean isConnected() {
         Logger.log(this, "Checking internet connection");
-        Gen204Result res_204 = gen_204.check(pref_midsession && !ignore_midsession);
+        Gen204Result res_204 = gen_204.check();
 
-        if (res_204.isFalseNegative()) {
-            Provider midsession = Provider.find(this, res_204.response)
+        if (pref_midsession && !ignore_midsession && res_204.isFalseNegative()) {
+            Provider midsession = Provider.find(this, res_204.getFalseNegative())
                     .setRunningListener(running);
 
             Logger.log(Logger.LEVEL.DEBUG,
@@ -357,19 +357,18 @@ public class ConnectionService extends IntentService {
                 );
 
                 try {
-                    ParsedResponse res = res_204.response;
+                    ParsedResponse res = res_204.getFalseNegative();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     String next_redirect = res.parseAnyRedirect();
 
-                    while (next_redirect != null) {
+                    while (next_redirect != null && running.get()) {
                         Logger.log(Logger.LEVEL.DEBUG,
                             "Midsession | Requesting " + next_redirect
                         );
 
                         res = midsession.getClient().get(
-                            res_204.response.parseAnyRedirect(),
-                            null, pref_retry_count
+                            next_redirect, null, pref_retry_count
                         );
                         Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
@@ -385,7 +384,7 @@ public class ConnectionService extends IntentService {
             }
 
             running.sleep(3000);
-            res_204 = gen_204.check(true);
+            res_204 = gen_204.check();
 
             if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
@@ -394,11 +393,10 @@ public class ConnectionService extends IntentService {
                 Logger.log(this, "Midsession | Unable to solve, ignoring...");
                 Logger.report("Midsession Failure (" + midsession.getName() + ")");
                 ignore_midsession = true;
-                return true;
             }
         }
 
-        return res_204.connected;
+        return res_204.isConnected();
     }
 
     private void main() {
