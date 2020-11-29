@@ -36,6 +36,7 @@ import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
+import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -367,6 +368,9 @@ public class ConnectionService extends IntentService {
                     "Midsession | Attempting to solve without algorithm"
                 );
 
+                Client client = midsession.getClient();
+                client.followRedirects(false);
+
                 try {
                     ParsedResponse res = res_204.getFalseNegative();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
@@ -378,9 +382,7 @@ public class ConnectionService extends IntentService {
                             "Midsession | Requesting " + next_redirect
                         );
 
-                        res = midsession.getClient().get(
-                            next_redirect, null, pref_retry_count
-                        );
+                        res = client.get(next_redirect, null, pref_retry_count);
                         Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                         next_redirect = res.parseAnyRedirect();
@@ -388,6 +390,8 @@ public class ConnectionService extends IntentService {
                 } catch (IOException | ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                 }
+
+                client.followRedirects(true);
             } else {
                 Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
                 Logger.log(getString(R.string.algorithm_name, midsession.getName()));
