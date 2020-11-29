@@ -349,6 +349,10 @@ public class ConnectionService extends IntentService {
             res_204 = gen_204.check();
         }
 
+        if (!res_204.isConnected()) {
+            return false;
+        }
+
         if (pref_midsession && !ignore_midsession && res_204.isFalseNegative()) {
             Provider midsession = Provider.find(this, res_204.getFalseNegative())
                     .setRunningListener(running)
@@ -390,10 +394,14 @@ public class ConnectionService extends IntentService {
                 midsession.start();
             }
 
-            running.sleep(3000);
+            if (!running.sleep(3000)) return false;
+
             res_204 = gen_204.check();
 
-            if (!res_204.isFalseNegative()) {
+            if (!res_204.isConnected()) {
+                Logger.log(this, "Midsession | Connection lost, aborting...");
+                return false;
+            } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
                 Logger.report("Midsession Success (" + midsession.getName() + ")");
             } else {
