@@ -38,6 +38,7 @@ import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
+import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.Client.METHOD;
@@ -267,7 +268,8 @@ public class MosMetroV2WV extends WebViewProvider {
             public boolean until(HashMap<String, Object> vars) {
                 if (pref_internet_check && ++counter == interval * 10) {
                     counter = 0;
-                    return isConnected();
+                    Gen204Result res_204 = gen_204.check();
+                    return res_204.isConnected() && !res_204.isFalseNegative();
                 }
 
                 return !auth_page.matcher(wv.getURL()).matches();
