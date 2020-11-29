@@ -231,6 +231,16 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
+         * Async: Block {mcc,spb}.wi-fi.ru, gowifi.ru
+         */
+        add(new InterceptorTask(this, "https?://((mcc|spb)\\.wi-fi\\.ru|gowifi\\.ru)/") {
+            @Override
+            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
+                return new ParsedResponse("");
+            }
+        });
+
+        /**
          * Opening auth page
          * ⇒ GET https://auth.wi-fi.ru
          * ⇐ JavaScript redirect: /auth
