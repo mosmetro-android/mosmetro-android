@@ -34,6 +34,7 @@ import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.NewsChecker;
 import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
@@ -59,7 +60,15 @@ class ProviderMetrics {
         switch ((Provider.RESULT) vars.get("result")) {
             case CONNECTED: connected = true; break;
             case ALREADY_CONNECTED: connected = false; break;
-            default: return false;
+            default:
+                if (vars.containsKey("branch")) {
+                    String branch = (String)vars.get("branch");
+                    if (branch.endsWith("-fallback")) {
+                        Logger.report("Unsuccessful MMV2 branch fallback (" + branch + ")");
+                    }
+                }
+
+                return false;
         }
 
         WifiUtils wifi = new WifiUtils(p.context);
