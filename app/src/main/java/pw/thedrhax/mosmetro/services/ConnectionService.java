@@ -340,12 +340,19 @@ public class ConnectionService extends IntentService {
     private boolean ignore_midsession = false;
 
     private boolean isConnected() {
-        Logger.log(this, "Checking internet connection");
-        Gen204Result res_204 = gen_204.check();
+        return isConnected(null);
+    }
+
+    private boolean isConnected(Gen204Result res_204) {
+        if (res_204 == null) {
+            Logger.log(this, "Checking internet connection");
+            res_204 = gen_204.check();
+        }
 
         if (pref_midsession && !ignore_midsession && res_204.isFalseNegative()) {
             Provider midsession = Provider.find(this, res_204.getFalseNegative())
-                    .setRunningListener(running);
+                    .setRunningListener(running)
+                    .setGen204(gen_204);
 
             Logger.log(Logger.LEVEL.DEBUG,
                 "Midsession | Detected (" + midsession.getName() + ")"
@@ -431,6 +438,7 @@ public class ConnectionService extends IntentService {
 
         Provider provider = Provider.find(this, running)
                 .setRunningListener(running)
+                .setGen204(gen_204)
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
@@ -473,6 +481,9 @@ public class ConnectionService extends IntentService {
                 .putExtra("SSID", SSID)
                 .putExtra("PROVIDER", provider.getName())
         );
+
+        // Check for midsession in cached Gen204 result
+        isConnected(gen_204.getLastResult());
 
         // Wait while internet connection is available
         int count = 0;

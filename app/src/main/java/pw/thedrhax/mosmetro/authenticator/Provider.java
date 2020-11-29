@@ -302,6 +302,14 @@ public abstract class Provider extends LinkedList<Task> {
     }
 
     /**
+     * Replace default Gen204 provider
+     */
+    public Provider setGen204(Gen204 gen_204) {
+        this.gen_204 = gen_204;
+        return this;
+    }
+
+    /**
      * Method used to check if Provider must finish as soon as possible.
      * @return true is Provider must stop, otherwise false.
      */

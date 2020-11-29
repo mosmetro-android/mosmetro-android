@@ -65,6 +65,8 @@ public class Gen204 {
     private final Randomizer random;
     private final int pref_retry_count;
 
+    private Gen204Result last_result = null;
+
     public Gen204(Context context, Listener<Boolean> running) {
         this.running.subscribe(running);
 
@@ -92,7 +94,7 @@ public class Gen204 {
         return res;
     }
 
-    public Gen204Result check() {
+    private Gen204Result tripleCheck() {
         ParsedResponse unrel, rel_https, rel_http;
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
@@ -137,6 +139,16 @@ public class Gen204 {
 
         Logger.log(this, "Unexpected state");
         return new Gen204Result(EMPTY);
+    }
+
+    public Gen204Result check() {
+        Gen204Result res = tripleCheck();
+        last_result = res;
+        return res;
+    }
+
+    public Gen204Result getLastResult() {
+        return last_result;
     }
 
     public class Gen204Result {
