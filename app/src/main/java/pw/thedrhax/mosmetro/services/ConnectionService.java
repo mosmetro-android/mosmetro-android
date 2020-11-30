@@ -410,10 +410,8 @@ public class ConnectionService extends IntentService {
                 return false;
             } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
-                Logger.report("Midsession Success (" + midsession.getName() + ")");
             } else {
                 Logger.log(this, "Midsession | Unable to solve, ignoring...");
-                Logger.report("Midsession Failure (" + midsession.getName() + ")");
                 ignore_midsession = true;
             }
         }
