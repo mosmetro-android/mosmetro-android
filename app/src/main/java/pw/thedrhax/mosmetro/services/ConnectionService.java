@@ -27,6 +27,7 @@ import android.preference.PreferenceManager;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
@@ -395,7 +396,9 @@ public class ConnectionService extends IntentService {
             } else {
                 Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
                 Logger.log(getString(R.string.algorithm_name, midsession.getName()));
-                midsession.start();
+                midsession.start(new HashMap<String, Object>() {{
+                    put("midsession", true);
+                }});
             }
 
             if (!running.sleep(3000)) return false;

@@ -80,7 +80,12 @@ class ProviderMetrics {
         params.put("build_branch", Version.getBranch());
         params.put("build_number", "" + Version.getBuildNumber());
 
-        params.put("success", connected ? "true" : "false");
+        if (vars.containsKey("midsession")) {
+            params.put("success", "midsession");
+        } else {
+            params.put("success", connected ? "true" : "false");
+        }
+
         params.put("ssid", wifi.getSSID());
         params.put("provider", p.getName());
 

@@ -236,9 +236,8 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Start the connection sequence defined in child classes.
      */
-    public RESULT start() {
+    public RESULT start(HashMap<String,Object> vars) {
         ProviderMetrics metrics = new ProviderMetrics(this).start();
-        HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
 
         Logger.date(">> ");
@@ -271,6 +270,10 @@ public abstract class Provider extends LinkedList<Task> {
         deinit();
         Logger.date("<< ");
         return (RESULT)vars.get("result");
+    }
+
+    public RESULT start() {
+        return start(new HashMap<String,Object>());
     }
 
     /**
