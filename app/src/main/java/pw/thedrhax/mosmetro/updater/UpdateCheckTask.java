@@ -37,7 +37,6 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
-import pw.thedrhax.mosmetro.services.ScheduledWorker;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
@@ -76,7 +75,7 @@ public class UpdateCheckTask {
     public Result check() {
         // Generate base URL
         String UPDATE_INFO_URL = settings.getString(
-                ScheduledWorker.PREF_BACKEND_URL,
+                BackgroundTask.PREF_BACKEND_URL,
                 BuildConfig.API_URL_DEFAULT
         ) + BuildConfig.API_REL_BRANCHES;
 
