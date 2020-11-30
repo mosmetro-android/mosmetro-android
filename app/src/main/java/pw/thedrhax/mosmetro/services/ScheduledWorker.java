@@ -110,6 +110,8 @@ public class ScheduledWorker extends Worker {
         if (settings.getLong("pref_notify_news_id", 0) >= id)
             return false;
 
+        settings.edit().putLong("pref_notify_news_id", id).apply();
+
         new Notify(context).id(255)
                 .icon(R.drawable.ic_notification_message_colored,
                       R.drawable.ic_notification_message)
@@ -122,10 +124,6 @@ public class ScheduledWorker extends Worker {
                 .text(message)
                 .cancelOnClick(true)
                 .show();
-
-        settings.edit()
-                .putLong("pref_notify_news_id", id)
-                .apply();
 
         return true;
     }
@@ -141,6 +139,12 @@ public class ScheduledWorker extends Worker {
             return true;
 
         UpdateCheckTask.Branch branch = result.getBranch();
+
+        // Show notification only once for each build
+        if (settings.getString("pref_updater_ignore_notification", "").equals(branch.id()))
+            return true;
+
+        settings.edit().putString("pref_updater_ignore_notification", branch.id()).apply();
 
         Notify notify = new Notify(context)
                 .id(3)

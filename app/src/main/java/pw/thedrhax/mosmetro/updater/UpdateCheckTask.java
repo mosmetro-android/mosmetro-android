@@ -234,6 +234,10 @@ public class UpdateCheckTask {
             this.url = (String)data.get("url");
         }
 
+        public String id() {
+            return name + " " + version;
+        }
+
         private int getVersion() {
             if (by_build) {
                 if (Version.getBranch().equals(name)) {
