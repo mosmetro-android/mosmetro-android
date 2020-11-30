@@ -40,7 +40,7 @@ import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 
-public class UpdateCheckTask {
+public class UpdateChecker {
     // Info from the app
     private final Context context;
     private final SharedPreferences settings;
@@ -51,7 +51,7 @@ public class UpdateCheckTask {
     private boolean check_ignored = false;
     private boolean force_check = false;
 
-    public UpdateCheckTask(Context context) {
+    public UpdateChecker(Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.retriever = new CachedRetriever(context);
@@ -60,7 +60,7 @@ public class UpdateCheckTask {
     /**
      * Force check for updates even if current last version is marked 'ignored' by user.
      */
-    public UpdateCheckTask ignore(boolean skip_ignored) {
+    public UpdateChecker ignore(boolean skip_ignored) {
         this.check_ignored = !skip_ignored; return this;
     }
 
@@ -68,14 +68,14 @@ public class UpdateCheckTask {
      * Clear branch cache before checking for updates and force update notification even if
      * there are no updates available.
      */
-    public UpdateCheckTask force(boolean force) {
+    public UpdateChecker force(boolean force) {
         this.force_check = force; return this;
     }
 
     public Result check() {
         // Generate base URL
         String UPDATE_INFO_URL = settings.getString(
-                BackgroundTask.PREF_BACKEND_URL,
+                BackendRequest.PREF_BACKEND_URL,
                 BuildConfig.API_URL_DEFAULT
         ) + BuildConfig.API_REL_BRANCHES;
 

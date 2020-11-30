@@ -30,19 +30,19 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-import pw.thedrhax.mosmetro.updater.BackgroundTask;
+import pw.thedrhax.mosmetro.updater.BackendRequest;
 
-public class ScheduledWorker extends Worker {
+public class BackendWorker extends Worker {
     private final Context context;
 
-    public ScheduledWorker(Context context, WorkerParameters params) {
+    public BackendWorker(Context context, WorkerParameters params) {
         super(context, params);
         this.context = context;
     }
 
     @Override @NonNull
     public Result doWork() {
-        BackgroundTask task = new BackgroundTask(context);
+        BackendRequest task = new BackendRequest(context);
         if (task.run()) {
             return Result.success();
         } else {
@@ -54,16 +54,16 @@ public class ScheduledWorker extends Worker {
         Constraints constraints = new Constraints();
         constraints.setRequiredNetworkType(NetworkType.UNMETERED);
 
-        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(ScheduledWorker.class, 3, TimeUnit.HOURS)
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(BackendWorker.class, 3, TimeUnit.HOURS)
                 .setConstraints(constraints)
                 .setInitialDelay(10, TimeUnit.MINUTES)
-                .addTag("ScheduledWorker")
+                .addTag("BackendWorker")
                 .build();
 
         WorkManager manager = WorkManager.getInstance(context);
 
         manager.enqueueUniquePeriodicWork(
-            "ScheduledWorker",
+            "BackendWorker",
             ExistingPeriodicWorkPolicy.REPLACE,
             request
         );

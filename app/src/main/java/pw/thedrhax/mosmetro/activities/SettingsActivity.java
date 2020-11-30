@@ -56,7 +56,7 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.services.ConnectionService;
-import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.mosmetro.updater.UpdateChecker;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
@@ -65,7 +65,7 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
-    private Listener<Map<String,UpdateCheckTask.Branch>> branches;
+    private Listener<Map<String, UpdateChecker.Branch>> branches;
     private SharedPreferences settings;
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -96,9 +96,9 @@ public class SettingsActivity extends Activity {
     }
 
     public static class BranchFragment extends NestedFragment {
-        private Map<String,UpdateCheckTask.Branch> branches;
+        private Map<String, UpdateChecker.Branch> branches;
 
-        public BranchFragment branches(@NonNull Map<String, UpdateCheckTask.Branch> branches) {
+        public BranchFragment branches(@NonNull Map<String, UpdateChecker.Branch> branches) {
             this.branches = branches; return this;
         }
 
@@ -120,7 +120,7 @@ public class SettingsActivity extends Activity {
 
             if (branches == null) return;
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            for (final UpdateCheckTask.Branch branch : branches.values()) {
+            for (final UpdateChecker.Branch branch : branches.values()) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
                     @Override
                     protected void onBindView(View view) {
@@ -364,17 +364,17 @@ public class SettingsActivity extends Activity {
             public boolean onPreferenceClick(Preference preference) {
                 boolean manual = preference != null;
 
-                UpdateCheckTask update = new UpdateCheckTask(SettingsActivity.this)
+                UpdateChecker updater = new UpdateChecker(SettingsActivity.this)
                         .ignore(!manual).force(manual);
 
-                update.async_check(new UpdateCheckTask.Callback() {
+                updater.async_check(new UpdateChecker.Callback() {
                     @Override
                     public void onStart() {
                         pref_updater_check.setEnabled(false);
                     }
 
                     @Override
-                    public void onResult(UpdateCheckTask.Result result) {
+                    public void onResult(UpdateChecker.Result result) {
                         pref_updater_check.setEnabled(true);
                         branches.set(result.getBranches());
 
@@ -536,7 +536,7 @@ public class SettingsActivity extends Activity {
         pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Map<String,UpdateCheckTask.Branch> branch_list = branches.get();
+                Map<String, UpdateChecker.Branch> branch_list = branches.get();
                 if (branch_list != null) {
                     replaceFragment("branch", new BranchFragment().branches(branch_list));
                 } else {
@@ -546,9 +546,9 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        branches = new Listener<Map<String,UpdateCheckTask.Branch>>(null) {
+        branches = new Listener<Map<String, UpdateChecker.Branch>>(null) {
             @Override
-            public void onChange(Map<String, UpdateCheckTask.Branch> new_value) {
+            public void onChange(Map<String, UpdateChecker.Branch> new_value) {
                 pref_updater_branch.setEnabled(new_value != null && new_value.size() > 0);
             }
         };

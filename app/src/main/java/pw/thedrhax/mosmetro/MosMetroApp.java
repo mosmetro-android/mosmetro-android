@@ -27,7 +27,7 @@ import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
 
 import pw.thedrhax.mosmetro.acra.CustomHttpSenderFactory;
-import pw.thedrhax.mosmetro.services.ScheduledWorker;
+import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.util.Logger;
 
 import static org.acra.ReportField.*;
@@ -56,7 +56,7 @@ public class MosMetroApp extends Application {
                         .setMinimumLoggingLevel(android.util.Log.DEBUG)
                         .build()
         );
-        ScheduledWorker.configure(this);
+        BackendWorker.configure(this);
     }
 
     @Override

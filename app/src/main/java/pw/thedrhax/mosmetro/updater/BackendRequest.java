@@ -38,14 +38,14 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Version;
 
-public class BackgroundTask {
+public class BackendRequest {
     public static final String PREF_BACKEND_URL = "backend_url";
 
     private Context context;
     private SharedPreferences settings;
     private Client client;
 
-    public BackgroundTask(Context context) {
+    public BackendRequest(Context context) {
         this.context = context;
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.client = new OkHttp(context);
@@ -119,8 +119,8 @@ public class BackgroundTask {
     }
 
     private boolean checkUpdates() {
-        UpdateCheckTask updater = new UpdateCheckTask(context).force(false);
-        UpdateCheckTask.Result result = updater.check();
+        UpdateChecker updater = new UpdateChecker(context).force(false);
+        UpdateChecker.Result result = updater.check();
 
         if (result == null)
             return false;
@@ -128,7 +128,7 @@ public class BackgroundTask {
         if (!result.hasUpdate() || result.getBranch() == null)
             return true;
 
-        UpdateCheckTask.Branch branch = result.getBranch();
+        UpdateChecker.Branch branch = result.getBranch();
 
         // Show notification only once for each build
         if (settings.getString("pref_updater_ignore_notification", "").equals(branch.id()))
