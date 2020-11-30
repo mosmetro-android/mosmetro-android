@@ -118,7 +118,12 @@ class ProviderMetrics {
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        if (System.currentTimeMillis() - 6*60*60*1000 > p.settings.getLong("pref_worker_timestamp", 0)) {
+        long ts = p.settings.getLong("pref_worker_timestamp", 0);
+        if (System.currentTimeMillis() - 6*60*60*1000 > ts) {
+            if (ts > 0) {
+                Logger.report("BackendWorker didn't run after 6 hours");
+            }
+
             new BackendRequest(p.context).run();
         }
 
