@@ -356,39 +356,44 @@ public class SettingsActivity extends Activity {
     }
 
     private void update_checker_setup() {
-        // Force check
         final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
-        pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+        Preference.OnPreferenceClickListener click = new Preference.OnPreferenceClickListener() {
             @SuppressLint("StaticFieldLeak")
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new UpdateCheckTask(SettingsActivity.this) {
+                boolean manual = preference != null;
+
+                UpdateCheckTask update = new UpdateCheckTask(SettingsActivity.this)
+                        .ignore(!manual).force(manual);
+
+                update.async_check(new UpdateCheckTask.Callback() {
                     @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
+                    public void onStart() {
                         pref_updater_check.setEnabled(false);
                     }
 
                     @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
+                    public void onResult(UpdateCheckTask.Result result) {
                         pref_updater_check.setEnabled(true);
-                    }
+                        branches.set(result.getBranches());
 
-                    @Override
-                    public void result(@Nullable Map<String, Branch> result) {
-                        branches.set(result);
+                        if (result != null && (result.hasUpdate() || manual)) {
+                            result.showDialog();
+                        }
                     }
-                }.ignore(preference == null).force(preference != null).execute();
+                });
+
                 return false;
             }
-        });
+        };
+
+        // Force check
+        pref_updater_check.setOnPreferenceClickListener(click);
 
         // Check for updates on start if enabled
         if (settings.getBoolean("pref_updater_enabled", true))
-            pref_updater_check
-                    .getOnPreferenceClickListener()
-                    .onPreferenceClick(null);
+            click.onPreferenceClick(null);
     }
 
     @RequiresApi(23)

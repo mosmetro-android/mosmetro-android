@@ -104,6 +104,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.work:work-runtime:2.4.0'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
