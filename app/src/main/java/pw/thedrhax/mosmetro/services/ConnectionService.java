@@ -412,6 +412,7 @@ public class ConnectionService extends IntentService {
                 Logger.log(this, "Midsession | Solved successfully");
             } else {
                 Logger.log(this, "Midsession | Unable to solve, ignoring...");
+                Logger.report("Midsession Failure (" + midsession.getName() + ")");
                 ignore_midsession = true;
             }
         }
