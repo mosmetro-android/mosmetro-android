@@ -52,15 +52,7 @@ class ProviderMetrics {
         switch ((Provider.RESULT) vars.get("result")) {
             case CONNECTED: connected = true; break;
             case ALREADY_CONNECTED: connected = false; break;
-            default:
-                if (vars.containsKey("branch")) {
-                    String branch = (String)vars.get("branch");
-                    if (branch.endsWith("-fallback")) {
-                        Logger.report("Unsuccessful MMV2 branch fallback (" + branch + ")");
-                    }
-                }
-
-                return false;
+            default: return false;
         }
 
         WifiUtils wifi = new WifiUtils(p.context);
