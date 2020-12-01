@@ -483,6 +483,11 @@ public class ConnectionService extends IntentService {
             case CONNECTED:
             case ALREADY_CONNECTED:
                 if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
+
+                // Check for midsession in cached Gen204 result
+                ignore_midsession = false;
+                isConnected(gen_204.getLastResult());
+
                 if (!from_shortcut) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
@@ -496,12 +501,8 @@ public class ConnectionService extends IntentService {
                 .putExtra("PROVIDER", provider.getName())
         );
 
-        // Check for midsession in cached Gen204 result
-        isConnected(gen_204.getLastResult());
-
         // Wait while internet connection is available
         int count = 0;
-        ignore_midsession = false;
         while (running.sleep(1000)) {
             if (pref_internet_check && ++count == pref_internet_check_interval) {
                 count = 0;
