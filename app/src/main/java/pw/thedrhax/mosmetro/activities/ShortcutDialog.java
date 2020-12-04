@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.CheckBox;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 
 public class ShortcutDialog extends Activity {
     private CheckBox check_background;
@@ -92,8 +93,8 @@ public class ShortcutDialog extends Activity {
         Intent result = new Intent();
 
         Intent shortcut_intent = new Intent(this, getActivityClass())
-                .putExtra("force", check_force.isChecked())
-                .putExtra("stop", check_stop.isChecked())
+                .putExtra(ConnectionService.EXTRA_FORCE, check_force.isChecked())
+                .putExtra(ConnectionService.EXTRA_STOP, check_stop.isChecked())
                 .putExtra("view_only", check_log.isChecked());
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);

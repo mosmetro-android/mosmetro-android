@@ -73,7 +73,7 @@ public class ToggleWidget extends AppWidgetProvider {
 
             Intent service = new Intent(context, ConnectionService.class);
             if (!pref_autoconnect)
-                service.setAction("STOP");
+                service.setAction(ConnectionService.ACTION_STOP);
             context.startService(service);
         }
 

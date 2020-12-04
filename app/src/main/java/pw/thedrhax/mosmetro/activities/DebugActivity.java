@@ -76,13 +76,13 @@ public class DebugActivity extends Activity {
         service_state = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                service_running = intent.getBooleanExtra("RUNNING", false);
+                service_running = intent.getBooleanExtra(ConnectionService.EXTRA_RUNNING, false);
                 button_connect.setText(service_running ?
                         getString(R.string.stop) : getString(R.string.retry)
                 );
             }
         };
-        service_filter = new IntentFilter("pw.thedrhax.mosmetro.event.ConnectionService");
+        service_filter = new IntentFilter(ConnectionService.ACTION_EVENT);
 
         text_messages = (RecyclerView)findViewById(R.id.text_messages);
         text_messages_adapter = new LogAdapter();
@@ -134,7 +134,7 @@ public class DebugActivity extends Activity {
 
         // Get initial ConnectionService state (not very accurate)
         service_state.onReceive(this,
-                new Intent().putExtra("RUNNING", ConnectionService.isRunning())
+                new Intent().putExtra(ConnectionService.EXTRA_RUNNING, ConnectionService.isRunning())
         );
     }
 
@@ -222,9 +222,9 @@ public class DebugActivity extends Activity {
     public void button_connect (final View view) {
         Intent service = new Intent(this, ConnectionService.class);
         if (service_running)
-            service.setAction("STOP");
+            service.setAction(ConnectionService.ACTION_STOP);
         else
-            service.putExtra("debug", true);
+            service.putExtra(ConnectionService.EXTRA_DEBUG, true);
         startService(service);
     }
 

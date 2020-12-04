@@ -48,6 +48,16 @@ import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
+    public static final String ACTION_EVENT = "pw.thedrhax.mosmetro.event.ConnectionService";
+    public static final String ACTION_STOP = "STOP";
+    public static final String ACTION_EVENT_CONNECTED = "pw.thedrhax.mosmetro.event.CONNECTED";
+    public static final String ACTION_EVENT_DISCONNECTED = "pw.thedrhax.mosmetro.event.DISCONNECTED";
+
+    public static final String EXTRA_DEBUG = "debug"; // boolean
+    public static final String EXTRA_FORCE = "force"; // boolean
+    public static final String EXTRA_RUNNING = "RUNNING"; // boolean
+    public static final String EXTRA_STOP = "stop"; // boolean
+
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Listener<Boolean> running = new Listener<>(false);
     private static String SSID = WifiUtils.UNKNOWN_SSID;
@@ -94,7 +104,7 @@ public class ConnectionService extends IntentService {
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
-                new Intent(this, ConnectionService.class).setAction("STOP"),
+                new Intent(this, ConnectionService.class).setAction(ACTION_STOP),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
@@ -267,17 +277,17 @@ public class ConnectionService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
 
-        if ("STOP".equals(intent.getAction()) || intent.getBooleanExtra("stop", false)) { // Stop by intent
+        if (ACTION_STOP.equals(intent.getAction()) || intent.getBooleanExtra(EXTRA_STOP, false)) { // Stop by intent
             Logger.log(this, "Stopping by Intent");
             running.set(false);
             return START_NOT_STICKY;
         }
 
-        if (intent.getBooleanExtra("debug", false)) {
+        if (intent.getBooleanExtra(EXTRA_DEBUG, false)) {
             Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
             from_debug = true;
-        } else if (intent.getBooleanExtra("force", false)) {
+        } else if (intent.getBooleanExtra(EXTRA_FORCE, false)) {
             Logger.log(this, "Started from shortcut");
             from_shortcut = true;
             from_debug = false;
@@ -305,9 +315,7 @@ public class ConnectionService extends IntentService {
     public void onHandleIntent(Intent intent) {
         if (lock.tryLock()) {
             Logger.log(this, "Broadcast | ConnectionService (RUNNING = true)");
-            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                    .putExtra("RUNNING", true)
-            );
+            sendBroadcast(new Intent(ACTION_EVENT).putExtra(EXTRA_RUNNING, true));
 
             Logger.date(">>> ");
             Logger.log(getString(R.string.version, Version.getFormattedVersion()));
@@ -329,9 +337,7 @@ public class ConnectionService extends IntentService {
             notify.hide();
 
             Logger.log(this, "Broadcast | ConnectionService (RUNNING = false)");
-            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                    .putExtra("RUNNING", false)
-            );
+            sendBroadcast(new Intent(ACTION_EVENT).putExtra(EXTRA_RUNNING, false));
 
             Logger.date("<<< ");
         } else {
@@ -496,7 +502,7 @@ public class ConnectionService extends IntentService {
         }
 
         Logger.log(this, "Broadcast | CONNECTED");
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
+        sendBroadcast(new Intent(ACTION_EVENT_CONNECTED)
                 .putExtra("SSID", SSID)
                 .putExtra("PROVIDER", provider.getName())
         );
@@ -511,7 +517,7 @@ public class ConnectionService extends IntentService {
         }
 
         Logger.log(this, "Broadcast | DISCONNECTED");
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
+        sendBroadcast(new Intent(ACTION_EVENT_DISCONNECTED));
         notify.hide();
 
         // Try to reconnect the Wi-Fi network

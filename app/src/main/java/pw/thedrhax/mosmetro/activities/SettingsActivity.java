@@ -56,6 +56,7 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.services.ConnectionService;
+import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -519,17 +520,46 @@ public class SettingsActivity extends Activity {
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =
                 (CheckBoxPreference) fragment.findPreference("pref_autoconnect");
+        final CheckBoxPreference pref_autoconnect_service =
+                (CheckBoxPreference) fragment.findPreference("pref_autoconnect_service");
+
+        Intent receiver_service = new Intent(SettingsActivity.this, ReceiverService.class);
+
         pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
+            public boolean onPreferenceChange(Preference preference, Object new_value) {
                 Context context = SettingsActivity.this;
                 Intent service = new Intent(context, ConnectionService.class);
-                if (pref_autoconnect.isChecked())
-                    service.setAction("STOP");
+                if (!(Boolean)new_value) {
+                    service.setAction(ConnectionService.ACTION_STOP);
+                    pref_autoconnect_service.setChecked(false);
+                    stopService(receiver_service);
+                }
+                pref_autoconnect_service.setEnabled((Boolean)new_value);
                 context.startService(service);
                 return true;
             }
         });
+
+        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object new_value) {
+                if ((Boolean)new_value) {
+                    startService(receiver_service);
+                } else {
+                    stopService(receiver_service);
+                }
+                return true;
+            }
+        });
+
+        if (!pref_autoconnect.isChecked()) {
+            pref_autoconnect_service.setEnabled(false);
+        }
+
+        if (pref_autoconnect_service.isChecked()) {
+            startService(receiver_service);
+        }
 
         // Branch Selector
         Preference pref_updater_branch = fragment.findPreference("pref_updater_branch");
