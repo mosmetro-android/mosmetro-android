@@ -410,6 +410,7 @@ public class ConnectionService extends IntentService {
                 return false;
             } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
+                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
             } else {
                 Logger.log(this, "Midsession | Unable to solve, ignoring...");
                 ignore_midsession = true;
