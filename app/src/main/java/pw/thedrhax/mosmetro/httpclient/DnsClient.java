@@ -47,19 +47,19 @@ public class DnsClient implements Dns {
     private String[] getServers() {
         Set<String> servers = new HashSet<String>();
 
-        wifi.getDns().forEach(new Consumer<InetAddress>() {
-            @Override
-            public void accept(InetAddress t) {
-                servers.add(t.getHostAddress());
-            }
-        });
-
         String[] config = ResolverConfig.getCurrentConfig().servers();
         if (config != null) {
             for (String addr : config) {
                 servers.add(addr);
             }
         }
+
+        wifi.getDns().forEach(new Consumer<InetAddress>() {
+            @Override
+            public void accept(InetAddress t) {
+                servers.add(t.getHostAddress());
+            }
+        });
 
         return servers.toArray(new String[servers.size()]);
     }
