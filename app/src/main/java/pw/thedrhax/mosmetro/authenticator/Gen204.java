@@ -65,6 +65,8 @@ public class Gen204 {
     private final Randomizer random;
     private final int pref_retry_count;
 
+    private Gen204Result last_result = null;
+
     public Gen204(Context context, Listener<Boolean> running) {
         this.running.subscribe(running);
 
@@ -92,7 +94,7 @@ public class Gen204 {
         return res;
     }
 
-    public Gen204Result check(boolean false_negatives) {
+    private Gen204Result tripleCheck() {
         ParsedResponse unrel, rel_https, rel_http;
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
@@ -100,7 +102,7 @@ public class Gen204 {
             unrel = request("http://" + random.choose(URL_DEFAULT));
         } catch (IOException ex) {
             // network is most probably unreachable
-            return new Gen204Result(EMPTY, false);
+            return new Gen204Result(EMPTY);
         }
 
         // Reliable HTTPS check
@@ -121,40 +123,61 @@ public class Gen204 {
 
                 if (rel_http != null && rel_http.getResponseCode() != 204) {
                     Logger.log(this, "False positive detected");
-                    return new Gen204Result(rel_http, false); // false positive
+                    return new Gen204Result(rel_http); // false positive
                 }
             } else {
-                return new Gen204Result(rel_https, true); // confirmed positive
+                return new Gen204Result(rel_https); // confirmed positive
             }
         } else {
             if (rel_https == null) {
-                return new Gen204Result(unrel, false); // confirmed negative
+                return new Gen204Result(unrel); // confirmed negative
             } else if (rel_https.getResponseCode() == 204) {
                 Logger.log(this, "False negative detected");
-
-                if (false_negatives) {
-                    return new Gen204Result(unrel, true); // false negative
-                } else {
-                    return new Gen204Result(rel_https, true);
-                }
+                return new Gen204Result(rel_https, unrel);
             }
         }
 
         Logger.log(this, "Unexpected state");
-        return new Gen204Result(EMPTY, false);
+        return new Gen204Result(EMPTY);
+    }
+
+    public Gen204Result check() {
+        Gen204Result res = tripleCheck();
+        last_result = res;
+        return res;
+    }
+
+    public Gen204Result getLastResult() {
+        return last_result;
     }
 
     public class Gen204Result {
-        public final ParsedResponse response;
-        public final boolean connected;
+        private final ParsedResponse response;
+        private final ParsedResponse falseNegative;
 
-        public Gen204Result(ParsedResponse response, boolean connected) {
+        public Gen204Result(ParsedResponse response, ParsedResponse falseNegative) {
             this.response = response;
-            this.connected = connected;
+            this.falseNegative = falseNegative;
+        }
+
+        public Gen204Result(ParsedResponse response) {
+            this(response, null);
+        }
+
+        public ParsedResponse getResponse() {
+            return response;
+        }
+
+        public boolean isConnected() {
+            return response.getResponseCode() == 204;
         }
 
         public boolean isFalseNegative() {
-            return response.getResponseCode() != 204 && connected;
+            return falseNegative != null;
+        }
+
+        public ParsedResponse getFalseNegative() {
+            return falseNegative;
         }
     }
 }

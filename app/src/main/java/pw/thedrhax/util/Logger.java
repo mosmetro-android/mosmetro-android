@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.acra.ACRA;
+
 import pw.thedrhax.mosmetro.R;
 
 public class Logger {
@@ -70,10 +72,12 @@ public class Logger {
      */
 
     private static boolean pref_debug_logcat = false;
+    private static boolean pref_debug_testing = false;
 
     public static void configure(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         pref_debug_logcat = settings.getBoolean("pref_debug_logcat", false);
+        pref_debug_testing = settings.getBoolean("pref_debug_testing", false);
 
         for (LEVEL level : LEVEL.values()) {
             if (logs.containsKey(level)) {
@@ -149,6 +153,12 @@ public class Logger {
                 writer.clear();
             }
         }
+    }
+
+    public static void report(String message) {
+        if (!pref_debug_testing) return;
+        Logger.log(LEVEL.DEBUG, "Sending automated report | " + message);
+        ACRA.getErrorReporter().handleSilentException(new Exception(message));
     }
 
     /*

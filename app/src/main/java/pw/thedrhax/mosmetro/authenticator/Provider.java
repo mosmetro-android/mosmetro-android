@@ -114,7 +114,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-        ParsedResponse response = new Gen204(context, running).check(true).response;
+        ParsedResponse response = new Gen204(context, running).check().getResponse();
         Provider result = Provider.find(context, response);
         return result;
     }
@@ -153,7 +153,7 @@ public abstract class Provider extends LinkedList<Task> {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return isConnected(gen_204.check(false).response);
+        return isConnected(gen_204.check().getResponse());
     }
 
     /**
@@ -236,9 +236,8 @@ public abstract class Provider extends LinkedList<Task> {
     /**
      * Start the connection sequence defined in child classes.
      */
-    public RESULT start() {
+    public RESULT start(HashMap<String,Object> vars) {
         ProviderMetrics metrics = new ProviderMetrics(this).start();
-        HashMap<String,Object> vars = new HashMap<>();
         vars.put("result", RESULT.ERROR);
 
         Logger.date(">> ");
@@ -273,6 +272,10 @@ public abstract class Provider extends LinkedList<Task> {
         return (RESULT)vars.get("result");
     }
 
+    public RESULT start() {
+        return start(new HashMap<String,Object>());
+    }
+
     /**
      * Listener used to stop Provider immediately after
      * variable is changed by another thread
@@ -294,6 +297,18 @@ public abstract class Provider extends LinkedList<Task> {
                 .customDnsEnabled(true)
                 .setRunningListener(running)
                 .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
+        return this;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    /**
+     * Replace default Gen204 provider
+     */
+    public Provider setGen204(Gen204 gen_204) {
+        this.gen_204 = gen_204;
         return this;
     }
 

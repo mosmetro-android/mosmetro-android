@@ -54,20 +54,23 @@ public class DnsClient implements Dns {
             }
         });
 
-        String[] config = ResolverConfig.getCurrentConfig().servers();
-        if (config != null) {
-            for (String addr : config) {
-                servers.add(addr);
-            }
-        }
-
         return servers.toArray(new String[servers.size()]);
+    }
+
+    private String[] getDefaultServers() {
+        String[] config = ResolverConfig.getCurrentConfig().servers();
+        return config != null ? config : new String[0];
     }
 
     public DnsClient(Context context) {
         wifi = new WifiUtils(context);
 
         String[] servers = getServers();
+
+        if (servers.length == 0) {
+            Logger.log(this, "Unable to get servers from Android API");
+            servers = getDefaultServers();
+        }
 
         if (servers.length == 0) {
             Logger.log(this, "No servers found, using fallback resolver");

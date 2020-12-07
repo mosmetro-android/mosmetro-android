@@ -20,11 +20,14 @@ package pw.thedrhax.mosmetro;
 
 import android.app.Application;
 import android.content.Context;
+import androidx.work.Configuration;
+import androidx.work.WorkManager;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
 
 import pw.thedrhax.mosmetro.acra.CustomHttpSenderFactory;
+import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.util.Logger;
 
 import static org.acra.ReportField.*;
@@ -44,6 +47,17 @@ import static org.acra.ReportField.*;
         applicationLogFile = "log-debug.txt",
         applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        WorkManager.initialize(this,
+                new Configuration.Builder()
+                        .setMinimumLoggingLevel(android.util.Log.DEBUG)
+                        .build()
+        );
+        BackendWorker.configure(this);
+    }
 
     @Override
     protected void attachBaseContext(Context base) {

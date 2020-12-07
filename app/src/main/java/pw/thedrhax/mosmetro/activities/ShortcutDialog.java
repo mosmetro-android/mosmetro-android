@@ -26,6 +26,7 @@ import android.widget.CheckBox;
 import androidx.appcompat.app.AppCompatActivity;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Util;
 
 public class ShortcutDialog extends AppCompatActivity {
@@ -95,8 +96,8 @@ public class ShortcutDialog extends AppCompatActivity {
         Intent result = new Intent();
 
         Intent shortcut_intent = new Intent(this, getActivityClass())
-                .putExtra("force", check_force.isChecked())
-                .putExtra("stop", check_stop.isChecked())
+                .putExtra(ConnectionService.EXTRA_FORCE, check_force.isChecked())
+                .putExtra(ConnectionService.EXTRA_STOP, check_stop.isChecked())
                 .putExtra("view_only", check_log.isChecked());
 
         result.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcut_intent);

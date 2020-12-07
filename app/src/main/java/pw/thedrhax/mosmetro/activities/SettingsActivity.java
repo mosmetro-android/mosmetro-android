@@ -57,7 +57,8 @@ import java.util.Map;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.services.ConnectionService;
-import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
+import pw.thedrhax.mosmetro.services.ReceiverService;
+import pw.thedrhax.mosmetro.updater.UpdateChecker;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
@@ -67,7 +68,7 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends AppCompatActivity {
     private SettingsFragment fragment;
-    private Listener<Map<String,UpdateCheckTask.Branch>> branches;
+    private Listener<Map<String, UpdateChecker.Branch>> branches;
     private SharedPreferences settings;
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -98,9 +99,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class BranchFragment extends NestedFragment {
-        private Map<String,UpdateCheckTask.Branch> branches;
+        private Map<String, UpdateChecker.Branch> branches;
 
-        public BranchFragment branches(@NonNull Map<String, UpdateCheckTask.Branch> branches) {
+        public BranchFragment branches(@NonNull Map<String, UpdateChecker.Branch> branches) {
             this.branches = branches; return this;
         }
 
@@ -122,7 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (branches == null) return;
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            for (final UpdateCheckTask.Branch branch : branches.values()) {
+            for (final UpdateChecker.Branch branch : branches.values()) {
                 CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
                     @Override
                     protected void onBindView(View view) {
@@ -225,20 +226,57 @@ public class SettingsActivity extends AppCompatActivity {
             setTitle(getString(R.string.pref_debug));
             addPreferencesFromResource(R.xml.pref_debug);
 
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
             Preference.OnPreferenceChangeListener reload_logger = new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    PreferenceManager.getDefaultSharedPreferences(getActivity())
-                            .edit()
-                            .putBoolean(preference.getKey(), (Boolean) newValue)
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    settings.edit()
+                            .putBoolean(pref.getKey(), (Boolean) new_value)
                             .apply();
                     Logger.configure(getActivity());
                     return true;
                 }
             };
 
-            CheckBoxPreference pref_debug_logcat =
-                    (CheckBoxPreference) getPreferenceScreen().findPreference("pref_debug_logcat");
+            CheckBoxPreference pref_debug_acra = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("acra.enable");
+            CheckBoxPreference pref_debug_last_log = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_last_log");
+            CheckBoxPreference pref_debug_testing = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_testing");
+            CheckBoxPreference pref_debug_logcat = (CheckBoxPreference)
+                    getPreferenceScreen().findPreference("pref_debug_logcat");
+
+            pref_debug_last_log.setEnabled(pref_debug_acra.isChecked());
+            pref_debug_testing.setEnabled(pref_debug_last_log.isChecked());
+
+            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+                @Override
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    if (!(Boolean)new_value) {
+                        pref_debug_last_log.setChecked(false);
+                        pref_debug_testing.setChecked(false);
+                        pref_debug_testing.setEnabled(false);
+                    }
+
+                    pref_debug_last_log.setEnabled((Boolean) new_value);
+                    return true;
+                }
+            });
+            
+            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+                public boolean onPreferenceChange(Preference pref, Object new_value) {
+                    if (!(Boolean)new_value) {
+                        pref_debug_testing.setChecked(false);
+                    }
+
+                    pref_debug_testing.setEnabled((Boolean) new_value);
+                    return true;
+                };
+            });
+
+            pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
             pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
         }
     }
@@ -268,14 +306,14 @@ public class SettingsActivity extends AppCompatActivity {
                 ClipData clip;
 
                 switch (i) {
-                    case 0: // Yandex.Money
+                    case 0: // Yandex.Money / YooMoney
                         startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
                                 .putExtra("data", getString(R.string.donate_yandex_data))
                         );
                         break;
 
-                    case 1: // Bitcoin
-                        clip = ClipData.newPlainText("", getString(R.string.donate_bitcoin_data));
+                    case 1: // Sberbank
+                        clip = ClipData.newPlainText("", getString(R.string.donate_sberbank_data));
                         clipboard.setPrimaryClip(clip);
 
                         Toast.makeText(SettingsActivity.this,
@@ -321,39 +359,44 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void update_checker_setup() {
-        // Force check
         final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
-        pref_updater_check.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+        Preference.OnPreferenceClickListener click = new Preference.OnPreferenceClickListener() {
             @SuppressLint("StaticFieldLeak")
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new UpdateCheckTask(SettingsActivity.this) {
+                boolean manual = preference != null;
+
+                UpdateChecker updater = new UpdateChecker(SettingsActivity.this)
+                        .ignore(!manual).force(manual);
+
+                updater.async_check(new UpdateChecker.Callback() {
                     @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
+                    public void onStart() {
                         pref_updater_check.setEnabled(false);
                     }
 
                     @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
+                    public void onResult(UpdateChecker.Result result) {
                         pref_updater_check.setEnabled(true);
-                    }
+                        branches.set(result.getBranches());
 
-                    @Override
-                    public void result(@Nullable Map<String, Branch> result) {
-                        branches.set(result);
+                        if (result != null && (result.hasUpdate() || manual)) {
+                            result.showDialog();
+                        }
                     }
-                }.ignore(preference == null).force(preference != null).execute();
+                });
+
                 return false;
             }
-        });
+        };
+
+        // Force check
+        pref_updater_check.setOnPreferenceClickListener(click);
 
         // Check for updates on start if enabled
         if (settings.getBoolean("pref_updater_enabled", true))
-            pref_updater_check
-                    .getOnPreferenceClickListener()
-                    .onPreferenceClick(null);
+            click.onPreferenceClick(null);
     }
 
     @RequiresApi(23)
@@ -480,24 +523,53 @@ public class SettingsActivity extends AppCompatActivity {
         // Start/stop service on pref_autoconnect change
         final CheckBoxPreference pref_autoconnect =
                 (CheckBoxPreference) fragment.findPreference("pref_autoconnect");
+        final CheckBoxPreference pref_autoconnect_service =
+                (CheckBoxPreference) fragment.findPreference("pref_autoconnect_service");
+
+        Intent receiver_service = new Intent(SettingsActivity.this, ReceiverService.class);
+
         pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
+            public boolean onPreferenceChange(Preference preference, Object new_value) {
                 Context context = SettingsActivity.this;
                 Intent service = new Intent(context, ConnectionService.class);
-                if (pref_autoconnect.isChecked())
-                    service.setAction("STOP");
+                if (!(Boolean)new_value) {
+                    service.setAction(ConnectionService.ACTION_STOP);
+                    pref_autoconnect_service.setChecked(false);
+                    stopService(receiver_service);
+                }
+                pref_autoconnect_service.setEnabled((Boolean)new_value);
                 context.startService(service);
                 return true;
             }
         });
+
+        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object new_value) {
+                if ((Boolean)new_value) {
+                    startService(receiver_service);
+                } else {
+                    stopService(receiver_service);
+                }
+                return true;
+            }
+        });
+
+        if (!pref_autoconnect.isChecked()) {
+            pref_autoconnect_service.setEnabled(false);
+        }
+
+        if (pref_autoconnect_service.isChecked()) {
+            startService(receiver_service);
+        }
 
         // Branch Selector
         Preference pref_updater_branch = fragment.findPreference("pref_updater_branch");
         pref_updater_branch.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Map<String,UpdateCheckTask.Branch> branch_list = branches.get();
+                Map<String, UpdateChecker.Branch> branch_list = branches.get();
                 if (branch_list != null) {
                     replaceFragment("branch", new BranchFragment().branches(branch_list));
                 } else {
@@ -507,9 +579,9 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        branches = new Listener<Map<String,UpdateCheckTask.Branch>>(null) {
+        branches = new Listener<Map<String, UpdateChecker.Branch>>(null) {
             @Override
-            public void onChange(Map<String, UpdateCheckTask.Branch> new_value) {
+            public void onChange(Map<String, UpdateChecker.Branch> new_value) {
                 pref_updater_branch.setEnabled(new_value != null && new_value.size() > 0);
             }
         };

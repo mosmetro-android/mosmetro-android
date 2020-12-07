@@ -25,6 +25,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,6 +36,9 @@ import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
+import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
+import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -43,6 +48,16 @@ import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
 public class ConnectionService extends IntentService {
+    public static final String ACTION_EVENT = "pw.thedrhax.mosmetro.event.ConnectionService";
+    public static final String ACTION_STOP = "STOP";
+    public static final String ACTION_EVENT_CONNECTED = "pw.thedrhax.mosmetro.event.CONNECTED";
+    public static final String ACTION_EVENT_DISCONNECTED = "pw.thedrhax.mosmetro.event.DISCONNECTED";
+
+    public static final String EXTRA_DEBUG = "debug"; // boolean
+    public static final String EXTRA_FORCE = "force"; // boolean
+    public static final String EXTRA_RUNNING = "RUNNING"; // boolean
+    public static final String EXTRA_STOP = "stop"; // boolean
+
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Listener<Boolean> running = new Listener<>(false);
     private static String SSID = WifiUtils.UNKNOWN_SSID;
@@ -54,7 +69,13 @@ public class ConnectionService extends IntentService {
     private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_ip_wait;
+    private int pref_internet_check_interval;
+    private boolean pref_internet_check;
+    private boolean pref_midsession;
     private boolean pref_notify_foreground;
+
+    // Internet check
+    private Gen204 gen_204;
 
     // Notifications
     private Notify notify;
@@ -77,12 +98,17 @@ public class ConnectionService extends IntentService {
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
+        pref_internet_check = settings.getBoolean("pref_internet_check", true);
+        pref_midsession = settings.getBoolean("pref_internet_check_midsession", true);
+        pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
-                new Intent(this, ConnectionService.class).setAction("STOP"),
+                new Intent(this, ConnectionService.class).setAction(ACTION_STOP),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
+
+        gen_204 = new Gen204(this, running);
 
         notify = new Notify(this) {
             @Override
@@ -251,17 +277,17 @@ public class ConnectionService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
 
-        if ("STOP".equals(intent.getAction()) || intent.getBooleanExtra("stop", false)) { // Stop by intent
+        if (ACTION_STOP.equals(intent.getAction()) || intent.getBooleanExtra(EXTRA_STOP, false)) { // Stop by intent
             Logger.log(this, "Stopping by Intent");
             running.set(false);
             return START_NOT_STICKY;
         }
 
-        if (intent.getBooleanExtra("debug", false)) {
+        if (intent.getBooleanExtra(EXTRA_DEBUG, false)) {
             Logger.log(this, "Started from DebugActivity");
             from_shortcut = true;
             from_debug = true;
-        } else if (intent.getBooleanExtra("force", false)) {
+        } else if (intent.getBooleanExtra(EXTRA_FORCE, false)) {
             Logger.log(this, "Started from shortcut");
             from_shortcut = true;
             from_debug = false;
@@ -289,9 +315,7 @@ public class ConnectionService extends IntentService {
     public void onHandleIntent(Intent intent) {
         if (lock.tryLock()) {
             Logger.log(this, "Broadcast | ConnectionService (RUNNING = true)");
-            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                    .putExtra("RUNNING", true)
-            );
+            sendBroadcast(new Intent(ACTION_EVENT).putExtra(EXTRA_RUNNING, true));
 
             Logger.date(">>> ");
             Logger.log(getString(R.string.version, Version.getFormattedVersion()));
@@ -299,7 +323,6 @@ public class ConnectionService extends IntentService {
 
             running.set(true);
             boolean first_iteration = true;
-            HashMap<String,Object> vars = new HashMap<String,Object>();
             while (running.get()) {
                 if (!first_iteration) {
                     Logger.log(this, "Still alive!");
@@ -307,16 +330,14 @@ public class ConnectionService extends IntentService {
                     first_iteration = false;
                 }
 
-                main(vars);
+                main();
             }
             lock.unlock();
 
             notify.hide();
 
             Logger.log(this, "Broadcast | ConnectionService (RUNNING = false)");
-            sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.ConnectionService")
-                    .putExtra("RUNNING", false)
-            );
+            sendBroadcast(new Intent(ACTION_EVENT).putExtra(EXTRA_RUNNING, false));
 
             Logger.date("<<< ");
         } else {
@@ -324,7 +345,88 @@ public class ConnectionService extends IntentService {
         }
     }
 
-    private void main(HashMap<String,Object> vars) {
+    private boolean ignore_midsession = false;
+
+    private boolean isConnected() {
+        return isConnected(null);
+    }
+
+    private boolean isConnected(Gen204Result res_204) {
+        if (res_204 == null) {
+            Logger.log(this, "Checking internet connection");
+            res_204 = gen_204.check();
+        }
+
+        if (!res_204.isConnected()) {
+            return false;
+        }
+
+        if (pref_midsession && !ignore_midsession && res_204.isFalseNegative()) {
+            Provider midsession = Provider.find(this, res_204.getFalseNegative())
+                    .setRunningListener(running)
+                    .setGen204(gen_204);
+
+            Logger.log(Logger.LEVEL.DEBUG,
+                "Midsession | Detected (" + midsession.getName() + ")"
+            );
+
+            if (midsession instanceof Unknown) {
+                Logger.log(Logger.LEVEL.DEBUG,
+                    "Midsession | Attempting to solve without algorithm"
+                );
+
+                Client client = midsession.getClient();
+                client.followRedirects(false);
+
+                try {
+                    ParsedResponse res = res_204.getFalseNegative();
+                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                    String next_redirect = res.parseAnyRedirect();
+
+                    while (next_redirect != null && running.get()) {
+                        Logger.log(Logger.LEVEL.DEBUG,
+                            "Midsession | Requesting " + next_redirect
+                        );
+
+                        res = client.get(next_redirect, null, pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                        next_redirect = res.parseAnyRedirect();
+                    }
+                } catch (IOException | ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                }
+
+                client.followRedirects(true);
+            } else {
+                Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
+                Logger.log(getString(R.string.algorithm_name, midsession.getName()));
+                midsession.start(new HashMap<String, Object>() {{
+                    put("midsession", true);
+                }});
+            }
+
+            if (!running.sleep(3000)) return false;
+
+            res_204 = gen_204.check();
+
+            if (!res_204.isConnected()) {
+                Logger.log(this, "Midsession | Connection lost, aborting...");
+                return false;
+            } else if (!res_204.isFalseNegative()) {
+                Logger.log(this, "Midsession | Solved successfully");
+                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
+            } else {
+                Logger.log(this, "Midsession | Unable to solve, ignoring...");
+                ignore_midsession = true;
+            }
+        }
+
+        return res_204.isConnected();
+    }
+
+    private void main() {
         notify.icon(R.drawable.ic_notification_connecting_colored,
                     R.drawable.ic_notification_connecting);
 
@@ -356,6 +458,7 @@ public class ConnectionService extends IntentService {
 
         Provider provider = Provider.find(this, running)
                 .setRunningListener(running)
+                .setGen204(gen_204)
                 .setCallback(new Provider.ICallback() {
                     @Override
                     public void onProgressUpdate(int progress) {
@@ -386,6 +489,11 @@ public class ConnectionService extends IntentService {
             case CONNECTED:
             case ALREADY_CONNECTED:
                 if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
+
+                // Check for midsession in cached Gen204 result
+                ignore_midsession = false;
+                isConnected(gen_204.getLastResult());
+
                 if (!from_shortcut) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
@@ -394,47 +502,22 @@ public class ConnectionService extends IntentService {
         }
 
         Logger.log(this, "Broadcast | CONNECTED");
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.CONNECTED")
+        sendBroadcast(new Intent(ACTION_EVENT_CONNECTED)
                 .putExtra("SSID", SSID)
                 .putExtra("PROVIDER", provider.getName())
         );
 
         // Wait while internet connection is available
-        Gen204 gen_204 = new Gen204(this, running);
-        Gen204Result res_204;
         int count = 0;
         while (running.sleep(1000)) {
-            // Check internet connection each 10 seconds
-            int check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
-            if (settings.getBoolean("pref_internet_check", true) && ++count == check_interval) {
-                Logger.log(this, "Checking internet connection");
+            if (pref_internet_check && ++count == pref_internet_check_interval) {
                 count = 0;
-
-                res_204 = gen_204.check(true); // TODO: Add preference here
-
-                if (res_204.isFalseNegative()) {
-                    if (!vars.containsKey("midsession")) {
-                        Logger.log(this, "Midsession | Detected. Attempting to solve");
-                        vars.put("midsession", true);
-                        break;
-                    } else {
-                        Logger.log(this, "Midsession | Failed to solve");
-                    }
-                } else {
-                    if (vars.containsKey("midsession")) {
-                        Logger.log(this, "Midsession | Solved successfully");
-                        vars.remove("midsession");
-                    }
-                }
-
-                if (!res_204.connected) {
-                    break;
-                }
+                if (!isConnected()) break;
             }
         }
 
         Logger.log(this, "Broadcast | DISCONNECTED");
-        sendBroadcast(new Intent("pw.thedrhax.mosmetro.event.DISCONNECTED"));
+        sendBroadcast(new Intent(ACTION_EVENT_DISCONNECTED));
         notify.hide();
 
         // Try to reconnect the Wi-Fi network
