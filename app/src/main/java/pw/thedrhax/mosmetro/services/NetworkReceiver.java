@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 
 import java.util.Locale;
 

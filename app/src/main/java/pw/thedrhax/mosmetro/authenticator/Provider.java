@@ -20,7 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;

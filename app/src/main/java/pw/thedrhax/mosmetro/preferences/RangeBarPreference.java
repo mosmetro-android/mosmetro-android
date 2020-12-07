@@ -18,26 +18,15 @@
 
 package pw.thedrhax.mosmetro.preferences;
 
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.preference.DialogPreference;
-import android.preference.PreferenceManager;
+import androidx.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.TextView;
-
-import com.edmodo.rangebar.RangeBar;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.util.Util;
 
 public class RangeBarPreference extends DialogPreference {
 
-    @TargetApi(21)
     public RangeBarPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
@@ -53,15 +42,27 @@ public class RangeBarPreference extends DialogPreference {
         init(context, attrs);
     }
 
-    @TargetApi(21)
     public RangeBarPreference(Context context) {
         super(context);
     }
 
-    private String key_min = getKey() + "_min";
-    private String key_max = getKey() + "_max";
-
     private int defaultMin, defaultMax, min, max;
+
+    public int getDefaultMin() {
+        return defaultMin;
+    }
+
+    public int getDefaultMax() {
+        return defaultMax;
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RangeBarPreference, 0, 0);
@@ -72,54 +73,5 @@ public class RangeBarPreference extends DialogPreference {
         max = ta.getInt(R.styleable.RangeBarPreference_max, 10);
 
         ta.recycle();
-    }
-
-    @Override
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        super.onPrepareDialogBuilder(builder);
-
-        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final View view = View.inflate(getContext(), R.layout.rangebar_preference, null);
-        final RangeBar rangebar = (RangeBar) view.findViewById(R.id.rangebar);
-
-        rangebar.setTickCount(max - min + 1);
-        rangebar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
-            private TextView rangetext = (TextView) view.findViewById(R.id.rangetext);
-
-            @Override
-            public void onIndexChangeListener(RangeBar rangeBar, int left, int right) {
-                if (left < min || left > max) {
-                    rangeBar.setLeft(min); return;
-                }
-
-                if (right < min || right > max) {
-                    rangeBar.setRight(max); return;
-                }
-
-                rangetext.setText("" + (left + min) + " - " + (right + min));
-            }
-        });
-
-        int current_min = Util.getIntPreference(getContext(), key_min, defaultMin);
-        if (current_min < min)
-            current_min = min;
-
-        int current_max = Util.getIntPreference(getContext(), key_max, defaultMax);
-        if (current_max > max)
-            current_max = max;
-
-        rangebar.setThumbIndices(current_min, current_max);
-
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                settings.edit()
-                        .putInt(key_min, rangebar.getLeftIndex() + min)
-                        .putInt(key_max, rangebar.getRightIndex() + min)
-                        .apply();
-            }
-        });
-
-        builder.setView(view);
     }
 }

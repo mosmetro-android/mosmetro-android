@@ -19,9 +19,7 @@
 package pw.thedrhax.mosmetro.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -30,24 +28,25 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.fragment.app.DialogFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.acra.ACRA;
@@ -56,6 +55,9 @@ import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
+import pw.thedrhax.mosmetro.preferences.LoginFormPreferenceFragment;
+import pw.thedrhax.mosmetro.preferences.RangeBarPreference;
+import pw.thedrhax.mosmetro.preferences.RangeBarPreferenceFragment;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
@@ -71,23 +73,21 @@ public class SettingsActivity extends AppCompatActivity {
     private Listener<Map<String, UpdateChecker.Branch>> branches;
     private SharedPreferences settings;
 
-    public static class SettingsFragment extends PreferenceFragment {
+    public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.preferences);
         }
     }
 
-    public static class NestedFragment extends PreferenceFragment {
+    public static class NestedFragment extends PreferenceFragmentCompat {
         protected void setTitle(String title) {
             ActionBar bar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (bar != null) bar.setTitle(title);
         }
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setHasOptionsMenu(true);
         }
 
@@ -95,6 +95,21 @@ public class SettingsActivity extends AppCompatActivity {
         public void onPrepareOptionsMenu(Menu menu) {
             super.onPrepareOptionsMenu(menu);
             menu.clear();
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference instanceof LoginFormPreference) {
+                DialogFragment fragment = new LoginFormPreferenceFragment((LoginFormPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "LoginFormPreference");
+            } else if (preference instanceof RangeBarPreference) {
+                DialogFragment fragment = new RangeBarPreferenceFragment((RangeBarPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "RangeBarPreference");
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+            }
         }
     }
 
@@ -124,17 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (branches == null) return;
             final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
             for (final UpdateChecker.Branch branch : branches.values()) {
-                CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
-                    @Override
-                    protected void onBindView(View view) {
-                        super.onBindView(view);
-
-                        // Increase number of lines on Android 4.x
-                        // Source: https://stackoverflow.com/a/2615650
-                        TextView summary = (TextView) view.findViewById(android.R.id.summary);
-                        summary.setMaxLines(15);
-                    }
-                };
+                CheckBoxPreference pref = new CheckBoxPreference(getActivity());
                 pref.setTitle(branch.name);
                 pref.setSummary(branch.description);
                 pref.setChecked(Version.getBranch().equals(branch.name));
@@ -467,9 +472,9 @@ public class SettingsActivity extends AppCompatActivity {
                 dialog.show();
     }
 
-    private void replaceFragment(String id, Fragment fragment) {
+    private void replaceFragment(String id, PreferenceFragmentCompat fragment) {
         try {
-            getFragmentManager()
+            getSupportFragmentManager()
                     .beginTransaction()
                     .replace(android.R.id.content, fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -486,7 +491,7 @@ public class SettingsActivity extends AppCompatActivity {
         setTheme(Util.getTheme(this, false));
 
         // Populate preferences
-        final FragmentManager fmanager = getFragmentManager();
+        final FragmentManager fmanager = getSupportFragmentManager();
         fragment = new SettingsFragment();
         fmanager.beginTransaction()
                 .replace(android.R.id.content, fragment)

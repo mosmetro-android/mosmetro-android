@@ -20,11 +20,11 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.ThemeDialog;
+import androidx.preference.PreferenceManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
