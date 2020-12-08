@@ -75,32 +75,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Dialogs -->
-
-        <activity
-            android:name=".activities.ShortcutDialog"
-            android:label="@string/manual_connection_shortcut"
-            android:theme="@style/AppBaseTheme.Dialog">
-            <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".activities.ThemeDialog"
-            android:label="@string/pref_theme"
-            android:theme="@style/AppBaseTheme.Dialog">
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ThemeDialog" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <!-- Services -->
 
         <service android:name=".services.ReceiverService" />

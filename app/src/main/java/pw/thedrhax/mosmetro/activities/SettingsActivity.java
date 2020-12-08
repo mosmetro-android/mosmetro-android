@@ -1,17 +1,17 @@
 /**
  * Wi-Fi в метро (pw.thedrhax.mosmetro, Moscow Wi-Fi autologin)
  * Copyright © 2015 Dmitry Karikh <the.dr.hax@gmail.com>
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,8 +28,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.CheckBoxPreference;
@@ -38,16 +47,6 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.fragment.app.DialogFragment;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -58,6 +57,10 @@ import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreferenceFragment;
 import pw.thedrhax.mosmetro.preferences.RangeBarPreference;
 import pw.thedrhax.mosmetro.preferences.RangeBarPreferenceFragment;
+import pw.thedrhax.mosmetro.preferences.ShortcutDialogPreference;
+import pw.thedrhax.mosmetro.preferences.ShortcutDialogPreferenceFragment;
+import pw.thedrhax.mosmetro.preferences.ThemeDialogPreference;
+import pw.thedrhax.mosmetro.preferences.ThemeDialogPreferenceFragment;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
@@ -78,11 +81,27 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.preferences);
         }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference instanceof ShortcutDialogPreference) {
+                DialogFragment fragment = new ShortcutDialogPreferenceFragment((ShortcutDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ShortcutDialogPreference");
+            } else if (preference instanceof ThemeDialogPreference) {
+                DialogFragment fragment = new ThemeDialogPreferenceFragment((ThemeDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ThemeDialogPreference");
+            }
+            else {
+                super.onDisplayPreferenceDialog(preference);
+            }
+        }
     }
 
     public static class NestedFragment extends PreferenceFragmentCompat {
         protected void setTitle(String title) {
-            ActionBar bar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+            ActionBar bar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (bar != null) bar.setTitle(title);
         }
 
@@ -107,7 +126,16 @@ public class SettingsActivity extends AppCompatActivity {
                 DialogFragment fragment = new RangeBarPreferenceFragment((RangeBarPreference) preference);
                 fragment.setTargetFragment(this, 0);
                 fragment.show(getParentFragmentManager(), "RangeBarPreference");
-            } else {
+            } else if (preference instanceof ShortcutDialogPreference) {
+                DialogFragment fragment = new ShortcutDialogPreferenceFragment((ShortcutDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ShortcutDialogPreference");
+            } else if (preference instanceof ThemeDialogPreference) {
+                DialogFragment fragment = new ThemeDialogPreferenceFragment((ThemeDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ThemeDialogPreference");
+            }
+            else {
                 super.onDisplayPreferenceDialog(preference);
             }
         }
@@ -117,7 +145,8 @@ public class SettingsActivity extends AppCompatActivity {
         private Map<String, UpdateChecker.Branch> branches;
 
         public BranchFragment branches(@NonNull Map<String, UpdateChecker.Branch> branches) {
-            this.branches = branches; return this;
+            this.branches = branches;
+            return this;
         }
 
         @Override
@@ -147,7 +176,7 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         boolean same = Version.getBranch().equals(branch.name);
-                        ((CheckBoxPreference)preference).setChecked(same);
+                        ((CheckBoxPreference) preference).setChecked(same);
                         if (!same) {
                             settings.edit().putInt("pref_updater_ignore", 0).apply();
                             branch.dialog().show();
@@ -256,10 +285,10 @@ public class SettingsActivity extends AppCompatActivity {
             pref_debug_last_log.setEnabled(pref_debug_acra.isChecked());
             pref_debug_testing.setEnabled(pref_debug_last_log.isChecked());
 
-            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean)new_value) {
+                    if (!(Boolean) new_value) {
                         pref_debug_last_log.setChecked(false);
                         pref_debug_testing.setChecked(false);
                         pref_debug_testing.setEnabled(false);
@@ -269,16 +298,18 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
-            
-            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+
+            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean)new_value) {
+                    if (!(Boolean) new_value) {
                         pref_debug_testing.setChecked(false);
                     }
 
                     pref_debug_testing.setEnabled((Boolean) new_value);
                     return true;
-                };
+                }
+
+                ;
             });
 
             pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
@@ -488,7 +519,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Util.getTheme(this, false));
+        setTheme(Util.getTheme(this));
 
         // Populate preferences
         final FragmentManager fmanager = getSupportFragmentManager();
@@ -538,21 +569,21 @@ public class SettingsActivity extends AppCompatActivity {
             public boolean onPreferenceChange(Preference preference, Object new_value) {
                 Context context = SettingsActivity.this;
                 Intent service = new Intent(context, ConnectionService.class);
-                if (!(Boolean)new_value) {
+                if (!(Boolean) new_value) {
                     service.setAction(ConnectionService.ACTION_STOP);
                     pref_autoconnect_service.setChecked(false);
                     stopService(receiver_service);
                 }
-                pref_autoconnect_service.setEnabled((Boolean)new_value);
+                pref_autoconnect_service.setEnabled((Boolean) new_value);
                 context.startService(service);
                 return true;
             }
         });
 
-        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                if ((Boolean)new_value) {
+                if ((Boolean) new_value) {
                     startService(receiver_service);
                 } else {
                     stopService(receiver_service);

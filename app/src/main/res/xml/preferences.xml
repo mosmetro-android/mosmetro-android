@@ -28,13 +28,10 @@
         </intent>
     </Preference>
 
-    <Preference
+    <pw.thedrhax.mosmetro.preferences.ShortcutDialogPreference
         android:key="pref_shortcut"
         android:title="@string/manual_connection_shortcut"
-        android:summary="@string/manual_connection_shortcut_summary">
-
-        <intent android:action="pw.thedrhax.mosmetro.activities.ShortcutActivity" />
-    </Preference>
+        android:summary="@string/manual_connection_shortcut_summary" />
 
     <PreferenceCategory
         android:key="pref_category_main"
@@ -50,12 +47,9 @@
             android:title="@string/pref_category_notifications"
             android:summary="@string/pref_category_notifications_summary" />
 
-        <Preference
+        <pw.thedrhax.mosmetro.preferences.ThemeDialogPreference
             android:key="pref_theme"
-            android:title="@string/pref_theme">
-
-            <intent android:action="pw.thedrhax.mosmetro.activities.ThemeDialog" />
-        </Preference>
+            android:title="@string/pref_theme" />
 
         <Preference
             android:key="pref_debug"

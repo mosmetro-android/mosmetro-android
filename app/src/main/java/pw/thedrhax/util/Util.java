@@ -20,10 +20,8 @@ package pw.thedrhax.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.appcompat.app.AppCompatDelegate;
 
-import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.ThemeDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 import java.io.BufferedReader;
@@ -31,6 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+
+import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.preferences.ThemeDialogPreferenceFragment;
 
 public final class Util {
     private Util() {}
@@ -72,30 +73,22 @@ public final class Util {
         return sb.toString();
     }
 
-    public static int getTheme(Context context, boolean dialog) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+    public static int getTheme(Context context) {
+        SharedPreferences settings = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
         int theme = settings.getInt("pref_theme", 0);
 
-        if (theme == ThemeDialog.THEME_DARK || theme == ThemeDialog.THEME_OLED) {
+        if (theme == ThemeDialogPreferenceFragment.THEME_DARK || theme == ThemeDialogPreferenceFragment.THEME_OLED) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else if (theme == ThemeDialog.THEME_LIGHT) {
+        } else if (theme == ThemeDialogPreferenceFragment.THEME_LIGHT) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
 
-        if (!dialog) {
-            if (theme == ThemeDialog.THEME_OLED) {
-                return R.style.AppBaseTheme_OLED;
-            } else {
-                return R.style.AppBaseTheme;
-            }
+        if (theme == ThemeDialogPreferenceFragment.THEME_OLED) {
+            return R.style.AppBaseTheme_OLED;
         } else {
-            if (theme == ThemeDialog.THEME_OLED) {
-                return R.style.AppBaseTheme_OLED_Dialog;
-            } else {
-                return R.style.AppBaseTheme_Dialog;
-            }
+            return R.style.AppBaseTheme;
         }
     }
 }

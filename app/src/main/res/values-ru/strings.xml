@@ -229,11 +229,6 @@
     <string name="auth_webview_page">Получение страницы авторизации</string>
     <string name="auth_webview_page_wait">Ожидание загрузки страницы</string>
     <string name="auth_webview_script">Ожидание завершения скрипта</string>
-    <string name="pref_theme_default">По умолчанию</string>
-    <string name="pref_theme_light">Светлая</string>
-    <string name="pref_theme_dark">Тёмная</string>
-    <string name="pref_theme_black">Чёрная (OLED)</string>
-    <string name="pref_theme">Тема оформления</string>
     <string name="pref_internet_check_midsession">Отключать midsession</string>
     <string name="pref_internet_check_midsession_summary">Если у вас появляется уведомление \"Требуется вход в сеть\" или Android считает, что доступа в интернет нет, когда он на самом деле есть, то эта опция может помочь.</string>
     <string name="pref_debug_testing">Участие в тестировании</string>
@@ -242,4 +237,12 @@
     <string name="reveiver_service_summary">Нажмите сюда, чтобы открыть настройки</string>
     <string name="pref_autoconnect_service_title">Постоянный фоновый процесс</string>
     <string name="pref_autoconnect_service_summary">Включите эту опцию, если приложение не запускается самостоятельно при подключении устройства к Wi-Fi</string>
+
+    <string name="pref_theme">Тема оформления</string>
+    <string-array name="theme_options">
+        <item>По умолчанию</item>
+        <item>Светлая</item>
+        <item>Тёмная</item>
+        <item>Чёрная (OLED)</item>
+    </string-array>
 </resources>
