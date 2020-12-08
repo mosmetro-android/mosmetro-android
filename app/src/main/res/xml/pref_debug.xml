@@ -14,6 +14,12 @@
         android:defaultValue="true" />
 
     <CheckBoxPreference
+        android:key="pref_debug_testing"
+        android:title="@string/pref_debug_testing"
+        android:summary="@string/pref_debug_testing_summary"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
         android:key="pref_debug_logcat"
         android:title="@string/pref_debug_logcat"
         android:summary="@string/pref_debug_logcat_summary"

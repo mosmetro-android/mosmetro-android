@@ -176,19 +176,20 @@
     <string name="contributor_Igor_Dyatlov_summary">Graphic design, logo</string>
     <string name="contributor_Igor_Dyatlov_link" translatable="false">https://github.com/igor-dyatlov</string>
 
-    <string name="action_donate">Support the project (doesn\'t affect the functionality)</string>
-    <string name="action_donate_cond">Support</string>
+    <string name="action_donate">Support the project</string>
+    <string name="action_donate_cond">Donate</string>
 
     <string-array name="donate_options">
-        <item>Yandex.Money or credit card</item>
-        <item>Bitcoin (copy the address)</item>
+        <item>Yandex.Money / YooMoney</item>
+        <item>Sberbank (copy the card number)</item>
         <item>Ethereum (copy the address)</item>
         <item>Join the community (VK, Telegram, GitHub)</item>
         <item>Cancel</item>
     </string-array>
-    <string name="donate_bitcoin_data" translatable="false">1U8aphhieUGX1TFY9dTmAujeo2WDQaD7m</string>
+    <string name="donate_sberbank_data" translatable="false">4274320057156229</string>
     <string name="donate_ethereum_data" translatable="false">0x949aecb10ae89673a9574f53bda04baffddabff7</string>
-    <string name="donate_yandex_data" translatable="false">https://money.yandex.ru/to/410014087156910</string>
+    <string name="donate_yandex_data" translatable="false">https://yoomoney.ru/to/410014087156910</string>
+    <string name="donate_paypal_data" translatable="false">https://paypal.me/thedrhax</string>
     <string name="pref_category_wifi">Wi-Fi control</string>
     <string name="pref_category_internet">Internet checks</string>
     <string name="open_settings">Open settings</string>
@@ -236,7 +237,7 @@
     <string name="pref_debug_summary">Automatic reports, LogCat, etc.</string>
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm was used during the 2018 FIFA World Cup in Moscow and St. Petersburg. It is currently disabled, so most likely this setting will not affect anything.</string>
-    <string name="pref_mainet">MAInet (wifi.mai.ru)</string>
+    <string name="pref_mainet" translatable="false">MAInet (wifi.mai.ru)</string>
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
     <string name="pref_mainet_credentials">MAInet settings</string>
     <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
@@ -257,4 +258,12 @@
     <string name="pref_theme_dark">Dark</string>
     <string name="pref_theme_black">Black (OLED)</string>
     <string name="pref_theme">Change theme</string>
+    <string name="pref_internet_check_midsession">Disable midsession</string>
+    <string name="pref_internet_check_midsession_summary">If you are seeing \"Sign into Wi-Fi network\" in your notifications, or Android thinks that internet is not available even if it is, this option might help.</string>
+    <string name="pref_debug_testing">Participation in testing</string>
+    <string name="pref_debug_testing_summary">Send conditional automated reports. Conditions change in every update and are targeting new functions and fixes. Reports contain last log, app version and some information about system and device.</string>
+    <string name="receiver_service_title">Waiting for Wi-Fi connection</string>
+    <string name="reveiver_service_summary">Tap here to open settings</string>
+    <string name="pref_autoconnect_service_title">Persistent service</string>
+    <string name="pref_autoconnect_service_summary">Enable this option if the application does not automatically start when the device connects to Wi-Fi</string>
 </resources>

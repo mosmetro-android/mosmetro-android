@@ -6,6 +6,12 @@
         android:summary="@string/pref_autoconnect_summary"
         android:defaultValue="true" />
 
+    <CheckBoxPreference
+        android:key="pref_autoconnect_service"
+        android:title="@string/pref_autoconnect_service_title"
+        android:summary="@string/pref_autoconnect_service_summary"
+        android:defaultValue="false" />
+
     <Preference
         android:title="@string/manual_connection"
         android:summary="@string/manual_connection_summary">

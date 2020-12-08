@@ -55,6 +55,12 @@
         android:title="@string/pref_internet_check_interval"
         android:summary="@string/pref_internet_check_interval_summary" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_internet_check_midsession"
+        android:summary="@string/pref_internet_check_midsession_summary"
+        android:title="@string/pref_internet_check_midsession" />
+
     <PreferenceCategory android:title="@string/pref_category_connection" />
 
     <EditTextPreference

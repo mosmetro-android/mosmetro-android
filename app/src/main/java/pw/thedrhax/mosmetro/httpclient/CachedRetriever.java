@@ -20,7 +20,7 @@ package pw.thedrhax.mosmetro.httpclient;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.util.Patterns;
 
 import org.json.simple.JSONArray;

@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import pw.thedrhax.util.Logger;
 
 class CustomHttpSender extends HttpSender {
