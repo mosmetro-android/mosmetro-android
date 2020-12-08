@@ -159,12 +159,12 @@
     <string name="contributor_Alexander_Krotov_summary">Первый Pull-реквест, миграция на Gradle, английский перевод</string>
     <string name="contributor_Igor_Dyatlov_summary">Графическое оформление, логотип</string>
 
-    <string name="action_donate">Поддержать проект (не влияет на функциональность)</string>
+    <string name="action_donate">Поддержать проект</string>
     <string name="action_donate_cond">Поддержать</string>
 
     <string-array name="donate_options">
-        <item>Яндекс.Деньги или карта</item>
-        <item>Bitcoin (скопировать адрес)</item>
+        <item>Яндекс.Деньги / ЮMoney</item>
+        <item>Сбербанк (скопировать номер карты)</item>
         <item>Ethereum (скопировать адрес)</item>
         <item>Вступить в сообщество (Вконтакте, Telegram, GitHub)</item>
         <item>Отмена</item>
@@ -234,4 +234,12 @@
     <string name="pref_theme_dark">Тёмная</string>
     <string name="pref_theme_black">Чёрная (OLED)</string>
     <string name="pref_theme">Тема оформления</string>
+    <string name="pref_internet_check_midsession">Отключать midsession</string>
+    <string name="pref_internet_check_midsession_summary">Если у вас появляется уведомление \"Требуется вход в сеть\" или Android считает, что доступа в интернет нет, когда он на самом деле есть, то эта опция может помочь.</string>
+    <string name="pref_debug_testing">Участие в тестировании</string>
+    <string name="pref_debug_testing_summary">Автоматически отправлять отчёты при определённых условиях. Условия меняются в каждом обновлении и направлены на проверку работы новых функций. Отчёт содержит последний лог, версию приложения и некоторую информацию о системе и устройстве.</string>
+    <string name="receiver_service_title">Ожидание подключения к сети Wi-Fi</string>
+    <string name="reveiver_service_summary">Нажмите сюда, чтобы открыть настройки</string>
+    <string name="pref_autoconnect_service_title">Постоянный фоновый процесс</string>
+    <string name="pref_autoconnect_service_summary">Включите эту опцию, если приложение не запускается самостоятельно при подключении устройства к Wi-Fi</string>
 </resources>

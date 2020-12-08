@@ -19,22 +19,15 @@
 package pw.thedrhax.mosmetro.authenticator;
 
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.os.AsyncTask;
-import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.BuildConfig;
-import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.activities.SettingsActivity;
-import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.updater.NewsChecker;
-import pw.thedrhax.mosmetro.updater.UpdateCheckTask;
-import pw.thedrhax.util.Notify;
+import pw.thedrhax.mosmetro.updater.BackendRequest;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
@@ -71,7 +64,12 @@ class ProviderMetrics {
         params.put("build_branch", Version.getBranch());
         params.put("build_number", "" + Version.getBuildNumber());
 
-        params.put("success", connected ? "true" : "false");
+        if (vars.containsKey("midsession")) {
+            params.put("success", "midsession");
+        } else {
+            params.put("success", connected ? "true" : "false");
+        }
+
         params.put("ssid", wifi.getSSID());
         params.put("provider", p.getName());
 
@@ -99,9 +97,9 @@ class ProviderMetrics {
             protected Void doInBackground(Void... none) {
                 if (!p.random.delay(p.running)) return null;
 
-                String STATISTICS_URL = new CachedRetriever(p.context).get(
-                        BuildConfig.API_URL_SOURCE, BuildConfig.API_URL_DEFAULT,
-                        CachedRetriever.Type.URL
+                String STATISTICS_URL = p.settings.getString(
+                        BackendRequest.PREF_BACKEND_URL,
+                        BuildConfig.API_URL_DEFAULT
                 ) + BuildConfig.API_REL_STATISTICS;
 
                 try {
@@ -112,31 +110,8 @@ class ProviderMetrics {
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        if (p.settings.getBoolean("pref_notify_news", true)) {
-            new NewsChecker(p.context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-
-        if (p.settings.getBoolean("pref_updater_enabled", true)) {
-            new UpdateCheckTask(p.context) {
-                @Override
-                public void result(boolean hasUpdate, @Nullable Branch current_branch) {
-                    if (!hasUpdate || current_branch == null) return;
-
-                    Notify notify = new Notify(p.context)
-                            .id(3)
-                            .title(p.context.getString(R.string.update_available))
-                            .text(current_branch.message)
-                            .icon(R.drawable.ic_notification_message,
-                                  R.drawable.ic_notification_message_colored)
-                            .cancelOnClick(true)
-                            .onClick(PendingIntent.getActivity(
-                                    p.context, 252,
-                                    new Intent(p.context, SettingsActivity.class),
-                                    PendingIntent.FLAG_UPDATE_CURRENT));
-
-                    notify.show();
-                }
-            }.force(false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (System.currentTimeMillis() - 6*60*60*1000 > p.settings.getLong("pref_worker_timestamp", 0)) {
+            new BackendRequest(p.context).run();
         }
 
         return false;

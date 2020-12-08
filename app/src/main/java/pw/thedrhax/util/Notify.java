@@ -25,7 +25,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.core.app.NotificationCompat;
 
 public class Notify extends NotificationCompat.Builder {

@@ -26,7 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.services.ConnectionService;
@@ -73,7 +73,7 @@ public class ToggleWidget extends AppWidgetProvider {
 
             Intent service = new Intent(context, ConnectionService.class);
             if (!pref_autoconnect)
-                service.setAction("STOP");
+                service.setAction(ConnectionService.ACTION_STOP);
             context.startService(service);
         }
 
