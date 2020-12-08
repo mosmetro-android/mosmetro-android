@@ -126,14 +126,6 @@ public class SettingsActivity extends AppCompatActivity {
                 DialogFragment fragment = new RangeBarPreferenceFragment((RangeBarPreference) preference);
                 fragment.setTargetFragment(this, 0);
                 fragment.show(getParentFragmentManager(), "RangeBarPreference");
-            } else if (preference instanceof ShortcutDialogPreference) {
-                DialogFragment fragment = new ShortcutDialogPreferenceFragment((ShortcutDialogPreference) preference);
-                fragment.setTargetFragment(this, 0);
-                fragment.show(getParentFragmentManager(), "ShortcutDialogPreference");
-            } else if (preference instanceof ThemeDialogPreference) {
-                DialogFragment fragment = new ThemeDialogPreferenceFragment((ThemeDialogPreference) preference);
-                fragment.setTargetFragment(this, 0);
-                fragment.show(getParentFragmentManager(), "ThemeDialogPreference");
             }
             else {
                 super.onDisplayPreferenceDialog(preference);
@@ -309,7 +301,6 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
 
-                ;
             });
 
             pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
