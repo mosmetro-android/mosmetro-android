@@ -132,11 +132,20 @@ public class Logger {
     }
 
     public static void log (Object obj, String message) {
-        log(LEVEL.DEBUG, String.format(Locale.ENGLISH, "%s (%d) | %s",
-                obj.getClass().getSimpleName(),
-                System.identityHashCode(obj),
-                message
-        ));
+        if (obj instanceof Metadata) {
+            log(LEVEL.DEBUG, String.format(Locale.ENGLISH, "%s (%d) [%s] | %s",
+                    obj.getClass().getSimpleName(),
+                    System.identityHashCode(obj),
+                    ((Metadata)obj).tag(),
+                    message
+            ));
+        } else {
+            log(LEVEL.DEBUG, String.format(Locale.ENGLISH, "%s (%d) | %s",
+                    obj.getClass().getSimpleName(),
+                    System.identityHashCode(obj),
+                    message
+            ));
+        }
     }
 
     /*
@@ -313,6 +322,15 @@ public class Logger {
         context.startActivity(Intent.createChooser(
                 share, context.getString(R.string.report_choose_client)
         ));
+    }
+
+    /**
+     * Metadata interface
+     * 
+     * Allows to override default message format for Logger.log(this, ...)
+     */
+    public interface Metadata {
+        String tag();
     }
 
     /**
