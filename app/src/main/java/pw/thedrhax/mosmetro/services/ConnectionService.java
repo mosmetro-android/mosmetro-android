@@ -277,38 +277,49 @@ public class ConnectionService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
 
-        if (ACTION_STOP.equals(intent.getAction()) || intent.getBooleanExtra(EXTRA_STOP, false)) { // Stop by intent
-            Logger.log(this, "Stopping by Intent");
-            running.set(false);
+        // Stop by intent
+        if (ACTION_STOP.equals(intent.getAction()) || intent.getBooleanExtra(EXTRA_STOP, false)) {
+            if (running.get() && lock.isLocked()) {
+                Logger.log(this, "Stopping by Intent");
+                running.set(false);
+            }
             return START_NOT_STICKY;
         }
 
+        String source;
         if (intent.getBooleanExtra(EXTRA_DEBUG, false)) {
-            Logger.log(this, "Started from DebugActivity");
+            source = "Started from DebugActivity";
             from_shortcut = true;
             from_debug = true;
         } else if (intent.getBooleanExtra(EXTRA_FORCE, false)) {
-            Logger.log(this, "Started from shortcut");
+            source = "Started from shortcut";
             from_shortcut = true;
             from_debug = false;
         } else {
-            Logger.log(this, "Started by system");
+            source = "Started by system";
             from_shortcut = false;
             from_debug = false;
         }
 
         SSID = wifi.getSSID(intent);
 
-        if (!running.get() && lock.isLocked()) {
+        // Ignore if service is already running
+        if (lock.isLocked()) {
             // Service is shutting down. Trying to interrupt
-            running.set(true);
+            if (!running.get()) { 
+                running.set(true);
+            }
+
+            return START_NOT_STICKY;
         }
 
-        if (!running.get() && !lock.isLocked()) // Ignore if service is already running
-            if (!WifiUtils.UNKNOWN_SSID.equals(SSID) || from_shortcut)
-                if (Provider.isSSIDSupported(SSID) || from_shortcut)
-                    onStart(intent, startId);
+        if (!Provider.isSSIDSupported(SSID) && !from_shortcut) {
+            Logger.log(this, "Not starting: SSID is not supported (" + SSID + ")");
+            return START_NOT_STICKY;
+        }
 
+        Logger.log(this, source);
+        onStart(intent, startId);
         return START_NOT_STICKY;
     }
 
