@@ -45,9 +45,10 @@ import pw.thedrhax.util.WifiUtils;
  * @see ConnectionService
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  */
-public class NetworkReceiver extends BroadcastReceiver {
+public class NetworkReceiver extends BroadcastReceiver implements Logger.Metadata {
     private Context context;
     private Intent intent;
+    private boolean dynamic = false; 
 
     public void onReceive(Context context, Intent intent) {
         this.context = context;
@@ -102,11 +103,16 @@ public class NetworkReceiver extends BroadcastReceiver {
                     stopService();
                     break;
                 default:
-                    Logger.log(this, "Unknown SupplicantState: " + state.name());
+                    break;
             }
         } else {
             Logger.log(this, "Unknown Intent: " + intent.getAction());
         }
+    }
+
+    public NetworkReceiver setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+        return this;
     }
 
     /**
@@ -127,5 +133,10 @@ public class NetworkReceiver extends BroadcastReceiver {
                 new Intent(context, ConnectionService.class)
                         .setAction(ConnectionService.ACTION_STOP)
         );
+    }
+
+    @Override
+    public String tag() {
+        return dynamic ? "dynamic" : "static";
     }
 }

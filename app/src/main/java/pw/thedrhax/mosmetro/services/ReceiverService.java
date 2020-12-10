@@ -54,7 +54,7 @@ public class ReceiverService extends Service {
                 .priority(-2)
                 .locked(true);
         
-        receiver = new NetworkReceiver();
+        receiver = new NetworkReceiver().setDynamic(true);
         connection_receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
