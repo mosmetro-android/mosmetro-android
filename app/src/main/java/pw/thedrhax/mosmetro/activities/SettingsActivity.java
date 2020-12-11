@@ -126,8 +126,7 @@ public class SettingsActivity extends AppCompatActivity {
                 DialogFragment fragment = new RangeBarPreferenceFragment((RangeBarPreference) preference);
                 fragment.setTargetFragment(this, 0);
                 fragment.show(getParentFragmentManager(), "RangeBarPreference");
-            }
-            else {
+            } else {
                 super.onDisplayPreferenceDialog(preference);
             }
         }
@@ -298,7 +297,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                     pref_debug_testing.setEnabled((Boolean) new_value);
                     return true;
-                }
+                };
 
             });
 
