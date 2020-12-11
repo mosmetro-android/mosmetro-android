@@ -288,7 +288,7 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
-
+            
             pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
                 public boolean onPreferenceChange(Preference pref, Object new_value) {
                     if (!(Boolean)new_value) {
@@ -298,7 +298,6 @@ public class SettingsActivity extends AppCompatActivity {
                     pref_debug_testing.setEnabled((Boolean) new_value);
                     return true;
                 };
-
             });
 
             pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
