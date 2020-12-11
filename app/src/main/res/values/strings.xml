@@ -11,6 +11,7 @@
     <string name="connect">Connect</string>
     <string name="in_background">In background</string>
     <string name="ok">OK</string>
+    <string name="OK">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="install">Install</string>

@@ -71,7 +71,7 @@ public class DebugActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Util.getTheme(this));
+        setTheme(Util.getTheme(this, false));
 		setContentView(R.layout.debug_activity);
 
         button_connect = (Button) findViewById(R.id.button_connect);

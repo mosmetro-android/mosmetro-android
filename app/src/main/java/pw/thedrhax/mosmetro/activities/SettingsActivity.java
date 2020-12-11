@@ -1,17 +1,17 @@
 /**
  * Wi-Fi в метро (pw.thedrhax.mosmetro, Moscow Wi-Fi autologin)
  * Copyright © 2015 Dmitry Karikh <the.dr.hax@gmail.com>
- * <p>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -101,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static class NestedFragment extends PreferenceFragmentCompat {
         protected void setTitle(String title) {
-            ActionBar bar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            ActionBar bar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (bar != null) bar.setTitle(title);
         }
 
@@ -137,8 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
         private Map<String, UpdateChecker.Branch> branches;
 
         public BranchFragment branches(@NonNull Map<String, UpdateChecker.Branch> branches) {
-            this.branches = branches;
-            return this;
+            this.branches = branches; return this;
         }
 
         @Override
@@ -168,7 +167,7 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         boolean same = Version.getBranch().equals(branch.name);
-                        ((CheckBoxPreference) preference).setChecked(same);
+                        ((CheckBoxPreference)preference).setChecked(same);
                         if (!same) {
                             settings.edit().putInt("pref_updater_ignore", 0).apply();
                             branch.dialog().show();
@@ -277,10 +276,10 @@ public class SettingsActivity extends AppCompatActivity {
             pref_debug_last_log.setEnabled(pref_debug_acra.isChecked());
             pref_debug_testing.setEnabled(pref_debug_last_log.isChecked());
 
-            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
                 @Override
                 public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean) new_value) {
+                    if (!(Boolean)new_value) {
                         pref_debug_last_log.setChecked(false);
                         pref_debug_testing.setChecked(false);
                         pref_debug_testing.setEnabled(false);
@@ -291,9 +290,9 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
 
-            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
                 public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean) new_value) {
+                    if (!(Boolean)new_value) {
                         pref_debug_testing.setChecked(false);
                     }
 
@@ -510,7 +509,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Util.getTheme(this));
+        setTheme(Util.getTheme(this, false));
 
         // Populate preferences
         final FragmentManager fmanager = getSupportFragmentManager();
@@ -560,21 +559,21 @@ public class SettingsActivity extends AppCompatActivity {
             public boolean onPreferenceChange(Preference preference, Object new_value) {
                 Context context = SettingsActivity.this;
                 Intent service = new Intent(context, ConnectionService.class);
-                if (!(Boolean) new_value) {
+                if (!(Boolean)new_value) {
                     service.setAction(ConnectionService.ACTION_STOP);
                     pref_autoconnect_service.setChecked(false);
                     stopService(receiver_service);
                 }
-                pref_autoconnect_service.setEnabled((Boolean) new_value);
+                pref_autoconnect_service.setEnabled((Boolean)new_value);
                 context.startService(service);
                 return true;
             }
         });
 
-        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                if ((Boolean) new_value) {
+                if ((Boolean)new_value) {
                     startService(receiver_service);
                 } else {
                     stopService(receiver_service);

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.preferences.ThemeDialogPreferenceFragment;
@@ -62,7 +63,7 @@ public final class Util {
     // Source: https://stackoverflow.com/a/34836992
     public static String readAsset(Context context, String filename) throws IOException {
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(context.getAssets().open(filename), "UTF-8"));
+                new InputStreamReader(context.getAssets().open(filename), StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String mLine = reader.readLine();
         while (mLine != null) {
@@ -73,8 +74,8 @@ public final class Util {
         return sb.toString();
     }
 
-    public static int getTheme(Context context) {
-        SharedPreferences settings = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+    public static int getTheme(Context context, boolean dialog) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         int theme = settings.getInt("pref_theme", 0);
 
         if (theme == ThemeDialogPreferenceFragment.THEME_DARK || theme == ThemeDialogPreferenceFragment.THEME_OLED) {
@@ -85,10 +86,18 @@ public final class Util {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
 
-        if (theme == ThemeDialogPreferenceFragment.THEME_OLED) {
-            return R.style.AppBaseTheme_OLED;
+        if (!dialog) {
+            if (theme == ThemeDialogPreferenceFragment.THEME_OLED) {
+                return R.style.AppBaseTheme_OLED;
+            } else {
+                return R.style.AppBaseTheme;
+            }
         } else {
-            return R.style.AppBaseTheme;
+            if (theme == ThemeDialogPreferenceFragment.THEME_OLED) {
+                return R.style.AppBaseTheme_OLED_Dialog;
+            } else {
+                return R.style.AppBaseTheme_Dialog;
+            }
         }
     }
 }
