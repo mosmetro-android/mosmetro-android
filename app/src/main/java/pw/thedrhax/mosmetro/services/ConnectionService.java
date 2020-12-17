@@ -74,9 +74,6 @@ public class ConnectionService extends IntentService {
     private boolean pref_midsession;
     private boolean pref_notify_foreground;
 
-    // Internet check
-    private Gen204 gen_204;
-
     // Notifications
     private Notify notify;
 
@@ -107,8 +104,6 @@ public class ConnectionService extends IntentService {
                 new Intent(this, ConnectionService.class).setAction(ACTION_STOP),
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
-
-        gen_204 = new Gen204(this, running);
 
         notify = new Notify(this) {
             @Override
@@ -358,11 +353,11 @@ public class ConnectionService extends IntentService {
 
     private boolean ignore_midsession = false;
 
-    private boolean isConnected() {
-        return isConnected(null);
+    private boolean isConnected(Gen204 gen_204) {
+        return isConnected(gen_204, null);
     }
 
-    private boolean isConnected(Gen204Result res_204) {
+    private boolean isConnected(Gen204 gen_204, Gen204Result res_204) {
         if (res_204 == null) {
             Logger.log(this, "Checking internet connection");
             res_204 = gen_204.check();
@@ -467,6 +462,8 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
+        Gen204 gen_204 = new Gen204(this, running);
+
         Provider provider = Provider.find(this, running)
                 .setRunningListener(running)
                 .setGen204(gen_204)
@@ -503,7 +500,7 @@ public class ConnectionService extends IntentService {
 
                 // Check for midsession in cached Gen204 result
                 ignore_midsession = false;
-                isConnected(gen_204.getLastResult());
+                isConnected(gen_204, gen_204.getLastResult());
 
                 if (!from_shortcut) break;
             default:
@@ -523,7 +520,7 @@ public class ConnectionService extends IntentService {
         while (running.sleep(1000)) {
             if (pref_internet_check && ++count == pref_internet_check_interval) {
                 count = 0;
-                if (!isConnected()) break;
+                if (!isConnected(gen_204)) break;
             }
         }
 
