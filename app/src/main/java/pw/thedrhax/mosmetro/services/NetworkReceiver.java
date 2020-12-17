@@ -96,12 +96,10 @@ public class NetworkReceiver extends BroadcastReceiver implements Logger.Metadat
             switch (state) {
                 case COMPLETED:
                 case ASSOCIATED: // This appears randomly between multiple CONNECTED states
-                    count(settings, dynamic);
                     startService();
                     break;
                 case SCANNING: // Some devices do not report DISCONNECTED state so...
                 case DISCONNECTED:
-                    count(settings, dynamic);
                     stopService();
                     break;
                 default:
@@ -140,30 +138,5 @@ public class NetworkReceiver extends BroadcastReceiver implements Logger.Metadat
     @Override
     public String tag() {
         return dynamic ? "dynamic" : "static";
-    }
-
-    private static synchronized void count(SharedPreferences settings, boolean dynamic) {
-        if (!settings.getBoolean("pref_debug_testing", false)) return;
-        if (!settings.getBoolean("pref_autoconnect_service", false)) return;
-        if (settings.getBoolean("debug_receiver_delta_sent", false)) return;
-
-        int val = settings.getInt("debug_receiver_delta", 0);
-        val += dynamic ? 1 : -1;
-
-        if (val >= 50) {
-            Logger.report("Dynamic receiver works better than static");
-        } else if (val <= -50) {
-            Logger.report("Static receiver works better than dynamic");
-        }
-
-        if (Math.abs(val) >= 50) {
-            settings.edit()
-                .remove("debug_receiver_delta")
-                .putBoolean("debug_receiver_delta_sent", true)
-                .apply();
-            return;
-        }
-
-        settings.edit().putInt("debug_receiver_delta", val).apply();
     }
 }
