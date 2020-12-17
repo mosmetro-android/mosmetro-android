@@ -91,16 +91,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.ThemeDialog"
-            android:label="@string/pref_theme"
-            android:theme="@style/AppBaseTheme.Dialog">
-            <intent-filter>
-                <action android:name="pw.thedrhax.mosmetro.activities.ThemeDialog" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <!-- Services -->
 
         <service android:name=".services.ReceiverService" />

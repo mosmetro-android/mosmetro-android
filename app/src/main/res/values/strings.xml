@@ -11,6 +11,7 @@
     <string name="connect">Connect</string>
     <string name="in_background">In background</string>
     <string name="ok">OK</string>
+    <string name="OK">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="install">Install</string>
@@ -253,11 +254,6 @@
     <string name="auth_webview_page">Opening auth page</string>
     <string name="auth_webview_page_wait">Waiting for page to load</string>
     <string name="auth_webview_script">Waiting for script</string>
-    <string name="pref_theme_default">System default</string>
-    <string name="pref_theme_light">Light</string>
-    <string name="pref_theme_dark">Dark</string>
-    <string name="pref_theme_black">Black (OLED)</string>
-    <string name="pref_theme">Change theme</string>
     <string name="pref_internet_check_midsession">Disable midsession</string>
     <string name="pref_internet_check_midsession_summary">If you are seeing \"Sign into Wi-Fi network\" in your notifications, or Android thinks that internet is not available even if it is, this option might help.</string>
     <string name="pref_debug_testing">Participation in testing</string>
@@ -266,4 +262,12 @@
     <string name="reveiver_service_summary">Tap here to open settings</string>
     <string name="pref_autoconnect_service_title">Persistent service</string>
     <string name="pref_autoconnect_service_summary">Enable this option if the application does not automatically start when the device connects to Wi-Fi</string>
+
+    <string name="pref_theme">Change theme</string>
+    <string-array name="theme_options">
+        <item>System default</item>
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Black (OLED)</item>
+    </string-array>
 </resources>

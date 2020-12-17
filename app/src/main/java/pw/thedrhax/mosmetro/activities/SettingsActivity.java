@@ -28,8 +28,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.CheckBoxPreference;
@@ -38,16 +47,6 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.fragment.app.DialogFragment;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 
@@ -58,6 +57,10 @@ import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreferenceFragment;
 import pw.thedrhax.mosmetro.preferences.RangeBarPreference;
 import pw.thedrhax.mosmetro.preferences.RangeBarPreferenceFragment;
+import pw.thedrhax.mosmetro.preferences.ShortcutDialogPreference;
+import pw.thedrhax.mosmetro.preferences.ShortcutDialogPreferenceFragment;
+import pw.thedrhax.mosmetro.preferences.ThemeDialogPreference;
+import pw.thedrhax.mosmetro.preferences.ThemeDialogPreferenceFragment;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
@@ -77,6 +80,22 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.preferences);
+        }
+
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            if (preference instanceof ShortcutDialogPreference) {
+                DialogFragment fragment = new ShortcutDialogPreferenceFragment((ShortcutDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ShortcutDialogPreference");
+            } else if (preference instanceof ThemeDialogPreference) {
+                DialogFragment fragment = new ThemeDialogPreferenceFragment((ThemeDialogPreference) preference);
+                fragment.setTargetFragment(this, 0);
+                fragment.show(getParentFragmentManager(), "ThemeDialogPreference");
+            }
+            else {
+                super.onDisplayPreferenceDialog(preference);
+            }
         }
     }
 

@@ -14,8 +14,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="5dp"
-        android:onClick="check_background" />
+        android:layout_marginBottom="5dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -42,8 +41,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:onClick="check_log" />
+        android:layout_marginBottom="5dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -55,32 +53,6 @@
         android:layout_marginLeft="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="5dp"
-        android:onClick="check_stop" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        style="?android:attr/buttonBarStyle"
-        android:layout_marginBottom="4dp"
-        android:layout_marginRight="11dp"
-        android:layout_marginEnd="11dp">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="button_cancel" />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/OK"
-            style="?android:attr/buttonBarButtonStyle"
-            android:onClick="button_save" />
-
-    </LinearLayout>
+        android:layout_marginTop="5dp" />
 
 </LinearLayout>
