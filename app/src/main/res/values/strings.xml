@@ -101,8 +101,8 @@
     <string name="developer_telegram_channel_summary" translatable="false">t.me/wifi_v_metro</string>
     <string name="developer_telegram_channel_link" translatable="false">https://t.me/wifi_v_metro</string>
     <string name="developer_telegram">Telegram group</string>
-    <string name="developer_telegram_group_summary" translatable="false">t.me/joinchat/BVgshUHjD3rzVCmguodb4Q</string>
-    <string name="developer_telegram_link" translatable="false">https://t.me/joinchat/BVgshUHjD3rzVCmguodb4Q</string>
+    <string name="developer_telegram_group_summary" translatable="false">t.me/joinchat/0S7nOjfkV2E2OTAy</string>
+    <string name="developer_telegram_link" translatable="false">https://t.me/joinchat/0S7nOjfkV2E2OTAy</string>
 
     <string name="manual_connection">Manual connection</string>
     <string name="manual_connection_summary">You can connect here if this application is ignoring Wi-Fi state</string>
