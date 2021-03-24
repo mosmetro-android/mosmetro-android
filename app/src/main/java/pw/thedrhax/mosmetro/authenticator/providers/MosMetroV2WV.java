@@ -90,7 +90,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     vars.put("branch", "spb");
                 } else if (uri.getPath().startsWith("/new")) {
                     vars.put("branch", "mcc");
-                } else if (uri.getPath().startsWith("/metro")) {
+                } else if (uri.getPath().startsWith("/") || uri.getPath().isEmpty()) {
                     vars.put("branch", "metro");
                 } else {
                     vars.put("branch", "default");
@@ -163,11 +163,11 @@ public class MosMetroV2WV extends WebViewProvider {
             }
         });
 
-        final Pattern auth_page = Pattern.compile("https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?");
+        final Pattern auth_page = Pattern.compile("https?://auth\\.wi-fi\\.ru/(auth|(spb/)?new)?(\\?.*)?");
 
         /**
          * Async: https://auth.wi-fi.ru/auth
-         *        https://auth.wi-fi.ru/metro
+         *        https://auth.wi-fi.ru/
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
          * - Detect if device is not registered in the network (302 redirect to /identification)

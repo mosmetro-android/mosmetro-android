@@ -56,7 +56,7 @@ import pw.thedrhax.util.Randomizer;
  */
 
 public class MosMetroV2 extends Provider {
-    private String redirect = "http://auth.wi-fi.ru/?segment=metro";
+    private String redirect = "https://auth.wi-fi.ru/?segment=metro";
 
     // TODO: Split branches into sub-providers
 
@@ -88,7 +88,7 @@ public class MosMetroV2 extends Provider {
      * Moscow Metro branch
      * 
      * auth.wi-fi.ru → none
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru/metro
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru
      * none → auth.wi-fi.ru/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
@@ -124,7 +124,7 @@ public class MosMetroV2 extends Provider {
                 } else if (uri.getPath().startsWith("/new")) {
                     vars.put("branch", "mcc");
                     mcc = true;
-                } else if (uri.getPath().startsWith("/metro")) {
+                } else if (uri.getPath().equals("/") || uri.getPath().isEmpty()) {
                     vars.put("branch", "metro");
                     mosmetro = true;
                 } else {
