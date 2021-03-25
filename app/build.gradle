@@ -10,8 +10,8 @@ android {
         minSdkVersion 14
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 25
-        versionCode 73
-        versionName "2.1"
+        versionCode 74
+        versionName "2.2"
 
         // Jenkins build info
         def branch_name = System.getenv("BRANCH_NAME") ?: "play"
