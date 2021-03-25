@@ -63,7 +63,7 @@ public class MosMetroV2 extends Provider {
      * Saint-Petersburg branch
      *
      * auth.wi-fi.ru → none
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb/new
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru/spb
      * none → auth.wi-fi.ru/spb/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
@@ -117,7 +117,7 @@ public class MosMetroV2 extends Provider {
 
                 Uri uri = Uri.parse(redirect);
 
-                if (uri.getPath().startsWith("/spb/new")) {
+                if (uri.getPath().startsWith("/spb")) {
                     vars.put("branch", "spb");
                     spb = true;
                 } else if (uri.getPath().startsWith("/new")) {
