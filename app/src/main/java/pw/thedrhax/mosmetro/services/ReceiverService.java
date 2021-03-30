@@ -25,10 +25,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.IBinder;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.util.Notify;
+import pw.thedrhax.util.PermissionUtils;
 
 public class ReceiverService extends Service {
     public static final int NOTIFY_ID = 123;
@@ -65,6 +67,11 @@ public class ReceiverService extends Service {
                 }
             }
         };
+
+        PermissionUtils pu = new PermissionUtils(this);
+        if (Build.VERSION.SDK_INT >= 28 && !pu.isCoarseLocationGranted()) {
+            stopSelf();
+        }
     }
 
     @Override

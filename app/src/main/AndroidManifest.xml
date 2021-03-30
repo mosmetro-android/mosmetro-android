@@ -93,7 +93,9 @@
 
         <!-- Services -->
 
-        <service android:name=".services.ReceiverService" />
+        <service
+            android:name=".services.ReceiverService"
+            android:foregroundServiceType="location" />
         <service android:name=".services.ConnectionService" />
         <service android:name=".services.WebViewService" />
 

@@ -18,6 +18,7 @@
 
 package pw.thedrhax.mosmetro.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -31,6 +32,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -66,8 +68,11 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
+    private PermissionUtils pu;
     private Listener<Map<String, UpdateChecker.Branch>> branches;
     private SharedPreferences settings;
+    private CheckBoxPreference pref_autoconnect;
+    private CheckBoxPreference pref_autoconnect_service;
 
     public static class SettingsFragment extends PreferenceFragment {
         @Override
@@ -431,17 +436,41 @@ public class SettingsActivity extends Activity {
                 dialog.show();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (permissions[0]) {
+                case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
+                case Manifest.permission.ACCESS_COARSE_LOCATION:
+                    if (Build.VERSION.SDK_INT >= 29 && pu.isBackgroundLocationGranted()) {
+                        pref_autoconnect_service.setChecked(false);
+                        pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, false);
+                    }
+
+                    pref_autoconnect.setChecked(true);
+                    pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, true);
+            }
+        } else {
+            switch (permissions[0]) {
+                case Manifest.permission.ACCESS_COARSE_LOCATION:
+                    pref_autoconnect.setChecked(false);
+                    pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, false);
+                case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
+                    pref_autoconnect_service.setChecked(true);
+                    pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, true);
+            }
+        }
+    }
+
     @RequiresApi(28)
     private void location_permission_setup() {
-        final PermissionUtils pu = new PermissionUtils(this);
-
         AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.location_permission)
                 .setMessage(R.string.location_permission_saving)
                 .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        pu.requestCoarseLocation();
+                        pu.requestCoarseLocation(SettingsActivity.this);
                     }
                 })
                 .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
@@ -463,6 +492,18 @@ public class SettingsActivity extends Activity {
         if (!settings.getBoolean("pref_location_ignore", false))
             if (!pu.isCoarseLocationGranted())
                 dialog.show();
+
+        if (!pu.isCoarseLocationGranted() && pref_autoconnect.isChecked()) {
+            pref_autoconnect.setChecked(false);
+            pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, false);
+        }
+
+        if (Build.VERSION.SDK_INT >= 29
+                && !pu.isBackgroundLocationGranted()
+                && !pref_autoconnect_service.isChecked()) {
+            pref_autoconnect_service.setChecked(true);
+            pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, true);
+        }
     }
 
     private void replaceFragment(String id, Fragment fragment) {
@@ -481,6 +522,7 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pu = new PermissionUtils(this);
 
         // Populate preferences
         final FragmentManager fmanager = getFragmentManager();
@@ -518,25 +560,33 @@ public class SettingsActivity extends Activity {
         app_name.setSummary(getString(R.string.version, Version.getFormattedVersion()));
 
         // Start/stop service on pref_autoconnect change
-        final CheckBoxPreference pref_autoconnect =
-                (CheckBoxPreference) fragment.findPreference("pref_autoconnect");
-        final CheckBoxPreference pref_autoconnect_service =
-                (CheckBoxPreference) fragment.findPreference("pref_autoconnect_service");
+        pref_autoconnect = (CheckBoxPreference) fragment.findPreference("pref_autoconnect");
+        pref_autoconnect_service = (CheckBoxPreference) fragment.findPreference("pref_autoconnect_service");
 
         Intent receiver_service = new Intent(SettingsActivity.this, ReceiverService.class);
 
         pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                Context context = SettingsActivity.this;
-                Intent service = new Intent(context, ConnectionService.class);
+                if ((Boolean)new_value && Build.VERSION.SDK_INT >= 28 && !pu.isCoarseLocationGranted()) {
+                    pu.requestCoarseLocation(SettingsActivity.this);
+                    return false;
+                }
+
+                Intent service = new Intent(SettingsActivity.this, ConnectionService.class);
                 if (!(Boolean)new_value) {
                     service.setAction(ConnectionService.ACTION_STOP);
-                    pref_autoconnect_service.setChecked(false);
+                }
+                startService(service);
+
+                if (pref_autoconnect_service.isChecked() && (Boolean)new_value) {
+                    startService(receiver_service);
+                } else {
                     stopService(receiver_service);
                 }
+
                 pref_autoconnect_service.setEnabled((Boolean)new_value);
-                context.startService(service);
+
                 return true;
             }
         });
@@ -544,11 +594,17 @@ public class SettingsActivity extends Activity {
         pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                if ((Boolean)new_value) {
+                if (!(Boolean)new_value && Build.VERSION.SDK_INT >= 29 && !pu.isBackgroundLocationGranted()) {
+                    pu.requestBackgroundLocation(SettingsActivity.this);
+                    return false;
+                }
+
+                if (pref_autoconnect.isChecked() && (Boolean)new_value) {
                     startService(receiver_service);
                 } else {
                     stopService(receiver_service);
                 }
+
                 return true;
             }
         });
@@ -557,7 +613,7 @@ public class SettingsActivity extends Activity {
             pref_autoconnect_service.setEnabled(false);
         }
 
-        if (pref_autoconnect_service.isChecked()) {
+        if (pref_autoconnect.isChecked() && pref_autoconnect_service.isChecked()) {
             startService(receiver_service);
         }
 

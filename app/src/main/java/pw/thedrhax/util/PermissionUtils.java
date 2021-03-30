@@ -38,10 +38,10 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 
 public final class PermissionUtils {
-    private final Activity context;
+    private final Context context;
     private final PowerManager pm;
 
-    public PermissionUtils(@NonNull Activity context) {
+    public PermissionUtils(@NonNull Context context) {
         this.context = context;
         this.pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
@@ -75,9 +75,20 @@ public final class PermissionUtils {
         return p == PackageManager.PERMISSION_GRANTED;
     }
 
+    @RequiresApi(29)
+    public boolean isBackgroundLocationGranted() {
+        int p = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+        return p == PackageManager.PERMISSION_GRANTED;
+    }
+
     @RequiresApi(23)
-    public void requestCoarseLocation() {
-        context.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+    public void requestCoarseLocation(Activity activity) {
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+    }
+
+    @RequiresApi(29)
+    public void requestBackgroundLocation(Activity activity) {
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 2);
     }
 
     /**

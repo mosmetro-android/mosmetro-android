@@ -29,7 +29,8 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (settings.getBoolean("pref_autoconnect_service", false)) {
+        if (settings.getBoolean("pref_autoconnect", true)
+                && settings.getBoolean("pref_autoconnect_service", false)) {
             context.startService(new Intent(context, ReceiverService.class));
         }
     }
