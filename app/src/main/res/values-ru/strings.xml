@@ -23,6 +23,7 @@
     <string name="show_debug_log">Показать подробные сообщения</string>
     <string name="clipboard_copy">Текст скопирован в буфер обмена</string>
     <string name="screen_clear">Очистить экран</string>
+    <string name="warning">Предупреждение</string>
     <string name="about">О программе</string>
     <string name="log">Лог</string>
 
@@ -214,8 +215,9 @@
     <string name="pref_debug">Отладка</string>
     <string name="pref_debug_summary">Автоматические отчёты, LogCat, и т.д.</string>
     <string name="pref_mosmetro_v3_summary">Этот алгоритм использовался во время ЧМ 2018 по футболу в Москве и Санкт-Петербурге. В данный момент он отключён, так что, скорее всего, эта настройка ни на что не повлияет.</string>
-    <string name="pref_mosmetro_v2wv">MosMetroV2WV (бета)</string>
-    <string name="pref_mosmetro_v2wv_summary">Расширение алгоритма MosMetroV2, использующее браузер в фоновом режиме вместо заранее заданных HTTP запросов. Медленнее, но безопаснее, если провайдер снова начнёт принимать меры против пользователей данного приложения.</string>
+    <string name="pref_mosmetro_v2_wv">MosMetroV2WV (бета)</string>
+    <string name="pref_mosmetro_v2_wv_summary">Расширение алгоритма MosMetroV2, использующее браузер в фоновом режиме вместо заранее заданных HTTP запросов. Медленнее, но безопаснее, если провайдер снова начнёт принимать меры против пользователей данного приложения.</string>
+    <string name="pref_mosmetro_v2_wv_warning">Данный алгоритм работает менее стабильно, чем MosMetroV2. Он может зависать, вылетать или просто медленно подключаться. Вы действительно хотите его включить?</string>
     <string name="pref_mainet_summary">Этот алгоритм используется для авторизации в сети MAInet_public Московского авиационного института.</string>
     <string name="pref_mainet_credentials">Настройки MAInet</string>
     <string name="pref_mainet_credentials_summary">Здесь вы можете настроить данные для входа в сеть MAInet_public.</string>

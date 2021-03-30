@@ -189,6 +189,45 @@ public class SettingsActivity extends Activity {
                     return true;
                 }
             });
+
+            final CheckBoxPreference mmv2 = (CheckBoxPreference)
+                    screen.findPreference("pref_mosmetro_v2_wv");
+            mmv2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if (mmv2.isChecked()) {
+                        mmv2.setChecked(false);
+
+                        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+                                .setTitle(R.string.warning)
+                                .setMessage(R.string.pref_mosmetro_v2_wv_warning)
+                                .setPositiveButton("Включить", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        mmv2.setChecked(true);
+                                    }
+                                })
+                                .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                })
+                                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialogInterface) {
+                                        mmv2.setChecked(false);
+                                    }
+                                })
+                                .setCancelable(true);
+
+                        dialog.show();
+                        return false;
+                    }
+
+                    return true;
+                }
+            });
         }
     }
 

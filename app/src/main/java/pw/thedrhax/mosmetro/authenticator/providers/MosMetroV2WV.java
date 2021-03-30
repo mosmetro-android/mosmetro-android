@@ -315,7 +315,7 @@ public class MosMetroV2WV extends WebViewProvider {
      * @return          True if response matches this Provider implementation.
      */
     public static boolean match(ParsedResponse response, SharedPreferences settings) {
-        if (!settings.getBoolean("pref_mosmetro_v2wv", false)) return false;
+        if (!settings.getBoolean("pref_mosmetro_v2_wv", false)) return false;
 
         String redirect;
 

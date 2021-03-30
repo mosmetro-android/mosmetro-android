@@ -4,9 +4,9 @@
     <PreferenceCategory android:title="Алгоритмы" />
 
     <CheckBoxPreference
-        android:key="pref_mosmetro_v2wv"
-        android:title="@string/pref_mosmetro_v2wv"
-        android:summary="@string/pref_mosmetro_v2wv_summary"
+        android:key="pref_mosmetro_v2_wv"
+        android:title="@string/pref_mosmetro_v2_wv"
+        android:summary="@string/pref_mosmetro_v2_wv_summary"
         android:defaultValue="false" />
 
     <CheckBoxPreference
