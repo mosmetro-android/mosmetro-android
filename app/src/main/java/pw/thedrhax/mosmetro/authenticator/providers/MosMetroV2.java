@@ -67,31 +67,19 @@ public class MosMetroV2 extends Provider {
      * none → auth.wi-fi.ru/spb/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/spb/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/spb/gapi/auth/check
-     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification (?)
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/spb/identification
      */
     private Boolean spb = false;
-
-    /**
-     * Moscow Trains branch (MCC, CPPK, MCD)
-     *
-     * auth.wi-fi.ru → none
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru/new
-     * none → auth.wi-fi.ru/gapi/auth/start
-     * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
-     * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
-     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
-     */
-    private Boolean mcc = false;
 
     /**
      * Moscow Metro branch
      * 
      * auth.wi-fi.ru → none
-     * auth.wi-fi.ru/auth → auth.wi-fi.ru
+     * auth.wi-fi.ru/auth → auth.wi-fi.ru(/|/new)?
      * none → auth.wi-fi.ru/gapi/auth/start
      * auth.wi-fi.ru/auth/init → auth.wi-fi.ru/gapi/auth/init
      * auth.wi-fi.ru/auth/check → auth.wi-fi.ru/gapi/auth/check
-     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification (?)
+     * auth.wi-fi.ru/identification → auth.wi-fi.ru/identification
      */
     private Boolean mosmetro = false;
 
@@ -116,18 +104,22 @@ public class MosMetroV2 extends Provider {
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
 
                 Uri uri = Uri.parse(redirect);
+                String path = uri.getPath();
 
-                if (uri.getPath().startsWith("/spb")) {
+                if (path.startsWith("/auth")) {
+                    vars.put("branch", "default");
+                } else if (path.startsWith("/spb")) {
                     vars.put("branch", "spb");
                     spb = true;
-                } else if (uri.getPath().startsWith("/new")) {
-                    vars.put("branch", "mcc");
-                    mcc = true;
-                } else if (uri.getPath().equals("/") || uri.getPath().isEmpty()) {
-                    vars.put("branch", "metro");
+                } else if (path.isEmpty() || path.equals("/") || path.startsWith("/new")) {
+                    String dn = uri.getQueryParameter("dn");
+                    boolean ruckus = dn != null && dn.contains("ruckus");
+
+                    vars.put("branch", ruckus ? "metro-ruckus" : "metro");
                     mosmetro = true;
                 } else {
-                    vars.put("branch", "default");
+                    vars.put("branch", "unknown");
+                    Logger.log(Logger.LEVEL.DEBUG, "Warning: Unknown path" + path);
                 }
 
                 Logger.log(Logger.LEVEL.DEBUG, "Branch: " + vars.get("branch"));
@@ -140,8 +132,12 @@ public class MosMetroV2 extends Provider {
 
                 Logger.log(Logger.LEVEL.DEBUG, "Segment: " + vars.get("segment"));
 
-                if (uri.getQueryParameter("mac") != null) {
+                if (uri.getQueryParameter("mac") != null) { // from cppk
                     vars.put("mac", uri.getQueryParameter("mac"));
+                }
+
+                if (uri.getQueryParameter("client_mac") != null) { // from metro
+                    vars.put("mac", uri.getQueryParameter("client_mac"));
                 }
 
                 return true;
@@ -264,7 +260,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc && !mosmetro) {
+                if (!spb && !mosmetro) {
                     url += "/auth?segment=" + vars.get("segment");
                 } else {
                     if (spb) {
@@ -305,7 +301,7 @@ public class MosMetroV2 extends Provider {
         add(new Task() {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (spb || mcc || mosmetro) return true;
+                if (spb || mosmetro) return true;
 
                 String token = new Randomizer(context).string(6);
                 Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
@@ -343,7 +339,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc && !mosmetro) {
+                if (!spb && !mosmetro) {
                     url += "/auth/init?mode=0&segment=" + vars.get("segment");
                 } else {
                     if (spb) {
@@ -382,7 +378,7 @@ public class MosMetroV2 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 String url = ParsedResponse.removePathFromUrl(redirect);
 
-                if (!spb && !mcc && !mosmetro) {
+                if (!spb && !mosmetro) {
                     url += "/auth/check?segment=" + vars.get("segment");
                 } else {
                     if (spb) {

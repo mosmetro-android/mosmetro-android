@@ -85,15 +85,20 @@ public class MosMetroV2WV extends WebViewProvider {
                 Logger.log(Logger.LEVEL.DEBUG, redirect);
 
                 Uri uri = Uri.parse(redirect);
+                String path = uri.getPath();
 
-                if (uri.getPath().startsWith("/spb")) {
-                    vars.put("branch", "spb");
-                } else if (uri.getPath().startsWith("/new")) {
-                    vars.put("branch", "mcc");
-                } else if (uri.getPath().startsWith("/") || uri.getPath().isEmpty()) {
-                    vars.put("branch", "metro");
-                } else {
+                if (path.startsWith("/auth")) {
                     vars.put("branch", "default");
+                } else if (path.startsWith("/spb")) {
+                    vars.put("branch", "spb");
+                } else if (path.isEmpty() || path.equals("/") || path.startsWith("/new")) {
+                    String dn = uri.getQueryParameter("dn");
+                    boolean ruckus = dn != null && dn.contains("ruckus");
+
+                    vars.put("branch", ruckus ? "metro-ruckus" : "metro");
+                } else {
+                    vars.put("branch", "unknown");
+                    Logger.log(Logger.LEVEL.DEBUG, "Warning: Unknown path" + path);
                 }
 
                 Logger.log(Logger.LEVEL.DEBUG, "Branch: " + vars.get("branch"));
