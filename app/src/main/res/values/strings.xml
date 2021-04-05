@@ -182,6 +182,7 @@
 
     <string-array name="donate_options">
         <item>Yandex.Money / YooMoney</item>
+        <item>QIWI Wallet</item>
         <item>Sberbank (copy the card number)</item>
         <item>Ethereum (copy the address)</item>
         <item>Join the community (VK, Telegram, GitHub)</item>
@@ -190,7 +191,7 @@
     <string name="donate_sberbank_data" translatable="false">4274320057156229</string>
     <string name="donate_ethereum_data" translatable="false">0x949aecb10ae89673a9574f53bda04baffddabff7</string>
     <string name="donate_yandex_data" translatable="false">https://yoomoney.ru/to/410014087156910</string>
-    <string name="donate_paypal_data" translatable="false">https://paypal.me/thedrhax</string>
+    <string name="donate_qiwi_data" translatable="false">https://my.qiwi.com/Dmytryi-KreG6l0snl</string>
     <string name="pref_category_wifi">Wi-Fi control</string>
     <string name="pref_category_internet">Internet checks</string>
     <string name="open_settings">Open settings</string>

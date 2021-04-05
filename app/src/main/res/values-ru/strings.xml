@@ -165,6 +165,7 @@
 
     <string-array name="donate_options">
         <item>Яндекс.Деньги / ЮMoney</item>
+        <item>QIWI Кошелёк</item>
         <item>Сбербанк (скопировать номер карты)</item>
         <item>Ethereum (скопировать адрес)</item>
         <item>Вступить в сообщество (Вконтакте, Telegram, GitHub)</item>

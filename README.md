@@ -30,6 +30,7 @@
 
 * Материальная поддержка:
     * [Яндекс.Деньги / ЮMoney](https://yoomoney.ru/to/410014087156910)
+    * [QIWI Кошелёк](https://my.qiwi.com/Dmytryi-KreG6l0snl)
     * Сбербанк: `4274320057156229`
     * Ethereum: `0x949aecb10ae89673a9574f53bda04baffddabff7`
 * Помощь в разработке:

@@ -354,7 +354,13 @@ public class SettingsActivity extends Activity {
                         );
                         break;
 
-                    case 1: // Sberbank
+                    case 1: // QIWI Wallet
+                        startActivity(new Intent(SettingsActivity.this, SafeViewActivity.class)
+                                .putExtra("data", getString(R.string.donate_qiwi_data))
+                        );
+                        break;
+
+                    case 2: // Sberbank
                         clip = ClipData.newPlainText("", getString(R.string.donate_sberbank_data));
                         clipboard.setPrimaryClip(clip);
 
@@ -364,7 +370,7 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 2: // Ethereum
+                    case 3: // Ethereum
                         clip = ClipData.newPlainText("", getString(R.string.donate_ethereum_data));
                         clipboard.setPrimaryClip(clip);
 
@@ -374,7 +380,7 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 3: // Communities
+                    case 4: // Communities
                         replaceFragment("about", new AboutFragment());
                         break;
                 }
