@@ -221,6 +221,8 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (permissions.length == 0 || grantResults.length == 0) return;
+
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (permissions[0]) {
                 case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
