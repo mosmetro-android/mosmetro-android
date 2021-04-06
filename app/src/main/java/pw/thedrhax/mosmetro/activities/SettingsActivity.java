@@ -33,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -41,6 +42,8 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -219,8 +222,64 @@ public class SettingsActivity extends Activity {
                 dialog.show();
     }
 
+    private void changeCheckBox(CheckBoxPreference pref, boolean checked) {
+        pref.setChecked(checked);
+        pref.getOnPreferenceChangeListener().onPreferenceChange(pref, checked);
+    }
+
+    private void openAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    @RequiresApi(28)
+    private void showLocationDialog(boolean coarse) {
+        new AlertDialog.Builder(this).setTitle(R.string.warning)
+                .setMessage(coarse ? getString(R.string.coarse_location_permission)
+                        : getString(R.string.background_location_permission))
+                .setNegativeButton(coarse ? getString(R.string.force_on) : getString(R.string.force_off),
+                        (dialogInterface, i) -> {
+                            if (coarse) {
+                                settings.edit().putBoolean("pref_location_ignore_autoconnect", true).apply();
+
+                                changeCheckBox(pref_autoconnect, true);
+                            } else {
+                                settings.edit().putBoolean("pref_location_ignore_autoconnect_service", true).apply();
+
+                                changeCheckBox(pref_autoconnect_service, false);
+                            }
+                        })
+                .setPositiveButton(R.string.permission_request, (dialogInterface, i) -> {
+                    permissionRequestTimestamp = System.currentTimeMillis();
+
+                    if (coarse || Build.VERSION.SDK_INT < 29) {
+                        pu.requestCoarseLocation(SettingsActivity.this, 1);
+                    } else {
+                        pu.requestBackgroundLocation(SettingsActivity.this, 2);
+                    }
+                })
+                .setCancelable(true)
+                .show();
+    }
+
+    private long permissionRequestTimestamp = 0;
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // Request codes:
+        // 0 - from starting dialog
+        // 1 - requesting coarse location by enabling pref_autoconnect
+        // 2 - requesting background location by disabling pref_autoconnect_service
+
+        // Approved or rejected automatically (too fast for user)
+        boolean auto = System.currentTimeMillis() - permissionRequestTimestamp < 200;
+
+        if (auto && (requestCode == 1 || requestCode == 2)) {
+            openAppSettings();
+        }
+
         if (permissions.length == 0 || grantResults.length == 0) return;
 
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -228,21 +287,17 @@ public class SettingsActivity extends Activity {
                 case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
                 case Manifest.permission.ACCESS_COARSE_LOCATION:
                     if (Build.VERSION.SDK_INT >= 29 && pu.isBackgroundLocationGranted()) {
-                        pref_autoconnect_service.setChecked(false);
-                        pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, false);
+                        changeCheckBox(pref_autoconnect_service, false);
                     }
 
-                    pref_autoconnect.setChecked(true);
-                    pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, true);
+                    changeCheckBox(pref_autoconnect, true);
             }
         } else {
             switch (permissions[0]) {
                 case Manifest.permission.ACCESS_COARSE_LOCATION:
-                    pref_autoconnect.setChecked(false);
-                    pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, false);
+                    changeCheckBox(pref_autoconnect, false);
                 case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
-                    pref_autoconnect_service.setChecked(true);
-                    pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, true);
+                    changeCheckBox(pref_autoconnect_service, true);
             }
         }
     }
@@ -255,7 +310,7 @@ public class SettingsActivity extends Activity {
                 .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        pu.requestCoarseLocation(SettingsActivity.this);
+                        pu.requestCoarseLocation(SettingsActivity.this, 0);
                     }
                 })
                 .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
@@ -278,16 +333,17 @@ public class SettingsActivity extends Activity {
             if (!pu.isCoarseLocationGranted())
                 dialog.show();
 
-        if (!pu.isCoarseLocationGranted() && pref_autoconnect.isChecked()) {
-            pref_autoconnect.setChecked(false);
-            pref_autoconnect.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect, false);
+        if (!settings.getBoolean("pref_location_ignore_autoconnect", false)
+                && !pu.isCoarseLocationGranted()
+                && pref_autoconnect.isChecked()) {
+            changeCheckBox(pref_autoconnect, false);
         }
 
-        if (Build.VERSION.SDK_INT >= 29
+        if (!settings.getBoolean("pref_location_ignore_autoconnect_service", false)
+                && Build.VERSION.SDK_INT >= 29
                 && !pu.isBackgroundLocationGranted()
                 && !pref_autoconnect_service.isChecked()) {
-            pref_autoconnect_service.setChecked(true);
-            pref_autoconnect_service.getOnPreferenceChangeListener().onPreferenceChange(pref_autoconnect_service, true);
+            changeCheckBox(pref_autoconnect_service, true);
         }
     }
 
@@ -353,8 +409,10 @@ public class SettingsActivity extends Activity {
         pref_autoconnect.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                if ((Boolean)new_value && Build.VERSION.SDK_INT >= 28 && !pu.isCoarseLocationGranted()) {
-                    pu.requestCoarseLocation(SettingsActivity.this);
+                boolean force = settings.getBoolean("pref_location_ignore_autoconnect", false);
+
+                if (!force && (Boolean)new_value && Build.VERSION.SDK_INT >= 28 && !pu.isCoarseLocationGranted()) {
+                    showLocationDialog(true);
                     return false;
                 }
 
@@ -367,6 +425,10 @@ public class SettingsActivity extends Activity {
                 if (pref_autoconnect_service.isChecked() && (Boolean)new_value) {
                     startService(receiver_service);
                 } else {
+                    settings.edit()
+                            .putBoolean("pref_location_ignore_autoconnect", false)
+                            .apply();
+
                     stopService(receiver_service);
                 }
 
@@ -379,12 +441,18 @@ public class SettingsActivity extends Activity {
         pref_autoconnect_service.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
             @Override
             public boolean onPreferenceChange(Preference preference, Object new_value) {
-                if (!(Boolean)new_value && Build.VERSION.SDK_INT >= 29 && !pu.isBackgroundLocationGranted()) {
-                    pu.requestBackgroundLocation(SettingsActivity.this);
+                boolean force = settings.getBoolean("pref_location_ignore_autoconnect_service", false);
+
+                if (!force && !(Boolean)new_value && Build.VERSION.SDK_INT >= 29 && !pu.isBackgroundLocationGranted()) {
+                    showLocationDialog(false);
                     return false;
                 }
 
                 if (pref_autoconnect.isChecked() && (Boolean)new_value) {
+                    settings.edit()
+                            .putBoolean("pref_location_ignore_autoconnect_service", false)
+                            .apply();
+
                     startService(receiver_service);
                 } else {
                     stopService(receiver_service);

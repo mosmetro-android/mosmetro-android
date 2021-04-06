@@ -248,7 +248,7 @@
     <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>
     <string name="auth_algorithm_failure">algorithm initialization failed</string>
     <string name="location_permission">Location permission</string>
-    <string name="location_permission_saving">Starting with Android 9.0, you need to grant location permission to this application, so that it can automatically connect to network. Otherwise, only manual connection will be available.</string>
+    <string name="location_permission_saving">Android 9+ requires location access in order to get the name of the Wi-Fi network. Without this permission app will not start automatically, but you can still connect manually through main menu or shortcuts.</string>
     <string name="log_wipe_confirmation">Clear log file?</string>
     <string name="pref_mosmetro_v2_wv">MosMetroV2WV (beta)</string>
     <string name="pref_mosmetro_v2_wv_summary">Extension of MosMetroV2 that uses headless browser and JavaScript instead of hardcoded HTTP requests. Slower but safer if the provider would start to take action against this app\'s users again.</string>
@@ -264,4 +264,8 @@
     <string name="reveiver_service_summary">Tap here to open settings</string>
     <string name="pref_autoconnect_service_title">Persistent service</string>
     <string name="pref_autoconnect_service_summary">Enable this option if the application does not automatically start when the device connects to Wi-Fi</string>
+    <string name="force_on">Enable anyway</string>
+    <string name="force_off">Disable anyway</string>
+    <string name="coarse_location_permission">Android 9+ requires location access in order to get the name of the Wi-Fi network. Without this permission app will not start automatically even if this option is enabled.</string>
+    <string name="background_location_permission">Android 9+ requires background location access or persistent notification in order to be able to get the name of the Wi-Fi network. Without this permission app will not start automatically when this option is disabled.</string>
 </resources>

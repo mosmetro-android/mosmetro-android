@@ -24,9 +24,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
+
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.util.Notify;
@@ -69,7 +72,11 @@ public class ReceiverService extends Service {
         };
 
         PermissionUtils pu = new PermissionUtils(this);
-        if (Build.VERSION.SDK_INT >= 28 && !pu.isCoarseLocationGranted()) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (!settings.getBoolean("pref_location_ignore_autoconnect", false)
+                && Build.VERSION.SDK_INT >= 28
+                && !pu.isCoarseLocationGranted()) {
             stopSelf();
         }
     }

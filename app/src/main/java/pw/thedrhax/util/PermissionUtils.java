@@ -82,13 +82,13 @@ public final class PermissionUtils {
     }
 
     @RequiresApi(23)
-    public void requestCoarseLocation(Activity activity) {
-        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+    public void requestCoarseLocation(Activity activity, int requestCode) {
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
     }
 
     @RequiresApi(29)
-    public void requestBackgroundLocation(Activity activity) {
-        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 2);
+    public void requestBackgroundLocation(Activity activity, int requestCode) {
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, requestCode);
     }
 
     /**

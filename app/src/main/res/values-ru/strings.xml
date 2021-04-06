@@ -227,7 +227,7 @@
     <string name="pref_debug_last_log_summary">Лог будет отправляться вместе с отчетами ACRA в случае сбоя.</string>
     <string name="auth_algorithm_failure">не удалось инициализировать алгоритм</string>
     <string name="location_permission">Определение местоположения</string>
-    <string name="location_permission_saving">Начиная с Android 9.0 для работы автоматического подключения требуется предоставление права на определение местоположения. В противном случае будет работать только ручное подключение.</string>
+    <string name="location_permission_saving">Чтобы приложение могло узнать название сети Wi-Fi, Android 9+ требует доступ к местоположению. Без этого разрешения приложение не сможет подключаться автоматически, но вы по-прежнему сможете использовать ручное подключение в главном меню или через ярлыки.</string>
     <string name="log_wipe_confirmation">Очистить файл лога?</string>
     <string name="auth_webview_page">Получение страницы авторизации</string>
     <string name="auth_webview_page_wait">Ожидание загрузки страницы</string>
@@ -240,4 +240,8 @@
     <string name="reveiver_service_summary">Нажмите сюда, чтобы открыть настройки</string>
     <string name="pref_autoconnect_service_title">Постоянный фоновый процесс</string>
     <string name="pref_autoconnect_service_summary">Включите эту опцию, если приложение не запускается самостоятельно при подключении устройства к Wi-Fi</string>
+    <string name="force_on">Всё-равно включить</string>
+    <string name="force_off">Всё-равно отключить</string>
+    <string name="coarse_location_permission">Чтобы приложение могло узнать название сети Wi-Fi, Android 9+ требует доступ к местоположению. Без этого разрешения приложение не сможет подключаться автоматически, даже если эта опция включена.</string>
+    <string name="background_location_permission">Чтобы приложение могло узнать название сети Wi-Fi, Android 9+ требует доступ к местоположению в фоне или постоянное уведомление. Если отключить эту опцию, не предоставив доступ к местоположению, то приложение не сможет подключаться автоматически.</string>
 </resources>
