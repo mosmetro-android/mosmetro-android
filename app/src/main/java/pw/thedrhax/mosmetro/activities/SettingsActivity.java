@@ -37,18 +37,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.acra.ACRA;
@@ -56,14 +51,17 @@ import org.acra.ACRA;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
+import pw.thedrhax.mosmetro.activities.fragments.AboutFragment;
+import pw.thedrhax.mosmetro.activities.fragments.BranchFragment;
+import pw.thedrhax.mosmetro.activities.fragments.ConnectionSettingsFragment;
+import pw.thedrhax.mosmetro.activities.fragments.DebugSettingsFragment;
+import pw.thedrhax.mosmetro.activities.fragments.NotificationSettingsFragment;
+import pw.thedrhax.mosmetro.activities.fragments.SettingsFragment;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.services.ReceiverService;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
 import pw.thedrhax.util.Listener;
-import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.PermissionUtils;
-import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
@@ -73,264 +71,6 @@ public class SettingsActivity extends Activity {
     private SharedPreferences settings;
     private CheckBoxPreference pref_autoconnect;
     private CheckBoxPreference pref_autoconnect_service;
-
-    public static class SettingsFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
-        }
-    }
-
-    public static class NestedFragment extends PreferenceFragment {
-        protected void setTitle(String title) {
-            ActionBar bar = getActivity().getActionBar();
-            if (bar != null) bar.setTitle(title);
-        }
-
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setHasOptionsMenu(true);
-        }
-
-        @Override
-        public void onPrepareOptionsMenu(Menu menu) {
-            super.onPrepareOptionsMenu(menu);
-            menu.clear();
-        }
-    }
-
-    public static class BranchFragment extends NestedFragment {
-        private Map<String, UpdateChecker.Branch> branches;
-
-        public BranchFragment branches(@NonNull Map<String, UpdateChecker.Branch> branches) {
-            this.branches = branches; return this;
-        }
-
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setTitle(getString(R.string.pref_updater_branch));
-
-            PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(screen);
-
-            PreferenceCategory stable = new PreferenceCategory(getActivity());
-            stable.setTitle(R.string.pref_updater_branch_stable);
-            screen.addPreference(stable);
-
-            PreferenceCategory experimental = new PreferenceCategory(getActivity());
-            experimental.setTitle(R.string.pref_updater_branch_experimental);
-            screen.addPreference(experimental);
-
-            if (branches == null) return;
-            final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            for (final UpdateChecker.Branch branch : branches.values()) {
-                CheckBoxPreference pref = new CheckBoxPreference(getActivity()) {
-                    @Override
-                    protected void onBindView(View view) {
-                        super.onBindView(view);
-
-                        // Increase number of lines on Android 4.x
-                        // Source: https://stackoverflow.com/a/2615650
-                        TextView summary = (TextView) view.findViewById(android.R.id.summary);
-                        summary.setMaxLines(15);
-                    }
-                };
-                pref.setTitle(branch.name);
-                pref.setSummary(branch.description);
-                pref.setChecked(Version.getBranch().equals(branch.name));
-                pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        boolean same = Version.getBranch().equals(branch.name);
-                        ((CheckBoxPreference)preference).setChecked(same);
-                        if (!same) {
-                            settings.edit().putInt("pref_updater_ignore", 0).apply();
-                            branch.dialog().show();
-                        }
-                        getActivity().onBackPressed();
-                        return true;
-                    }
-                });
-
-                if (branch.stable) {
-                    stable.addPreference(pref);
-                } else {
-                    experimental.addPreference(pref);
-                }
-            }
-        }
-    }
-
-    public static class ConnectionSettingsFragment extends NestedFragment {
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            // Generate random User-Agent if it is unset
-            new Randomizer(getActivity()).cached_useragent();
-
-            setTitle(getString(R.string.pref_category_connection));
-            addPreferencesFromResource(R.xml.pref_conn);
-
-            PreferenceScreen screen = getPreferenceScreen();
-
-            final CheckBoxPreference pref_mainet = (CheckBoxPreference)
-                    screen.findPreference("pref_mainet");
-            final LoginFormPreference pref_mainet_creds = (LoginFormPreference)
-                    screen.findPreference("pref_mainet_credentials");
-            pref_mainet_creds.setEnabled(pref_mainet.isChecked());
-            pref_mainet.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    pref_mainet_creds.setEnabled((Boolean) newValue);
-                    return true;
-                }
-            });
-
-            final CheckBoxPreference mmv2 = (CheckBoxPreference)
-                    screen.findPreference("pref_mosmetro_v2_wv");
-            mmv2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    if (mmv2.isChecked()) {
-                        mmv2.setChecked(false);
-
-                        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-                                .setTitle(R.string.warning)
-                                .setMessage(R.string.pref_mosmetro_v2_wv_warning)
-                                .setPositiveButton("Включить", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        mmv2.setChecked(true);
-                                    }
-                                })
-                                .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.cancel();
-                                    }
-                                })
-                                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialogInterface) {
-                                        mmv2.setChecked(false);
-                                    }
-                                })
-                                .setCancelable(true);
-
-                        dialog.show();
-                        return false;
-                    }
-
-                    return true;
-                }
-            });
-        }
-    }
-
-    public static class NotificationSettingsFragment extends NestedFragment {
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setTitle(getString(R.string.pref_category_notifications));
-            addPreferencesFromResource(R.xml.pref_notify);
-
-            PreferenceScreen screen = getPreferenceScreen();
-
-            // Link pref_notify_foreground and pref_notify_success_lock
-            final CheckBoxPreference foreground = (CheckBoxPreference)
-                    screen.findPreference("pref_notify_foreground");
-            final CheckBoxPreference success = (CheckBoxPreference)
-                    screen.findPreference("pref_notify_success");
-            final CheckBoxPreference success_lock = (CheckBoxPreference)
-                    screen.findPreference("pref_notify_success_lock");
-            foreground.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    success.setEnabled(!((Boolean) newValue));
-                    success_lock.setEnabled(!((Boolean) newValue));
-                    return true;
-                }
-            });
-            foreground
-                    .getOnPreferenceChangeListener()
-                    .onPreferenceChange(foreground, foreground.isChecked());
-        }
-    }
-
-    public static class DebugSettingsFragment extends NestedFragment {
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setTitle(getString(R.string.pref_debug));
-            addPreferencesFromResource(R.xml.pref_debug);
-
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-            Preference.OnPreferenceChangeListener reload_logger = new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    settings.edit()
-                            .putBoolean(pref.getKey(), (Boolean) new_value)
-                            .apply();
-                    Logger.configure(getActivity());
-                    return true;
-                }
-            };
-
-            CheckBoxPreference pref_debug_acra = (CheckBoxPreference)
-                    getPreferenceScreen().findPreference("acra.enable");
-            CheckBoxPreference pref_debug_last_log = (CheckBoxPreference)
-                    getPreferenceScreen().findPreference("pref_debug_last_log");
-            CheckBoxPreference pref_debug_testing = (CheckBoxPreference)
-                    getPreferenceScreen().findPreference("pref_debug_testing");
-            CheckBoxPreference pref_debug_logcat = (CheckBoxPreference)
-                    getPreferenceScreen().findPreference("pref_debug_logcat");
-
-            pref_debug_last_log.setEnabled(pref_debug_acra.isChecked());
-            pref_debug_testing.setEnabled(pref_debug_last_log.isChecked());
-
-            pref_debug_acra.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
-                @Override
-                public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean)new_value) {
-                        pref_debug_last_log.setChecked(false);
-                        pref_debug_testing.setChecked(false);
-                        pref_debug_testing.setEnabled(false);
-                    }
-
-                    pref_debug_last_log.setEnabled((Boolean) new_value);
-                    return true;
-                }
-            });
-            
-            pref_debug_last_log.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
-                public boolean onPreferenceChange(Preference pref, Object new_value) {
-                    if (!(Boolean)new_value) {
-                        pref_debug_testing.setChecked(false);
-                    }
-
-                    pref_debug_testing.setEnabled((Boolean) new_value);
-                    return true;
-                };
-            });
-
-            pref_debug_testing.setOnPreferenceChangeListener(reload_logger);
-            pref_debug_logcat.setOnPreferenceChangeListener(reload_logger);
-        }
-    }
-
-    public static class AboutFragment extends NestedFragment {
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setTitle(getString(R.string.about));
-            addPreferencesFromResource(R.xml.about);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -449,8 +189,6 @@ public class SettingsActivity extends Activity {
 
     @RequiresApi(23)
     private void energy_saving_setup() {
-        final PermissionUtils pu = new PermissionUtils(this);
-
         AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_battery_saving)
                 .setMessage(R.string.dialog_battery_saving_summary)
