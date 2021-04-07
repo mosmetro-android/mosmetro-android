@@ -205,37 +205,12 @@ public class MosMetroV2 extends Provider {
          *        https://auth.wi-fi.ru/metro
          *        https://auth.wi-fi.ru/new
          *        https://auth.wi-fi.ru/spb/new
-         * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token (if present)
          */
         add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
-            @Override
-            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
-                client.followRedirects(false);
-                ParsedResponse response = client.get(url, null, pref_retry_count);
-                client.followRedirects(true);
-                return response;
-            }
 
             @NonNull @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
-                try {
-                    String redirect = response.get300Redirect();
-
-                    if (redirect.contains("/identification")) { // not registered
-                        Logger.log(context.getString(R.string.error,
-                                context.getString(R.string.auth_error_not_registered)
-                        ));
-
-                        vars.put("result", RESULT.NOT_REGISTERED);
-                        running.set(false);
-                        return response;
-                    }
-
-                    // Follow 3xx redirect
-                    response = client.get(redirect, null, pref_retry_count);
-                } catch (ParseException ignored) {}
-
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
@@ -361,6 +336,19 @@ public class MosMetroV2 extends Provider {
                         Logger.log(data.toJSONString());
 
                         if (!((Boolean) data.get("result"))) {
+                            if (data.containsKey("auth_error_code")) {
+                                String error = (String) data.get("auth_error_code");
+
+                                if (error != null && error.startsWith("err_device_not_identified")) {
+                                    Logger.log(context.getString(R.string.error,
+                                            context.getString(R.string.auth_error_not_registered)
+                                    ));
+
+                                    vars.put("result", RESULT.NOT_REGISTERED);
+                                    return false;
+                                }
+                            }
+
                             throw new ParseException("Unexpected result: false", 0);
                         }
                     } catch (org.json.simple.parser.ParseException|NullPointerException ex) {

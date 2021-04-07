@@ -175,7 +175,6 @@ public class MosMetroV2WV extends WebViewProvider {
          *        https://auth.wi-fi.ru/
          *        https://auth.wi-fi.ru/new/
          *        https://auth.wi-fi.ru/spb/
-         * - Detect if device is not registered in the network (302 redirect to /identification)
          * - Parse CSRF token
          * - Insert automation script into response
          */
@@ -193,16 +192,6 @@ public class MosMetroV2WV extends WebViewProvider {
                 try {
                     String redirect = response.get300Redirect();
 
-                    if (redirect.contains("/identification")) { // not registered
-                        Logger.log(context.getString(R.string.error,
-                                context.getString(R.string.auth_error_not_registered)
-                        ));
-
-                        vars.put("result", RESULT.NOT_REGISTERED);
-                        running.set(false);
-                        return new ParsedResponse("");
-                    }
-
                     // Follow 3xx redirect because it can not be passed to WebView
                     response = client.get(redirect, null, pref_retry_count);
                 } catch (ParseException ignored) {}
@@ -217,6 +206,24 @@ public class MosMetroV2WV extends WebViewProvider {
 
                 response.getPageContent().body().append("<script src=\"https://mosmetro/MosMetroV2.js\"></script>");
                 return response;
+            }
+        });
+
+        /**
+         * Async: https://auth.wi-fi.ru/identification
+         *        https://auth.wi-fi.ru/spb/identification
+         * - Detect if device is not registered in the network
+         */
+        add(new InterceptorTask(this, Pattern.compile("https://auth.wi-fi.ru(/spb)?/identification")) {
+            @Override
+            public ParsedResponse request(Client client, METHOD method, String url, Map<String, String> params) throws IOException {
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_not_registered)
+                ));
+
+                vars.put("result", RESULT.NOT_REGISTERED);
+                running.set(false);
+                return new ParsedResponse("");
             }
         });
 
