@@ -354,10 +354,21 @@ public class MosMetroV2 extends Provider {
                 }
 
                 try {
-                    ParsedResponse response = client.post(url, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
+                    ParsedResponse res = client.post(url, null, pref_retry_count);
+
+                    try {
+                        JSONObject data = res.json();
+                        Logger.log(data.toJSONString());
+
+                        if (!((Boolean) data.get("result"))) {
+                            throw new ParseException("Unexpected result: false", 0);
+                        }
+                    } catch (org.json.simple.parser.ParseException|NullPointerException ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+                        Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
+                    }
                 } catch (ProtocolException ignored) { // Too many follow-up requests
-                } catch (IOException ex) {
+                } catch (IOException|ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
@@ -389,14 +400,15 @@ public class MosMetroV2 extends Provider {
                 }
 
                 try {
-                    JSONObject response = client.get(url, null, pref_retry_count).json();
+                    ParsedResponse res = client.get(url, null, pref_retry_count);
 
-                    Logger.log(Logger.LEVEL.DEBUG, response.toJSONString());
-
-                    if (!((Boolean) response.get("result"))) {
-                        throw new ParseException("Unexpected answer: false", 0);
+                    try {
+                        Logger.log(Logger.LEVEL.DEBUG, res.json().toJSONString());
+                    } catch (org.json.simple.parser.ParseException ex) {
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+                        Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
                     }
-                } catch (IOException|org.json.simple.parser.ParseException|ParseException ex) {
+                } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
