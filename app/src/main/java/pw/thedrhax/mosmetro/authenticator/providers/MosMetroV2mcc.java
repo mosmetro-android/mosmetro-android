@@ -24,16 +24,13 @@ import android.net.Uri;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.net.ProtocolException;
 import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
-import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.util.Logger;
@@ -76,12 +73,8 @@ public class MosMetroV2mcc extends Provider {
                 if (url != null && !url.isEmpty()) {
                     uri = Uri.parse(url);
                 }
-                String mac = uri.getQueryParameter("mac");
-                if (mac != null && !mac.isEmpty()) {
-                    vars.put("mac", mac.toLowerCase());
-                } else {
-                    vars.put("mac", "00-00-00-00-00-00");
-                }
+
+                vars.put("mac", uri.getQueryParameter("mac"));
 
                 return true;
             }
@@ -168,7 +161,13 @@ public class MosMetroV2mcc extends Provider {
                     client.followRedirects(false);
 
                     response = client.get("http://hotspot.maximatelecom/login", new HashMap<String, String>() {{
-                        put("username", (String) vars.get("mac"));
+                        String mac = (String) vars.get("mac");
+
+                        if (mac == null || mac.isEmpty()) {
+                            mac = "00-00-00-00-00-00";
+                        }
+
+                        put("username", mac.toLowerCase());
                         put("password", "placeholder");
                     }}, pref_retry_count);
 
