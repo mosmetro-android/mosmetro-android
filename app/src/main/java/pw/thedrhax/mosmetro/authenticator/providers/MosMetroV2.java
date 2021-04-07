@@ -256,7 +256,27 @@ public class MosMetroV2 extends Provider {
 
                 try {
                     ParsedResponse response = client.get(url, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                    
+                    if (mosmetro || spb) { // expecting JSON
+                        Logger.log(Logger.LEVEL.DEBUG, response.toHeaderString());
+
+                        try {
+                            JSONObject json = response.json();
+                            JSONObject data = (JSONObject) json.get("data");
+
+                            if (data != null) {
+                                data.remove("segmentParams");
+                                data.remove("userParams");
+                            }
+
+                            Logger.log(Logger.LEVEL.DEBUG, json.toJSONString());
+                        } catch (org.json.simple.parser.ParseException ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, response.toBodyString());
+                        }
+                    } else {
+                        Logger.log(Logger.LEVEL.DEBUG, response.toString());
+                    }
+
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
