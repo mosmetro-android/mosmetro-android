@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.Util;
 
 public class ParsedResponse {
     private String url;
@@ -272,7 +271,7 @@ public class ParsedResponse {
         return result;
     }
 
-    public String toString() {
+    public String toHeaderString() {
         StringBuilder builder = new StringBuilder();
 
         builder.append("URL: ").append(" ").append(url).append("\n");
@@ -285,15 +284,30 @@ public class ParsedResponse {
             }
         }
 
+        return builder.toString();
+    }
+
+    public String toBodyString() {
         if (document != null) {
             String html = document.outerHtml();
-            if (Util.countLines(html) < 512) {
-                builder.append(html);
+            if (html.length() <= 2000) {
+                return html;
             } else {
-                builder.append("<!-- file is too long -->");
+                return "<!-- file is too long -->";
             }
+        } else {
+            try {
+                return json().toJSONString();
+            } catch (org.json.simple.parser.ParseException ignored) {}
         }
 
+        return "<!-- format not supported -->";
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(toHeaderString()).append("\n");
+        builder.append(toBodyString());
         return builder.toString();
     }
 }

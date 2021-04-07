@@ -187,7 +187,7 @@ public class MosMetroV2 extends Provider {
                     }
 
                     ParsedResponse response = client.get(redirect, null, pref_retry_count);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
 
                     return true;
                 } catch (IOException | ParseException ex) {
@@ -330,10 +330,10 @@ public class MosMetroV2 extends Provider {
 
                 try {
                     ParsedResponse res = client.post(url, null, pref_retry_count);
+                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     try {
                         JSONObject data = res.json();
-                        Logger.log(data.toJSONString());
 
                         if (!((Boolean) data.get("result"))) {
                             if (data.containsKey("auth_error_code")) {
@@ -389,13 +389,7 @@ public class MosMetroV2 extends Provider {
 
                 try {
                     ParsedResponse res = client.get(url, null, pref_retry_count);
-
-                    try {
-                        Logger.log(Logger.LEVEL.DEBUG, res.json().toJSONString());
-                    } catch (org.json.simple.parser.ParseException ex) {
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
-                        Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
-                    }
+                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
