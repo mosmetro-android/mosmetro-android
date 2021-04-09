@@ -372,7 +372,6 @@ public class MosMetroV2 extends Provider {
                             throw new ParseException("Unexpected result: false", 0);
                         }
                     } catch (org.json.simple.parser.ParseException|NullPointerException ex) {
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
                         Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
                     }
                 } catch (ProtocolException ignored) { // Too many follow-up requests
@@ -383,6 +382,7 @@ public class MosMetroV2 extends Provider {
                     ));
                     return false;
                 }
+
                 return true;
             }
         });

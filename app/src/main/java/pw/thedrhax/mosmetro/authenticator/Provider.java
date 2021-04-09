@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.providers.AuthLastochkaCenter;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
@@ -63,7 +64,8 @@ public abstract class Provider extends LinkedList<Task> {
             "MT_FREE", "MT_FREE_",
             "CPPK_Free",
             "Air_WiFi_Free",
-            "MAInet_public"
+            "MAInet_public",
+            "Lastochka.Center"
     };
 
     protected Context context;
@@ -95,7 +97,8 @@ public abstract class Provider extends LinkedList<Task> {
     @NonNull public static Provider find(Context context, HttpResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
+        if (AuthLastochkaCenter.match(response)) return new AuthLastochkaCenter(context, response);
+        else if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
         else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV2mcc.match(response)) return new MosMetroV2mcc(context, response);
