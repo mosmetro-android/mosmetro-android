@@ -342,10 +342,6 @@ public class MosMetroV2 extends Provider {
                     }
 
                     url += "/gapi/auth/init?mode=0&segment=" + vars.get("segment");
-
-                    if (vars.containsKey("mac")) {
-                        url += "&clientMac=" + vars.get("mac");
-                    }
                 }
 
                 try {
