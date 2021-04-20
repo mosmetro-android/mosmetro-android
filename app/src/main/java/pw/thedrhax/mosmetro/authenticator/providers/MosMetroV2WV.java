@@ -147,7 +147,7 @@ public class MosMetroV2WV extends WebViewProvider {
         /**
          * Async: Block some URL patterns for performance and stability
          */
-        add(new InterceptorTask(this, ".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
+        add(new InterceptorTask(".*(ads\\.adfox\\.ru|mc\\.yandex\\.ru|ac\\.yandex\\.ru|\\.mp4$).*") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 Logger.log(Logger.LEVEL.DEBUG, "Blocked: " + url);
@@ -155,10 +155,12 @@ public class MosMetroV2WV extends WebViewProvider {
             }
         });
 
+        String key = random.string(25).toLowerCase();
+
         /**
          * Async: Fake response with MosMetroV2.js script
          */
-        add(new InterceptorTask(this, "https://mosmetro/MosMetroV2\\.js") {
+        add(new InterceptorTask("https://" + key + "/MosMetroV2\\.js") {
             @Override
             public ParsedResponse request(Client client, METHOD method, String url, Map<String, String> params) throws IOException {
                 return new ParsedResponse(
@@ -178,11 +180,11 @@ public class MosMetroV2WV extends WebViewProvider {
          * - Parse CSRF token
          * - Insert automation script into response
          */
-        add(new InterceptorTask(this, auth_page) {
+        add(new InterceptorTask(auth_page) {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
                 client.followRedirects(false);
-                ParsedResponse response = client.get(url, null, pref_retry_count);
+                ParsedResponse response = client.get(url, params, pref_retry_count);
                 client.followRedirects(true);
                 return response;
             }
@@ -204,7 +206,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }
 
-                response.getPageContent().body().append("<script src=\"https://mosmetro/MosMetroV2.js\"></script>");
+                response.getPageContent().body().append("<script src=\"https://" + key + "/MosMetroV2.js\"></script>");
                 return response;
             }
         });
@@ -214,7 +216,7 @@ public class MosMetroV2WV extends WebViewProvider {
          *        https://auth.wi-fi.ru/spb/identification
          * - Detect if device is not registered in the network
          */
-        add(new InterceptorTask(this, Pattern.compile("https://auth.wi-fi.ru(/spb)?/identification")) {
+        add(new InterceptorTask(Pattern.compile("https://auth.wi-fi.ru(/spb)?/identification")) {
             @Override
             public ParsedResponse request(Client client, METHOD method, String url, Map<String, String> params) throws IOException {
                 Logger.log(context.getString(R.string.error,
@@ -228,27 +230,29 @@ public class MosMetroV2WV extends WebViewProvider {
         });
 
         /**
-         * Async: Replace GET /auth/init with POST /auth/init
-         * https://auth.wi-fi.ru/auth/init
-         * https://auth.wi-fi.ru/gapi/auth/init
-         * https://auth.wi-fi.ru/spb/gapi/auth/init
+         * Async: Replace /auth/init_smart with /auth/init
+         * https://auth.wi-fi.ru/auth/init_smart
+         * https://auth.wi-fi.ru/gapi/auth/init_smart
+         * https://auth.wi-fi.ru/spb/gapi/auth/init_smart
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/((spb/)?gapi/)?auth/init(_smart)?(\\?.*)?") {
+        add(new InterceptorTask("https?://auth\\.wi-fi\\.ru/((spb/)?gapi/)?auth/init_smart(\\?.*)?") {
             @Nullable @Override
             public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
-                if (url.contains("auth/init_smart")) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Replacing \"init_smart\" with \"init\"");
-                    url = url.replace("auth/init_smart", "auth/init");
-                }
+                Logger.log(Logger.LEVEL.DEBUG, "Replacing \"init_smart\" with \"init\"");
+                url = url.replace("auth/init_smart", "auth/init");
 
-                return client.post(url, null, pref_retry_count);
+                if (method == METHOD.GET) {
+                    return client.get(url, params, pref_retry_count);
+                } else {
+                    return client.post(url, params, pref_retry_count);
+                }
             }
         });
 
         /**
          * Async: Block {mcc,spb}.wi-fi.ru, gowifi.ru
          */
-        add(new InterceptorTask(this, "https?://((mcc|spb)\\.wi-fi\\.ru|gowifi\\.ru)/") {
+        add(new InterceptorTask("https?://((mcc|spb)\\.wi-fi\\.ru|gowifi\\.ru)/") {
             @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
                 return new ParsedResponse("");

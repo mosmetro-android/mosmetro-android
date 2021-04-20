@@ -33,6 +33,8 @@ import android.preference.PreferenceManager;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -48,23 +50,32 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
+import pw.thedrhax.util.Util;
 
 public class WebViewService extends Service {
-    private Listener<Boolean> running = new Listener<Boolean>(true) {
+    private final Listener<Boolean> running = new Listener<Boolean>(true) {
         @Override
         public void onChange(Boolean new_value) {
             if (!new_value) {
@@ -237,7 +248,7 @@ public class WebViewService extends Service {
     }
 
     public void setClient(Client client) {
-        webviewclient.client = client;
+        webviewclient.setClient(client);
     }
 
     /**
@@ -245,21 +256,66 @@ public class WebViewService extends Service {
      * Inspired by https://stackoverflow.com/a/25547544
      */
     private class InterceptedClient extends WebViewClient {
-        private Listener<String> current_url = new Listener<String>("") {
+        private final Listener<String> current_url = new Listener<String>("") {
             @Override
             public void onChange(String new_value) {
                 Logger.log(InterceptedClient.this, "Current URL | " + new_value);
             }
         };
 
-        private Client client = new OkHttp(WebViewService.this).setRunningListener(running);
-
+        private Client client = null;
         private String next_referer;
         private String referer;
+        private final String key;
+        private final List<InterceptorTask> interceptors = new LinkedList<>();
+
+        public InterceptedClient() {
+            setClient(new OkHttp(WebViewService.this).setRunningListener(running));
+            key = new Randomizer(WebViewService.this).string(25).toLowerCase();
+
+            // Serve interceptor script
+            this.interceptors.add(new InterceptorTask("^https?://" + key + "/webview-proxy\\.js$") {
+                @Nullable @Override
+                public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
+                    String script =
+                            Util.readAsset(WebViewService.this, "xhook.min.js") +
+                            Util.readAsset(WebViewService.this, "webview-proxy.js")
+                                    .replaceAll("INTERCEPT_KEY", key);
+
+                    return new ParsedResponse(script, "text/javascript");
+                }
+            });
+        }
+
+        public InterceptedClient setClient(Client client) {
+            if (this.client != null) {
+                for (InterceptorTask task : this.interceptors) {
+                    this.client.interceptors.remove(task);
+                }
+            }
+
+            this.client = client;
+
+            for (InterceptorTask task : this.interceptors) {
+                this.client.interceptors.add(0, task);
+            }
+
+            return this;
+        }
 
         private WebResourceResponse webresponse(@NonNull ParsedResponse response) {
             if (response.getMimeType().contains("text/html") && !response.getURL().isEmpty()) {
                 Logger.log(this, response.toString());
+            }
+
+            if (response.isHtml()) {
+                Document doc = response.getPageContent();
+
+                doc.head().insertChildren(0, new LinkedList<Element>() {{
+                    Element xhook = doc.createElement("script");
+                    xhook.attr("src", "https://" + key + "/webview-proxy.js");
+                    add(xhook);
+                }});
             }
 
             WebResourceResponse result = new WebResourceResponse(
@@ -276,16 +332,6 @@ public class WebViewService extends Service {
                             put(name, headers.get(name).get(0));
                         }
                     }
-
-                    if (referer != null) {
-                        Uri uri = Uri.parse(referer);
-                        remove("access-control-allow-origin");
-                        put("access-control-allow-origin", uri.getScheme() + "://" + uri.getHost());
-                        put("access-control-allow-credentials", "true");
-                    }
-
-                    remove("x-content-type-options");
-                    remove("x-xss-protection");
                 }});
 
                 if (!response.getReason().isEmpty()) {
@@ -297,6 +343,47 @@ public class WebViewService extends Service {
             }
 
             return result;
+        }
+
+        private ParsedResponse getToPost(String url) throws IOException {
+            if (url.matches("https?://[^/]+/" + key + "\\?.*")) {
+                Uri uri = Uri.parse(url);
+                url = uri.getQueryParameter("url");
+
+                HashMap<String, List<String>> headers = new HashMap<>();
+
+                try {
+                    JSONParser parser = new JSONParser();
+                    JSONObject rawHeaders = (JSONObject) parser.parse(uri.getQueryParameter("headers"));
+
+                    if (rawHeaders != null) {
+                        for (Object key : rawHeaders.keySet()) {
+                            headers.put((String) key, new LinkedList<String>() {{
+                                add((String) rawHeaders.get(key));
+                            }});
+                        }
+                    }
+                } catch (ParseException|ClassCastException ex) {
+                    Logger.log(this, Log.getStackTraceString(ex));
+                    Logger.log(this, "Unable to parse headers");
+                }
+
+                String type = "text/plain";
+
+                if (headers.containsKey(Client.HEADER_CONTENT_TYPE)) {
+                    type = headers.get(Client.HEADER_CONTENT_TYPE).get(0);
+                }
+
+                String body = uri.getQueryParameter("body");
+
+                Logger.log(this, "POST " + url);
+                Logger.log(this, body);
+
+                return client.post(url, type, body);
+            } else {
+                Logger.log(this, "GET " + url);
+                return client.get(url, null, 1);
+            }
         }
 
         @Override
@@ -315,8 +402,7 @@ public class WebViewService extends Service {
 
             try {
                 client.setCookies(url, getCookies(url));
-                Logger.log(this, "Requesting: " + url);
-                result = webresponse(client.get(url, null, 1));
+                result = webresponse(getToPost(url));
                 setCookies(url, client.getCookies(url));
             } catch (UnknownHostException ex) {
                 onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
@@ -341,7 +427,16 @@ public class WebViewService extends Service {
             return result;
         }
 
-        @Override @TargetApi(24)
+        @Nullable @Override @TargetApi(21)
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            if ("POST".equals(request.getMethod())) {
+                Logger.log(this, "WARNING: Cannot intercept POST request to " + request.getUrl());
+            }
+
+            return super.shouldInterceptRequest(view, request);
+        }
+
+        @Override @TargetApi(21)
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return shouldOverrideUrlLoading(view, request.getUrl().toString());
         }

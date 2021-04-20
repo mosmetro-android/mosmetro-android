@@ -44,6 +44,7 @@ public abstract class Client {
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
     public static final String HEADER_ACAO = "Access-Control-Allow-Origin";
+    public static final String HEADER_ACAC = "Access-Control-Allow-Credentials";
     public static final String HEADER_USER_AGENT = "User-Agent";
     public static final String HEADER_REFERER = "Referer";
     public static final String HEADER_CSRF = "X-CSRF-Token";
@@ -128,27 +129,33 @@ public abstract class Client {
     protected abstract ParsedResponse request(METHOD method, String link, Map<String,String> params) throws IOException;
 
     private ParsedResponse interceptedRequest(METHOD method, String link, Map<String,String> params) throws IOException {
-        InterceptorTask interceptor = null;
         ParsedResponse response = null;
 
-        for (InterceptorTask i : interceptors) {
-            if (i.match(link) && !intercepting) {
-                interceptor = i;
-            }
-        }
-
         try {
-            if (interceptor != null) {
+            if (!intercepting) {
                 intercepting = true;
-                response = interceptor.request(this, method, link, params);
+
+                for (InterceptorTask i : interceptors) {
+                    if (i.match(link)) {
+                        response = i.request(this, method, link, params);
+
+                        if (response != null) {
+                            Logger.log(this, "Request intercepted by " + i.toString());
+                            break;
+                        }
+                    }
+                }
             }
 
             if (response == null) {
                 response = request(method, link, params);
             }
 
-            if (interceptor != null) {
-                response = interceptor.response(this, link, response);
+            for (InterceptorTask i : interceptors) {
+                if (i.match(link)) {
+                    response = i.response(this, link, response);
+                    Logger.log(this, "Response intercepted by " + i.toString());
+                }
             }
         } finally {
             intercepting = false;

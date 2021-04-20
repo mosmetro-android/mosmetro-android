@@ -110,11 +110,26 @@ public class ParsedResponse {
 
     @Nullable
     public String getResponseHeader(String name) {
-        if (headers != null && headers.get(name.toLowerCase()) != null) {
+        if (headers.get(name.toLowerCase()) != null) {
             return headers.get(name.toLowerCase()).get(0);
         } else {
             return null;
         }
+    }
+
+    public ParsedResponse setResponseHeader(String name, List<String> values) {
+        headers.put(name, values);
+        return this;
+    }
+
+    public ParsedResponse setResponseHeader(String name, String value) {
+        return setResponseHeader(name, new LinkedList<String>() {{
+            add(value);
+        }});
+    }
+
+    public boolean isHtml() {
+        return document != null;
     }
 
     public Document getPageContent() {

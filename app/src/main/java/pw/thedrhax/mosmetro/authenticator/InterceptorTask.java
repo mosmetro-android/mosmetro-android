@@ -25,42 +25,26 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
-import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.util.Logger;
 
 public abstract class InterceptorTask implements Task {
-    private Provider p;
-    private String regex;
-    private PatternSyntaxException ex = null;
-    private Pattern pattern;
+    private final Pattern pattern;
 
     protected HashMap<String,Object> vars = null;
 
-    public InterceptorTask(Provider p, String regex) {
-        this(p, Pattern.compile(regex));
+    public InterceptorTask(String regex) {
+        this(Pattern.compile(regex));
     }
 
-    public InterceptorTask(Provider p, Pattern pattern) {
-        this.p = p;
+    public InterceptorTask(Pattern pattern) {
         this.pattern = pattern;
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        if (ex != null) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-            Logger.log(p.context.getString(R.string.error,
-                    p.context.getString(R.string.auth_error_regex, regex)
-            ));
-            return false;
-        }
-
         this.vars = vars;
-
         return true;
     }
 
@@ -72,6 +56,11 @@ public abstract class InterceptorTask implements Task {
     @NonNull
     public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
         return response;
+    }
+
+    @Override
+    public String toString() {
+        return "InterceptorTask{" + pattern.toString() + '}';
     }
 
     public boolean match(String url) {

@@ -207,7 +207,7 @@ public class MosMetroV2 extends Provider {
          *        https://auth.wi-fi.ru/spb/new
          * - Parse CSRF token (if present)
          */
-        add(new InterceptorTask(this, "https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
+        add(new InterceptorTask("https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
 
             @NonNull @Override
             public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
