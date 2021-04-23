@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.InterceptedWebViewClient;
+import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 
 public class WebViewService extends Service {
@@ -56,9 +57,9 @@ public class WebViewService extends Service {
     public void onCreate() {
         super.onCreate();
         setContentView(R.layout.webview_activity);
+        Client client = new OkHttp(this).setRunningListener(running);
         webview = (WebView)view.findViewById(R.id.webview);
-        webviewclient = new InterceptedWebViewClient(this);
-        webviewclient.setRunningListener(running);
+        webviewclient = new InterceptedWebViewClient(this, client);
         webviewclient.setup(webview);
     }
 

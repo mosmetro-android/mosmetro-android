@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ import pw.thedrhax.util.Randomizer;
 import pw.thedrhax.util.Util;
 
 public abstract class Client {
-    public enum METHOD { GET, POST, POST_RAW }
+    public enum METHOD { GET, POST }
 
     public static final String HEADER_ACCEPT = "Accept";
     public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
@@ -126,18 +127,32 @@ public abstract class Client {
     public abstract Client setTimeout(int ms);
 
     // IO methods
-    protected abstract ParsedResponse request(METHOD method, String link, Map<String,String> params) throws IOException;
+    protected abstract HttpResponse request(HttpRequest request) throws IOException;
 
-    private ParsedResponse interceptedRequest(METHOD method, String link, Map<String,String> params) throws IOException {
-        ParsedResponse response = null;
+    protected HttpResponse requestWithRetries(HttpRequest request) throws IOException {
+        return new RetryOnException<HttpResponse>() {
+            @Override
+            public HttpResponse body() throws IOException {
+                if (random_delays) {
+                    if (!random.delay(running)) {
+                        throw new InterruptedIOException();
+                    }
+                }
+                return request(request);
+            }
+        }.run(request.getTries());
+    }
+
+    private HttpResponse interceptedRequest(HttpRequest request) throws IOException {
+        HttpResponse response = null;
 
         try {
             if (!intercepting) {
                 intercepting = true;
 
                 for (InterceptorTask i : interceptors) {
-                    if (i.match(link)) {
-                        response = i.request(this, method, link, params);
+                    if (i.match(request.getUrl())) {
+                        response = i.request(this, request);
 
                         if (response != null) {
                             Logger.log(this, "Request intercepted by " + i.toString());
@@ -148,12 +163,12 @@ public abstract class Client {
             }
 
             if (response == null) {
-                response = request(method, link, params);
+                response = requestWithRetries(request);
             }
 
             for (InterceptorTask i : interceptors) {
-                if (i.match(link)) {
-                    response = i.response(this, link, response);
+                if (i.match(request.getUrl())) {
+                    response = i.response(this, request, response);
                     Logger.log(this, "Response intercepted by " + i.toString());
                 }
             }
@@ -162,77 +177,39 @@ public abstract class Client {
         }
 
         if (response == null) {
-            return new ParsedResponse("");
+            return new HttpResponse(request, "");
         }
 
         String type = response.getResponseHeader(HEADER_CONTENT_TYPE.toLowerCase());
 
         if (type != null && type.startsWith("text/html")) {
-            if (!response.getURL().isEmpty()) {
-                setHeader(Client.HEADER_REFERER, response.getURL());
+            if (!response.getUrl().isEmpty()) {
+                setHeader(Client.HEADER_REFERER, response.getUrl());
             }
         }
 
         return response;
     }
 
-    public ParsedResponse get(String link, Map<String,String> params) throws IOException {
-        return interceptedRequest(METHOD.GET, link, params);
-    }
-    public ParsedResponse post(String link, Map<String,String> params) throws IOException {
-        return interceptedRequest(METHOD.POST, link, params);
-    }
-    public ParsedResponse post(String link, String type, String body) throws IOException {
-        return interceptedRequest(METHOD.POST_RAW, link, new HashMap<String,String>() {{
-            put("type", type);
-            put("body", body);
-        }});
+    public HttpRequest get(String link) {
+        return new HttpRequest(this, METHOD.GET, link);
     }
 
-    // Retry methods
-    public ParsedResponse get(final String link, final Map<String,String> params,
-                      int tries) throws IOException {
-        return new RetryOnException<ParsedResponse>() {
-            @Override
-            public ParsedResponse body() throws IOException {
-                if (random_delays) {
-                    if (!random.delay(running)) {
-                        throw new InterruptedIOException();
-                    }
-                }
-                return get(link, params);
-            }
-        }.run(tries);
+    public HttpRequest get(String link, Map<String,String> form) {
+        return new HttpRequest(this, METHOD.GET, link + '?' + requestToString(form));
     }
 
-    public ParsedResponse post(final String link, final Map<String,String> params,
-                       int tries) throws IOException {
-        return new RetryOnException<ParsedResponse>() {
-            @Override
-            public ParsedResponse body() throws IOException {
-                if (random_delays) {
-                    if (!random.delay(running)) {
-                        throw new InterruptedIOException();
-                    }
-                }
-                return post(link, params);
-            }
-        }.run(tries);
+    public HttpRequest post(String link, String body, String type) {
+        return new HttpRequest(this, METHOD.POST, link).setBody(body, type);
     }
 
-    public ParsedResponse post(final String link, final String type, final String body,
-                               int tries) throws IOException {
-        return new RetryOnException<ParsedResponse>() {
-            @Override
-            public ParsedResponse body() throws IOException {
-                if (random_delays) {
-                    if (!random.delay(running)) {
-                        throw new InterruptedIOException();
-                    }
-                }
-                return post(link, type, body);
-            }
-        }.run(tries);
+    public HttpRequest post(String link, Map<String,String> form) {
+        return new HttpRequest(this, METHOD.POST, link)
+                .setBody(requestToString(form), "application/x-www-form-urlencoded");
+    }
+
+    public HttpResponse execute(HttpRequest request) throws IOException {
+        return interceptedRequest(request);
     }
 
     // Cancel current request
@@ -248,7 +225,7 @@ public abstract class Client {
                         .append(params_string.length() == 0 ? "?" : "&")
                         .append(entry.getKey())
                         .append("=")
-                        .append(entry.getValue());
+                        .append(URLEncoder.encode(entry.getValue()));
 
         return params_string.toString();
     }

@@ -39,8 +39,8 @@ import java.util.Map;
 
 import pw.thedrhax.util.Logger;
 
-public class ParsedResponse {
-    private String url;
+public class HttpResponse {
+    private HttpRequest request;
     private byte[] bytes;
     private int code;
     private String reason;
@@ -49,9 +49,13 @@ public class ParsedResponse {
     private String html;
     private Document document;
 
-    public ParsedResponse(@NonNull String url, @NonNull byte[] bytes, int code, String reason,
-                          @Nullable Map<String,List<String>> headers) {
-        this.url = url;
+    public static HttpResponse EMPTY(Client client) {
+        return new HttpResponse(new HttpRequest(client, Client.METHOD.GET, ""), "");
+    }
+
+    public HttpResponse(@NonNull HttpRequest request, @NonNull byte[] bytes, int code, String reason,
+                        @Nullable Map<String,List<String>> headers) {
+        this.request = request;
         this.bytes = bytes;
         this.code = code;
         this.reason = reason;
@@ -67,12 +71,12 @@ public class ParsedResponse {
         }
 
         if (html != null && !html.isEmpty() && getMimeType().contains("text/html")) {
-            document = Jsoup.parse(html, url);
+            document = Jsoup.parse(html, getUrl());
         }
     }
 
-    public ParsedResponse(String content, String content_type) {
-        this("", content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
+    public HttpResponse(HttpRequest request, String content, String content_type) {
+        this(request, content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
             put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
                 add(content_type);
             }});
@@ -82,8 +86,8 @@ public class ParsedResponse {
         }});
     }
 
-    public ParsedResponse(String html) {
-        this(html, "text/html; charset=utf-8");
+    public HttpResponse(HttpRequest request, String html) {
+        this(request, html, "text/html; charset=utf-8");
     }
 
     @NonNull
@@ -92,8 +96,8 @@ public class ParsedResponse {
     }
 
     @NonNull
-    public String getURL() {
-        return url;
+    public String getUrl() {
+        return request.getUrl();
     }
 
     public int getResponseCode() {
@@ -117,12 +121,12 @@ public class ParsedResponse {
         }
     }
 
-    public ParsedResponse setResponseHeader(String name, List<String> values) {
+    public HttpResponse setResponseHeader(String name, List<String> values) {
         headers.put(name, values);
         return this;
     }
 
-    public ParsedResponse setResponseHeader(String name, String value) {
+    public HttpResponse setResponseHeader(String name, String value) {
         return setResponseHeader(name, new LinkedList<String>() {{
             add(value);
         }});
@@ -177,6 +181,10 @@ public class ParsedResponse {
         return new ByteArrayInputStream(getBytes());
     }
 
+    public HttpRequest getRequest() {
+        return request;
+    }
+
     public String parseMetaContent (String name) throws ParseException {
         String value = null;
 
@@ -221,7 +229,7 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return absolutePathToUrl(url, link);
+        return absolutePathToUrl(getUrl(), link);
     }
 
     @NonNull
@@ -251,7 +259,7 @@ public class ParsedResponse {
             if (!link.substring(link.indexOf("://") + 3, link.indexOf("?")).contains("/"))
                 link = link.replace("?", "/?");
 
-        return absolutePathToUrl(url, link);
+        return absolutePathToUrl(getUrl(), link);
     }
 
     public static String removePathFromUrl(String url) {
@@ -289,9 +297,8 @@ public class ParsedResponse {
     public String toHeaderString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("URL: ").append(" ").append(url).append("\n");
-        builder.append("Response code: ").append(code).append("\n");
-        builder.append("Response reason: ").append(reason).append("\n");
+        builder.append("URL: ").append(" ").append(request.getUrl()).append("\n");
+        builder.append(code).append(' ').append(reason).append("\n");
 
         for (String header : headers.keySet()) {
             for (String value : headers.get(header)) {

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -59,7 +59,7 @@ public class Enforta extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(HttpResponse response) {
         try {
             return response.parseMetaRedirect().contains("enforta");
         } catch (ParseException ex) {

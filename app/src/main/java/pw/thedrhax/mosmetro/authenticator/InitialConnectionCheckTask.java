@@ -21,22 +21,22 @@ package pw.thedrhax.mosmetro.authenticator;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 public abstract class InitialConnectionCheckTask implements Task {
     private Provider p;
-    private ParsedResponse res;
+    private HttpResponse res;
     private boolean first_start = true;
 
-    public InitialConnectionCheckTask(Provider p, ParsedResponse res) {
+    public InitialConnectionCheckTask(Provider p, HttpResponse res) {
         this.p = p;
         this.res = res;
     }
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
-        ParsedResponse response = res;
+        HttpResponse response = res;
 
         if (!first_start) {
             Logger.log(p.context.getString(R.string.auth_checking_connection));
@@ -54,5 +54,5 @@ public abstract class InitialConnectionCheckTask implements Task {
         return handle_response(vars, response);
     }
 
-    public abstract boolean handle_response(HashMap<String, Object> vars, ParsedResponse response);
+    public abstract boolean handle_response(HashMap<String, Object> vars, HttpResponse response);
 }

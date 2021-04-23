@@ -55,12 +55,12 @@ public class BackendRequest {
         String url;
 
         try {
-            url = client.get(BuildConfig.API_URL_SOURCE, null).getPage();
+            url = client.get(BuildConfig.API_URL_SOURCE).execute().getPage();
         } catch (IOException ex) {
             return false;
         }
 
-        if (url == null || url.isEmpty())
+        if (url.isEmpty())
             return false;
         
         if (!Patterns.WEB_URL.matcher(url).matches())
@@ -77,7 +77,7 @@ public class BackendRequest {
         JSONObject data;
 
         try {
-            data = client.get(BuildConfig.NEWS_URL, null).json();
+            data = client.get(BuildConfig.NEWS_URL).execute().json();
         } catch (IOException | ParseException ex) {
             return false;
         }

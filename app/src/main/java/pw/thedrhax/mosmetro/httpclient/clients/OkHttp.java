@@ -44,7 +44,6 @@ import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Dns;
-import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -54,7 +53,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.DnsClient;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpRequest;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
@@ -177,30 +177,45 @@ public class OkHttp extends Client {
         return this;
     }
 
-    private Response call(String url, RequestBody data) throws IOException {
+    protected HttpResponse request(HttpRequest request) throws IOException {
         if (!running.get()) throw new InterruptedIOException();
 
-        Request.Builder builder = new Request.Builder().url(url);
+        Request.Builder builder = new Request.Builder().url(request.getUrl());
 
         // Choose appropriate request method
-        if (data == null) {
-            builder = builder.get();
-        } else {
-            builder = builder.post(data);
+        switch (request.getMethod()) {
+            case GET:
+                builder = builder.get();
+                break;
+            case POST:
+                builder = builder.post(RequestBody.create(
+                        MediaType.parse(request.getContentType()),
+                        request.getBody()
+                ));
         }
 
         // Populate headers
+        Map<String,List<String>> reqHeaders = request.getHeaders();
+
         for (String name : headers.keySet()) {
-            builder.addHeader(name, getHeader(name));
+            if (!reqHeaders.containsKey(name.toLowerCase())) {
+                builder.addHeader(name, getHeader(name));
+            }
+        }
+
+        for (String name : reqHeaders.keySet()) {
+            for (String value : request.getHeader(name)) {
+                builder.addHeader(name, value);
+            }
         }
 
         // Upgrade-Insecure-Requests
-        if (url.contains("http://")) {
+        if (request.getUrl().contains("http://")) {
             builder.addHeader(Client.HEADER_UPGRADE_INSECURE_REQUESTS, "1");
         }
 
         // Accept
-        String accept = Client.acceptByExtension(url);
+        String accept = Client.acceptByExtension(request.getUrl());
         if (!accept.isEmpty()) {
             builder.addHeader(Client.HEADER_ACCEPT, accept);
         }
@@ -210,37 +225,7 @@ public class OkHttp extends Client {
         }
 
         last_call = client.newCall(builder.build());
-        return last_call.execute();
-    }
-
-    @Override
-    protected ParsedResponse request(METHOD method, String link, Map<String, String> params) throws IOException {
-        switch (method) {
-            case GET:
-                return parse(call(link + requestToString(params), null));
-
-            case POST:
-                FormBody.Builder body = new FormBody.Builder();
-
-                if (params != null) {
-                    for (Map.Entry<String, String> entry : params.entrySet()) {
-                        if (entry.getValue() != null)
-                            body.add(entry.getKey(), entry.getValue());
-                    }
-                }
-
-                return parse(call(link, body.build()));
-
-            case POST_RAW:
-                if (params == null || !params.containsKey("type") || !params.containsKey("body"))
-                    return null;
-                else
-                    return parse(call(link, RequestBody.create(
-                            MediaType.parse(params.get("type")), params.get("body")
-                    )));
-        }
-
-        return null;
+        return parse(request, last_call.execute());
     }
 
     @Override
@@ -250,16 +235,16 @@ public class OkHttp extends Client {
         }
     }
 
-    private ParsedResponse parse(Response response) throws IOException {
+    private HttpResponse parse(HttpRequest request, Response response) throws IOException {
         ResponseBody body = response.body();
 
         if (body == null) {
             throw new IOException("Response body is null! Code: " + response.code());
         }
 
-        return new ParsedResponse(
-                response.request().url().toString(), body.bytes(),
-                response.code(), response.message(), response.headers().toMultimap()
+        return new HttpResponse(
+                request, body.bytes(), response.code(), response.message(),
+                response.headers().toMultimap()
         );
     }
 

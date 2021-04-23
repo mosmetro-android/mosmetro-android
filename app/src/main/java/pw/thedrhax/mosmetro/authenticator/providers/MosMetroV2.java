@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Map;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
@@ -38,7 +37,8 @@ import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpRequest;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
 
@@ -83,7 +83,7 @@ public class MosMetroV2 extends Provider {
      */
     private Boolean mosmetro = false;
 
-    public MosMetroV2(final Context context, final ParsedResponse res) {
+    public MosMetroV2(final Context context, final HttpResponse res) {
         super(context);
 
         /**
@@ -93,7 +93,7 @@ public class MosMetroV2 extends Provider {
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+            public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
                     redirect = response.parseAnyRedirect();
                 } catch (ParseException ex) {
@@ -156,7 +156,7 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
 
                     try {
-                        ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                        HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
                         Logger.log(Logger.LEVEL.DEBUG, response.getPage());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -186,7 +186,7 @@ public class MosMetroV2 extends Provider {
                         throw new ParseException("Invalid URL: " + redirect, 0);
                     }
 
-                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
 
                     return true;
@@ -210,7 +210,7 @@ public class MosMetroV2 extends Provider {
         add(new InterceptorTask("https?://auth\\.wi-fi\\.ru/(auth|metro|(spb/)?new)(\\?.*)?") {
 
             @NonNull @Override
-            public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
+            public HttpResponse response(Client client, HttpRequest request, HttpResponse response) throws IOException {
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
@@ -233,7 +233,7 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String url = ParsedResponse.removePathFromUrl(redirect);
+                String url = HttpResponse.removePathFromUrl(redirect);
 
                 if (!spb && !mosmetro) {
                     url += "/auth?segment=" + vars.get("segment");
@@ -255,7 +255,7 @@ public class MosMetroV2 extends Provider {
                       .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
 
                 try {
-                    ParsedResponse response = client.get(url, null, pref_retry_count);
+                    HttpResponse response = client.get(url).setTries(pref_retry_count).execute();
                     
                     if (mosmetro || spb) { // expecting JSON
                         Logger.log(Logger.LEVEL.DEBUG, response.toHeaderString());
@@ -301,11 +301,11 @@ public class MosMetroV2 extends Provider {
                 String token = new Randomizer(context).string(6);
                 Logger.log(Logger.LEVEL.DEBUG, "Trying to set auth token: " + token);
 
-                String url = ParsedResponse.removePathFromUrl(redirect);
+                String url = HttpResponse.removePathFromUrl(redirect);
                 url += "/auth/set_token?token=" + token;
 
                 try {
-                    ParsedResponse response = client.get(url, null);
+                    HttpResponse response = client.get(url).execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -332,20 +332,24 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String url = ParsedResponse.removePathFromUrl(redirect);
+                String url = HttpResponse.removePathFromUrl(redirect);
+
+                HashMap<String,String> params = new HashMap<>();
+                params.put("mode", "0");
+                params.put("segment", (String) vars.get("segment"));
 
                 if (!spb && !mosmetro) {
-                    url += "/auth/init?mode=0&segment=" + vars.get("segment");
+                    url += "/auth/init";
                 } else {
                     if (spb) {
                         url += "/spb";
                     }
 
-                    url += "/gapi/auth/init?mode=0&segment=" + vars.get("segment");
+                    url += "/gapi/auth/init";
                 }
 
                 try {
-                    ParsedResponse res = client.post(url, null, pref_retry_count);
+                    HttpResponse res = client.post(url, params).setTries(pref_retry_count).execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     try {
@@ -391,7 +395,7 @@ public class MosMetroV2 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String url = ParsedResponse.removePathFromUrl(redirect);
+                String url = HttpResponse.removePathFromUrl(redirect);
 
                 if (!spb && !mosmetro) {
                     url += "/auth/check?segment=" + vars.get("segment");
@@ -404,7 +408,7 @@ public class MosMetroV2 extends Provider {
                 }
 
                 try {
-                    ParsedResponse res = client.get(url, null, pref_retry_count);
+                    HttpResponse res = client.get(url).setTries(pref_retry_count).execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -443,7 +447,7 @@ public class MosMetroV2 extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(HttpResponse response) {
         String redirect;
 
         try {

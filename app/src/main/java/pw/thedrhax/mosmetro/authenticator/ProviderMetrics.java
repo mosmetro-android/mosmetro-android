@@ -108,7 +108,7 @@ class ProviderMetrics {
                 ) + BuildConfig.API_REL_STATISTICS;
 
                 try {
-                    new OkHttp(p.context).post(STATISTICS_URL, params);
+                    new OkHttp(p.context).post(STATISTICS_URL, params).execute();
                 } catch (IOException ignored) {}
 
                 return null;

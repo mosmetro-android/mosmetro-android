@@ -32,7 +32,7 @@ import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.WaitTask;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -47,7 +47,7 @@ import pw.thedrhax.util.Logger;
 public class MosMetroV2mcc extends Provider {
     private String redirect;
 
-    public MosMetroV2mcc(Context context, final ParsedResponse res) {
+    public MosMetroV2mcc(Context context, final HttpResponse res) {
         super(context);
 
         /**
@@ -57,7 +57,7 @@ public class MosMetroV2mcc extends Provider {
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+            public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
                     redirect = response.parseAnyRedirect();
                 } catch (ParseException ex) {
@@ -101,7 +101,7 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean until(HashMap<String, Object> vars) {
                 try {
-                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
 
                     redirect = response.get300Redirect();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
@@ -155,7 +155,7 @@ public class MosMetroV2mcc extends Provider {
         add(new NamedTask(context.getString(R.string.auth_algorithm_continue, getName())) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                ParsedResponse response;
+                HttpResponse response;
 
                 try {
                     client.followRedirects(false);
@@ -169,7 +169,7 @@ public class MosMetroV2mcc extends Provider {
 
                         put("username", mac.toLowerCase());
                         put("password", "placeholder");
-                    }}, pref_retry_count);
+                    }}).setTries(pref_retry_count).execute();
 
                     client.followRedirects(true);
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
@@ -213,7 +213,7 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean until(HashMap<String, Object> vars) {
                 try {
-                    ParsedResponse response = client.get(redirect, null, pref_retry_count);
+                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
 
                     redirect = response.get300Redirect();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
@@ -258,7 +258,7 @@ public class MosMetroV2mcc extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(HttpResponse response) {
         Element el = response.getPageContent().getElementsByTag("h2").first();
 
         try {

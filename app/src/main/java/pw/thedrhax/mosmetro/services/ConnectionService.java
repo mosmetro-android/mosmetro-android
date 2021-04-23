@@ -38,7 +38,7 @@ import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -383,7 +383,7 @@ public class ConnectionService extends IntentService {
                 client.followRedirects(false);
 
                 try {
-                    ParsedResponse res = res_204.getFalseNegative();
+                    HttpResponse res = res_204.getFalseNegative();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     String next_redirect = res.parseAnyRedirect();
@@ -393,7 +393,7 @@ public class ConnectionService extends IntentService {
                             "Midsession | Requesting " + next_redirect
                         );
 
-                        res = client.get(next_redirect, null, pref_retry_count);
+                        res = client.get(next_redirect).setTries(pref_retry_count).execute();
                         Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                         next_redirect = res.parseAnyRedirect();

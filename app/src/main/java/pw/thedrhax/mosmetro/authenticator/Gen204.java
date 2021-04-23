@@ -22,7 +22,8 @@ import java.io.IOException;
 
 import android.content.Context;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpRequest;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -58,8 +59,6 @@ public class Gen204 {
             "play.googleapis.com/generate_204"
     };
 
-    private static final ParsedResponse EMPTY = new ParsedResponse("");
-
     private final Listener<Boolean> running = new Listener<Boolean>(true);
     private final Client client;
     private final Randomizer random;
@@ -82,10 +81,10 @@ public class Gen204 {
     /**
      * Perform logged request to specified URL.
      */
-    private ParsedResponse request(String url) throws IOException {
-        ParsedResponse res;
+    private HttpResponse request(String url) throws IOException {
+        HttpResponse res;
         try {
-            res = client.get(url, null, pref_retry_count);
+            res = client.get(url).setTries(pref_retry_count).execute();
             Logger.log(this, url + " | " + res.getResponseCode());
         } catch (IOException ex) {
             Logger.log(this, url + " | " + ex.toString());
@@ -95,14 +94,14 @@ public class Gen204 {
     }
 
     private Gen204Result tripleCheck() {
-        ParsedResponse unrel, rel_https, rel_http;
+        HttpResponse unrel, rel_https, rel_http;
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
         try {
             unrel = request("http://" + random.choose(URL_DEFAULT));
         } catch (IOException ex) {
             // network is most probably unreachable
-            return new Gen204Result(EMPTY);
+            return new Gen204Result(HttpResponse.EMPTY(client));
         }
 
         // Reliable HTTPS check
@@ -138,7 +137,7 @@ public class Gen204 {
         }
 
         Logger.log(this, "Unexpected state");
-        return new Gen204Result(EMPTY);
+        return new Gen204Result(HttpResponse.EMPTY(client));
     }
 
     public Gen204Result check() {
@@ -152,19 +151,19 @@ public class Gen204 {
     }
 
     public class Gen204Result {
-        private final ParsedResponse response;
-        private final ParsedResponse falseNegative;
+        private final HttpResponse response;
+        private final HttpResponse falseNegative;
 
-        public Gen204Result(ParsedResponse response, ParsedResponse falseNegative) {
+        public Gen204Result(HttpResponse response, HttpResponse falseNegative) {
             this.response = response;
             this.falseNegative = falseNegative;
         }
 
-        public Gen204Result(ParsedResponse response) {
+        public Gen204Result(HttpResponse response) {
             this(response, null);
         }
 
-        public ParsedResponse getResponse() {
+        public HttpResponse getResponse() {
             return response;
         }
 
@@ -176,7 +175,7 @@ public class Gen204 {
             return falseNegative != null;
         }
 
-        public ParsedResponse getFalseNegative() {
+        public HttpResponse getFalseNegative() {
             return falseNegative;
         }
     }

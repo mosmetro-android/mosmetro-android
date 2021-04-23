@@ -55,8 +55,6 @@ import java.util.List;
 import java.util.Map;
 
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
-import pw.thedrhax.mosmetro.services.WebViewService;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
@@ -74,7 +72,6 @@ public class InterceptedWebViewClient extends WebViewClient {
         }
     };
 
-    private final Listener<Boolean> running = new Listener<>(true);
     private final String key;
     private final List<InterceptorTask> interceptors = new LinkedList<>();
 
@@ -84,7 +81,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     private String next_referer;
     private String referer;
 
-    public InterceptedWebViewClient(Context context) {
+    public InterceptedWebViewClient(Context context, Client client) {
         this.context = context;
         random = new Randomizer(context);
         key = random.string(25).toLowerCase();
@@ -92,17 +89,16 @@ public class InterceptedWebViewClient extends WebViewClient {
         // Serve interceptor script
         this.interceptors.add(new InterceptorTask("^https?://" + key + "/webview-proxy\\.js$") {
             @Nullable @Override
-            public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String, String> params) throws IOException {
+            public HttpResponse request(Client client, HttpRequest request) throws IOException {
                 String script =
                         Util.readAsset(context, "xhook.min.js") +
                         Util.readAsset(context, "webview-proxy.js")
                                 .replaceAll("INTERCEPT_KEY", key);
-                Logger.log(Logger.LEVEL.DEBUG, "Serving webview-proxy.js");
-                return new ParsedResponse(script, "text/javascript");
+                return new HttpResponse(request, script, "text/javascript");
             }
         });
 
-        setClient(new OkHttp(context).setRunningListener(running));
+        setClient(client);
     }
 
     public Map<String, String> getCookies(String url) {
@@ -214,8 +210,8 @@ public class InterceptedWebViewClient extends WebViewClient {
         return currentUrl.get();
     }
 
-    private WebResourceResponse webresponse(@NonNull ParsedResponse response) {
-        if (response.getMimeType().contains("text/html") && !response.getURL().isEmpty()) {
+    private WebResourceResponse webresponse(@NonNull HttpResponse response) {
+        if (response.getMimeType().contains("text/html") && !response.getUrl().isEmpty()) {
             Logger.log(this, response.toString());
         }
 
@@ -256,7 +252,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         return result;
     }
 
-    private ParsedResponse getToPost(String url) throws IOException {
+    private HttpResponse getToPost(String url) throws IOException {
         if (url.matches("https?://[^/]+/" + key + "\\?.*")) {
             Uri uri = Uri.parse(url);
             url = uri.getQueryParameter("url");
@@ -290,10 +286,10 @@ public class InterceptedWebViewClient extends WebViewClient {
             Logger.log(this, "POST " + url);
             Logger.log(this, body);
 
-            return client.post(url, type, body);
+            return client.post(url, body, type).execute();
         } else {
             Logger.log(this, "GET " + url);
-            return client.get(url, null, 1);
+            return client.get(url).execute();
         }
     }
 
@@ -383,10 +379,5 @@ public class InterceptedWebViewClient extends WebViewClient {
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         Logger.log(this, "Error: " + error.getDescription());
-    }
-
-    public InterceptedWebViewClient setRunningListener(Listener<Boolean> running) {
-        this.running.subscribe(running);
-        return this;
     }
 }

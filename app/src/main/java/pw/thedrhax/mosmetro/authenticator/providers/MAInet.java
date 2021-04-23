@@ -28,7 +28,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -43,7 +43,7 @@ import pw.thedrhax.util.Logger;
 public class MAInet extends Provider {
     private String redirect = "https://wifi.mai.ru/login.html";
 
-    public MAInet(Context context, ParsedResponse res) {
+    public MAInet(Context context, HttpResponse res) {
         super(context);
 
         /**
@@ -53,7 +53,7 @@ public class MAInet extends Provider {
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+            public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
                     redirect = response.parseAnyRedirect();
                     Logger.log(Logger.LEVEL.DEBUG, redirect);
@@ -86,7 +86,7 @@ public class MAInet extends Provider {
                 }
 
                 try {
-                    ParsedResponse response = client.post(redirect, new HashMap<String, String>() {{
+                    HttpResponse response = client.post(redirect, new HashMap<String, String>() {{
                         put("buttonClicked", "4");
                         put("err_flag", "0");
                         put("err_msg", "");
@@ -96,7 +96,7 @@ public class MAInet extends Provider {
                         put("network_name", "Guest+Network");
                         put("username", login);
                         put("password", password);
-                    }}, pref_retry_count);
+                    }}).setTries(pref_retry_count).execute();
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
@@ -136,7 +136,7 @@ public class MAInet extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(HttpResponse response) {
         try {
             return response.parseAnyRedirect().contains("wifi.mai.ru");
         } catch (ParseException ex1) {

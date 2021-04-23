@@ -110,7 +110,7 @@ public class CachedRetriever {
 
         // Try to retrieve content from server
         try {
-            ParsedResponse response = client.get(url, null);
+            HttpResponse response = client.get(url).execute();
 
             if (response.getResponseCode() != 200) {
                 throw new IOException("Invalid response: " + response.getResponseCode());

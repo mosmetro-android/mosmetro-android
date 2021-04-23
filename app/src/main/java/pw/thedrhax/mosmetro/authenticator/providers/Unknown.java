@@ -25,7 +25,7 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -40,7 +40,7 @@ import pw.thedrhax.util.Logger;
 
 public class Unknown extends Provider {
 
-    public Unknown(final Context context, final ParsedResponse response) {
+    public Unknown(final Context context, final HttpResponse response) {
         super(context);
 
         /**

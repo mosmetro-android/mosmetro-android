@@ -37,7 +37,7 @@ import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2mcc;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
@@ -92,7 +92,7 @@ public abstract class Provider extends LinkedList<Task> {
      *
      * @see Client
      */
-    @NonNull public static Provider find(Context context, ParsedResponse response) {
+    @NonNull public static Provider find(Context context, HttpResponse response) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
@@ -114,7 +114,7 @@ public abstract class Provider extends LinkedList<Task> {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-        ParsedResponse response = new Gen204(context, running).check().getResponse();
+        HttpResponse response = new Gen204(context, running).check().getResponse();
         Provider result = Provider.find(context, response);
         return result;
     }
@@ -160,7 +160,7 @@ public abstract class Provider extends LinkedList<Task> {
      * Checks ParsedResponse to be a valid generate_204 response.
      * @return True if generate_204 response is valid; otherwise, false is returned.
      */
-    protected static boolean isConnected(ParsedResponse response) {
+    protected static boolean isConnected(HttpResponse response) {
         return response.getResponseCode() == 204;
     }
 

@@ -30,10 +30,7 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
@@ -48,7 +45,7 @@ import pw.thedrhax.util.Logger;
 public class MosMetroV1 extends Provider {
     protected String redirect;
 
-    public MosMetroV1(final Context context, final ParsedResponse res) {
+    public MosMetroV1(final Context context, final HttpResponse res) {
         super(context);
 
         /**
@@ -58,7 +55,7 @@ public class MosMetroV1 extends Provider {
          */
         add(new InitialConnectionCheckTask(this, res) {
             @Override
-            public boolean handle_response(HashMap<String, Object> vars, ParsedResponse response) {
+            public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
                     redirect = response.parseAnyRedirect();
                 } catch (ParseException ex) {
@@ -81,10 +78,10 @@ public class MosMetroV1 extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                ParsedResponse response;
+                HttpResponse response;
 
                 try {
-                    response = client.get(redirect, null, pref_retry_count);
+                    response = client.get(redirect).setTries(pref_retry_count).execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -102,7 +99,7 @@ public class MosMetroV1 extends Provider {
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }
-                vars.put("form", ParsedResponse.parseForm(forms.first()));
+                vars.put("form", HttpResponse.parseForm(forms.first()));
                 return true;
             }
         });
@@ -116,7 +113,7 @@ public class MosMetroV1 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 try {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
-                    client.post(redirect, form, pref_retry_count);
+                    client.post(redirect, form).setTries(pref_retry_count).execute();
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -153,7 +150,7 @@ public class MosMetroV1 extends Provider {
      * @param response  Instance of ParsedResponse.
      * @return          True if response matches this Provider implementation.
      */
-    public static boolean match(ParsedResponse response) {
+    public static boolean match(HttpResponse response) {
         try {
             return response.parseAnyRedirect().contains("login.wi-fi.ru");
         } catch (ParseException ex) {

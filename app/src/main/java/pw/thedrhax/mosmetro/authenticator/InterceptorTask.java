@@ -23,11 +23,11 @@ import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.ParsedResponse;
+import pw.thedrhax.mosmetro.httpclient.HttpRequest;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 
 public abstract class InterceptorTask implements Task {
     private final Pattern pattern;
@@ -49,12 +49,12 @@ public abstract class InterceptorTask implements Task {
     }
 
     @Nullable
-    public ParsedResponse request(Client client, Client.METHOD method, String url, Map<String,String> params) throws IOException {
+    public HttpResponse request(Client client, HttpRequest request) throws IOException {
         return null;
     }
 
     @NonNull
-    public ParsedResponse response(Client client, String url, ParsedResponse response) throws IOException {
+    public HttpResponse response(Client client, HttpRequest request, HttpResponse response) throws IOException {
         return response;
     }
 
