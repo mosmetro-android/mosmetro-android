@@ -48,7 +48,7 @@ class ProviderMetrics {
     @SuppressLint("StaticFieldLeak")
     public boolean end(HashMap<String, Object> vars) {
         String branch = (String)vars.get("branch");
-        if ("unknown".equals(branch) || "metro-ruckus".equals("branch")) {
+        if ("unknown".equals(branch)) {
             Logger.report("MMV2 branch: " + branch);
         }
 
