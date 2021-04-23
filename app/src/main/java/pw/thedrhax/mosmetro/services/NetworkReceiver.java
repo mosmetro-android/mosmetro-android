@@ -58,11 +58,6 @@ public class NetworkReceiver extends BroadcastReceiver implements Logger.Metadat
         if (intent == null || intent.getAction() == null)
             return;
 
-        // Stop if automatic connection is disabled in settings
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!settings.getBoolean("pref_autoconnect", true))
-            return;
-
         // If Wi-Fi is disabled, stop ConnectionService immediately
         WifiUtils wifi = new WifiUtils(context);
         if (!wifi.isEnabled()) {
@@ -70,6 +65,11 @@ public class NetworkReceiver extends BroadcastReceiver implements Logger.Metadat
             stopService();
             return;
         }
+
+        // Stop if automatic connection is disabled in settings
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!settings.getBoolean("pref_autoconnect", true))
+            return;
 
         SupplicantState state = null;
 

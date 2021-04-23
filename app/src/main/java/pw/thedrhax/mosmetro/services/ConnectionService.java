@@ -71,6 +71,7 @@ public class ConnectionService extends IntentService {
     private int pref_ip_wait;
     private int pref_internet_check_interval;
     private boolean pref_internet_check;
+    private boolean pref_manual_connection_monitoring;
     private boolean pref_midsession;
     private boolean pref_notify_foreground;
 
@@ -96,6 +97,7 @@ public class ConnectionService extends IntentService {
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
         pref_internet_check = settings.getBoolean("pref_internet_check", true);
+        pref_manual_connection_monitoring = settings.getBoolean("pref_manual_connection_monitoring", true);
         pref_midsession = settings.getBoolean("pref_internet_check_midsession", true);
         pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
@@ -131,20 +133,16 @@ public class ConnectionService extends IntentService {
                 .locked(pref_notify_foreground);
     }
 
-    public boolean isFromDebug() {
-        return from_debug;
-    }
-
     private void notify (Provider.RESULT result) {
         notify.hideProgress();
 
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                boolean enabled = !pref_notify_foreground;
-                enabled &= !settings.getBoolean("pref_notify_success", true);
+                boolean enabled = pref_notify_foreground;
+                enabled |= settings.getBoolean("pref_notify_success", true);
 
-                if (enabled || from_debug) {
+                if (!enabled || (from_debug && !pref_manual_connection_monitoring)) {
                     notify.hide();
                     break;
                 }
@@ -153,7 +151,7 @@ public class ConnectionService extends IntentService {
                     notify.locked(true);
                 }
 
-                if (from_shortcut) {
+                if (from_shortcut && !pref_manual_connection_monitoring) {
                     // TODO: Auto cancel this notification after 30 seconds
                     notify.id(2) // protect this notification from removing
                             .cancelOnClick(true)
@@ -212,7 +210,7 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean waitForIP() {
-        if (from_shortcut) return true;
+        if (wifi.getIP() != 0) return true;
 
         int count = 0;
 
@@ -446,7 +444,7 @@ public class ConnectionService extends IntentService {
         }
 
         // Apply random delay
-        if (!from_debug && !settings.getBoolean("pref_delay_always", false)) {
+        if (!from_shortcut && !settings.getBoolean("pref_delay_always", false)) {
             Logger.log(getString(R.string.notification_progress_waiting));
             notify.title(getString(R.string.notification_progress_waiting))
                     .progress(0, true)
@@ -502,7 +500,7 @@ public class ConnectionService extends IntentService {
                 ignore_midsession = false;
                 isConnected(gen_204, gen_204.getLastResult());
 
-                if (!from_shortcut) break;
+                if (!from_shortcut || pref_manual_connection_monitoring) break;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
                 running.set(false);
