@@ -280,7 +280,7 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new WaitTask(this, context.getString(R.string.auth_webview_page_wait)) {
             @Override
             public boolean until(HashMap<String, Object> vars) {
-                return auth_page.matcher(wv.getURL()).matches();
+                return auth_page.matcher(wv.getUrl()).matches();
             }
         }.timeout(60000));
 
@@ -301,7 +301,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     return res_204.isConnected() && !res_204.isFalseNegative();
                 }
 
-                return !auth_page.matcher(wv.getURL()).matches();
+                return !auth_page.matcher(wv.getUrl()).matches();
             }
         }.timeout(120000));
 
