@@ -243,7 +243,11 @@ public class HttpResponse {
 
     @NonNull
     public JSONObject json() throws org.json.simple.parser.ParseException {
-        return (JSONObject) new JSONParser().parse(getPage());
+        if (html != null) {
+            return (JSONObject) new JSONParser().parse(getPage());
+        } else {
+            throw new org.json.simple.parser.ParseException(0);
+        }
     }
 
     @NonNull
