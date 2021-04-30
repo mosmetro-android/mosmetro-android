@@ -138,7 +138,7 @@
         and register with your phone number to get SMS with further instructions.
         It is only required the first time, after that application will work normally.\n
         Disclaimer: This application developer has nothing to do with registration.
-        Registration is required by MaximaTelecom ISP (http://maximatelecom.ru).
+        Registration is required by the ISP.
     </string>
     <string name="auth_error_mainet_credentials">
         Login and password are required to connect to this network. Please check \"MAInet settings\" in \"Connection settings\" menu.

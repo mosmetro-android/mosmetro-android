@@ -30,6 +30,7 @@ import java.util.List;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.AuthLastochkaCenter;
 import pw.thedrhax.mosmetro.authenticator.providers.Enforta;
+import pw.thedrhax.mosmetro.authenticator.providers.HotspotSzimc;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
@@ -98,6 +99,7 @@ public abstract class Provider extends LinkedList<Task> {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (AuthLastochkaCenter.match(response)) return new AuthLastochkaCenter(context, response);
+        else if (HotspotSzimc.match(response)) return new HotspotSzimc(context, response);
         else if (MosMetroV3.match(response, settings)) return new MosMetroV3(context, response);
         else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
