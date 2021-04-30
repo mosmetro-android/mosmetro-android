@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.BuildConfig;
+import pw.thedrhax.mosmetro.authenticator.providers.AuthLastochkaCenter;
+import pw.thedrhax.mosmetro.authenticator.providers.HotspotSzimc;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
 import pw.thedrhax.util.Logger;
@@ -50,6 +52,10 @@ class ProviderMetrics {
         String branch = (String)vars.get("branch");
         if ("unknown".equals(branch)) {
             Logger.report("MMV2 branch: " + branch);
+        }
+
+        if (p instanceof AuthLastochkaCenter || p instanceof HotspotSzimc) {
+            Logger.report("Lastochka " + p.getName());
         }
 
         boolean connected;
