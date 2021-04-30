@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.authenticator.providers;
 
-
 import android.content.Context;
 import android.net.Uri;
 
@@ -71,7 +70,7 @@ public class AuthLastochkaCenter extends Provider {
 
                 vars.put("mac", uri.getQueryParameter("mac"));
 
-                return false;
+                return true;
             }
         });
 
