@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +137,6 @@ public abstract class Client {
                         response = i.request(this, request);
 
                         if (response != null) {
-                            Logger.log(this, "Request intercepted by " + i.toString());
                             break;
                         }
                     }
@@ -152,7 +150,6 @@ public abstract class Client {
             for (InterceptorTask i : interceptors) {
                 if (i.match(request.getUrl())) {
                     response = i.response(this, request, response);
-                    Logger.log(this, "Response intercepted by " + i.toString());
                 }
             }
         } finally {
