@@ -59,8 +59,8 @@ public class WebViewService extends Service {
         setContentView(R.layout.webview_activity);
         Client client = new OkHttp(this).setRunningListener(running);
         webview = (WebView)view.findViewById(R.id.webview);
-        webviewclient = new InterceptedWebViewClient(this, client);
-        webviewclient.setup(webview);
+        webviewclient = new InterceptedWebViewClient(this, client, webview);
+        webviewclient.setup();
     }
 
     private void setContentView(@LayoutRes int layoutResID) {
@@ -90,7 +90,7 @@ public class WebViewService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        webviewclient.onDestroy(webview);
+        webviewclient.onDestroy();
         webview = null;
         if (view != null && wm != null) {
             wm.removeView(view);

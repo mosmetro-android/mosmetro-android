@@ -77,13 +77,16 @@ public class InterceptedWebViewClient extends WebViewClient {
 
     private Context context;
     private Randomizer random;
+    private WebView webview;
     private Client client = null;
     private String next_referer;
     private String referer;
 
-    public InterceptedWebViewClient(Context context, Client client) {
+    public InterceptedWebViewClient(Context context, Client client, WebView webview) {
         this.context = context;
-        random = new Randomizer(context);
+        this.random = new Randomizer(context);
+        this.webview = webview;
+
         key = random.string(25).toLowerCase();
 
         try {
@@ -99,7 +102,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public void setup(WebView webview) {
+    public void setup() {
         webview.setWebViewClient(this);
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -141,7 +144,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         }
     }
 
-    public void onDestroy(WebView webview) {
+    public void onDestroy() {
         webview.stopLoading();
 
         // Avoid WebView leaks
