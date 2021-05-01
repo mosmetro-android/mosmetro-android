@@ -128,7 +128,7 @@ public class MosMetroV2WV extends WebViewProvider {
 
                     try {
                         HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
-                        Logger.log(Logger.LEVEL.DEBUG, response.getPage());
+                        Logger.log(Logger.LEVEL.DEBUG, response.toString());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
                     }

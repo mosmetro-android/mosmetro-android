@@ -49,13 +49,12 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.DnsClient;
 import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
@@ -218,7 +217,7 @@ public class OkHttp extends Client {
         }
 
         last_call = client.newCall(builder.build());
-        return parse(request, last_call.execute());
+        return new HttpResponse(request, last_call.execute());
     }
 
     @Override
@@ -226,19 +225,6 @@ public class OkHttp extends Client {
         if (last_call != null) {
             last_call.cancel();
         }
-    }
-
-    private HttpResponse parse(HttpRequest request, Response response) throws IOException {
-        ResponseBody body = response.body();
-
-        if (body == null) {
-            throw new IOException("Response body is null! Code: " + response.code());
-        }
-
-        return new HttpResponse(
-                request, body.bytes(), response.code(), response.message(),
-                response.headers().toMultimap()
-        );
     }
 
     private class InterceptedCookieJar implements CookieJar {

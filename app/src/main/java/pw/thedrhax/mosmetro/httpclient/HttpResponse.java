@@ -37,25 +37,61 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 public class HttpResponse {
+    public static final LinkedList<String> PARSED_TYPES = new LinkedList<String>() {{
+        add("text/html");
+        add("text/plain");
+        add("text/xml");
+
+        add("application/x-www-form-urlencoded");
+        add("application/json");
+        add("application/xml");
+        add("application/xhtml+xml");
+    }};
+
     public final Headers headers = new Headers();
 
     private HttpRequest request;
-    private byte[] bytes;
+    private InputStream stream;
     private int code;
     private String reason;
 
-    private String html;
+    private String body;
     private Document document;
 
     public static HttpResponse EMPTY(Client client) {
         return new HttpResponse(new HttpRequest(client, Client.METHOD.GET, ""), "");
     }
 
-    public HttpResponse(@NonNull HttpRequest request, @NonNull byte[] bytes, int code, String reason,
+    public HttpResponse(@NonNull HttpRequest request, @NonNull Response response) throws IOException {
+        this.request = request;
+        this.code = response.code();
+        this.reason = response.message();
+
+        ResponseBody body = response.body();
+        if (body == null) {
+            throw new IOException("Response body is null! Code: " + code);
+        }
+
+        this.headers.putAll(response.headers().toMultimap());
+
+        if (PARSED_TYPES.contains(this.headers.getMimeType())) {
+            this.body = body.string();
+
+            if (!this.body.isEmpty() && this.headers.getMimeType().contains("text/html")) {
+                document = Jsoup.parse(this.body, getUrl());
+            }
+        } else {
+            this.stream = body.byteStream();
+        }
+    }
+
+    public HttpResponse(@NonNull HttpRequest request, @NonNull String body, int code, String reason,
                         @Nullable Headers headers) {
         this.request = request;
-        this.bytes = bytes;
         this.code = code;
         this.reason = reason;
 
@@ -63,31 +99,27 @@ public class HttpResponse {
             this.headers.putAll(headers);
         }
 
-        try {
-            body = new String(bytes, headers.getEncoding());
-        } catch (UnsupportedEncodingException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-        }
+        this.body = body;
 
-        if (body != null && !body.isEmpty() && headers.getMimeType().contains("text/html")) {
+        if (!body.isEmpty() && this.headers.getMimeType().contains("text/html")) {
             document = Jsoup.parse(body, getUrl());
         }
     }
 
     public HttpResponse(HttpRequest request, String content, String contentType) {
-        this(request, content.getBytes(), 200, "OK", new Headers() {{
+        this(request, content, 200, "OK", new Headers() {{
             setHeader(Headers.CONTENT_TYPE, contentType);
             setHeader(Headers.ACAO, "*");
         }});
     }
 
-    public HttpResponse(HttpRequest request, String html) {
-        this(request, html, "text/html; charset=utf-8");
+    public HttpResponse(HttpRequest request, String body) {
+        this(request, body, "text/html; charset=utf-8");
     }
 
     @NonNull
     public String getPage() {
-        return html;
+        return body != null ? body : "";
     }
 
     @NonNull
@@ -111,18 +143,25 @@ public class HttpResponse {
         return document != null ? document : Jsoup.parse("<html></html>");
     }
 
-    @NonNull
-    public byte[] getBytes() {
-        if (document != null) {
-            return document.outerHtml().getBytes();
-        } else {
-            return bytes;
-        }
-    }
-
     @Nullable
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(getBytes());
+        if (stream != null) {
+            return stream;
+        }
+
+        if (document != null) {
+            return new ByteArrayInputStream(document.toString().getBytes());
+        }
+
+        if (body != null) {
+            return new ByteArrayInputStream(body.getBytes());
+        }
+
+        return null;
+    }
+
+    public boolean isStream() {
+        return stream != null;
     }
 
     public HttpRequest getRequest() {
@@ -187,11 +226,7 @@ public class HttpResponse {
 
     @NonNull
     public JSONObject json() throws org.json.simple.parser.ParseException {
-        if (html != null) {
-            return (JSONObject) new JSONParser().parse(getPage());
-        } else {
-            throw new org.json.simple.parser.ParseException(0);
-        }
+        return (JSONObject) new JSONParser().parse(getPage());
     }
 
     @NonNull
