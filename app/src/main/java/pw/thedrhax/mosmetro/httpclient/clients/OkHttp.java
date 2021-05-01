@@ -53,6 +53,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.DnsClient;
+import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.WifiUtils;
@@ -181,35 +182,35 @@ public class OkHttp extends Client {
                 break;
             case POST:
                 builder = builder.post(RequestBody.create(
-                        MediaType.parse(request.getContentType()),
+                        MediaType.parse(request.headers.getContentType()),
                         request.getBody()
                 ));
         }
 
         // Populate headers
-        Map<String,List<String>> reqHeaders = request.getHeaders();
+        Headers headers = new Headers();
+        headers.putAll(request.headers);
+        headers.remove(Headers.CONTENT_TYPE); // Already set in builder
 
         for (String name : headers.keySet()) {
-            if (!reqHeaders.containsKey(name.toLowerCase())) {
-                builder.addHeader(name, getHeader(name));
-            }
-        }
+            List<String> header = headers.get(name);
 
-        for (String name : reqHeaders.keySet()) {
-            for (String value : request.getHeader(name)) {
+            if (header == null) continue;
+
+            for (String value : header) {
                 builder.addHeader(name, value);
             }
         }
 
         // Upgrade-Insecure-Requests
         if (request.getUrl().contains("http://")) {
-            builder.addHeader(Client.HEADER_UPGRADE_INSECURE_REQUESTS, "1");
+            builder.addHeader(Headers.UPGRADE_INSECURE_REQUESTS, "1");
         }
 
         // Accept
         String accept = Client.acceptByExtension(request.getUrl());
         if (!accept.isEmpty()) {
-            builder.addHeader(Client.HEADER_ACCEPT, accept);
+            builder.addHeader(Headers.ACCEPT, accept);
         }
 
         if (context != null && context.getApplicationContext() != null) {

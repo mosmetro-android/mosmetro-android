@@ -211,7 +211,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     }
 
     private WebResourceResponse webresponse(@NonNull HttpResponse response) {
-        if (response.getMimeType().contains("text/html") && !response.getUrl().isEmpty()) {
+        if (response.isHtml() && !response.getUrl().isEmpty()) {
             Logger.log(this, response.toString());
         }
 
@@ -226,18 +226,19 @@ public class InterceptedWebViewClient extends WebViewClient {
         }
 
         WebResourceResponse result = new WebResourceResponse(
-                response.getMimeType(),
-                response.getEncoding(),
+                response.headers.getMimeType(),
+                response.headers.getEncoding(),
                 response.getInputStream()
         );
 
         if (Build.VERSION.SDK_INT >= 21) {
             result.setResponseHeaders(new HashMap<String, String>() {{
-                Map<String,List<String>> headers = response.getHeaders();
-                for (String name : headers.keySet()) {
-                    if (headers.get(name) != null && headers.get(name).size() == 1) {
-                        put(name, headers.get(name).get(0));
+                for (String name : response.headers.keySet()) {
+                    if (name.equalsIgnoreCase(Headers.CSP)) {
+                        continue;
                     }
+
+                    put(name, response.headers.getFirst(name));
                 }
             }});
 
@@ -257,7 +258,7 @@ public class InterceptedWebViewClient extends WebViewClient {
             Uri uri = Uri.parse(url);
             url = uri.getQueryParameter("url");
 
-            HashMap<String, List<String>> headers = new HashMap<>();
+            Headers headers = new Headers();
 
             try {
                 JSONParser parser = new JSONParser();
@@ -265,9 +266,7 @@ public class InterceptedWebViewClient extends WebViewClient {
 
                 if (rawHeaders != null) {
                     for (Object key : rawHeaders.keySet()) {
-                        headers.put((String) key, new LinkedList<String>() {{
-                            add((String) rawHeaders.get(key));
-                        }});
+                        headers.setHeader((String) key, (String) rawHeaders.get(key));
                     }
                 }
             } catch (ParseException | ClassCastException ex) {
@@ -277,16 +276,18 @@ public class InterceptedWebViewClient extends WebViewClient {
 
             String type = "text/plain";
 
-            if (headers.containsKey(Client.HEADER_CONTENT_TYPE)) {
-                type = headers.get(Client.HEADER_CONTENT_TYPE).get(0);
+            if (headers.containsKey(Headers.CONTENT_TYPE)) {
+                type = headers.getFirst(Headers.CONTENT_TYPE);
+                headers.remove(Headers.CONTENT_TYPE);
             }
 
             String body = uri.getQueryParameter("body");
 
             Logger.log(this, "POST " + url);
-            Logger.log(this, body);
 
-            return client.post(url, body, type).execute();
+            HttpRequest request = client.post(url, body, type);
+            request.headers.putAll(headers);
+            return request.execute();
         } else {
             Logger.log(this, "GET " + url);
             return client.get(url).execute();
@@ -302,7 +303,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         );
 
         if (referer != null) {
-            client.setHeader(Client.HEADER_REFERER, referer);
+            client.headers.setHeader(Headers.REFERER, referer);
         }
 
         if ("about:blank".equals(url)) return null;

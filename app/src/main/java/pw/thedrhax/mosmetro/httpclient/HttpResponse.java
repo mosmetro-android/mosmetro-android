@@ -29,22 +29,21 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import pw.thedrhax.util.Logger;
-
 public class HttpResponse {
+    public final Headers headers = new Headers();
+
     private HttpRequest request;
     private byte[] bytes;
     private int code;
     private String reason;
-    private Map<String,List<String>> headers = new HashMap<>();
 
     private String html;
     private Document document;
@@ -54,7 +53,7 @@ public class HttpResponse {
     }
 
     public HttpResponse(@NonNull HttpRequest request, @NonNull byte[] bytes, int code, String reason,
-                        @Nullable Map<String,List<String>> headers) {
+                        @Nullable Headers headers) {
         this.request = request;
         this.bytes = bytes;
         this.code = code;
@@ -65,24 +64,20 @@ public class HttpResponse {
         }
 
         try {
-            html = new String(bytes, getEncoding());
+            body = new String(bytes, headers.getEncoding());
         } catch (UnsupportedEncodingException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
         }
 
-        if (html != null && !html.isEmpty() && getMimeType().contains("text/html")) {
-            document = Jsoup.parse(html, getUrl());
+        if (body != null && !body.isEmpty() && headers.getMimeType().contains("text/html")) {
+            document = Jsoup.parse(body, getUrl());
         }
     }
 
-    public HttpResponse(HttpRequest request, String content, String content_type) {
-        this(request, content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
-            put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
-                add(content_type);
-            }});
-            put(Client.HEADER_ACAO.toLowerCase(), new LinkedList<String>() {{
-                add("*");
-            }});
+    public HttpResponse(HttpRequest request, String content, String contentType) {
+        this(request, content.getBytes(), 200, "OK", new Headers() {{
+            setHeader(Headers.CONTENT_TYPE, contentType);
+            setHeader(Headers.ACAO, "*");
         }});
     }
 
@@ -108,63 +103,12 @@ public class HttpResponse {
         return reason;
     }
 
-    public Map<String,List<String>> getHeaders() {
-        return headers;
-    }
-
-    @Nullable
-    public String getResponseHeader(String name) {
-        if (headers.get(name.toLowerCase()) != null) {
-            return headers.get(name.toLowerCase()).get(0);
-        } else {
-            return null;
-        }
-    }
-
-    public HttpResponse setResponseHeader(String name, List<String> values) {
-        headers.put(name, values);
-        return this;
-    }
-
-    public HttpResponse setResponseHeader(String name, String value) {
-        return setResponseHeader(name, new LinkedList<String>() {{
-            add(value);
-        }});
-    }
-
     public boolean isHtml() {
         return document != null;
     }
 
     public Document getPageContent() {
         return document != null ? document : Jsoup.parse("<html></html>");
-    }
-
-    @NonNull
-    public String getContentType() {
-        if (headers.containsKey(Client.HEADER_CONTENT_TYPE.toLowerCase())) {
-            return headers.get(Client.HEADER_CONTENT_TYPE.toLowerCase()).get(0);
-        } else {
-            return "text/plain";
-        }
-    }
-
-    @NonNull
-    public String getMimeType() {
-        return getContentType().split("; ")[0];
-    }
-
-    @NonNull
-    public String getEncoding() {
-        String content_type = getContentType();
-
-        for (String param : content_type.split(";")) {
-            if (param.contains("charset")) {
-                return param.split("charset=")[1];
-            }
-        }
-
-        return "utf-8";
     }
 
     @NonNull
@@ -252,10 +196,10 @@ public class HttpResponse {
 
     @NonNull
     public String get300Redirect() throws ParseException {
-        String link = getResponseHeader(Client.HEADER_LOCATION);
+        String link = headers.getFirst(Headers.LOCATION);
 
         if (link == null || link.isEmpty()) {
-            throw new ParseException("302 redirect is empty", 0);
+            throw new ParseException("Location header is not present", 0);
         }
 
         // Workaround for auth.wi-fi.ru[/]?segment=
@@ -271,11 +215,11 @@ public class HttpResponse {
         return base_uri.getScheme() + "://" + base_uri.getHost();
     }
 
-    private static String absolutePathToUrl(String base_url, String path) throws ParseException {
-        String base = removePathFromUrl(base_url);
+    public static String absolutePathToUrl(String baseUrl, String path) throws ParseException {
+        String base = removePathFromUrl(baseUrl);
 
         if (path.startsWith("//")) {
-            return Uri.parse(base_url).getScheme() + ":" + path;
+            return Uri.parse(baseUrl).getScheme() + ":" + path;
         } else if (path.startsWith("/")) {
             return base + path;
         } else if (path.startsWith("http")) {
@@ -304,8 +248,12 @@ public class HttpResponse {
         builder.append("URL: ").append(" ").append(request.getUrl()).append("\n");
         builder.append(code).append(' ').append(reason).append("\n");
 
-        for (String header : headers.keySet()) {
-            for (String value : headers.get(header)) {
+        for (String name : headers.keySet()) {
+            List<String> header = headers.get(name);
+
+            if (header == null) continue;
+
+            for (String value : header) {
                 builder.append(header).append(": ").append(value).append("\n");
             }
         }

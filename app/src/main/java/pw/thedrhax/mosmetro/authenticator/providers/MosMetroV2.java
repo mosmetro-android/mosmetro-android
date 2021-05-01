@@ -37,6 +37,7 @@ import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
@@ -214,7 +215,7 @@ public class MosMetroV2 extends Provider {
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
-                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+                    client.headers.setHeader(Headers.CSRF, csrf_token);
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }

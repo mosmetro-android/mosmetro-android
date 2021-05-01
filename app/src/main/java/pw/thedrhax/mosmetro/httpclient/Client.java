@@ -43,21 +43,10 @@ import pw.thedrhax.util.Util;
 public abstract class Client {
     public enum METHOD { GET, POST }
 
-    public static final String HEADER_ACCEPT = "Accept";
-    public static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
-    public static final String HEADER_ACAO = "Access-Control-Allow-Origin";
-    public static final String HEADER_ACAC = "Access-Control-Allow-Credentials";
-    public static final String HEADER_USER_AGENT = "User-Agent";
-    public static final String HEADER_REFERER = "Referer";
-    public static final String HEADER_CSRF = "X-CSRF-Token";
-    public static final String HEADER_LOCATION = "Location";
-    public static final String HEADER_CONTENT_TYPE = "Content-Type";
-    public static final String HEADER_UPGRADE_INSECURE_REQUESTS = "Upgrade-Insecure-Requests";
-
     public final List<InterceptorTask> interceptors = new LinkedList<>();
+    public final Headers headers;
 
     private boolean intercepting = false;
-    protected Map<String,String> headers;
     private boolean followRedirects = true;
     protected Context context;
     protected Randomizer random;
@@ -66,7 +55,7 @@ public abstract class Client {
 
     protected Client(Context context) {
         this.context = context;
-        this.headers = new HashMap<>();
+        this.headers = new Headers();
         this.random = new Randomizer(context);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -82,8 +71,8 @@ public abstract class Client {
 
     public Client configure() {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
-        setHeader(HEADER_USER_AGENT, random.cached_useragent());
-        setHeader(HEADER_ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+        headers.setHeader(Headers.USER_AGENT, random.cached_useragent());
+        headers.setHeader(Headers.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
         return this;
     }
 
@@ -102,18 +91,6 @@ public abstract class Client {
                    "application/xml;q=0.9,image/webp," +
                    "image/apng,*/*;q=0.8";
         }
-    }
-
-    public Client setHeader (String name, String value) {
-        headers.put(name, value); return this;
-    }
-
-    public String getHeader (String name) {
-        return headers.containsKey(name) ? headers.get(name) : null;
-    }
-
-    public Client resetHeaders () {
-        headers = new HashMap<>(); return this;
     }
 
     public Client setDelaysEnabled(boolean enabled) {
@@ -186,12 +163,8 @@ public abstract class Client {
             return new HttpResponse(request, "");
         }
 
-        String type = response.getResponseHeader(HEADER_CONTENT_TYPE.toLowerCase());
-
-        if (type != null && type.startsWith("text/html")) {
-            if (!response.getUrl().isEmpty()) {
-                setHeader(Client.HEADER_REFERER, response.getUrl());
-            }
+        if (response.isHtml() && !response.getUrl().isEmpty()) {
+            headers.setHeader(Headers.REFERER, response.getUrl());
         }
 
         return response;
@@ -232,7 +205,7 @@ public abstract class Client {
 
                 // Keep POST method and request body if response code is not "303 See Other"
                 if (res.getResponseCode() != 303 && tmpReq.getMethod() == METHOD.POST) {
-                    tmpReq = post(redirect, request.getBody(), request.getContentType());
+                    tmpReq = post(redirect, request.getBody(), request.headers.getContentType());
                 } else {
                     tmpReq = get(redirect);
                 }

@@ -27,7 +27,6 @@ import androidx.annotation.Nullable;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import pw.thedrhax.mosmetro.R;
@@ -40,9 +39,9 @@ import pw.thedrhax.mosmetro.authenticator.WaitTask;
 import pw.thedrhax.mosmetro.authenticator.WebViewProvider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
-import pw.thedrhax.mosmetro.httpclient.Client.METHOD;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -203,7 +202,7 @@ public class MosMetroV2WV extends WebViewProvider {
                 try {
                     String csrf_token = response.parseMetaContent("csrf-token");
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token: " + csrf_token);
-                    client.setHeader(Client.HEADER_CSRF, csrf_token);
+                    client.headers.setHeader(Headers.CSRF, csrf_token);
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, "CSRF token not found");
                 }
