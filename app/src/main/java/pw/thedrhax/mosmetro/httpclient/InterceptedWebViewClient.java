@@ -52,7 +52,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.util.Listener;
@@ -99,42 +98,6 @@ public class InterceptedWebViewClient extends WebViewClient {
         });
 
         setClient(client);
-    }
-
-    public Map<String, String> getCookies(String url) {
-        Map<String, String> result = new HashMap<>();
-
-        String cookie_string = CookieManager.getInstance().getCookie(url);
-        if (cookie_string != null) {
-            String[] cookies = cookie_string.split("; ");
-            for (String cookie : cookies) {
-                String[] name_value = cookie.split("=");
-                result.put(name_value[0], name_value.length > 1 ? name_value[1] : "");
-            }
-        }
-
-        return result;
-    }
-
-    public void setCookies(String url, Map<String, String> cookies) {
-        CookieManager manager = CookieManager.getInstance();
-
-        CookieSyncManager syncmanager = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            syncmanager = CookieSyncManager.createInstance(context);
-            syncmanager.startSync();
-        }
-
-        for (String name : cookies.keySet()) {
-            manager.setCookie(url, name + "=" + cookies.get(name));
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            syncmanager.stopSync();
-            syncmanager.sync();
-        } else {
-            manager.flush();
-        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -309,9 +272,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         if ("about:blank".equals(url)) return null;
 
         try {
-            client.setCookies(url, getCookies(url));
             result = webresponse(getToPost(url));
-            setCookies(url, client.getCookies(url));
         } catch (UnknownHostException ex) {
             onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
             return result;

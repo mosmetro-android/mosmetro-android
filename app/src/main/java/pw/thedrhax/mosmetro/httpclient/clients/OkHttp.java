@@ -20,6 +20,9 @@ package pw.thedrhax.mosmetro.httpclient.clients;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -29,6 +32,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -228,35 +232,51 @@ public class OkHttp extends Client {
     }
 
     private class InterceptedCookieJar implements CookieJar {
-        private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
+        private final CookieManager manager;
+        private final CookieSyncManager syncmanager;
 
-        private HttpUrl getHost (HttpUrl url) {
-            return HttpUrl.parse("http://" + url.host());
+        public InterceptedCookieJar() {
+            manager = CookieManager.getInstance();
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                syncmanager = CookieSyncManager.createInstance(context);
+            } else {
+                syncmanager = null;
+            }
         }
 
         @Override
         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-            HttpUrl host = getHost(url);
-            List<Cookie> url_cookies = loadForRequest(host);
-            for (Cookie cookie : cookies) {
-                List<Cookie> for_deletion = new ArrayList<>();
-                for (Cookie old_cookie : url_cookies) {
-                    if (cookie.name().equals(old_cookie.name()))
-                        for_deletion.add(old_cookie);
-                }
-                for (Cookie old_cookie : for_deletion) {
-                    url_cookies.remove(old_cookie);
-                }
-                url_cookies.add(cookie);
+            if (syncmanager != null) {
+                syncmanager.startSync();
             }
-            this.cookies.put(host, url_cookies);
+
+            for (Cookie cookie : cookies) {
+                manager.setCookie(url.toString(), cookie.toString());
+            }
+
+            if (syncmanager != null) {
+                syncmanager.stopSync();
+                syncmanager.sync();
+            }
         }
 
         @Override
         public List<Cookie> loadForRequest(HttpUrl url) {
-            HttpUrl host = getHost(url);
-            List<Cookie> url_cookies = cookies.get(host);
-            return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
+            String rawCookies = manager.getCookie(url.toString());
+
+            if (rawCookies == null) {
+                return new LinkedList<>();
+            }
+
+            String[] rawCookiesList = rawCookies.split("; ");
+            List<Cookie> result = new LinkedList<>();
+
+            for (String cookie : rawCookiesList) {
+                result.add(Cookie.parse(url, cookie));
+            }
+
+            return result;
         }
     }
 }
