@@ -311,6 +311,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if ("POST".equals(request.getMethod())) {
             Logger.log(this, "WARNING: Cannot intercept POST request to " + request.getUrl());
+            return null;
         }
 
         return super.shouldInterceptRequest(view, request);
