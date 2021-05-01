@@ -98,6 +98,18 @@ public class InterceptedWebViewClient extends WebViewClient {
             throw new RuntimeException("Unable to read assets");
         }
 
+        interceptors.add(new InterceptorTask(".*") {
+            @NonNull @Override
+            public HttpResponse response(Client client, HttpRequest request, HttpResponse response) throws IOException {
+                try {
+                    String redirect = response.get300Redirect();
+                    return new HttpResponse(request, "<meta http-equiv=\"refresh\" content=\"0;URL=" + redirect + "\">");
+                } catch (java.text.ParseException ignored) {}
+
+                return super.response(client, request, response);
+            }
+        });
+
         setClient(client);
     }
 
