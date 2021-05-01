@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import android.content.Context;
 import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
@@ -71,7 +70,7 @@ public class Gen204 {
 
         client = new OkHttp(context)
                 .customDnsEnabled(true)
-                .followRedirects(false)
+                .setFollowRedirects(false)
                 .setRunningListener(this.running);
 
         random = new Randomizer(context);

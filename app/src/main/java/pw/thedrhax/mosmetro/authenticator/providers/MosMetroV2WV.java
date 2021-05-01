@@ -185,9 +185,9 @@ public class MosMetroV2WV extends WebViewProvider {
         add(new InterceptorTask(auth_page) {
             @Nullable @Override
             public HttpResponse request(Client client, HttpRequest request) throws IOException {
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
                 HttpResponse response = request.setTries(pref_retry_count).execute();
-                client.followRedirects(true);
+                client.setFollowRedirects(true);
                 return response;
             }
 

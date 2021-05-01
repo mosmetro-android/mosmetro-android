@@ -67,6 +67,8 @@ public class OkHttp extends Client {
         wifi = new WifiUtils(context);
 
         client = new OkHttpClient.Builder()
+                .followRedirects(false)
+                .followSslRedirects(false)
                 .cookieJar(new InterceptedCookieJar())
                 .build();
 
@@ -145,16 +147,6 @@ public class OkHttp extends Client {
                 .connectTimeout(ms, TimeUnit.MILLISECONDS)
                 .readTimeout(ms, TimeUnit.MILLISECONDS)
                 .writeTimeout(ms, TimeUnit.MILLISECONDS)
-                .build();
-
-        return this;
-    }
-
-    @Override
-    public Client followRedirects(boolean follow) {
-        client = client.newBuilder()
-                .followRedirects(follow)
-                .followSslRedirects(follow)
                 .build();
 
         return this;

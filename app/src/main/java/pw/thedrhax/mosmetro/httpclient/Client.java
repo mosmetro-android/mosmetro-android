@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +58,7 @@ public abstract class Client {
 
     private boolean intercepting = false;
     protected Map<String,String> headers;
+    private boolean followRedirects = true;
     protected Context context;
     protected Randomizer random;
     protected SharedPreferences settings;
@@ -71,8 +73,12 @@ public abstract class Client {
 
     // Settings methods
     public abstract Client trustAllCerts();
-    public abstract Client followRedirects(boolean follow);
     public abstract Client customDnsEnabled(boolean enabled);
+
+    public Client setFollowRedirects(boolean follow) {
+        this.followRedirects = follow;
+        return this;
+    }
 
     public Client configure() {
         setTimeout(Util.getIntPreference(context, "pref_timeout", 5) * 1000);
@@ -209,7 +215,35 @@ public abstract class Client {
     }
 
     public HttpResponse execute(HttpRequest request) throws IOException {
-        return interceptedRequest(request);
+        HttpResponse res = interceptedRequest(request);
+
+        if (!followRedirects) {
+            return res;
+        }
+
+        try {
+            int counter = 0;
+            String redirect;
+
+            HttpRequest tmpReq = request;
+
+            while (counter++ < 10) {
+                redirect = res.get300Redirect();
+
+                // Keep POST method and request body if response code is not "303 See Other"
+                if (res.getResponseCode() != 303 && tmpReq.getMethod() == METHOD.POST) {
+                    tmpReq = post(redirect, request.getBody(), request.getContentType());
+                } else {
+                    tmpReq = get(redirect);
+                }
+
+                res = interceptedRequest(tmpReq);
+            }
+
+            throw new IOException("Too many redirects");
+        } catch (ParseException ignored) {}
+
+        return res;
     }
 
     // Cancel current request

@@ -88,11 +88,11 @@ public class MosMetroV2mcc extends Provider {
 
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
 
                 boolean result = super.run(vars);
 
-                client.followRedirects(true);
+                client.setFollowRedirects(true);
                 vars.put("provider", provider);
 
                 return result;
@@ -158,7 +158,7 @@ public class MosMetroV2mcc extends Provider {
                 HttpResponse response;
 
                 try {
-                    client.followRedirects(false);
+                    client.setFollowRedirects(false);
 
                     response = client.get("http://hotspot.maximatelecom/login", new HashMap<String, String>() {{
                         String mac = (String) vars.get("mac");
@@ -171,7 +171,7 @@ public class MosMetroV2mcc extends Provider {
                         put("password", "placeholder");
                     }}).setTries(pref_retry_count).execute();
 
-                    client.followRedirects(true);
+                    client.setFollowRedirects(true);
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -201,11 +201,11 @@ public class MosMetroV2mcc extends Provider {
         add(new WaitTask(this, context.getString(R.string.auth_redirect)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
 
                 boolean result = super.run(vars);
 
-                client.followRedirects(true);
+                client.setFollowRedirects(true);
 
                 return result;
             }
