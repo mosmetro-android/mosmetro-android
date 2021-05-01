@@ -72,6 +72,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     };
 
     private final String key;
+    private final String interceptorScript;
     private final List<InterceptorTask> interceptors = new LinkedList<>();
 
     private Context context;
@@ -85,17 +86,14 @@ public class InterceptedWebViewClient extends WebViewClient {
         random = new Randomizer(context);
         key = random.string(25).toLowerCase();
 
-        // Serve interceptor script
-        this.interceptors.add(new InterceptorTask("^https?://" + key + "/webview-proxy\\.js$") {
-            @Nullable @Override
-            public HttpResponse request(Client client, HttpRequest request) throws IOException {
-                String script =
-                        Util.readAsset(context, "xhook.min.js") +
-                        Util.readAsset(context, "webview-proxy.js")
-                                .replaceAll("INTERCEPT_KEY", key);
-                return new HttpResponse(request, script, "text/javascript");
-            }
-        });
+        try {
+            interceptorScript =
+                    Util.readAsset(context, "xhook.min.js") +
+                    Util.readAsset(context, "webview-proxy.js")
+                            .replaceAll("INTERCEPT_KEY", key);
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to read assets");
+        }
 
         setClient(client);
     }
@@ -155,17 +153,13 @@ public class InterceptedWebViewClient extends WebViewClient {
 
     public InterceptedWebViewClient setClient(Client client) {
         if (this.client != null) {
-            for (InterceptorTask task : this.interceptors) {
+            for (InterceptorTask task : interceptors) {
                 this.client.interceptors.remove(task);
             }
         }
 
         this.client = client;
-
-        for (InterceptorTask task : this.interceptors) {
-            this.client.interceptors.add(0, task);
-        }
-
+        client.interceptors.addAll(interceptors);
         return this;
     }
 
@@ -251,6 +245,8 @@ public class InterceptedWebViewClient extends WebViewClient {
             HttpRequest request = client.post(url, body, type);
             request.headers.putAll(headers);
             return request.execute();
+        } else if (url.matches("^https?://" + key + "/webview-proxy\\.js$")) {
+            return new HttpResponse(client.get(url), interceptorScript, "text/javascript");
         } else {
             Logger.log(this, "GET " + url);
             return client.get(url).execute();
