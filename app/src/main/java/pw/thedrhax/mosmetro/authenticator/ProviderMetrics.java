@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.BuildConfig;
+import pw.thedrhax.mosmetro.authenticator.providers.HotspotWifiRu;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
 import pw.thedrhax.util.Logger;
@@ -48,6 +49,10 @@ class ProviderMetrics {
 
     @SuppressLint("StaticFieldLeak")
     public boolean end(HashMap<String, Object> vars) {
+        if (p instanceof HotspotWifiRu) {
+            Logger.report("HotspotWifiRu");
+        }
+
         String branch = (String)vars.get("branch");
         if ("unknown".equals(branch)) {
             Logger.report("MMV2 branch: " + branch);
