@@ -40,7 +40,7 @@ public class HotspotWifiRu extends Provider {
     private Element authForm;
 
     private static Element findForm(Document document) {
-        Elements forms = document.body().getElementsByClass("form");
+        Elements forms = document.body().getElementsByTag("form");
 
         for (Element form : forms) {
             String action = form.attr("action");
