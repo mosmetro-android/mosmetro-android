@@ -351,23 +351,26 @@ public class MosMetroV2 extends Provider {
                     try {
                         JSONObject data = res.json();
 
-                        if (!((Boolean) data.get("result"))) {
-                            if (data.containsKey("auth_error_code")) {
-                                String error = (String) data.get("auth_error_code");
+                        if (data.containsKey("auth_error_code")) {
+                            String error_code = (String) data.get("auth_error_code");
 
-                                if (error != null && error.startsWith("err_device_not_identified")) {
-                                    Logger.log(context.getString(R.string.error,
-                                            context.getString(R.string.auth_error_not_registered)
-                                    ));
+                            if (error_code != null && error_code.startsWith("err_device_not_identified")) {
+                                Logger.log(context.getString(R.string.error,
+                                        context.getString(R.string.auth_error_not_registered)
+                                ));
 
-                                    vars.put("result", RESULT.NOT_REGISTERED);
-                                    return false;
-                                }
+                                vars.put("result", RESULT.NOT_REGISTERED);
+                                return false;
                             }
-
-                            throw new ParseException("Unexpected result: false", 0);
                         }
-                    } catch (org.json.simple.parser.ParseException|NullPointerException ex) {
+
+                        boolean error = Boolean.FALSE.equals(data.get("result"));
+                        error |= "fail".equals(data.get("auth_status"));
+
+                        if (error) {
+                            throw new ParseException("Server returned an error", 0);
+                        }
+                    } catch (org.json.simple.parser.ParseException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, res.toString());
                         Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
                     }
