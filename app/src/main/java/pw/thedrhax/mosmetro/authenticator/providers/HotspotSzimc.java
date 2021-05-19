@@ -209,7 +209,7 @@ public class HotspotSzimc extends Provider {
                 HttpResponse res;
 
                 try {
-                    res = req.execute();
+                    res = req.setTries(pref_retry_count).execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
