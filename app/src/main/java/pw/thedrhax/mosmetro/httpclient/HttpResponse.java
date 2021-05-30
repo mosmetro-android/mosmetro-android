@@ -29,34 +29,69 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import pw.thedrhax.util.Logger;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class HttpResponse {
+    public static final LinkedList<String> PARSED_TYPES = new LinkedList<String>() {{
+        add("text/html");
+        add("text/plain");
+        add("text/xml");
+
+        add("application/x-www-form-urlencoded");
+        add("application/json");
+        add("application/xml");
+        add("application/xhtml+xml");
+    }};
+
+    public final Headers headers = new Headers();
+
     private HttpRequest request;
-    private byte[] bytes;
+    private InputStream stream;
     private int code;
     private String reason;
-    private Map<String,List<String>> headers = new HashMap<>();
 
-    private String html;
+    private String body;
     private Document document;
 
     public static HttpResponse EMPTY(Client client) {
         return new HttpResponse(new HttpRequest(client, Client.METHOD.GET, ""), "");
     }
 
-    public HttpResponse(@NonNull HttpRequest request, @NonNull byte[] bytes, int code, String reason,
-                        @Nullable Map<String,List<String>> headers) {
+    public HttpResponse(@NonNull HttpRequest request, @NonNull Response response) throws IOException {
         this.request = request;
-        this.bytes = bytes;
+        this.code = response.code();
+        this.reason = response.message();
+
+        ResponseBody body = response.body();
+        if (body == null) {
+            throw new IOException("Response body is null! Code: " + code);
+        }
+
+        this.headers.putAll(response.headers().toMultimap());
+
+        if (PARSED_TYPES.contains(this.headers.getMimeType())) {
+            this.body = body.string();
+
+            if (!this.body.isEmpty() && this.headers.getMimeType().contains("text/html")) {
+                document = Jsoup.parse(this.body, getUrl());
+            }
+        } else {
+            this.stream = body.byteStream();
+        }
+    }
+
+    public HttpResponse(@NonNull HttpRequest request, @NonNull String body, int code, String reason,
+                        @Nullable Headers headers) {
+        this.request = request;
         this.code = code;
         this.reason = reason;
 
@@ -64,35 +99,27 @@ public class HttpResponse {
             this.headers.putAll(headers);
         }
 
-        try {
-            html = new String(bytes, getEncoding());
-        } catch (UnsupportedEncodingException ex) {
-            Logger.log(Logger.LEVEL.DEBUG, ex);
-        }
+        this.body = body;
 
-        if (html != null && !html.isEmpty() && getMimeType().contains("text/html")) {
-            document = Jsoup.parse(html, getUrl());
+        if (!body.isEmpty() && this.headers.getMimeType().contains("text/html")) {
+            document = Jsoup.parse(body, getUrl());
         }
     }
 
-    public HttpResponse(HttpRequest request, String content, String content_type) {
-        this(request, content.getBytes(), 200, "OK", new HashMap<String,List<String>>() {{
-            put(Client.HEADER_CONTENT_TYPE.toLowerCase(), new LinkedList<String>() {{
-                add(content_type);
-            }});
-            put(Client.HEADER_ACAO.toLowerCase(), new LinkedList<String>() {{
-                add("*");
-            }});
+    public HttpResponse(HttpRequest request, String content, String contentType) {
+        this(request, content, 200, "OK", new Headers() {{
+            setHeader(Headers.CONTENT_TYPE, contentType);
+            setHeader(Headers.ACAO, "*");
         }});
     }
 
-    public HttpResponse(HttpRequest request, String html) {
-        this(request, html, "text/html; charset=utf-8");
+    public HttpResponse(HttpRequest request, String body) {
+        this(request, body, "text/html; charset=utf-8");
     }
 
     @NonNull
     public String getPage() {
-        return html;
+        return body != null ? body : "";
     }
 
     @NonNull
@@ -108,30 +135,6 @@ public class HttpResponse {
         return reason;
     }
 
-    public Map<String,List<String>> getHeaders() {
-        return headers;
-    }
-
-    @Nullable
-    public String getResponseHeader(String name) {
-        if (headers.get(name.toLowerCase()) != null) {
-            return headers.get(name.toLowerCase()).get(0);
-        } else {
-            return null;
-        }
-    }
-
-    public HttpResponse setResponseHeader(String name, List<String> values) {
-        headers.put(name, values);
-        return this;
-    }
-
-    public HttpResponse setResponseHeader(String name, String value) {
-        return setResponseHeader(name, new LinkedList<String>() {{
-            add(value);
-        }});
-    }
-
     public boolean isHtml() {
         return document != null;
     }
@@ -140,45 +143,25 @@ public class HttpResponse {
         return document != null ? document : Jsoup.parse("<html></html>");
     }
 
-    @NonNull
-    public String getContentType() {
-        if (headers.containsKey(Client.HEADER_CONTENT_TYPE.toLowerCase())) {
-            return headers.get(Client.HEADER_CONTENT_TYPE.toLowerCase()).get(0);
-        } else {
-            return "text/plain";
-        }
-    }
-
-    @NonNull
-    public String getMimeType() {
-        return getContentType().split("; ")[0];
-    }
-
-    @NonNull
-    public String getEncoding() {
-        String content_type = getContentType();
-
-        for (String param : content_type.split(";")) {
-            if (param.contains("charset")) {
-                return param.split("charset=")[1];
-            }
-        }
-
-        return "utf-8";
-    }
-
-    @NonNull
-    public byte[] getBytes() {
-        if (document != null) {
-            return document.outerHtml().getBytes();
-        } else {
-            return bytes;
-        }
-    }
-
     @Nullable
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(getBytes());
+        if (stream != null) {
+            return stream;
+        }
+
+        if (document != null) {
+            return new ByteArrayInputStream(document.toString().getBytes());
+        }
+
+        if (body != null) {
+            return new ByteArrayInputStream(body.getBytes());
+        }
+
+        return null;
+    }
+
+    public boolean isStream() {
+        return stream != null;
     }
 
     public HttpRequest getRequest() {
@@ -233,19 +216,15 @@ public class HttpResponse {
 
     @NonNull
     public JSONObject json() throws org.json.simple.parser.ParseException {
-        if (html != null) {
-            return (JSONObject) new JSONParser().parse(getPage());
-        } else {
-            throw new org.json.simple.parser.ParseException(0);
-        }
+        return (JSONObject) new JSONParser().parse(getPage());
     }
 
     @NonNull
     public String get300Redirect() throws ParseException {
-        String link = getResponseHeader(Client.HEADER_LOCATION);
+        String link = headers.getFirst(Headers.LOCATION);
 
         if (link == null || link.isEmpty()) {
-            throw new ParseException("302 redirect is empty", 0);
+            throw new ParseException("Location header is not present", 0);
         }
 
         return absolutePathToUrl(getUrl(), link);
@@ -264,16 +243,16 @@ public class HttpResponse {
         return result.toString();
     }
 
-    private static String absolutePathToUrl(String base_url, String path) throws ParseException {
+    private static String absolutePathToUrl(String baseUrl, String path) throws ParseException {
         // Workaround for auth.wi-fi.ru[/]?segment=
-        if (base_url.contains("?"))
-            if (!base_url.substring(base_url.indexOf("://") + 3, base_url.indexOf("?")).contains("/"))
-                base_url = base_url.replace("?", "/?");
+        if (baseUrl.contains("?"))
+            if (!baseUrl.substring(baseUrl.indexOf("://") + 3, baseUrl.indexOf("?")).contains("/"))
+                baseUrl = baseUrl.replace("?", "/?");
 
-        String base = removePathFromUrl(base_url);
+        String base = removePathFromUrl(baseUrl);
 
         if (path.startsWith("//")) {
-            return Uri.parse(base_url).getScheme() + ":" + path;
+            return Uri.parse(baseUrl).getScheme() + ":" + path;
         } else if (path.startsWith("/")) {
             return base + path;
         } else if (path.startsWith("http")) {
@@ -302,9 +281,13 @@ public class HttpResponse {
         builder.append("URL: ").append(" ").append(request.getUrl()).append("\n");
         builder.append(code).append(' ').append(reason).append("\n");
 
-        for (String header : headers.keySet()) {
-            for (String value : headers.get(header)) {
-                builder.append(header).append(": ").append(value).append("\n");
+        for (String name : headers.keySet()) {
+            List<String> header = headers.get(name);
+
+            if (header == null) continue;
+
+            for (String value : header) {
+                builder.append(name).append(": ").append(value).append("\n");
             }
         }
 

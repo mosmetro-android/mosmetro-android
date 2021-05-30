@@ -21,25 +21,23 @@ package pw.thedrhax.mosmetro.httpclient;
 import android.net.Uri;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class HttpRequest {
     private final Client client;
 
+    public final Headers headers = new Headers();
+
     private Client.METHOD method;
     private Uri url;
-    private String contentType;
     private String body;
-    private Map<String, List<String>> headers = new HashMap<>();
     private int tries = 1;
 
     public HttpRequest(Client client, Client.METHOD method, String url) {
         this.client = client;
         this.method = method;
         this.url = Uri.parse(url);
+        this.headers.putAll(client.headers);
     }
 
     public HttpRequest setMethod(Client.METHOD method) {
@@ -60,54 +58,20 @@ public class HttpRequest {
         return this;
     }
 
-    public Map<String, List<String>> getHeaders() {
-        return headers;
-    }
-
-    public HttpRequest setContentType(String contentType) {
-        this.contentType = contentType;
-        return this;
-    }
-
     public HttpRequest setBody(String body, String contentType) {
         this.body = body;
-        this.contentType = contentType;
+        headers.setHeader(Headers.CONTENT_TYPE, contentType);
         return this;
     }
 
     public HttpRequest setBody(String body) {
         this.body = body;
-        this.contentType = "text/plain";
+        headers.setHeader(Headers.CONTENT_TYPE, "text/plain");
         return this;
     }
 
     public String getBody() {
         return body;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public HttpRequest setHeader(String name, String value) {
-        headers.put(name.toLowerCase(), new LinkedList<String>() {{
-            add(value);
-        }});
-
-        return this;
-    }
-
-    public List<String> getHeader(String name) {
-        if (headers.containsKey(name.toLowerCase())) {
-            return headers.get(name.toLowerCase());
-        } else {
-            return null;
-        }
-    }
-
-    public HttpRequest setHeaders(Map<String, List<String>> headers) {
-        this.headers = headers;
-        return this;
     }
 
     public HttpRequest setTries(int tries) {
@@ -125,12 +89,17 @@ public class HttpRequest {
         result.append(method.toString()).append(' ').append(url.getPath()).append('\n');
 
         for (String name : headers.keySet()) {
-            for (String value : headers.get(name)) {
+            List<String> header = headers.get(name);
+
+            if (header == null) continue;
+
+            for (String value : header) {
                 result.append(name).append(": ").append(value).append('\n');
             }
         }
 
         if (body != null) {
+            result.append("content-type: ").append(headers.getContentType()).append('\n');
             result.append('\n').append(body);
         }
 

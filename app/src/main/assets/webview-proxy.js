@@ -2,7 +2,7 @@
   const KEY = "INTERCEPT_KEY";
 
   xhook.before(function (request) {
-    if (request.method.toUpperCase() !== 'POST') {
+    if (!request.method || request.method.toUpperCase() !== 'POST') {
       return;
     }
 

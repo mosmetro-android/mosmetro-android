@@ -380,7 +380,7 @@ public class ConnectionService extends IntentService {
                 );
 
                 Client client = midsession.getClient();
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
 
                 try {
                     HttpResponse res = res_204.getFalseNegative();
@@ -402,7 +402,7 @@ public class ConnectionService extends IntentService {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                 }
 
-                client.followRedirects(true);
+                client.setFollowRedirects(true);
             } else {
                 Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
                 Logger.log(getString(R.string.algorithm_name, midsession.getName()));

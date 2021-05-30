@@ -52,7 +52,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.util.Listener;
@@ -73,72 +72,49 @@ public class InterceptedWebViewClient extends WebViewClient {
     };
 
     private final String key;
+    private final String interceptorScript;
     private final List<InterceptorTask> interceptors = new LinkedList<>();
 
     private Context context;
     private Randomizer random;
+    private WebView webview;
     private Client client = null;
     private String next_referer;
     private String referer;
 
-    public InterceptedWebViewClient(Context context, Client client) {
+    public InterceptedWebViewClient(Context context, Client client, WebView webview) {
         this.context = context;
-        random = new Randomizer(context);
+        this.random = new Randomizer(context);
+        this.webview = webview;
+
         key = random.string(25).toLowerCase();
 
-        // Serve interceptor script
-        this.interceptors.add(new InterceptorTask("^https?://" + key + "/webview-proxy\\.js$") {
-            @Nullable @Override
-            public HttpResponse request(Client client, HttpRequest request) throws IOException {
-                String script =
-                        Util.readAsset(context, "xhook.min.js") +
-                        Util.readAsset(context, "webview-proxy.js")
-                                .replaceAll("INTERCEPT_KEY", key);
-                return new HttpResponse(request, script, "text/javascript");
+        try {
+            interceptorScript =
+                    Util.readAsset(context, "xhook.min.js") +
+                    Util.readAsset(context, "webview-proxy.js")
+                            .replaceAll("INTERCEPT_KEY", key);
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to read assets");
+        }
+
+        interceptors.add(new InterceptorTask(".*") {
+            @NonNull @Override
+            public HttpResponse response(Client client, HttpRequest request, HttpResponse response) throws IOException {
+                try {
+                    String redirect = response.get300Redirect();
+                    return new HttpResponse(request, "<meta http-equiv=\"refresh\" content=\"0;URL=" + redirect + "\">");
+                } catch (java.text.ParseException ignored) {}
+
+                return super.response(client, request, response);
             }
         });
 
         setClient(client);
     }
 
-    public Map<String, String> getCookies(String url) {
-        Map<String, String> result = new HashMap<>();
-
-        String cookie_string = CookieManager.getInstance().getCookie(url);
-        if (cookie_string != null) {
-            String[] cookies = cookie_string.split("; ");
-            for (String cookie : cookies) {
-                String[] name_value = cookie.split("=");
-                result.put(name_value[0], name_value.length > 1 ? name_value[1] : "");
-            }
-        }
-
-        return result;
-    }
-
-    public void setCookies(String url, Map<String, String> cookies) {
-        CookieManager manager = CookieManager.getInstance();
-
-        CookieSyncManager syncmanager = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            syncmanager = CookieSyncManager.createInstance(context);
-            syncmanager.startSync();
-        }
-
-        for (String name : cookies.keySet()) {
-            manager.setCookie(url, name + "=" + cookies.get(name));
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            syncmanager.stopSync();
-            syncmanager.sync();
-        } else {
-            manager.flush();
-        }
-    }
-
     @SuppressLint("SetJavaScriptEnabled")
-    public void setup(WebView webview) {
+    public void setup() {
         webview.setWebViewClient(this);
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -180,7 +156,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         }
     }
 
-    public void onDestroy(WebView webview) {
+    public void onDestroy() {
         webview.stopLoading();
 
         // Avoid WebView leaks
@@ -192,17 +168,13 @@ public class InterceptedWebViewClient extends WebViewClient {
 
     public InterceptedWebViewClient setClient(Client client) {
         if (this.client != null) {
-            for (InterceptorTask task : this.interceptors) {
+            for (InterceptorTask task : interceptors) {
                 this.client.interceptors.remove(task);
             }
         }
 
         this.client = client;
-
-        for (InterceptorTask task : this.interceptors) {
-            this.client.interceptors.add(0, task);
-        }
-
+        client.interceptors.addAll(interceptors);
         return this;
     }
 
@@ -211,7 +183,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     }
 
     private WebResourceResponse webresponse(@NonNull HttpResponse response) {
-        if (response.getMimeType().contains("text/html") && !response.getUrl().isEmpty()) {
+        if (response.isHtml() && !response.getUrl().isEmpty()) {
             Logger.log(this, response.toString());
         }
 
@@ -226,18 +198,19 @@ public class InterceptedWebViewClient extends WebViewClient {
         }
 
         WebResourceResponse result = new WebResourceResponse(
-                response.getMimeType(),
-                response.getEncoding(),
+                response.headers.getMimeType(),
+                response.headers.getEncoding(),
                 response.getInputStream()
         );
 
         if (Build.VERSION.SDK_INT >= 21) {
             result.setResponseHeaders(new HashMap<String, String>() {{
-                Map<String,List<String>> headers = response.getHeaders();
-                for (String name : headers.keySet()) {
-                    if (headers.get(name) != null && headers.get(name).size() == 1) {
-                        put(name, headers.get(name).get(0));
+                for (String name : response.headers.keySet()) {
+                    if (name.equalsIgnoreCase(Headers.CSP)) {
+                        continue;
                     }
+
+                    put(name, response.headers.getFirst(name));
                 }
             }});
 
@@ -257,7 +230,7 @@ public class InterceptedWebViewClient extends WebViewClient {
             Uri uri = Uri.parse(url);
             url = uri.getQueryParameter("url");
 
-            HashMap<String, List<String>> headers = new HashMap<>();
+            Headers headers = new Headers();
 
             try {
                 JSONParser parser = new JSONParser();
@@ -265,9 +238,7 @@ public class InterceptedWebViewClient extends WebViewClient {
 
                 if (rawHeaders != null) {
                     for (Object key : rawHeaders.keySet()) {
-                        headers.put((String) key, new LinkedList<String>() {{
-                            add((String) rawHeaders.get(key));
-                        }});
+                        headers.setHeader((String) key, (String) rawHeaders.get(key));
                     }
                 }
             } catch (ParseException | ClassCastException ex) {
@@ -277,16 +248,20 @@ public class InterceptedWebViewClient extends WebViewClient {
 
             String type = "text/plain";
 
-            if (headers.containsKey(Client.HEADER_CONTENT_TYPE)) {
-                type = headers.get(Client.HEADER_CONTENT_TYPE).get(0);
+            if (headers.containsKey(Headers.CONTENT_TYPE)) {
+                type = headers.getFirst(Headers.CONTENT_TYPE);
+                headers.remove(Headers.CONTENT_TYPE);
             }
 
             String body = uri.getQueryParameter("body");
 
             Logger.log(this, "POST " + url);
-            Logger.log(this, body);
 
-            return client.post(url, body, type).execute();
+            HttpRequest request = client.post(url, body, type);
+            request.headers.putAll(headers);
+            return request.execute();
+        } else if (url.matches("^https?://" + key + "/webview-proxy\\.js$")) {
+            return new HttpResponse(client.get(url), interceptorScript, "text/javascript");
         } else {
             Logger.log(this, "GET " + url);
             return client.get(url).execute();
@@ -302,15 +277,13 @@ public class InterceptedWebViewClient extends WebViewClient {
         );
 
         if (referer != null) {
-            client.setHeader(Client.HEADER_REFERER, referer);
+            client.headers.setHeader(Headers.REFERER, referer);
         }
 
         if ("about:blank".equals(url)) return null;
 
         try {
-            client.setCookies(url, getCookies(url));
             result = webresponse(getToPost(url));
-            setCookies(url, client.getCookies(url));
         } catch (UnknownHostException ex) {
             onReceivedError(view, ERROR_HOST_LOOKUP, ex.toString(), url);
             return result;
@@ -338,6 +311,7 @@ public class InterceptedWebViewClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if ("POST".equals(request.getMethod())) {
             Logger.log(this, "WARNING: Cannot intercept POST request to " + request.getUrl());
+            return null;
         }
 
         return super.shouldInterceptRequest(view, request);

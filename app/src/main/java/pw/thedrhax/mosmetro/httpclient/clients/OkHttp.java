@@ -20,6 +20,9 @@ package pw.thedrhax.mosmetro.httpclient.clients;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -29,6 +32,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,12 +53,12 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.DnsClient;
+import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.WifiUtils;
 
 public class OkHttp extends Client {
@@ -67,6 +71,8 @@ public class OkHttp extends Client {
         wifi = new WifiUtils(context);
 
         client = new OkHttpClient.Builder()
+                .followRedirects(false)
+                .followSslRedirects(false)
                 .cookieJar(new InterceptedCookieJar())
                 .build();
 
@@ -151,16 +157,6 @@ public class OkHttp extends Client {
     }
 
     @Override
-    public Client followRedirects(boolean follow) {
-        client = client.newBuilder()
-                .followRedirects(follow)
-                .followSslRedirects(follow)
-                .build();
-
-        return this;
-    }
-
-    @Override
     public Client customDnsEnabled(boolean enabled) {
         Dns dns;
 
@@ -189,35 +185,35 @@ public class OkHttp extends Client {
                 break;
             case POST:
                 builder = builder.post(RequestBody.create(
-                        MediaType.parse(request.getContentType()),
+                        MediaType.parse(request.headers.getContentType()),
                         request.getBody()
                 ));
         }
 
         // Populate headers
-        Map<String,List<String>> reqHeaders = request.getHeaders();
+        Headers headers = new Headers();
+        headers.putAll(request.headers);
+        headers.remove(Headers.CONTENT_TYPE); // Already set in builder
 
         for (String name : headers.keySet()) {
-            if (!reqHeaders.containsKey(name.toLowerCase())) {
-                builder.addHeader(name, getHeader(name));
-            }
-        }
+            List<String> header = headers.get(name);
 
-        for (String name : reqHeaders.keySet()) {
-            for (String value : request.getHeader(name)) {
+            if (header == null) continue;
+
+            for (String value : header) {
                 builder.addHeader(name, value);
             }
         }
 
         // Upgrade-Insecure-Requests
         if (request.getUrl().contains("http://")) {
-            builder.addHeader(Client.HEADER_UPGRADE_INSECURE_REQUESTS, "1");
+            builder.addHeader(Headers.UPGRADE_INSECURE_REQUESTS, "1");
         }
 
         // Accept
         String accept = Client.acceptByExtension(request.getUrl());
         if (!accept.isEmpty()) {
-            builder.addHeader(Client.HEADER_ACCEPT, accept);
+            builder.addHeader(Headers.ACCEPT, accept);
         }
 
         if (context != null && context.getApplicationContext() != null) {
@@ -225,7 +221,7 @@ public class OkHttp extends Client {
         }
 
         last_call = client.newCall(builder.build());
-        return parse(request, last_call.execute());
+        return new HttpResponse(request, last_call.execute());
     }
 
     @Override
@@ -235,49 +231,52 @@ public class OkHttp extends Client {
         }
     }
 
-    private HttpResponse parse(HttpRequest request, Response response) throws IOException {
-        ResponseBody body = response.body();
-
-        if (body == null) {
-            throw new IOException("Response body is null! Code: " + response.code());
-        }
-
-        return new HttpResponse(
-                request, body.bytes(), response.code(), response.message(),
-                response.headers().toMultimap()
-        );
-    }
-
     private class InterceptedCookieJar implements CookieJar {
-        private HashMap<HttpUrl, List<Cookie>> cookies = new HashMap<>();
+        private final CookieManager manager;
+        private final CookieSyncManager syncmanager;
 
-        private HttpUrl getHost (HttpUrl url) {
-            return HttpUrl.parse("http://" + url.host());
+        public InterceptedCookieJar() {
+            manager = CookieManager.getInstance();
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                syncmanager = CookieSyncManager.createInstance(context);
+            } else {
+                syncmanager = null;
+            }
         }
 
         @Override
         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-            HttpUrl host = getHost(url);
-            List<Cookie> url_cookies = loadForRequest(host);
-            for (Cookie cookie : cookies) {
-                List<Cookie> for_deletion = new ArrayList<>();
-                for (Cookie old_cookie : url_cookies) {
-                    if (cookie.name().equals(old_cookie.name()))
-                        for_deletion.add(old_cookie);
-                }
-                for (Cookie old_cookie : for_deletion) {
-                    url_cookies.remove(old_cookie);
-                }
-                url_cookies.add(cookie);
+            if (syncmanager != null) {
+                syncmanager.startSync();
             }
-            this.cookies.put(host, url_cookies);
+
+            for (Cookie cookie : cookies) {
+                manager.setCookie(url.toString(), cookie.toString());
+            }
+
+            if (syncmanager != null) {
+                syncmanager.stopSync();
+                syncmanager.sync();
+            }
         }
 
         @Override
         public List<Cookie> loadForRequest(HttpUrl url) {
-            HttpUrl host = getHost(url);
-            List<Cookie> url_cookies = cookies.get(host);
-            return (url_cookies != null) ? url_cookies : new ArrayList<Cookie>();
+            String rawCookies = manager.getCookie(url.toString());
+
+            if (rawCookies == null) {
+                return new LinkedList<>();
+            }
+
+            String[] rawCookiesList = rawCookies.split("; ");
+            List<Cookie> result = new LinkedList<>();
+
+            for (String cookie : rawCookiesList) {
+                result.add(Cookie.parse(url, cookie));
+            }
+
+            return result;
         }
     }
 }

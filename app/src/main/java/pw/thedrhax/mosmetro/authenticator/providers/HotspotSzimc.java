@@ -125,7 +125,7 @@ public class HotspotSzimc extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 if (fast) return true;
 
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
 
                 HttpResponse res;
 
@@ -141,7 +141,7 @@ public class HotspotSzimc extends Provider {
                     ));
                     return false;
                 } finally {
-                    client.followRedirects(true);
+                    client.setFollowRedirects(true);
                 }
 
                 try {
@@ -225,7 +225,7 @@ public class HotspotSzimc extends Provider {
                     req = client.get(form.attr("action"), HttpResponse.parseForm(form));
                 }
 
-                client.followRedirects(false);
+                client.setFollowRedirects(false);
 
                 HttpResponse res;
 
@@ -239,7 +239,7 @@ public class HotspotSzimc extends Provider {
                     ));
                     return false;
                 } finally {
-                    client.followRedirects(true);
+                    client.setFollowRedirects(true);
                 }
 
                 Uri url;

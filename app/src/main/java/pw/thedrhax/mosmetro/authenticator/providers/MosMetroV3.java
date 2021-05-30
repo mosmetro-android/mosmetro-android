@@ -142,7 +142,7 @@ public class MosMetroV3 extends Provider {
                             "application/json; charset=UTF-8"
                     ).setTries(pref_retry_count).execute();
 
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -182,7 +182,7 @@ public class MosMetroV3 extends Provider {
                     params.put("client_ip", "");
 
                     HttpResponse response = client.get(redirect + "/auth/check", params).setTries(pref_retry_count).execute();
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                 }
@@ -204,7 +204,7 @@ public class MosMetroV3 extends Provider {
 
                     HttpResponse response = client.get(redirect + "/success", params).setTries(pref_retry_count).execute();
                     vars.put("response", response);
-                    Logger.log(Logger.LEVEL.DEBUG, response.getPage());
+                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
