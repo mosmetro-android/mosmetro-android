@@ -289,7 +289,7 @@ public class HttpResponse {
             if (header == null) continue;
 
             for (String value : header) {
-                builder.append(header).append(": ").append(value).append("\n");
+                builder.append(name).append(": ").append(value).append("\n");
             }
         }
 
