@@ -18,7 +18,6 @@
 
 package pw.thedrhax.mosmetro.preferences;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,7 +36,6 @@ import pw.thedrhax.util.Util;
 
 public class RangeBarPreference extends DialogPreference {
 
-    @TargetApi(21)
     public RangeBarPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
@@ -53,7 +51,6 @@ public class RangeBarPreference extends DialogPreference {
         init(context, attrs);
     }
 
-    @TargetApi(21)
     public RangeBarPreference(Context context) {
         super(context);
     }
