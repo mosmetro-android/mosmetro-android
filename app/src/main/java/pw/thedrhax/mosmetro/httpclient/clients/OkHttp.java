@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,12 +46,14 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
+import okhttp3.ConnectionPool;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Dns;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -73,6 +76,8 @@ public class OkHttp extends Client {
         client = new OkHttpClient.Builder()
                 .followRedirects(false)
                 .followSslRedirects(false)
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .connectionPool(new ConnectionPool(0, 1, TimeUnit.SECONDS))
                 .cookieJar(new InterceptedCookieJar())
                 .build();
 
