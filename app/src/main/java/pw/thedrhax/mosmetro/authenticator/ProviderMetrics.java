@@ -20,6 +20,7 @@ package pw.thedrhax.mosmetro.authenticator;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Build;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -68,6 +69,7 @@ class ProviderMetrics {
         params.put("version_code", "" + Version.getVersionCode());
         params.put("build_branch", Version.getBranch());
         params.put("build_number", "" + Version.getBuildNumber());
+        params.put("api_level", "" + Build.VERSION.SDK_INT);
 
         if (vars.containsKey("midsession")) {
             params.put("success", "midsession");
