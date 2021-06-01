@@ -92,7 +92,10 @@ public class DebugActivity extends Activity {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                text_messages_adapter.autoscroll = !recyclerView.canScrollVertically(1);
+
+                if (Build.VERSION.SDK_INT >= 14) {
+                    text_messages_adapter.autoscroll = !recyclerView.canScrollVertically(1);
+                }
             }
         });
 

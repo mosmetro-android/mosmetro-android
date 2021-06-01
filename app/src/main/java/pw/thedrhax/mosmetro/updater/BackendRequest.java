@@ -140,8 +140,8 @@ public class BackendRequest {
                 .id(3)
                 .title(context.getString(R.string.update_available))
                 .text(branch.message)
-                .icon(R.drawable.ic_notification_message_colored,
-                        R.drawable.ic_notification_message)
+                .icon(R.drawable.ic_notification_message,
+                        R.drawable.ic_notification_message_colored)
                 .cancelOnClick(true)
                 .onClick(PendingIntent.getActivity(
                         context, 252,

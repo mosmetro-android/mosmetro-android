@@ -153,7 +153,9 @@ public class OkHttp extends Client {
         if (ms == 0) return this;
 
         client = client.newBuilder()
-                .callTimeout(ms, TimeUnit.MILLISECONDS)
+                .connectTimeout(ms, TimeUnit.MILLISECONDS)
+                .readTimeout(ms, TimeUnit.MILLISECONDS)
+                .writeTimeout(ms, TimeUnit.MILLISECONDS)
                 .build();
 
         return this;
@@ -240,20 +242,28 @@ public class OkHttp extends Client {
 
         public InterceptedCookieJar() {
             manager = CookieManager.getInstance();
-            syncmanager = CookieSyncManager.createInstance(context);
 
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                syncmanager = CookieSyncManager.createInstance(context);
+            } else {
+                syncmanager = null;
+            }
         }
 
         @Override
         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-            syncmanager.startSync();
+            if (syncmanager != null) {
+                syncmanager.startSync();
+            }
 
             for (Cookie cookie : cookies) {
                 manager.setCookie(url.toString(), cookie.toString());
             }
 
-            syncmanager.stopSync();
-            syncmanager.sync();
+            if (syncmanager != null) {
+                syncmanager.stopSync();
+                syncmanager.sync();
+            }
         }
 
         @Override

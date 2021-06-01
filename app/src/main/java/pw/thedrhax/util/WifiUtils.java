@@ -36,6 +36,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 public class WifiUtils {
     public static final String UNKNOWN_SSID = "<unknown ssid>";
@@ -68,7 +69,7 @@ public class WifiUtils {
 
     // Get WifiInfo from Intent or, if not available, from WifiManager
     public WifiInfo getWifiInfo(Intent intent) {
-        if (intent != null) {
+        if (intent != null && Build.VERSION.SDK_INT >= 14) {
             WifiInfo result = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
             if (result != null) return result;
         }
@@ -120,6 +121,7 @@ public class WifiUtils {
 
     // Get Network by type
     @Nullable
+    @RequiresApi(21)
     public Network getNetwork(int type) {
         for (Network network : cm.getAllNetworks()) {
             NetworkInfo info = cm.getNetworkInfo(network);
@@ -132,6 +134,7 @@ public class WifiUtils {
 
     // Get VPN (if active) or Wi-Fi Network object
     @Nullable
+    @RequiresApi(21)
     public Network getNetwork() {
         Network result = getNetwork(ConnectivityManager.TYPE_VPN);
         if (result == null) {
@@ -157,6 +160,7 @@ public class WifiUtils {
     }
 
     // Bind to Network
+    @RequiresApi(21)
     private void bindToNetwork(@Nullable Network network) {
         if (Build.VERSION.SDK_INT < 23) {
             try {
@@ -171,10 +175,15 @@ public class WifiUtils {
     // Refactored answer from Stack Overflow: http://stackoverflow.com/a/28664841
     public void bindToWifi() {
         if (!settings.getBoolean("pref_wifi_bind", true)) return;
-        bindToNetwork(getNetwork());
+
+        if (Build.VERSION.SDK_INT < 21)
+            cm.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
+        else
+            bindToNetwork(getNetwork());
     }
 
     // Report connectivity status to system
+    @RequiresApi(21)
     public void report(boolean status) {
         Network network = getNetwork();
         if (network == null) return;

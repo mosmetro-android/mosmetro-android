@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -136,13 +137,23 @@ public class InterceptedWebViewClient extends WebViewClient {
      * Clear user data: Cookies, History, Cache
      * Source: https://stackoverflow.com/a/31950789
      */
+    @SuppressWarnings("deprecation")
     public void clear(WebView webview) {
         webview.clearCache(true);
         webview.clearHistory();
 
         CookieManager manager = CookieManager.getInstance();
-        manager.removeAllCookies(null);
-        manager.flush();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            manager.removeAllCookies(null);
+            manager.flush();
+        } else {
+            CookieSyncManager syncmanager = CookieSyncManager.createInstance(context);
+            syncmanager.startSync();
+            manager.removeAllCookie();
+            manager.removeSessionCookie();
+            syncmanager.stopSync();
+            syncmanager.sync();
+        }
     }
 
     public void onDestroy() {
@@ -192,21 +203,23 @@ public class InterceptedWebViewClient extends WebViewClient {
                 response.getInputStream()
         );
 
-        result.setResponseHeaders(new HashMap<String, String>() {{
-            for (String name : response.headers.keySet()) {
-                if (name.equalsIgnoreCase(Headers.CSP)) {
-                    continue;
+        if (Build.VERSION.SDK_INT >= 21) {
+            result.setResponseHeaders(new HashMap<String, String>() {{
+                for (String name : response.headers.keySet()) {
+                    if (name.equalsIgnoreCase(Headers.CSP)) {
+                        continue;
+                    }
+
+                    put(name, response.headers.getFirst(name));
                 }
+            }});
 
-                put(name, response.headers.getFirst(name));
+            if (!response.getReason().isEmpty()) {
+                result.setStatusCodeAndReasonPhrase(
+                        response.getResponseCode(),
+                        response.getReason()
+                );
             }
-        }});
-
-        if (!response.getReason().isEmpty()) {
-            result.setStatusCodeAndReasonPhrase(
-                    response.getResponseCode(),
-                    response.getReason()
-            );
         }
 
         return result;
@@ -294,7 +307,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         return result;
     }
 
-    @Nullable @Override
+    @Nullable @Override @TargetApi(21)
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if ("POST".equals(request.getMethod())) {
             Logger.log(this, "WARNING: Cannot intercept POST request to " + request.getUrl());
@@ -304,7 +317,7 @@ public class InterceptedWebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, request);
     }
 
-    @Override
+    @Override @TargetApi(21)
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         return shouldOverrideUrlLoading(view, request.getUrl().toString());
     }

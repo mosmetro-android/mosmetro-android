@@ -420,7 +420,7 @@ public class ConnectionService extends IntentService {
                 return false;
             } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
-                wifi.report(true);
+                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
             } else {
                 Logger.log(this, "Midsession | Unable to solve, ignoring...");
                 ignore_midsession = true;
@@ -494,7 +494,7 @@ public class ConnectionService extends IntentService {
         switch (result) {
             case CONNECTED:
             case ALREADY_CONNECTED:
-                wifi.report(true);
+                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
 
                 // Check for midsession in cached Gen204 result
                 ignore_midsession = false;
