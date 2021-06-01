@@ -36,6 +36,7 @@ import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
+import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
@@ -370,6 +371,13 @@ public class ConnectionService extends IntentService {
                     .setRunningListener(running)
                     .setGen204(gen_204);
 
+            midsession.add(new Task() {
+                @Override
+                public boolean run(HashMap<String, Object> vars) {
+                    return !gen_204.getLastResult().isFalseNegative();
+                }
+            });
+
             Logger.log(Logger.LEVEL.DEBUG,
                 "Midsession | Detected (" + midsession.getName() + ")"
             );
@@ -388,7 +396,7 @@ public class ConnectionService extends IntentService {
 
                     String next_redirect = res.parseAnyRedirect();
 
-                    while (next_redirect != null && running.get()) {
+                    while (running.get()) {
                         Logger.log(Logger.LEVEL.DEBUG,
                             "Midsession | Requesting " + next_redirect
                         );

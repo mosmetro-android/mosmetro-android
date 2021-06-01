@@ -146,7 +146,7 @@ public class Gen204 {
     }
 
     public Gen204Result getLastResult() {
-        return last_result;
+        return last_result != null ? last_result : check();
     }
 
     public class Gen204Result {
