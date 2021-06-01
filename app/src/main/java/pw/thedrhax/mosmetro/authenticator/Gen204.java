@@ -38,7 +38,9 @@ public class Gen204 {
             // "www.google.com/gen_204",
             "connectivitycheck.gstatic.com/generate_204",
             "www.gstatic.com/generate_204",
-            "connectivitycheck.android.com/generate_204"
+            "connectivitycheck.android.com/generate_204",
+            "play.googleapis.com/generate_204",
+            "clients1.google.com/generate_204"
     };
 
     /**
@@ -49,13 +51,12 @@ public class Gen204 {
             "www.google.ru/gen_204",
             "google.com/generate_204",
             "gstatic.com/generate_204",
-            "clients1.google.com/generate_204",
             "maps.google.com/generate_204",
             "mt0.google.com/generate_204",
             "mt1.google.com/generate_204",
             "mt2.google.com/generate_204",
             "mt3.google.com/generate_204",
-            "play.googleapis.com/generate_204"
+            "www.google.com/generate_204"
     };
 
     private final Listener<Boolean> running = new Listener<Boolean>(true);
