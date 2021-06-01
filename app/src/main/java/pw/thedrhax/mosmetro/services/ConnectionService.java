@@ -425,6 +425,7 @@ public class ConnectionService extends IntentService {
 
             if (!res_204.isConnected()) {
                 Logger.log(this, "Midsession | Connection lost, aborting...");
+                ignore_midsession = true;
                 return false;
             } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");
