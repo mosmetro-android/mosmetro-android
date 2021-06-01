@@ -56,7 +56,7 @@
         android:summary="@string/pref_internet_check_interval_summary" />
 
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="pref_internet_check_midsession"
         android:summary="@string/pref_internet_check_midsession_summary"
         android:title="@string/pref_internet_check_midsession" />
