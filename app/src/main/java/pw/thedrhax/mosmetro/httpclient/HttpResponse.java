@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -189,16 +191,20 @@ public class HttpResponse {
         return value;
     }
 
+    private final Pattern META_REFRESH = Pattern.compile("^[0-9]+[;,] ?(URL=|url=)?['\"]?(.*?)['\"]?$");
+
     @NonNull
     public String parseMetaRedirect() throws ParseException {
         String attr = parseMetaContent("refresh");
-        String link = attr.substring(
-                attr.indexOf(
-                        attr.toLowerCase().contains("; url=") ? "=" : ";"
-                ) + 1
-        );
+        Matcher matcher = META_REFRESH.matcher(attr);
 
-        if (link.isEmpty()) {
+        if (!matcher.matches()) {
+            throw new ParseException("Meta redirect not found", 0);
+        }
+
+        String link = matcher.group(2);
+
+        if (link == null || link.isEmpty()) {
             throw new ParseException("Meta redirect not found", 0);
         }
 
