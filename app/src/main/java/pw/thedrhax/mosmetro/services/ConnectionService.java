@@ -36,6 +36,7 @@ import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
+import pw.thedrhax.mosmetro.authenticator.Task;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
@@ -98,7 +99,7 @@ public class ConnectionService extends IntentService {
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
         pref_internet_check = settings.getBoolean("pref_internet_check", true);
         pref_manual_connection_monitoring = settings.getBoolean("pref_manual_connection_monitoring", true);
-        pref_midsession = settings.getBoolean("pref_internet_check_midsession", true);
+        pref_midsession = settings.getBoolean("pref_internet_check_midsession", false);
         pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
         final PendingIntent stop_intent = PendingIntent.getService(
@@ -370,6 +371,13 @@ public class ConnectionService extends IntentService {
                     .setRunningListener(running)
                     .setGen204(gen_204);
 
+            midsession.add(new Task() {
+                @Override
+                public boolean run(HashMap<String, Object> vars) {
+                    return !gen_204.getLastResult().isFalseNegative();
+                }
+            });
+
             Logger.log(Logger.LEVEL.DEBUG,
                 "Midsession | Detected (" + midsession.getName() + ")"
             );
@@ -388,7 +396,7 @@ public class ConnectionService extends IntentService {
 
                     String next_redirect = res.parseAnyRedirect();
 
-                    while (next_redirect != null && running.get()) {
+                    while (running.get()) {
                         Logger.log(Logger.LEVEL.DEBUG,
                             "Midsession | Requesting " + next_redirect
                         );
@@ -417,6 +425,7 @@ public class ConnectionService extends IntentService {
 
             if (!res_204.isConnected()) {
                 Logger.log(this, "Midsession | Connection lost, aborting...");
+                ignore_midsession = true;
                 return false;
             } else if (!res_204.isFalseNegative()) {
                 Logger.log(this, "Midsession | Solved successfully");

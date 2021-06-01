@@ -47,6 +47,7 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Dns;
@@ -78,6 +79,13 @@ public class OkHttp extends Client {
                 .followSslRedirects(false)
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .connectionPool(new ConnectionPool(0, 1, TimeUnit.SECONDS))
+                .connectionSpecs(new LinkedList<ConnectionSpec>() {{
+                    add(ConnectionSpec.CLEARTEXT);
+                    add(new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                            .allEnabledTlsVersions()
+                            .allEnabledCipherSuites()
+                            .build());
+                }})
                 .cookieJar(new InterceptedCookieJar())
                 .build();
 
