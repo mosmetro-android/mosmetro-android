@@ -249,7 +249,7 @@ public class HttpResponse {
         return result.toString();
     }
 
-    private static String absolutePathToUrl(String baseUrl, String path) throws ParseException {
+    public static String absolutePathToUrl(String baseUrl, String path) throws ParseException {
         // Workaround for auth.wi-fi.ru[/]?segment=
         if (baseUrl.contains("?"))
             if (!baseUrl.substring(baseUrl.indexOf("://") + 3, baseUrl.indexOf("?")).contains("/"))

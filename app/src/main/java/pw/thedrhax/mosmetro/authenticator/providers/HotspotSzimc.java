@@ -46,9 +46,6 @@ import pw.thedrhax.util.Logger;
 public class HotspotSzimc extends Provider {
     private String redirect;
 
-    // If redirect contains "auth.szimc" instead of "hotspot.szimc", some steps can be skipped
-    private boolean fast = false;
-
     public HotspotSzimc(Context context, HttpResponse response) {
         super(context);
 
@@ -65,27 +62,13 @@ public class HotspotSzimc extends Provider {
                     return false;
                 }
 
-                Uri uri = Uri.parse(redirect);
-                String loginurl = uri.getQueryParameter("loginurl");
-
-                if (loginurl == null || loginurl.isEmpty()) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Redirect doesn't contain loginurl parameter");
-                    fast = false;
-                } else {
-                    fast = loginurl.matches("https?://auth\\.szimc.*");
-                }
-
-                if (fast) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Using fast route");
-                }
-
                 return true;
             }
         });
 
         /**
-         * Follow redirect to /www/coova.html
-         * Parse meta-redirect to /prelogin or auth.szimc/cp/coovachilli (fast route)
+         * Follow redirect to /www/loginCoova.html
+         * Parse form to /prelogin
          */
         add(new NamedTask(context.getString(R.string.auth_redirect)) {
             @Override
@@ -103,7 +86,13 @@ public class HotspotSzimc extends Provider {
                 }
 
                 try {
-                    redirect = res.parseMetaRedirect();
+                    Element form = res.getPageContent()
+                            .select("form[name=\"wnamlogin\"]")
+                            .first();
+
+                    redirect = HttpResponse.absolutePathToUrl(
+                        redirect, form == null ? "/prelogin" : form.attr("prelogin")
+                    );
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -118,13 +107,11 @@ public class HotspotSzimc extends Provider {
 
         /**
          * Get /prelogin
-         * Follow redirect to auth page hotspot.szimc:8000/?res=notyet&...
+         * Parse redirect to auth.szimc/cp/coovachilli
          */
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (fast) return true;
-
                 client.setFollowRedirects(false);
 
                 HttpResponse res;
@@ -144,33 +131,17 @@ public class HotspotSzimc extends Provider {
                     client.setFollowRedirects(true);
                 }
 
-                try {
-                    res = client.get(redirect).setTries(pref_retry_count).execute();
-                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_server)
-                    ));
-                    return false;
-                }
-
                 return true;
             }
         });
 
         /**
-         * Follow JavaScript redirect to auth.szimc/cp/coovachilli
+         * Follow redirect to auth.szimc/cp/coovachilli
          * Extract form
          */
         add(new NamedTask(context.getString(R.string.auth_redirect)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                if (!fast) {
-                    Uri orig = Uri.parse(redirect);
-                    redirect = "http://auth.szimc/cp/coovachilli?" + orig.getQuery();
-                }
-
                 HttpResponse res;
 
                 try {
@@ -210,7 +181,7 @@ public class HotspotSzimc extends Provider {
 
         /**
          * Send auth form to /logon
-         * Expect redirect to hotspot.szimc:8000?res=success&...
+         * Expect redirect to auth.szimc/cp/coovachilli?res=success&...
          */
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
@@ -296,7 +267,7 @@ public class HotspotSzimc extends Provider {
         try {
             Uri redirect = Uri.parse(response.parseAnyRedirect());
             String loginurl = redirect.getQueryParameter("loginurl");
-            return loginurl != null && loginurl.matches("https?://(auth|hotspot)\\.szimc");
+            return loginurl != null && loginurl.matches("^https?://auth\\.szimc.*");
         } catch (ParseException ex) {
             return false;
         }
