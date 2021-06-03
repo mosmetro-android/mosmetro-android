@@ -286,7 +286,7 @@ public class HttpResponse {
     public String toHeaderString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("URL: ").append(" ").append(request.getUrl()).append("\n");
+        builder.append("URL: ").append(request.getUrl()).append("\n");
         builder.append(code).append(' ').append(reason).append("\n");
 
         for (String name : headers.keySet()) {
