@@ -256,8 +256,8 @@
     <string name="auth_webview_page">Opening auth page</string>
     <string name="auth_webview_page_wait">Waiting for page to load</string>
     <string name="auth_webview_script">Waiting for script</string>
-    <string name="pref_internet_check_midsession">Disable midsession</string>
-    <string name="pref_internet_check_midsession_summary">If you are seeing \"Sign into Wi-Fi network\" in your notifications, or Android thinks that internet is not available even if it is, this option might help.</string>
+    <string name="pref_internet_midsession">Handle midsession</string>
+    <string name="pref_internet_midsession_summary">If you are seeing \"Sign into Wi-Fi network\" in your notifications, or Android thinks that internet is not available even if it actually is, this option might help.</string>
     <string name="pref_debug_testing">Participation in testing</string>
     <string name="pref_debug_testing_summary">Send conditional automated reports. Conditions change in every update and are targeting new functions and fixes. Reports contain last log, app version and some information about system and device.</string>
     <string name="receiver_service_title">Waiting for Wi-Fi connection</string>

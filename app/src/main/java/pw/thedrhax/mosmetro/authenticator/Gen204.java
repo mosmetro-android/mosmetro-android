@@ -21,6 +21,9 @@ package pw.thedrhax.mosmetro.authenticator;
 import java.io.IOException;
 
 import android.content.Context;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
@@ -34,8 +37,6 @@ public class Gen204 {
      * Unreliable generate_204 endpoints (might be intercepted by provider)
      */
     protected static final String[] URL_DEFAULT = {
-            // "www.google.com/generate_204",
-            // "www.google.com/gen_204",
             "connectivitycheck.gstatic.com/generate_204",
             "www.gstatic.com/generate_204",
             "connectivitycheck.android.com/generate_204",
@@ -81,15 +82,32 @@ public class Gen204 {
     /**
      * Perform logged request to specified URL.
      */
-    private HttpResponse request(String url) throws IOException {
-        HttpResponse res;
-        try {
-            res = client.get(url).setTries(pref_retry_count).execute();
-            Logger.log(this, url + " | " + res.getResponseCode());
-        } catch (IOException ex) {
-            Logger.log(this, url + " | " + ex.toString());
-            throw ex;
+    private HttpResponse request(String schema, String[] urls) throws IOException {
+        HttpResponse res = HttpResponse.EMPTY(client);
+        IOException last_ex = null;
+
+        for (int i = 0; i < pref_retry_count; i++) {
+            String url = schema + "://" + random.choose(urls);
+
+            try {
+                res = client.get(url).execute();
+                last_ex = null;
+                Logger.log(this, url + " | " + res.getResponseCode());
+                break;
+            } catch (IOException ex) {
+                Logger.log(this, url + " | " + ex.toString());
+                last_ex = ex;
+
+                if (ex instanceof SSLPeerUnverifiedException) {
+                    break;
+                }
+            }
         }
+
+        if (last_ex != null) {
+            throw last_ex;
+        }
+
         return res;
     }
 
@@ -98,7 +116,7 @@ public class Gen204 {
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
         try {
-            unrel = request("http://" + random.choose(URL_DEFAULT));
+            unrel = request("http", URL_DEFAULT);
         } catch (IOException ex) {
             // network is most probably unreachable
             return new Gen204Result(HttpResponse.EMPTY(client));
@@ -106,7 +124,7 @@ public class Gen204 {
 
         // Reliable HTTPS check
         try {
-            rel_https = request("https://" + random.choose(URL_RELIABLE));
+            rel_https = request("https", URL_RELIABLE);
         } catch (IOException ex) {
             rel_https = null;
         }
@@ -115,7 +133,7 @@ public class Gen204 {
             if (rel_https == null || rel_https.getResponseCode() != 204) {
                 // Reliable HTTP check
                 try {
-                    rel_http = request("http://" + random.choose(URL_RELIABLE));
+                    rel_http = request("http", URL_RELIABLE);
                 } catch (IOException ex) {
                     rel_http = null;
                 }

@@ -99,7 +99,7 @@ public class ConnectionService extends IntentService {
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
         pref_internet_check = settings.getBoolean("pref_internet_check", true);
         pref_manual_connection_monitoring = settings.getBoolean("pref_manual_connection_monitoring", true);
-        pref_midsession = settings.getBoolean("pref_internet_check_midsession", false);
+        pref_midsession = settings.getBoolean("pref_internet_midsession", false);
         pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
         final PendingIntent stop_intent = PendingIntent.getService(
