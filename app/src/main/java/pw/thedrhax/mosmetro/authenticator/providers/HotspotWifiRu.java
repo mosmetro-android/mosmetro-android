@@ -56,6 +56,9 @@ public class HotspotWifiRu extends Provider {
     public HotspotWifiRu(Context context, HttpResponse response) {
         super(context);
 
+        /**
+         * Parse login form
+         */
         add(new InitialConnectionCheckTask(this, response) {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
@@ -71,6 +74,11 @@ public class HotspotWifiRu extends Provider {
             }
         });
 
+        /**
+         * Send login form to /login
+         * Expect meta-redirect to auth.wi-fi.ru/?segment=bus_ttm
+         * Switch to another provider
+         */
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
@@ -85,8 +93,9 @@ public class HotspotWifiRu extends Provider {
                     request = client.get(action, params);
                 }
 
+                HttpResponse res;
                 try {
-                    HttpResponse res = request.setTries(3).execute();
+                    res = request.setTries(3).execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -96,7 +105,23 @@ public class HotspotWifiRu extends Provider {
                     return false;
                 }
 
-                return true;
+                Provider provider = Provider.find(context, res);
+
+                if (provider instanceof Unknown && isConnected()) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                } else if (provider instanceof HotspotWifiRu) {
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_loop)
+                    ));
+                } else {
+                    Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
+                    vars.put("switch", provider.getName());
+                    add(indexOf(this) + 1, provider);
+                    return true;
+                }
+
+                return false;
             }
         });
 

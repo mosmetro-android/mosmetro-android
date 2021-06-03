@@ -236,7 +236,7 @@ public class MosMetroV3 extends Provider {
                     vars.put("result", RESULT.CONNECTED);
                 } else if (provider instanceof MosMetroV3) {
                     Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_mosmetrov3_loop)
+                            context.getString(R.string.auth_error_loop)
                     ));
                 } else {
                     if (provider instanceof Unknown) {
