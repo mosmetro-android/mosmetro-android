@@ -28,7 +28,6 @@ import java.util.HashMap;
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
-import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
@@ -48,11 +47,6 @@ class ProviderMetrics {
 
     @SuppressLint("StaticFieldLeak")
     public boolean end(HashMap<String, Object> vars) {
-        String branch = (String)vars.get("branch");
-        if ("unknown".equals(branch)) {
-            Logger.report("MMV2 branch: " + branch);
-        }
-
         boolean connected;
 
         switch ((Provider.RESULT) vars.get("result")) {
