@@ -31,6 +31,7 @@ import pw.thedrhax.mosmetro.authenticator.providers.AuthLastochkaCenter;
 import pw.thedrhax.mosmetro.authenticator.providers.HotspotSzimc;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
+import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
