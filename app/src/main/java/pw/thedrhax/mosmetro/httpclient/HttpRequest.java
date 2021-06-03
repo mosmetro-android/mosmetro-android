@@ -86,7 +86,7 @@ public class HttpRequest {
     public String toString() {
         StringBuilder result = new StringBuilder();
 
-        result.append(method.toString()).append(' ').append(url.getPath()).append('\n');
+        result.append(method.toString()).append(' ').append(url).append('\n');
 
         for (String name : headers.keySet()) {
             List<String> header = headers.get(name);

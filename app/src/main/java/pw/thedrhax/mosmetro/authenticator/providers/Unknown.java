@@ -20,11 +20,15 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
@@ -43,22 +47,52 @@ public class Unknown extends Provider {
     public Unknown(final Context context, final HttpResponse response) {
         super(context);
 
-        /**
-         * Checking Internet connection for a first (and the last) time
-         */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
+        add(new InitialConnectionCheckTask(this, response) {
             @Override
-            public boolean run(HashMap<String, Object> vars) {
+            public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 if (response.getResponseCode() == 204) {
                     Logger.log(context.getString(R.string.auth_already_connected));
                     vars.put("result", RESULT.ALREADY_CONNECTED);
-                } else {
-                    Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_provider)
-                    ));
-                    vars.put("result", RESULT.NOT_SUPPORTED);
                 }
+
+                Logger.log(Logger.LEVEL.DEBUG, response.toString());
+
+                try {
+                    HttpResponse res = response;
+                    String redirect = res.parseAnyRedirect(); // throws ParseException
+
+                    Logger.log(Logger.LEVEL.DEBUG, "Attempting to follow all redirects");
+                    client.setFollowRedirects(false);
+
+                    for (int i = 0; i < 10; i++) {
+                        Provider provider = Provider.find(context, res);
+
+                        if (!(provider instanceof Unknown)) {
+                            vars.put("switch", provider.getName());
+                            Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
+                            return add(indexOf(this) + 1, provider);
+                        }
+
+                        HttpRequest req = client.get(redirect).setTries(pref_retry_count);
+                        Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
+
+                        res = req.execute(); // throws IOException
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                        redirect = res.parseAnyRedirect(); // throws ParseException
+                    }
+
+                    throw new IOException("Too many redirects");
+                } catch (IOException|ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                } finally {
+                    client.setFollowRedirects(true);
+                }
+
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_provider)
+                ));
+                vars.put("result", RESULT.NOT_SUPPORTED);
                 return false;
             }
         });

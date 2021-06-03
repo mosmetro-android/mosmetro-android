@@ -24,6 +24,7 @@ import android.os.Build;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.UUID;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.authenticator.providers.HotspotWifiRu;
@@ -34,7 +35,7 @@ import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
 class ProviderMetrics {
-    private Provider p;
+    private final Provider p;
 
     ProviderMetrics(Provider provider) {
         this.p = provider;
@@ -53,9 +54,11 @@ class ProviderMetrics {
             Logger.report("HotspotWifiRu");
         }
 
-        String branch = (String)vars.get("branch");
-        if ("unknown".equals(branch)) {
-            Logger.report("MMV2 branch: " + branch);
+        // Generate random anonymous UUID
+        String uuid = p.settings.getString("uuid", "none");
+        if ("none".equals(uuid)) {
+            uuid = UUID.randomUUID().toString();
+            p.settings.edit().putString("uuid", uuid).apply();
         }
 
         boolean connected;
@@ -70,6 +73,7 @@ class ProviderMetrics {
 
         final HashMap<String, String> params = new HashMap<>();
 
+        params.put("uuid", uuid);
         params.put("version_name", Version.getVersionName());
         params.put("version_code", "" + Version.getVersionCode());
         params.put("build_branch", Version.getBranch());
