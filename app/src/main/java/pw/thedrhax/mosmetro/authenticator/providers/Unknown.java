@@ -67,7 +67,7 @@ public class Unknown extends Provider {
                     recheck = true;
                     client.setFollowRedirects(false);
 
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 20; i++) {
                         Provider provider = Provider.find(context, res);
 
                         if (!(provider instanceof Unknown)) {
