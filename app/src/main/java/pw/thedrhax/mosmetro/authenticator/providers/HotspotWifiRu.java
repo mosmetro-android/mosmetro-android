@@ -95,7 +95,7 @@ public class HotspotWifiRu extends Provider {
 
                 HttpResponse res;
                 try {
-                    res = request.setTries(3).execute();
+                    res = request.retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);

@@ -401,7 +401,7 @@ public class ConnectionService extends IntentService {
                             "Midsession | Requesting " + next_redirect
                         );
 
-                        res = client.get(next_redirect).setTries(pref_retry_count).execute();
+                        res = client.get(next_redirect).retry().execute();
                         Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                         next_redirect = res.parseAnyRedirect();

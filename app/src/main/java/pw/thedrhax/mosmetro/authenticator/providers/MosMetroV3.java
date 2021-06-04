@@ -95,7 +95,7 @@ public class MosMetroV3 extends Provider {
                 try {
                     Map<String,String> params = new HashMap<>();
                     params.put("client_mac", (String)vars.get("mac"));
-                    response = client.get(redirect, params).setTries(pref_retry_count).execute();
+                    response = client.get(redirect, params).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -140,7 +140,7 @@ public class MosMetroV3 extends Provider {
                             redirect + "/auth/init",
                             body.toJSONString(),
                             "application/json; charset=UTF-8"
-                    ).setTries(pref_retry_count).execute();
+                    ).retry().execute();
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
@@ -181,7 +181,7 @@ public class MosMetroV3 extends Provider {
                     params.put("client_mac", (String)vars.get("mac"));
                     params.put("client_ip", "");
 
-                    HttpResponse response = client.get(redirect + "/auth/check", params).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(redirect + "/auth/check", params).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -202,7 +202,7 @@ public class MosMetroV3 extends Provider {
                     Map<String,String> params = new HashMap<>();
                     params.put("client_mac", (String)vars.get("mac"));
 
-                    HttpResponse response = client.get(redirect + "/success", params).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(redirect + "/success", params).retry().execute();
                     vars.put("response", response);
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
