@@ -64,7 +64,6 @@ public class Gen204 {
     private final Listener<Boolean> running = new Listener<Boolean>(true);
     private final Client client;
     private final Randomizer random;
-    private final int pref_retry_count;
 
     private Gen204Result last_result = null;
 
@@ -77,7 +76,6 @@ public class Gen204 {
                 .setRunningListener(this.running);
 
         random = new Randomizer(context);
-        pref_retry_count = Util.getIntPreference(context, "pref_retry_count", 3);
     }
 
     /**
@@ -87,7 +85,7 @@ public class Gen204 {
         HttpResponse res = HttpResponse.EMPTY(client);
         IOException last_ex = null;
 
-        for (int i = 0; i < pref_retry_count; i++) {
+        for (int i = 0; i < 3; i++) {
             String url = schema + "://" + random.choose(urls);
 
             try {

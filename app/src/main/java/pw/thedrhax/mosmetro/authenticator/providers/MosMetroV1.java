@@ -81,7 +81,7 @@ public class MosMetroV1 extends Provider {
                 HttpResponse response;
 
                 try {
-                    response = client.get(redirect).setTries(pref_retry_count).execute();
+                    response = client.get(redirect).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.getPageContent().outerHtml());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -113,7 +113,7 @@ public class MosMetroV1 extends Provider {
             public boolean run(HashMap<String, Object> vars) {
                 try {
                     HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
-                    client.post(redirect, form).setTries(pref_retry_count).execute();
+                    client.post(redirect, form).retry().execute();
                     return true;
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);

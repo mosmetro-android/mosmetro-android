@@ -73,7 +73,7 @@ public class Unknown extends Provider {
                             return add(indexOf(this) + 1, provider);
                         }
 
-                        HttpRequest req = client.get(redirect).setTries(pref_retry_count);
+                        HttpRequest req = client.get(redirect).retry();
                         Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
 
                         res = req.execute(); // throws IOException

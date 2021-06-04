@@ -96,7 +96,7 @@ public class MAInet extends Provider {
                         put("network_name", "Guest+Network");
                         put("username", login);
                         put("password", password);
-                    }}).setTries(pref_retry_count).execute();
+                    }}).retry().execute();
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
