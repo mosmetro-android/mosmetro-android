@@ -57,11 +57,14 @@ public class Unknown extends Provider {
 
                 Logger.log(Logger.LEVEL.DEBUG, response.toString());
 
+                boolean recheck = false;
+
                 try {
                     HttpResponse res = response;
                     String redirect = res.parseAnyRedirect(); // throws ParseException
 
                     Logger.log(Logger.LEVEL.DEBUG, "Attempting to follow all redirects");
+                    recheck = true;
                     client.setFollowRedirects(false);
 
                     for (int i = 0; i < 10; i++) {
@@ -87,6 +90,12 @@ public class Unknown extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                 } finally {
                     client.setFollowRedirects(true);
+                }
+
+                if (recheck && isConnected()) {
+                    Logger.log(context.getString(R.string.auth_connected));
+                    vars.put("result", RESULT.CONNECTED);
+                    return true;
                 }
 
                 Logger.log(context.getString(R.string.error,
