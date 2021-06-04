@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import android.content.Context;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import pw.thedrhax.mosmetro.httpclient.Client;
@@ -98,7 +99,7 @@ public class Gen204 {
                 Logger.log(this, url + " | " + ex.toString());
                 last_ex = ex;
 
-                if (ex instanceof SSLPeerUnverifiedException) {
+                if (ex instanceof SSLPeerUnverifiedException || ex instanceof SSLHandshakeException) {
                     break;
                 }
             }
