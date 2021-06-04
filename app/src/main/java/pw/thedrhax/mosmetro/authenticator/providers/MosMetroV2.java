@@ -157,7 +157,7 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
 
                     try {
-                        HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
+                        HttpResponse response = client.get(redirect).retry().execute();
                         Logger.log(Logger.LEVEL.DEBUG, response.toString());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -187,7 +187,7 @@ public class MosMetroV2 extends Provider {
                         throw new ParseException("Invalid URL: " + redirect, 0);
                     }
 
-                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(redirect).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
 
                     return true;
@@ -256,7 +256,7 @@ public class MosMetroV2 extends Provider {
                       .setCookie("http://auth.wi-fi.ru", "_mtp", prefix + random.string(21) + "_" + random.string(10));
 
                 try {
-                    HttpResponse response = client.get(url).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(url).retry().execute();
                     
                     if (mosmetro || spb) { // expecting JSON
                         Logger.log(Logger.LEVEL.DEBUG, response.toHeaderString());
@@ -350,7 +350,7 @@ public class MosMetroV2 extends Provider {
                 }
 
                 try {
-                    HttpResponse res = client.post(url, params).setTries(pref_retry_count).execute();
+                    HttpResponse res = client.post(url, params).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     try {
@@ -412,7 +412,7 @@ public class MosMetroV2 extends Provider {
                 }
 
                 try {
-                    HttpResponse res = client.get(url).setTries(pref_retry_count).execute();
+                    HttpResponse res = client.get(url).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);

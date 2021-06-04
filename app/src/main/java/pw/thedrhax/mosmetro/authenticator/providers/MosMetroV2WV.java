@@ -127,7 +127,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
 
                     try {
-                        HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
+                        HttpResponse response = client.get(redirect).retry().execute();
                         Logger.log(Logger.LEVEL.DEBUG, response.toString());
                     } catch (IOException ex) {
                         Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -185,7 +185,7 @@ public class MosMetroV2WV extends WebViewProvider {
             @Nullable @Override
             public HttpResponse request(Client client, HttpRequest request) throws IOException {
                 client.setFollowRedirects(false);
-                HttpResponse response = request.setTries(pref_retry_count).execute();
+                HttpResponse response = request.retry().execute();
                 client.setFollowRedirects(true);
                 return response;
             }
@@ -196,7 +196,7 @@ public class MosMetroV2WV extends WebViewProvider {
                     String redirect = response.get300Redirect();
 
                     // Follow 3xx redirect because it can not be passed to WebView
-                    response = client.get(redirect).setTries(pref_retry_count).execute();
+                    response = client.get(redirect).retry().execute();
                 } catch (ParseException ignored) {}
 
                 try {

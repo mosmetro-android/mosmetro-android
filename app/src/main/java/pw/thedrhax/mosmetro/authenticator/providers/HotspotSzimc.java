@@ -76,7 +76,7 @@ public class HotspotSzimc extends Provider {
                 HttpResponse res;
 
                 try {
-                    res = client.get(redirect).setTries(pref_retry_count).execute();
+                    res = client.get(redirect).retry().execute();
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
@@ -117,7 +117,7 @@ public class HotspotSzimc extends Provider {
                 HttpResponse res;
 
                 try {
-                    res = client.get(redirect).setTries(pref_retry_count).execute();
+                    res = client.get(redirect).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     redirect = res.get300Redirect();
@@ -145,7 +145,7 @@ public class HotspotSzimc extends Provider {
                 HttpResponse res;
 
                 try {
-                    res = client.get(redirect).setTries(pref_retry_count).execute();
+                    res = client.get(redirect).retry().execute();
                     Logger.log(res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -201,7 +201,7 @@ public class HotspotSzimc extends Provider {
                 HttpResponse res;
 
                 try {
-                    res = req.setTries(pref_retry_count).execute();
+                    res = req.retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -236,7 +236,7 @@ public class HotspotSzimc extends Provider {
                 }
 
                 try {
-                    res = client.get(url.toString()).setTries(pref_retry_count).execute();
+                    res = client.get(url.toString()).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);

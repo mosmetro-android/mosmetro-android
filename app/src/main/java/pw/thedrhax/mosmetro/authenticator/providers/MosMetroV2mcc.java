@@ -101,7 +101,7 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean until(HashMap<String, Object> vars) {
                 try {
-                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(redirect).retry().execute();
 
                     redirect = response.get300Redirect();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
@@ -169,7 +169,7 @@ public class MosMetroV2mcc extends Provider {
 
                         put("username", mac.toLowerCase());
                         put("password", "placeholder");
-                    }}).setTries(pref_retry_count).execute();
+                    }}).retry().execute();
 
                     client.setFollowRedirects(true);
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
@@ -213,7 +213,7 @@ public class MosMetroV2mcc extends Provider {
             @Override
             public boolean until(HashMap<String, Object> vars) {
                 try {
-                    HttpResponse response = client.get(redirect).setTries(pref_retry_count).execute();
+                    HttpResponse response = client.get(redirect).retry().execute();
 
                     redirect = response.get300Redirect();
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());

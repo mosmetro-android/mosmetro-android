@@ -122,7 +122,7 @@ public abstract class Client {
                 }
                 return request(request);
             }
-        }.run(request.getTries());
+        }.run(request.canRetry() ? 3 : 1); // 1 = try once, 3 = retry twice
     }
 
     private HttpResponse interceptedRequest(HttpRequest request) throws IOException {

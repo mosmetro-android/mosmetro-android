@@ -31,7 +31,7 @@ public class HttpRequest {
     private Client.METHOD method;
     private Uri url;
     private String body;
-    private int tries = 1;
+    private boolean retries = false;
 
     public HttpRequest(Client client, Client.METHOD method, String url) {
         this.client = client;
@@ -74,13 +74,17 @@ public class HttpRequest {
         return body;
     }
 
-    public HttpRequest setTries(int tries) {
-        this.tries = tries;
+    public HttpRequest retry() {
+        return retry(true);
+    }
+
+    public HttpRequest retry(boolean enabled) {
+        this.retries = enabled;
         return this;
     }
 
-    public int getTries() {
-        return tries;
+    public boolean canRetry() {
+        return retries;
     }
 
     public String toString() {

@@ -78,7 +78,7 @@ public class AuthLastochkaCenter extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
-                    HttpResponse res = client.get(redirect).setTries(pref_retry_count).execute();
+                    HttpResponse res = client.get(redirect).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -100,7 +100,7 @@ public class AuthLastochkaCenter extends Provider {
                 url += vars.get("mac");
 
                 try {
-                    HttpResponse res = client.get(url).setTries(pref_retry_count).execute();
+                    HttpResponse res = client.get(url).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -118,7 +118,7 @@ public class AuthLastochkaCenter extends Provider {
                 url += vars.get("mac");
 
                 try {
-                    HttpResponse res = client.get(url).setTries(pref_retry_count).execute();
+                    HttpResponse res = client.get(url).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
                     try {
