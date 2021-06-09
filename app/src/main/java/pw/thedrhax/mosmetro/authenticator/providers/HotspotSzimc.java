@@ -91,7 +91,7 @@ public class HotspotSzimc extends Provider {
                             .first();
 
                     redirect = HttpResponse.absolutePathToUrl(
-                        redirect, form == null ? "/prelogin" : form.attr("prelogin")
+                        redirect, form == null ? "/prelogin" : form.attr("action")
                     );
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -146,7 +146,7 @@ public class HotspotSzimc extends Provider {
 
                 try {
                     res = client.get(redirect).retry().execute();
-                    Logger.log(res.toString());
+                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
