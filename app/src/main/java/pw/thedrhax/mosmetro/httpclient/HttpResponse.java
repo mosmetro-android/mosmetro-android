@@ -32,7 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -269,7 +269,7 @@ public class HttpResponse {
     }
 
     public static Map<String,String> parseForm (Element form) {
-        Map<String,String> result = new HashMap<>();
+        Map<String,String> result = new LinkedHashMap<>();
 
         for (Element input : form.getElementsByTag("input")) {
             String value = input.attr("value");

@@ -67,8 +67,6 @@ public class MosMetroV3 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
 
-                Logger.log(Logger.LEVEL.DEBUG, redirect);
-
                 if (redirect.contains("client_mac")) {
                     vars.put("mac", Uri.parse(redirect).getQueryParameter("client_mac"));
                 } else {

@@ -102,8 +102,6 @@ public class MosMetroV2 extends Provider {
                     Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
                 }
 
-                Logger.log(Logger.LEVEL.DEBUG, redirect);
-
                 Uri uri = Uri.parse(redirect);
                 String path = uri.getPath();
 

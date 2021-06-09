@@ -172,7 +172,7 @@ public abstract class Client {
     }
 
     public HttpRequest get(String link, Map<String,String> form) {
-        return new HttpRequest(this, METHOD.GET, link + '?' + requestToString(form));
+        return new HttpRequest(this, METHOD.GET, link + requestToString(form));
     }
 
     public HttpRequest post(String link, String body, String type) {

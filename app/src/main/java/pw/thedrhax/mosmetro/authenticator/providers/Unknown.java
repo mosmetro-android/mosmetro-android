@@ -50,13 +50,6 @@ public class Unknown extends Provider {
         add(new InitialConnectionCheckTask(this, response) {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
-                if (response.getResponseCode() == 204) {
-                    Logger.log(context.getString(R.string.auth_already_connected));
-                    vars.put("result", RESULT.ALREADY_CONNECTED);
-                }
-
-                Logger.log(Logger.LEVEL.DEBUG, response.toString());
-
                 boolean recheck = false;
 
                 try {

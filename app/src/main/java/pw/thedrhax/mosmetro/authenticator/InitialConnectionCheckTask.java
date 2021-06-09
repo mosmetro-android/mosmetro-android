@@ -51,6 +51,7 @@ public abstract class InitialConnectionCheckTask implements Task {
             return false;
         }
 
+        Logger.log(Logger.LEVEL.DEBUG, response.toString());
         return handle_response(vars, response);
     }
 
