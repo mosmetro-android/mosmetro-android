@@ -24,11 +24,11 @@ import android.os.Build;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.UUID;
 
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
+import pw.thedrhax.util.UUID;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
@@ -48,13 +48,6 @@ class ProviderMetrics {
 
     @SuppressLint("StaticFieldLeak")
     public boolean end(HashMap<String, Object> vars) {
-        // Generate random anonymous UUID
-        String uuid = p.settings.getString("uuid", "none");
-        if ("none".equals(uuid)) {
-            uuid = UUID.randomUUID().toString();
-            p.settings.edit().putString("uuid", uuid).apply();
-        }
-
         boolean connected;
 
         switch ((Provider.RESULT) vars.get("result")) {
@@ -67,7 +60,7 @@ class ProviderMetrics {
 
         final HashMap<String, String> params = new HashMap<>();
 
-        params.put("uuid", uuid);
+        params.put("uuid", UUID.get(p.context));
         params.put("version_name", Version.getVersionName());
         params.put("version_code", "" + Version.getVersionCode());
         params.put("build_branch", Version.getBranch());

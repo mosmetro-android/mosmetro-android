@@ -71,6 +71,7 @@ public class SettingsActivity extends Activity {
     private SettingsFragment fragment;
     private PermissionUtils pu;
     private Listener<Map<String, UpdateChecker.Branch>> branches;
+    private UpdateChecker updater;
     private SharedPreferences settings;
     private CheckBoxPreference pref_autoconnect;
     private CheckBoxPreference pref_autoconnect_service;
@@ -152,14 +153,15 @@ public class SettingsActivity extends Activity {
     private void update_checker_setup() {
         final Preference pref_updater_check = fragment.findPreference("pref_updater_check");
 
+        updater = new UpdateChecker(SettingsActivity.this);
+        updater.init();
+
         Preference.OnPreferenceClickListener click = new Preference.OnPreferenceClickListener() {
             @SuppressLint("StaticFieldLeak")
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 boolean manual = preference != null;
-
-                UpdateChecker updater = new UpdateChecker(SettingsActivity.this)
-                        .ignore(!manual).force(manual);
+                updater.ignore(!manual).force(manual);
 
                 updater.async_check(new UpdateChecker.Callback() {
                     @Override
@@ -172,7 +174,7 @@ public class SettingsActivity extends Activity {
                         pref_updater_check.setEnabled(true);
                         branches.set(result.getBranches());
 
-                        if (result != null && (result.hasUpdate() || manual)) {
+                        if (result.hasUpdate() || manual) {
                             result.showDialog();
                         }
                     }
@@ -537,5 +539,11 @@ public class SettingsActivity extends Activity {
             energy_saving_setup();
         if (Build.VERSION.SDK_INT >= 28)
             location_permission_setup();
+    }
+
+    @Override
+    protected void onDestroy() {
+        updater.deinit();
+        super.onDestroy();
     }
 }

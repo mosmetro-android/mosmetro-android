@@ -33,6 +33,7 @@ android {
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
         buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
+        buildConfigField "String", "API_REL_DOWNLOAD", "\"/api/v2/download\""
     }
 
     compileOptions {

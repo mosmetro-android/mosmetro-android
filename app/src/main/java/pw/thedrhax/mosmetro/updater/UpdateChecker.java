@@ -19,11 +19,16 @@
 package pw.thedrhax.mosmetro.updater;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 
 import org.json.simple.JSONObject;
@@ -38,11 +43,13 @@ import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.UUID;
 import pw.thedrhax.util.Version;
 
 public class UpdateChecker {
     // Info from the app
     private final Context context;
+    private final DownloadManager dm;
     private final SharedPreferences settings;
     private final CachedRetriever retriever;
 
@@ -50,11 +57,46 @@ public class UpdateChecker {
     private boolean update_failed = false;
     private boolean check_ignored = false;
     private boolean force_check = false;
+    private long last_download = 0;
 
     public UpdateChecker(Context context) {
         this.context = context;
+        this.dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
         this.retriever = new CachedRetriever(context);
+    }
+
+    private final BroadcastReceiver onComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            if (id != last_download) return;
+
+            Uri uri = dm.getUriForDownloadedFile(id);
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                intent.setData(uri);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+
+            context.startActivity(intent);
+        }
+    };
+
+    public void init() {
+        context.registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        context.registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+    }
+
+    public void deinit() {
+        context.unregisterReceiver(onComplete);
     }
 
     /**
@@ -77,7 +119,7 @@ public class UpdateChecker {
         String UPDATE_INFO_URL = settings.getString(
                 BackendRequest.PREF_BACKEND_URL,
                 BuildConfig.API_URL_DEFAULT
-        ) + BuildConfig.API_REL_BRANCHES;
+        ) + BuildConfig.API_REL_BRANCHES + "?uuid=" + UUID.get(context);
 
         // Clear branch cache
         if (force_check) retriever.remove(UPDATE_INFO_URL);
@@ -219,9 +261,10 @@ public class UpdateChecker {
         public final String description;
         public final boolean stable;
         public final String url;
+        public final String filename;
 
-        private int version;
-        private boolean by_build = false; // Check by build number instead of version code
+        private final int version;
+        private final boolean by_build; // Check by build number instead of version code
 
         public Branch (String name, JSONObject data) {
             this.name = name;
@@ -231,6 +274,7 @@ public class UpdateChecker {
             this.description = (String)data.get("description");
             this.stable = data.containsKey("stable") && (Boolean)data.get("stable");
             this.url = (String)data.get("url");
+            this.filename = (String)data.get("filename");
         }
 
         public String id() {
@@ -260,6 +304,20 @@ public class UpdateChecker {
             settings.edit().putInt("pref_updater_ignore", ignore ? version : 0).apply();
         }
 
+        public void install() {
+            Uri uri = Uri.parse(settings.getString(
+                    BackendRequest.PREF_BACKEND_URL,
+                    BuildConfig.API_URL_DEFAULT
+            ) + BuildConfig.API_REL_DOWNLOAD + "/" + name + "?uuid=" + UUID.get(context));
+
+            DownloadManager.Request req = new DownloadManager.Request(uri)
+                    .setTitle(filename)
+                    .setDestinationInExternalFilesDir(context, null, "update.apk")
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+            last_download = dm.enqueue(req);
+        }
+
         public void download() {
             context.startActivity(new Intent(context, SafeViewActivity.class).putExtra("data", url));
         }
@@ -268,17 +326,37 @@ public class UpdateChecker {
             return new AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.update_available))
                     .setMessage(message)
-                    .setNeutralButton(R.string.later, null)
+                    .setNegativeButton(R.string.later, null)
+                    .setNeutralButton(R.string.download, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            download();
+                        }
+                    })
                     .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            download();
+                            install();
                         }
                     });
         }
 
         public AlertDialog.Builder dialog_update() {
-            return dialog()
+            return new AlertDialog.Builder(context)
+                    .setTitle(context.getString(R.string.update_available))
+                    .setMessage(message)
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            install();
+                        }
+                    })
+                    .setNeutralButton(R.string.download, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            download();
+                        }
+                    })
                     .setNegativeButton(R.string.ignore_short, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

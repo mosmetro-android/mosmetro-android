@@ -26,6 +26,7 @@
     <string name="warning">Предупреждение</string>
     <string name="about">О программе</string>
     <string name="log">Лог</string>
+    <string name="download">Скачать</string>
 
     <string name="form_login">Логин:</string>
     <string name="form_password">Пароль:</string>
