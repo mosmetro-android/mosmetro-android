@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
@@ -111,24 +112,7 @@ public class MAInet extends Provider {
             }
         });
 
-        /**
-         * Checking Internet connection
-         */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_connected));
-                    vars.put("result", RESULT.CONNECTED);
-                    return true;
-                } else {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_connection)
-                    ));
-                    return false;
-                }
-            }
-        });
+        add(new FinalConnectionCheckTask(this));
     }
 
     /**

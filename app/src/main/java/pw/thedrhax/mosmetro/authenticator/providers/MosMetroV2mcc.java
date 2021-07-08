@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
@@ -134,16 +135,9 @@ public class MosMetroV2mcc extends Provider {
                     return false;
                 }
 
-                Provider provider = (Provider)vars.get("provider");
-                vars.put("switch", provider.getName());
-
-                // Ignore internet connection check in child provider
-                if (provider instanceof MosMetroV2 || provider instanceof MosMetroV2WV) {
-                    provider.removeLast();
-                }
-
-                Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                return add(indexOf(this) + 1, provider);
+                Provider provider = (Provider) vars.get("provider");
+                add(indexOf(this) + 1, provider);
+                return true;
             }
         });
 
@@ -233,24 +227,7 @@ public class MosMetroV2mcc extends Provider {
             }
         }.tries(5));
 
-        /**
-         * Checking Internet connection
-         */
-        add(new NamedTask(context.getString(R.string.auth_checking_connection)) {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (isConnected()) {
-                    Logger.log(context.getString(R.string.auth_connected));
-                    vars.put("result", RESULT.CONNECTED);
-                    return true;
-                } else {
-                    Logger.log(context.getString(R.string.error,
-                            context.getString(R.string.auth_error_connection)
-                    ));
-                    return false;
-                }
-            }
-        });
+        add(new FinalConnectionCheckTask(this));
     }
 
     /**

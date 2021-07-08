@@ -64,9 +64,8 @@ public class Unknown extends Provider {
                         Provider provider = Provider.find(context, res);
 
                         if (!(provider instanceof Unknown)) {
-                            vars.put("switch", provider.getName());
-                            Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                            return add(indexOf(this) + 1, provider);
+                            add(indexOf(this) + 1, provider);
+                            return true;
                         }
 
                         HttpRequest req = client.get(redirect).retry();
