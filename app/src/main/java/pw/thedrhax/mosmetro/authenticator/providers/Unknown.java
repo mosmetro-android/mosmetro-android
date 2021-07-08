@@ -26,7 +26,6 @@ import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
-import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
@@ -63,18 +62,29 @@ public class Unknown extends Provider {
                     for (int i = 0; i < 20; i++) {
                         Provider provider = Provider.find(context, res);
 
-                        if (!(provider instanceof Unknown)) {
-                            add(indexOf(this) + 1, provider);
-                            return true;
+                        if (provider instanceof Unknown) {
+                            HttpRequest req = client.get(redirect).retry();
+                            Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
+
+                            res = req.execute(); // throws IOException
+                            Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                            redirect = res.parseAnyRedirect(); // throws ParseException
+                        } else {
+                            Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
+                            vars.put("switch", provider.getName());
+
+                            client.setFollowRedirects(true);
+
+                            provider.setNested(true)
+                                    .setRunningListener(running)
+                                    .setClient(client)
+                                    .start(vars);
+
+                            client.setFollowRedirects(false);
+
+                            redirect = gen_204.check().getResponse().parseAnyRedirect(); // throws ParseException
                         }
-
-                        HttpRequest req = client.get(redirect).retry();
-                        Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
-
-                        res = req.execute(); // throws IOException
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
-
-                        redirect = res.parseAnyRedirect(); // throws ParseException
                     }
 
                     throw new IOException("Too many redirects");
