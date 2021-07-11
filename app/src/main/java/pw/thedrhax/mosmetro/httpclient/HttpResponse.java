@@ -22,6 +22,12 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.Option;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
@@ -41,6 +47,7 @@ import java.util.regex.Pattern;
 
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import pw.thedrhax.util.Logger;
 
 public class HttpResponse {
     public static final LinkedList<String> PARSED_TYPES = new LinkedList<String>() {{
@@ -233,6 +240,23 @@ public class HttpResponse {
     @NonNull
     public JSONObject json() throws org.json.simple.parser.ParseException {
         return (JSONObject) new JSONParser().parse(getPage());
+    }
+
+    private final static Configuration JSONPATH_CONFIG = Configuration
+            .defaultConfiguration()
+            .addOptions(
+                    Option.SUPPRESS_EXCEPTIONS,
+                    Option.DEFAULT_PATH_LEAF_TO_NULL
+            );
+
+    @NonNull
+    public DocumentContext jsonpath() {
+        try {
+            return JsonPath.using(JSONPATH_CONFIG).parse(getPage());
+        } catch (IllegalArgumentException|JsonPathException ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
+            return JsonPath.using(JSONPATH_CONFIG).parse("{}");
+        }
     }
 
     @NonNull

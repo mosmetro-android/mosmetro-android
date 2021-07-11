@@ -23,6 +23,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import android.util.Patterns;
 
+import com.jayway.jsonpath.DocumentContext;
+
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -260,18 +262,15 @@ public class MosMetroV2 extends Provider {
                     if (mosmetro || spb) { // expecting JSON
                         Logger.log(Logger.LEVEL.DEBUG, response.toHeaderString());
 
-                        try {
-                            JSONObject json = response.json();
-                            JSONObject data = (JSONObject) json.get("data");
+                        DocumentContext json = response.jsonpath();
+                        json.delete("$.data.segmentParams.auth");
+                        json.delete("$.data.userParams");
+                        Logger.log(Logger.LEVEL.DEBUG, json.jsonString());
 
-                            if (data != null) {
-                                data.remove("segmentParams");
-                                data.remove("userParams");
-                            }
-
-                            Logger.log(Logger.LEVEL.DEBUG, json.toJSONString());
-                        } catch (org.json.simple.parser.ParseException ex) {
-                            Logger.log(Logger.LEVEL.DEBUG, response.toBodyString());
+                        String afterAuth = json.read("$.data.segmentParams.common.redirectUrl.afterAuth");
+                        if (afterAuth != null) {
+                            vars.put("post_auth_redirect", afterAuth);
+                            Logger.log(Logger.LEVEL.DEBUG, "Post-auth redirect: " + afterAuth);
                         }
                     } else {
                         Logger.log(Logger.LEVEL.DEBUG, response.toString());

@@ -83,7 +83,11 @@ public class Unknown extends Provider {
 
                             client.setFollowRedirects(false);
 
-                            redirect = gen_204.check().getResponse().parseAnyRedirect(); // throws ParseException
+                            if (vars.containsKey("post_auth_redirect")) {
+                                redirect = (String) vars.remove("post_auth_redirect");
+                            } else {
+                                redirect = gen_204.check().getResponse().parseAnyRedirect(); // throws ParseException
+                            }
                         }
                     }
 
