@@ -25,8 +25,6 @@ import android.util.Patterns;
 
 import com.jayway.jsonpath.DocumentContext;
 
-import org.json.simple.JSONObject;
-
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.ParseException;
@@ -351,40 +349,33 @@ public class MosMetroV2 extends Provider {
                     HttpResponse res = client.post(url, params).retry().execute();
                     Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
-                    try {
-                        JSONObject data = res.json();
+                    DocumentContext data = res.jsonpath();
 
-                        if (data.containsKey("auth_error_code")) {
-                            String error_code = (String) data.get("auth_error_code");
+                    String error_code = data.read("$.auth_error_code");
+                    if (error_code != null && error_code.startsWith("err_device_not_identified")) {
+                        Logger.log(context.getString(R.string.error,
+                                context.getString(R.string.auth_error_not_registered)
+                        ));
 
-                            if (error_code != null && error_code.startsWith("err_device_not_identified")) {
-                                Logger.log(context.getString(R.string.error,
-                                        context.getString(R.string.auth_error_not_registered)
-                                ));
+                        vars.put("result", RESULT.NOT_REGISTERED);
+                        return false;
+                    }
 
-                                vars.put("result", RESULT.NOT_REGISTERED);
-                                return false;
-                            }
-                        }
+                    boolean error = Boolean.FALSE.equals(data.read("$.result", Boolean.class));
+                    error |= "fail".equals(data.read("$.auth_status"));
 
-                        boolean error = Boolean.FALSE.equals(data.get("result"));
-                        error |= "fail".equals(data.get("auth_status"));
-
-                        if (error) {
-                            throw new ParseException("Server returned an error", 0);
-                        }
-                    } catch (org.json.simple.parser.ParseException ex) {
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
-                        Logger.log(Logger.LEVEL.DEBUG, "Unable to parse: response is not JSON");
+                    if (error) {
+                        throw new IOException("Server returned an error");
                     }
                 } catch (ProtocolException ignored) { // Too many follow-up requests
-                } catch (IOException|ParseException ex) {
+                } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(context.getString(R.string.error,
                             context.getString(R.string.auth_error_server)
                     ));
                     return false;
                 }
+
                 return true;
             }
         });
