@@ -81,6 +81,9 @@ public class Unknown extends Provider {
                                     .setClient(client)
                                     .start(vars);
 
+                            Logger.log(context.getString(R.string.auth_waiting));
+                            if (!running.sleep(5000)) return false;
+
                             client.setFollowRedirects(false);
 
                             if (vars.containsKey("post_auth_redirect")) {
