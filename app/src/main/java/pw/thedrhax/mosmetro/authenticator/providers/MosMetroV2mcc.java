@@ -154,16 +154,20 @@ public class MosMetroV2mcc extends Provider {
                 try {
                     client.setFollowRedirects(false);
 
-                    response = client.get("http://hotspot.maximatelecom/login", new HashMap<String, String>() {{
-                        String mac = (String) vars.get("mac");
+                    if (vars.containsKey("post_auth_redirect")) {
+                        response = client.get((String) vars.get("post_auth_redirect")).retry().execute();
+                    } else {
+                        response = client.get("http://hotspot.maximatelecom/login", new HashMap<String, String>() {{
+                            String mac = (String) vars.get("mac");
 
-                        if (mac == null || mac.isEmpty()) {
-                            mac = "00-00-00-00-00-00";
-                        }
+                            if (mac == null || mac.isEmpty()) {
+                                mac = "00-00-00-00-00-00";
+                            }
 
-                        put("username", mac.toLowerCase());
-                        put("password", "placeholder");
-                    }}).retry().execute();
+                            put("username", mac.toLowerCase());
+                            put("password", "placeholder");
+                        }}).retry().execute();
+                    }
 
                     client.setFollowRedirects(true);
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
