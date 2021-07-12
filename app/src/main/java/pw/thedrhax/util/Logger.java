@@ -64,7 +64,14 @@ public class Logger {
     private static String timestamp() {
         long diff = System.currentTimeMillis() - last_timestamp;
         last_timestamp = System.currentTimeMillis();
-        return diff > 9999 ? "[+>10s]" : String.format(Locale.ENGLISH, "[+%04d]", diff);
+
+        if (diff > 99000) {
+            return "[+>99s]";
+        } else if (diff > 9999) {
+            return String.format(Locale.ENGLISH, "[+%03ds]", diff / 1000);
+        } else {
+            return String.format(Locale.ENGLISH, "[+%04d]", diff);
+        }
     }
 
     /*
