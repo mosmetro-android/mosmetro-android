@@ -62,15 +62,7 @@ public class Unknown extends Provider {
                     for (int i = 0; i < 20; i++) {
                         Provider provider = Provider.find(context, res);
 
-                        if (provider instanceof Unknown) {
-                            HttpRequest req = client.get(redirect).retry();
-                            Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
-
-                            res = req.execute(); // throws IOException
-                            Logger.log(Logger.LEVEL.DEBUG, res.toString());
-
-                            redirect = res.parseAnyRedirect(); // throws ParseException
-                        } else {
+                        if (!(provider instanceof Unknown)) {
                             Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
                             vars.put("switch", provider.getName());
 
@@ -81,9 +73,6 @@ public class Unknown extends Provider {
                                     .setClient(client)
                                     .start(vars);
 
-                            Logger.log(context.getString(R.string.auth_waiting));
-                            if (!running.sleep(5000)) return false;
-
                             client.setFollowRedirects(false);
 
                             if (vars.containsKey("post_auth_redirect")) {
@@ -91,7 +80,17 @@ public class Unknown extends Provider {
                             } else {
                                 redirect = gen_204.check().getResponse().parseAnyRedirect(); // throws ParseException
                             }
+
+                            i++;
                         }
+
+                        HttpRequest req = client.get(redirect).retry();
+                        Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
+
+                        res = req.execute(); // throws IOException
+                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
+
+                        redirect = res.parseAnyRedirect(); // throws ParseException
                     }
 
                     throw new IOException("Too many redirects");
