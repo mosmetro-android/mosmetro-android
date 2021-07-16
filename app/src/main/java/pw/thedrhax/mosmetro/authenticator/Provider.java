@@ -62,7 +62,8 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "MT_FREE", "MT_FREE_",
             "CPPK_Free",
             "Air_WiFi_Free",
-            "MAInet_public"
+            "MAInet_public",
+            "Moscow_WiFi_Free"
     };
 
     protected Context context;
