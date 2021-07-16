@@ -266,9 +266,14 @@ public class MosMetroV2 extends Provider {
                         Logger.log(Logger.LEVEL.DEBUG, json.jsonString());
 
                         String afterAuth = json.read("$.data.segmentParams.common.redirectUrl.afterAuth");
-                        if (afterAuth != null) {
+                        try {
+                            if (afterAuth == null) throw new ParseException("URL is null", 0);
+                            afterAuth = HttpResponse.absolutePathToUrl(url, afterAuth); // throws ParseException
                             vars.put("post_auth_redirect", afterAuth);
                             Logger.log(Logger.LEVEL.DEBUG, "Post-auth redirect: " + afterAuth);
+                        } catch (ParseException ex) {
+                            Logger.log(Logger.LEVEL.DEBUG, ex);
+                            Logger.log(Logger.LEVEL.DEBUG, "Warning: Unable to parse post-auth redirect");
                         }
                     } else {
                         Logger.log(Logger.LEVEL.DEBUG, response.toString());
