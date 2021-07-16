@@ -50,11 +50,7 @@ import pw.thedrhax.util.Util;
  * The MosMetroV2VW class implements support for auth.wi-fi.ru algorithm using Android WebView
  * component to create requests and interpret server answers.
  *
- * Detection: Meta-redirect contains ".wi-fi.ru" with any 3rd level domain (except "login"
- * and "welcome").
- *
- * When pref_mosmetro_v3 is disabled, welcome.wi-fi.ru will be handled and bypassed by MosMetroV2WV
- * in all regions except Saint Petersburg (see MosMetroV3 instead).
+ * Detection: Meta-redirect contains "auth.wi-fi.ru".
  *
  * Overrides: MosMetroV2
  *
@@ -110,35 +106,6 @@ public class MosMetroV2WV extends WebViewProvider {
 
                 Logger.log(Logger.LEVEL.DEBUG, "Segment: " + vars.get("segment"));
 
-                return true;
-            }
-        });
-
-        /**
-         * Checking for bad redirect
-         * redirect ~= welcome.wi-fi.ru
-         */
-        if (!settings.getBoolean("pref_mosmetro_v3", true))
-        add(new Task() {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                if (redirect.contains("welcome.wi-fi.ru")) {
-                    Logger.log(Logger.LEVEL.DEBUG, "Found redirect to welcome.wi-fi.ru!");
-
-                    try {
-                        HttpResponse response = client.get(redirect).retry().execute();
-                        Logger.log(Logger.LEVEL.DEBUG, response.toString());
-                    } catch (IOException ex) {
-                        Logger.log(Logger.LEVEL.DEBUG, ex);
-                    }
-
-                    redirect = Uri.parse(redirect).buildUpon()
-                            .authority("auth.wi-fi.ru")
-                            .build().toString();
-
-                    vars.put("v3_bypass", "true");
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
-                }
                 return true;
             }
         });
@@ -319,6 +286,6 @@ public class MosMetroV2WV extends WebViewProvider {
             return false;
         }
 
-        return redirect.contains(".wi-fi.ru") && !redirect.contains("login.wi-fi.ru");
+        return redirect.matches("^https?://auth\\.wi-fi\\.ru/.*");
     }
 }
