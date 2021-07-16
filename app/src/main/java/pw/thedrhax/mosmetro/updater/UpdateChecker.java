@@ -330,9 +330,14 @@ public class UpdateChecker {
                     BuildConfig.API_URL_DEFAULT
             ) + BuildConfig.API_REL_DOWNLOAD + "/" + name + "?uuid=" + UUID.get(context));
 
+            File apk = new File(context.getExternalFilesDir(null), "update.apk");
+            if (apk.exists()) {
+                apk.delete();
+            }
+
             DownloadManager.Request req = new DownloadManager.Request(uri)
                     .setTitle(filename)
-                    .setDestinationInExternalFilesDir(context, null, "update.apk")
+                    .setDestinationUri(Uri.fromFile(apk))
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
             last_download = dm.enqueue(req);
