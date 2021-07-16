@@ -252,8 +252,10 @@ public class HttpResponse {
     @NonNull
     public DocumentContext jsonpath() {
         try {
-            return JsonPath.using(JSONPATH_CONFIG).parse(getPage());
-        } catch (IllegalArgumentException|JsonPathException ex) {
+            DocumentContext data = JsonPath.using(JSONPATH_CONFIG).parse(getPage());
+            data.jsonString(); // throws UnsupportedOperationException
+            return data;
+        } catch (IllegalArgumentException|JsonPathException|UnsupportedOperationException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             return JsonPath.using(JSONPATH_CONFIG).parse("{}");
         }
