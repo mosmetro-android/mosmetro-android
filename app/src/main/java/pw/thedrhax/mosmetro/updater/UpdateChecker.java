@@ -18,8 +18,10 @@
 
 package pw.thedrhax.mosmetro.updater;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,11 +32,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +71,7 @@ public class UpdateChecker {
     }
 
     private final BroadcastReceiver onComplete = new BroadcastReceiver() {
+        @SuppressLint("SetWorldReadable")
         @Override
         public void onReceive(Context context, Intent intent) {
             long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
@@ -74,17 +79,32 @@ public class UpdateChecker {
 
             Uri uri = dm.getUriForDownloadedFile(id);
 
+            Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
             if (Build.VERSION.SDK_INT >= 24) {
-                intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                intent.setData(uri);
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                install.setData(uri);
             } else {
-                intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                File apk = new File(context.getExternalFilesDir(null), "update.apk");
+                if (apk.exists()) apk.setReadable(true, false);
+                install.setDataAndType(uri, "application/vnd.android.package-archive");
             }
 
-            context.startActivity(intent);
+            try {
+                context.startActivity(install);
+                return;
+            } catch (ActivityNotFoundException ex) {
+                install.setAction(Intent.ACTION_VIEW);
+            }
+
+            try {
+                context.startActivity(install);
+            } catch (ActivityNotFoundException ex) {
+                Toast.makeText(context, context.getString(R.string.error,
+                        context.getString(R.string.update_error)
+                ), Toast.LENGTH_LONG).show();
+            }
         }
     };
 

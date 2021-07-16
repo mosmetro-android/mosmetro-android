@@ -251,4 +251,5 @@
     <string name="pref_manual_connection_monitoring_summary">Продолжать проверять соединение с интернетом после успешного ручного подключения и до прерывания соединения с сетью Wi-Fi. Это необходимо для обработки midsession.</string>
     <string name="pref_dnsjava">Альтернативный DNS клиент</string>
     <string name="pref_dnsjava_summary">Всегда использовать собственный DNS клиент вместо системного</string>
+    <string name="update_error">Не удалось установить обновление. Попробуйте \"Скачать\" вместо \"Установить\"</string>
 </resources>
