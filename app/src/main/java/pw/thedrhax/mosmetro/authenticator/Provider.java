@@ -23,9 +23,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
+import org.acra.ACRA;
+
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
@@ -253,7 +254,16 @@ public abstract class Provider extends LinkedList<Task> implements Task {
                 callback.onProgressUpdate(progress);
             }
 
-            if (!task.run(vars)) break;
+            try {
+                if (!task.run(vars)) break;
+            } catch (RuntimeException ex) {
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+                Logger.log(context.getString(R.string.error,
+                        context.getString(R.string.auth_error_fatal)
+                ));
+                ACRA.getErrorReporter().handleSilentException(ex);
+                break;
+            }
         }
 
         if (!nested) metrics.end(vars);
