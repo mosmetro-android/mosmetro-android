@@ -311,7 +311,6 @@ public abstract class Provider extends LinkedList<Task> implements Task {
      */
     public Provider setClient(Client client) {
         this.client = client
-                .customDnsEnabled(true)
                 .setRunningListener(running)
                 .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
         return this;

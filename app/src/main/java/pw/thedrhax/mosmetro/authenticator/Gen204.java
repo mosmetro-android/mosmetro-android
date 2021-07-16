@@ -71,7 +71,6 @@ public class Gen204 {
         this.running.subscribe(running);
 
         client = new OkHttp(context)
-                .customDnsEnabled(true)
                 .setFollowRedirects(false)
                 .setRunningListener(this.running);
 

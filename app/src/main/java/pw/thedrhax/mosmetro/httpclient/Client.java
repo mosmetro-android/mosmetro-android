@@ -61,7 +61,6 @@ public abstract class Client {
 
     // Settings methods
     public abstract Client trustAllCerts();
-    public abstract Client customDnsEnabled(boolean enabled);
 
     public Client setFollowRedirects(boolean follow) {
         this.followRedirects = follow;

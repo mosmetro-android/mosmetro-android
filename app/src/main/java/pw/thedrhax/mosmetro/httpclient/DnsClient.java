@@ -27,6 +27,8 @@ import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,27 +36,24 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import okhttp3.Dns;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.WifiUtils;
 
 public class DnsClient implements Dns {
-    private WifiUtils wifi;
+    private final WifiUtils wifi;
     private ExtendedResolver dns;
+    private final boolean pref_dnsjava;
 
     private String[] getServers() {
         Set<String> servers = new HashSet<String>();
 
-        wifi.getDns().forEach(new Consumer<InetAddress>() {
-            @Override
-            public void accept(InetAddress t) {
-                servers.add(t.getHostAddress());
-            }
-        });
+        for (InetAddress t : wifi.getDns()) {
+            servers.add(t.getHostAddress());
+        }
 
-        return servers.toArray(new String[servers.size()]);
+        return servers.toArray(new String[0]);
     }
 
     private String[] getDefaultServers() {
@@ -63,6 +62,9 @@ public class DnsClient implements Dns {
     }
 
     public DnsClient(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        pref_dnsjava = settings.getBoolean("pref_dnsjava", false);
+
         wifi = new WifiUtils(context);
 
         String[] servers = getServers();
@@ -73,18 +75,16 @@ public class DnsClient implements Dns {
         }
 
         if (servers.length == 0) {
-            Logger.log(this, "No servers found, using fallback resolver");
+            Logger.log(this, "No servers found, using system resolver");
             dns = null;
             return;
         }
-
-        Logger.log(this, String.join(", ", servers));
 
         try {
             dns = new ExtendedResolver(servers);
         } catch (UnknownHostException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            Logger.log(this, "Unable to initialize, using fallback resolver");
+            Logger.log(this, "Unable to initialize, using system resolver");
             dns = null;
         }
     }
@@ -93,6 +93,12 @@ public class DnsClient implements Dns {
     public List<InetAddress> lookup(String hostname) throws UnknownHostException {
         if (dns == null) {
             return Dns.SYSTEM.lookup(hostname);
+        }
+
+        if (!pref_dnsjava && !wifi.isPrivateDnsActive()) {
+            try {
+                return Dns.SYSTEM.lookup(hostname);
+            } catch (UnknownHostException ignored) {}
         }
 
         Lookup req;
