@@ -69,6 +69,12 @@
 
     <PreferenceCategory android:title="@string/pref_category_connection" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_dnsjava"
+        android:title="@string/pref_dnsjava"
+        android:summary="@string/pref_dnsjava_summary" />
+
     <EditTextPreference
         android:defaultValue="3"
         android:inputType="number"

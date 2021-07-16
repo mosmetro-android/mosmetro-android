@@ -273,4 +273,6 @@
     <string name="algorithms">Algorithms</string>
     <string name="pref_manual_connection_monitoring">After manual connection</string>
     <string name="pref_manual_connection_monitoring_summary">Continue to monitor internet connection after successfull manual connection until disconnecting from Wi-Fi. It is required for midsession detection.</string>
+    <string name="pref_dnsjava">Alternative DNS client</string>
+    <string name="pref_dnsjava_summary">Always use custom DNS client instead of the system one</string>
 </resources>

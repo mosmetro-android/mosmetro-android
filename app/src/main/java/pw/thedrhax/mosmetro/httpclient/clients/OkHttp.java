@@ -171,12 +171,12 @@ public class OkHttp extends Client {
 
     @Override
     public Client customDnsEnabled(boolean enabled) {
-        Dns dns;
+        boolean pref_dnsjava = settings.getBoolean("pref_dnsjava", false);
 
-        if (enabled && wifi.isPrivateDnsActive()) {
+        Dns dns = Dns.SYSTEM;
+
+        if (enabled && (wifi.isPrivateDnsActive() || pref_dnsjava)) {
             dns = new DnsClient(context);
-        } else {
-            dns = Dns.SYSTEM;
         }
 
         client = client.newBuilder()

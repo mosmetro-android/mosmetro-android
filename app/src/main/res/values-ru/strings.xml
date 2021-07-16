@@ -249,4 +249,6 @@
     <string name="algorithms">Алгоритмы</string>
     <string name="pref_manual_connection_monitoring">После ручного подключения</string>
     <string name="pref_manual_connection_monitoring_summary">Продолжать проверять соединение с интернетом после успешного ручного подключения и до прерывания соединения с сетью Wi-Fi. Это необходимо для обработки midsession.</string>
+    <string name="pref_dnsjava">Альтернативный DNS клиент</string>
+    <string name="pref_dnsjava_summary">Всегда использовать собственный DNS клиент вместо системного</string>
 </resources>
