@@ -47,7 +47,16 @@ import pw.thedrhax.util.Randomizer;
 /**
  * The MosMetroV2 class implements support for auth.wi-fi.ru algorithm.
  *
- * Detection: Meta-redirect contains "auth.wi-fi.ru".
+ * Detection: Meta-redirect contains:
+ *   - host: auth.wi-fi.ru
+ *   - path:
+ *     - /auth              (default)
+ *     - /                  (metro)
+ *     - /new               (metro)
+ *     - /spb               (spb)
+ *   - search:
+ *     - segment
+ *     - mac / client_mac   (optional)
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
@@ -405,6 +414,6 @@ public class MosMetroV2 extends Provider {
             return false;
         }
 
-        return redirect.matches("^https?://auth\\.wi-fi\\.ru/.*");
+        return redirect.matches("^https?://auth\\.wi-fi\\.ru/(auth|new|spb/)?(\\?.*)?$");
     }
 }

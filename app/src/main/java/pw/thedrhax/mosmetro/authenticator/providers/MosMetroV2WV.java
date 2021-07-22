@@ -50,7 +50,16 @@ import pw.thedrhax.util.Util;
  * The MosMetroV2VW class implements support for auth.wi-fi.ru algorithm using Android WebView
  * component to create requests and interpret server answers.
  *
- * Detection: Meta-redirect contains "auth.wi-fi.ru".
+ * Detection: Meta-redirect contains:
+ *   - host: auth.wi-fi.ru
+ *   - path:
+ *     - /auth              (default)
+ *     - /                  (metro)
+ *     - /new               (metro)
+ *     - /spb               (spb)
+ *   - search:
+ *     - segment
+ *     - mac / client_mac   (optional)
  *
  * Overrides: MosMetroV2
  *
@@ -286,6 +295,6 @@ public class MosMetroV2WV extends WebViewProvider {
             return false;
         }
 
-        return redirect.matches("^https?://auth\\.wi-fi\\.ru/.*");
+        return redirect.matches("^https?://auth\\.wi-fi\\.ru/(auth|new|spb/)?(\\?.*)?$");
     }
 }
