@@ -68,6 +68,8 @@ import pw.thedrhax.util.PermissionUtils;
 import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
+    public static final String ACTION_DONATE = "donate";
+
     private SettingsFragment fragment;
     private PermissionUtils pu;
     private Listener<Map<String, UpdateChecker.Branch>> branches;
@@ -539,6 +541,8 @@ public class SettingsActivity extends Activity {
             energy_saving_setup();
         if (Build.VERSION.SDK_INT >= 28)
             location_permission_setup();
+        if (getIntent() != null && ACTION_DONATE.equals(getIntent().getAction()))
+            donate_dialog();
     }
 
     @Override

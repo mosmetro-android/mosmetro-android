@@ -252,4 +252,10 @@
     <string name="pref_dnsjava">Альтернативный DNS клиент</string>
     <string name="pref_dnsjava_summary">Всегда использовать собственный DNS клиент вместо системного</string>
     <string name="update_error">Не удалось установить обновление. Попробуйте \"Скачать\" вместо \"Установить\"</string>
+    <string name="pref_notify_donate">Напоминание о поддержке проекта</string>
+    <string name="pref_notify_donate_summary">Раз в 50 успешных подключений приложение сообщит об этом и предложит поддержать проект</string>
+    <string name="notification_donate_title">Поздравляю с %d-м успешным подключением!</string>
+    <string name="notification_donate_text">Я трачу время на разработку, чтобы сэкономить ваше. Если хотите, вы можете поддержать проект. Нажмите на это уведомление, чтобы узнать больше :)</string>
+    <string name="remind_less_frequently">Напоминать реже</string>
+    <string name="do_not_show">Больше не показывать</string>
 </resources>

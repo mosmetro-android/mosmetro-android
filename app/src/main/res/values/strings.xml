@@ -276,4 +276,10 @@
     <string name="pref_dnsjava">Alternative DNS client</string>
     <string name="pref_dnsjava_summary">Always use custom DNS client instead of the system one</string>
     <string name="update_error">Unable to install the update. Please try \"Download\" instead of \"Install\"</string>
+    <string name="pref_notify_donate">Donation reminder</string>
+    <string name="pref_notify_donate_summary">Show notification about every 50-th successful connection and ask for a donation</string>
+    <string name="notification_donate_title">Congrats on the %d-th successful connection!</string>
+    <string name="notification_donate_text">I spend a lot of time to save yours. If you want, you can support the project. Click on this notification to find out more :)</string>
+    <string name="remind_less_frequently">Remind less</string>
+    <string name="do_not_show">Do not show</string>
 </resources>
