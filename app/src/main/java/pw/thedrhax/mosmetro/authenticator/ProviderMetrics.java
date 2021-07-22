@@ -21,7 +21,6 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 
 import java.io.IOException;
@@ -101,23 +100,14 @@ class ProviderMetrics {
             params.put("branch", (String) vars.get("branch"));
         }
 
-        new AsyncTask<Void,Void,Void>() {
-            @Override
-            protected Void doInBackground(Void... none) {
-                if (!p.random.delay(p.running)) return null;
+        String STATISTICS_URL = p.settings.getString(
+                BackendRequest.PREF_BACKEND_URL,
+                BuildConfig.API_URL_DEFAULT
+        ) + BuildConfig.API_REL_STATISTICS;
 
-                String STATISTICS_URL = p.settings.getString(
-                        BackendRequest.PREF_BACKEND_URL,
-                        BuildConfig.API_URL_DEFAULT
-                ) + BuildConfig.API_REL_STATISTICS;
-
-                try {
-                    new OkHttp(p.context).post(STATISTICS_URL, params).execute();
-                } catch (IOException ignored) {}
-
-                return null;
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        try {
+            new OkHttp(p.context).post(STATISTICS_URL, params).execute();
+        } catch (IOException ignored) {}
 
         if (System.currentTimeMillis() - 6*60*60*1000 > p.settings.getLong("pref_worker_timestamp", 0)) {
             new BackendRequest(p.context).run();
