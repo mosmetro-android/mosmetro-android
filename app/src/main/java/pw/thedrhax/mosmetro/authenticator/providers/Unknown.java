@@ -20,14 +20,16 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 
-import java.io.IOException;
+import androidx.annotation.Nullable;
+
 import java.text.ParseException;
 import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
+import pw.thedrhax.mosmetro.authenticator.FollowRedirectsTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
-import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
@@ -42,6 +44,7 @@ import pw.thedrhax.util.Logger;
  */
 
 public class Unknown extends Provider {
+    private String redirect = null;
 
     public Unknown(final Context context, final HttpResponse response) {
         super(context);
@@ -49,69 +52,27 @@ public class Unknown extends Provider {
         add(new InitialConnectionCheckTask(this, response) {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
-                boolean recheck = false;
-
                 try {
-                    HttpResponse res = response;
-                    String redirect = res.parseAnyRedirect(); // throws ParseException
-
-                    Logger.log(Logger.LEVEL.DEBUG, "Attempting to follow all redirects");
-                    recheck = true;
-                    client.setFollowRedirects(false);
-
-                    for (int i = 0; i < 20; i++) {
-                        Provider provider = Provider.find(context, res);
-
-                        if (!(provider instanceof Unknown)) {
-                            Logger.log(context.getString(R.string.auth_algorithm_switch, provider.getName()));
-                            vars.put("switch", provider.getName());
-
-                            client.setFollowRedirects(true);
-
-                            provider.setNested(true)
-                                    .setRunningListener(running)
-                                    .setClient(client)
-                                    .start(vars);
-
-                            client.setFollowRedirects(false);
-
-                            if (vars.containsKey("post_auth_redirect")) {
-                                redirect = (String) vars.remove("post_auth_redirect");
-                            } else {
-                                redirect = gen_204.check().getResponse().parseAnyRedirect(); // throws ParseException
-                            }
-
-                            i++;
-                        }
-
-                        HttpRequest req = client.get(redirect).retry();
-                        Logger.log(Logger.LEVEL.DEBUG, res.getRequest().toString());
-
-                        res = req.execute(); // throws IOException
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
-
-                        redirect = res.parseAnyRedirect(); // throws ParseException
-                    }
-
-                    throw new IOException("Too many redirects");
-                } catch (IOException|ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                } finally {
-                    client.setFollowRedirects(true);
-                }
-
-                if (recheck && isConnected()) {
-                    Logger.log(context.getString(R.string.auth_connected));
-                    vars.put("result", RESULT.CONNECTED);
+                    redirect = response.parseAnyRedirect();
                     return true;
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_provider)
+                    ));
+                    vars.put("result", RESULT.NOT_SUPPORTED);
+                    return false;
                 }
-
-                Logger.log(context.getString(R.string.error,
-                        context.getString(R.string.auth_error_provider)
-                ));
-                vars.put("result", RESULT.NOT_SUPPORTED);
-                return false;
             }
         });
+
+        add(new FollowRedirectsTask(this) {
+            @Nullable @Override
+            public String getInitialRedirect(HashMap<String, Object> vars) {
+                return redirect;
+            }
+        });
+
+        add(new FinalConnectionCheckTask(this));
     }
 }

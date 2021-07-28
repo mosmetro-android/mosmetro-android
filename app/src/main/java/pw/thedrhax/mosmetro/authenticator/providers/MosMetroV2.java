@@ -21,6 +21,8 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.net.Uri;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Patterns;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
+import pw.thedrhax.mosmetro.authenticator.FollowRedirectsTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.InterceptorTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
@@ -394,6 +397,13 @@ public class MosMetroV2 extends Provider {
                 }
 
                 return true;
+            }
+        });
+
+        add(new FollowRedirectsTask(this) {
+            @Nullable @Override
+            public String getInitialRedirect(HashMap<String, Object> vars) {
+                return (String) vars.get("post_auth_redirect");
             }
         });
 
