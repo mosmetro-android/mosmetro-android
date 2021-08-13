@@ -27,6 +27,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import androidx.core.content.FileProvider;
+
+import android.text.SpannableString;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -108,11 +110,11 @@ public class Logger {
      * Inputs
      */
 
-    public static void log (LEVEL level, String message) {
+    public static void log (LEVEL level, CharSequence message) {
         synchronized (logs) {
             if (level == LEVEL.DEBUG && message != CUT) {
                 if (pref_debug_logcat) {
-                    Log.d("pw.thedrhax.mosmetro", message);
+                    Log.d("pw.thedrhax.mosmetro", message.toString());
                 }
                 message = timestamp() + " " + message;
             }
@@ -132,13 +134,13 @@ public class Logger {
         }
     }
 
-    public static void log (String message) {
+    public static void log (CharSequence message) {
         for (LEVEL level : LEVEL.values()) {
             log(level, message);
         }
     }
 
-    public static void log (Object obj, String message) {
+    public static void log (Object obj, CharSequence message) {
         if (obj instanceof Metadata) {
             log(LEVEL.DEBUG, String.format(Locale.ENGLISH, "%s (%d) [%s] | %s",
                     obj.getClass().getSimpleName(),
@@ -181,7 +183,7 @@ public class Logger {
      * Outputs
      */
 
-    public static LinkedList<String> read(LEVEL level) {
+    public static LinkedList<CharSequence> read(LEVEL level) {
         synchronized (logs) {
             return new LinkedList<>(logs.get(level));
         }
@@ -189,7 +191,7 @@ public class Logger {
 
     public static String toString(LEVEL level) {
         StringBuilder result = new StringBuilder();
-        for (String message : read(level)) {
+        for (CharSequence message : read(level)) {
             result.append(message).append("\n");
         }
         return result.toString();
@@ -199,7 +201,7 @@ public class Logger {
      * Log file writer
      */
 
-    public static class LogWriter extends LinkedList<String> {
+    public static class LogWriter extends LinkedList<CharSequence> {
         private File file;
         private FileWriter writer = null;
 
@@ -242,10 +244,10 @@ public class Logger {
         }
 
         @Override
-        public boolean add(String e) {
+        public boolean add(CharSequence e) {
             try {
                 if (writer != null) {
-                    writer.write(e + '\n');
+                    writer.write(e.toString() + '\n');
                     writer.flush();
                 }
             } catch (IOException ignored) {}
@@ -253,10 +255,10 @@ public class Logger {
         }
 
         @Override
-        public boolean addAll(Collection<? extends String> c) {
-            for (String line : c) {
+        public boolean addAll(Collection<? extends CharSequence> c) {
+            for (CharSequence line : c) {
                 try {
-                    if (writer != null) writer.write(line + '\n');
+                    if (writer != null) writer.write(line.toString() + '\n');
                 } catch (IOException ignored) {}
             }
 
@@ -360,7 +362,7 @@ public class Logger {
                 public boolean handleMessage(Message msg) {
                     log(
                             LEVEL.valueOf(msg.getData().getString("level")),
-                            msg.getData().getString("message")
+                            msg.getData().getCharSequence("message")
                     );
                     return true;
                 }
@@ -372,10 +374,10 @@ public class Logger {
          * @param level One of values stored in LEVEL enum
          * @param message Text of the message being forwarded
          */
-        void call(LEVEL level, String message) {
+        void call(LEVEL level, CharSequence message) {
             Bundle data = new Bundle();
             data.putString("level", level.name());
-            data.putString("message", message);
+            data.putCharSequence("message", message);
 
             Message msg = new Message();
             msg.setData(data);
@@ -389,7 +391,7 @@ public class Logger {
          * @param level One of values stored in LEVEL enum
          * @param message Text of the message being forwarded
          */
-        public abstract void log(LEVEL level, String message);
+        public abstract void log(LEVEL level, CharSequence message);
     }
 
     /**
@@ -423,7 +425,7 @@ public class Logger {
         return callbacks.get(key);
     }
 
-    private static void onUpdate(LEVEL level, String message) {
+    private static void onUpdate(LEVEL level, CharSequence message) {
         for (Callback callback : callbacks.values()) {
             callback.call(level, message);
         }

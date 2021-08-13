@@ -31,8 +31,11 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -101,7 +104,7 @@ public class DebugActivity extends Activity {
 
         logger_callback = new Logger.Callback() {
             @Override
-            public void log(Logger.LEVEL level, String message) {
+            public void log(Logger.LEVEL level, CharSequence message) {
                 text_messages_adapter.refresh();
             }
         };
@@ -252,6 +255,7 @@ public class DebugActivity extends Activity {
             view.setTypeface(Typeface.MONOSPACE);
             view.setTextColor(Color.BLACK);
             view.setTextSize(14);
+            view.setMovementMethod(LinkMovementMethod.getInstance());
             return new ViewHolder(view);
         }
 
@@ -265,7 +269,7 @@ public class DebugActivity extends Activity {
             return getDataset().size();
         }
 
-        private LinkedList<String> getDataset() {
+        private LinkedList<CharSequence> getDataset() {
             return Logger.read(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO);
         }
 
