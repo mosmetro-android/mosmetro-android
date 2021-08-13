@@ -146,7 +146,9 @@ public class Gen204 {
             if (rel_https == null) {
                 return new Gen204Result(unrel); // confirmed negative
             } else if (rel_https.getResponseCode() == 204) {
-                Logger.log(this, "False negative detected");
+                if (last_result == null || !last_result.isFalseNegative()) {
+                    Logger.log(this, "False negative detected");
+                }
                 return new Gen204Result(rel_https, unrel);
             }
         }
