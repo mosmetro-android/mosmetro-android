@@ -31,13 +31,12 @@ import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Randomizer;
-import pw.thedrhax.util.Util;
 
 public class Gen204 {
     /**
      * Unreliable generate_204 endpoints (might be intercepted by provider)
      */
-    protected static final String[] URL_DEFAULT = {
+    public static final String[] URL_DEFAULT = {
             "connectivitycheck.gstatic.com/generate_204",
             "www.gstatic.com/generate_204",
             "connectivitycheck.android.com/generate_204",
@@ -48,7 +47,7 @@ public class Gen204 {
     /**
      * Reliable generate_204 endpoints (confirmed to not be intercepted)
      */
-    protected static final String[] URL_RELIABLE = {
+    public static final String[] URL_RELIABLE = {
             "www.google.ru/generate_204",
             "www.google.ru/gen_204",
             "google.com/generate_204",

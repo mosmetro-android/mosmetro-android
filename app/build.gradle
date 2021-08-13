@@ -114,6 +114,7 @@ dependencies {
     implementation 'com.edmodo:rangebar:1.0.0'
     implementation 'dnsjava:dnsjava:2.1.9'
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
+    implementation 'com.github.topjohnwu.libsu:core:3.1.2'
 
     // ACRA
     def acraVersion = '5.7.0'

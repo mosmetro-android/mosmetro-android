@@ -56,16 +56,24 @@
         android:summary="@string/pref_internet_check_interval_summary" />
 
     <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="pref_internet_midsession"
-        android:summary="@string/pref_internet_midsession_summary"
-        android:title="@string/pref_internet_midsession" />
-
-    <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_manual_connection_monitoring"
         android:title="@string/pref_manual_connection_monitoring"
         android:summary="@string/pref_manual_connection_monitoring_summary" />
+
+    <PreferenceCategory android:title="@string/captive" />
+
+    <CheckBoxPreference
+        android:key="pref_captive_fix"
+        android:title="@string/pref_captive_fix"
+        android:summary="@string/pref_captive_fix_summary"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_internet_midsession"
+        android:summary="@string/pref_internet_midsession_summary"
+        android:title="@string/pref_internet_midsession" />
 
     <PreferenceCategory android:title="@string/pref_category_connection" />
 

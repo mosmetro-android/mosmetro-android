@@ -258,4 +258,9 @@
     <string name="notification_donate_text">Я трачу время на разработку, чтобы сэкономить ваше. Если хотите, вы можете поддержать проект. Нажмите на это уведомление, чтобы узнать больше :)</string>
     <string name="remind_less_frequently">Напоминать реже</string>
     <string name="do_not_show">Больше не показывать</string>
+    <string name="root_unavailable">Права root недоступны</string>
+    <string name="captive_fix_message">Для того, чтобы применить это исправление, необходимы либо права root, либо доступ с компьютера через ADB. Это нужно сделать только один раз.</string>
+    <string name="captive_fix_open_manual">Инструкция для ADB</string>
+    <string name="pref_captive_fix">Исправить системную проверку</string>
+    <string name="pref_captive_fix_summary">Android не хочет использовать некоторые сети Wi-Fi из-за некорректного поведения провайдера. Включите эту опцию, чтобы глобально изменить адрес проверки на более надёжный. [Требуется root или ADB]</string>
 </resources>

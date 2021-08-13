@@ -282,4 +282,11 @@
     <string name="notification_donate_text">I spend a lot of time to save yours. If you want, you can support the project. Click on this notification to find out more :)</string>
     <string name="remind_less_frequently">Remind less</string>
     <string name="do_not_show">Do not show</string>
+    <string name="root_unavailable">Root is unavailable</string>
+    <string name="captive_fix_message">You need to have root permissions or a PC with ADB to apply this fix. This is only needed to be done once.</string>
+    <string name="captive_fix_open_manual">ADB guide</string>
+    <string name="captive_fix_manual_url" translatable="false">https://git.io/JR9Tl</string>
+    <string name="pref_captive_fix">Fix system-wide check</string>
+    <string name="pref_captive_fix_summary">Android does not want to use some Wi-Fi networks because of incorrect responses from the provider. Enable this option to change the system-wide connectivity check URL to a more reliable one. [Requires root or ADB]</string>
+    <string name="captive" translatable="false">Captive Portal</string>
 </resources>

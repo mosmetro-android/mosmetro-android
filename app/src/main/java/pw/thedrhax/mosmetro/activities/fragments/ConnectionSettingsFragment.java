@@ -20,15 +20,20 @@ package pw.thedrhax.mosmetro.activities.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.activities.SafeViewActivity;
+import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.preferences.LoginFormPreference;
+import pw.thedrhax.util.CaptivePortalFix;
 import pw.thedrhax.util.Randomizer;
 
 public class ConnectionSettingsFragment extends NestedFragment {
@@ -95,5 +100,48 @@ public class ConnectionSettingsFragment extends NestedFragment {
                 return true;
             }
         });
+
+        // Midsession fix
+        CaptivePortalFix cpf = new CaptivePortalFix(getActivity());
+        CheckBoxPreference pref_captive_fix = (CheckBoxPreference) screen.findPreference("pref_captive_fix");
+        CheckBoxPreference pref_internet_midsession = (CheckBoxPreference) screen.findPreference("pref_internet_midsession");
+
+        boolean isApplied = cpf.isApplied();
+        pref_captive_fix.setChecked(cpf.isApplied());
+
+        if (isApplied) {
+            pref_internet_midsession.setChecked(false);
+            pref_internet_midsession.setEnabled(false);
+        }
+
+        pref_captive_fix.setOnPreferenceClickListener(preference -> {
+            cpf.toggle(result -> {
+                boolean applied = cpf.isApplied();
+
+                if (applied) pref_internet_midsession.setChecked(false);
+                pref_internet_midsession.setEnabled(!applied);
+                pref_captive_fix.setChecked(applied);
+
+                if (!result.isSuccess()) {
+                    showCaptivePortalFixDialog();
+                }
+            });
+
+            return true;
+        });
+    }
+
+    private void showCaptivePortalFixDialog() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.root_unavailable)
+                .setMessage(R.string.captive_fix_message)
+                .setPositiveButton(R.string.captive_fix_open_manual, (dialog, which) -> {
+                        getActivity().startActivity(
+                                new Intent(getActivity(), SafeViewActivity.class)
+                                        .putExtra("data", getString(R.string.captive_fix_manual_url))
+                        );
+                })
+                .setNegativeButton(R.string.cancel, ((dialog, which) -> dialog.dismiss()))
+                .show();
     }
 }
