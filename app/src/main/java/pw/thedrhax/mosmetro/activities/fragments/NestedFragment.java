@@ -20,11 +20,16 @@ package pw.thedrhax.mosmetro.activities.fragments;
 
 import android.app.ActionBar;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.view.Menu;
+import android.widget.ListView;
+
 import androidx.annotation.Nullable;
 
 public class NestedFragment extends PreferenceFragment {
+    public static final String ARG_SCROLL_TO = "scrollTo";
+
     protected void setTitle(String title) {
         ActionBar bar = getActivity().getActionBar();
         if (bar != null)
@@ -41,5 +46,19 @@ public class NestedFragment extends PreferenceFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.clear();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(ARG_SCROLL_TO)) {
+            Preference scrollTo = findPreference(args.getString(ARG_SCROLL_TO));
+            ListView list = getView().findViewById(android.R.id.list);
+
+            if (list != null && scrollTo != null)
+                list.setSelection(scrollTo.getOrder());
+        }
     }
 }
