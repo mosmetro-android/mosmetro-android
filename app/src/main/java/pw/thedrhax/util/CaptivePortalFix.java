@@ -23,8 +23,10 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 
+import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +41,21 @@ public class CaptivePortalFix {
     public static final String CAPTIVE_PORTAL_HTTP_URL = "captive_portal_http_url";
     public static final String CAPTIVE_PORTAL_HTTPS_URL = "captive_portal_https_url";
 
+    // Generate_204 URLs
+    private static final List<String> GEN204_URLS = Arrays.asList(Gen204.URL_RELIABLE);
+    private static final List<String> GEN204_DOMAINS = new LinkedList<String>() {{
+        for (String server : GEN204_URLS) {
+            add(server.split("/")[0]);
+        }
+    }};
+
+    private static final CallbackList<String> SHELL_LOG = new CallbackList<String>() {
+        @Override
+        public void onAddElement(String s) {
+            Logger.log(Logger.LEVEL.DEBUG, "CaptivePortalFix.Shell | " + s);
+        }
+    };
+
     private final Context context;
     private final Randomizer random;
 
@@ -50,22 +67,15 @@ public class CaptivePortalFix {
     public boolean isApplied() {
         ContentResolver resolver = context.getContentResolver();
 
-        List<String> urls = Arrays.asList(Gen204.URL_RELIABLE);
-        List<String> domains = new LinkedList<String>() {{
-            for (String server : urls) {
-                add(server.split("/")[0]);
-            }
-        }};
-
         if (Build.VERSION.SDK_INT >= 17) {
             String server = Settings.Global.getString(resolver, CAPTIVE_PORTAL_SERVER);
-            if (server == null || !domains.contains(server)) return false;
+            if (server == null || !GEN204_DOMAINS.contains(server)) return false;
 
             String http_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTP_URL);
-            if (http_url == null || !urls.contains(http_url.substring(7))) return false;
+            if (http_url == null || !GEN204_URLS.contains(http_url.substring(7))) return false;
 
             String https_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTPS_URL);
-            if (https_url == null || !urls.contains(https_url.substring(8))) return false;
+            if (https_url == null || !GEN204_URLS.contains(https_url.substring(8))) return false;
 
             return true;
         } else {
@@ -78,18 +88,18 @@ public class CaptivePortalFix {
         String domain = url.split("/")[0];
 
         Shell.sh(
-                "settings put global " + CAPTIVE_PORTAL_SERVER + " " + domain,
-                "settings put global " + CAPTIVE_PORTAL_HTTP_URL + " http://" + url,
+                "settings put global " + CAPTIVE_PORTAL_SERVER + " " + domain + " && " +
+                "settings put global " + CAPTIVE_PORTAL_HTTP_URL + " http://" + url + " && " +
                 "settings put global " + CAPTIVE_PORTAL_HTTPS_URL + " https://" + url
-        ).submit(result);
+        ).to(SHELL_LOG).submit(result);
     }
 
     public void revert(Shell.ResultCallback result) {
         Shell.sh(
-                "settings delete global " + CAPTIVE_PORTAL_SERVER,
-                "settings delete global " + CAPTIVE_PORTAL_HTTP_URL,
+                "settings delete global " + CAPTIVE_PORTAL_SERVER + " && " +
+                "settings delete global " + CAPTIVE_PORTAL_HTTP_URL + " && " +
                 "settings delete global " + CAPTIVE_PORTAL_HTTPS_URL
-        ).submit(result);
+        ).to(SHELL_LOG).submit(result);
     }
 
     public void toggle(Shell.ResultCallback result) {

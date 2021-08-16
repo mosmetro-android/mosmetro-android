@@ -32,6 +32,8 @@ import pw.thedrhax.util.Logger;
 
 import static org.acra.ReportField.*;
 
+import com.topjohnwu.superuser.Shell;
+
 @AcraCore(
         reportContent = {
             // Required by Tracepot
@@ -47,6 +49,11 @@ import static org.acra.ReportField.*;
         applicationLogFile = "log-debug.txt",
         applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
+    static {
+        Shell.setDefaultBuilder(Shell.Builder.create()
+                .setFlags(Shell.FLAG_REDIRECT_STDERR)
+        );
+    }
 
     @Override
     public void onCreate() {
