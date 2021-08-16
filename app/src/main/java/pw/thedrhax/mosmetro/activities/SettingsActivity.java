@@ -58,6 +58,7 @@ import pw.thedrhax.mosmetro.activities.fragments.AboutFragment;
 import pw.thedrhax.mosmetro.activities.fragments.BranchFragment;
 import pw.thedrhax.mosmetro.activities.fragments.ConnectionSettingsFragment;
 import pw.thedrhax.mosmetro.activities.fragments.DebugSettingsFragment;
+import pw.thedrhax.mosmetro.activities.fragments.NestedFragment;
 import pw.thedrhax.mosmetro.activities.fragments.NotificationSettingsFragment;
 import pw.thedrhax.mosmetro.activities.fragments.SettingsFragment;
 import pw.thedrhax.mosmetro.services.ConnectionService;
@@ -69,6 +70,7 @@ import pw.thedrhax.util.Version;
 
 public class SettingsActivity extends Activity {
     public static final String ACTION_DONATE = "donate";
+    public static final String ACTION_MIDSESSION = "midsession";
 
     private SettingsFragment fragment;
     private PermissionUtils pu;
@@ -136,6 +138,22 @@ public class SettingsActivity extends Activity {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.action_donate)
                 .setItems(R.array.donate_options, listener)
+                .show();
+    }
+
+    private void midsession_dialog() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.midsession_dialog)
+                .setPositiveButton(R.string.open_settings, (dialog, which) -> {
+                    Bundle args = new Bundle();
+                    args.putString(NestedFragment.ARG_SCROLL_TO, "pref_captive");
+
+                    ConnectionSettingsFragment fragment = new ConnectionSettingsFragment();
+                    fragment.setArguments(args);
+
+                    replaceFragment("pref_conn", fragment);
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
@@ -543,6 +561,8 @@ public class SettingsActivity extends Activity {
             location_permission_setup();
         if (getIntent() != null && ACTION_DONATE.equals(getIntent().getAction()))
             donate_dialog();
+        if (getIntent() != null && ACTION_MIDSESSION.equals(getIntent().getAction()))
+            midsession_dialog();
     }
 
     @Override

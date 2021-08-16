@@ -259,8 +259,10 @@
     <string name="remind_less_frequently">Напоминать реже</string>
     <string name="do_not_show">Больше не показывать</string>
     <string name="root_unavailable">Права root недоступны</string>
-    <string name="captive_fix_message">Для того, чтобы применить это исправление, необходимы либо права root, либо доступ с компьютера через ADB. Это нужно сделать только один раз.</string>
-    <string name="captive_fix_open_manual">Инструкция для ADB</string>
+    <string name="captive_fix_message">Для того, чтобы применить это исправление, необходимы либо права root, либо компьютер. Это нужно сделать только один раз.</string>
+    <string name="captive_fix_open_manual">Инструкция для ПК</string>
     <string name="pref_captive_fix">Исправить системную проверку</string>
-    <string name="pref_captive_fix_summary">Android не хочет использовать некоторые сети Wi-Fi из-за некорректного поведения провайдера. Включите эту опцию, чтобы глобально изменить адрес проверки на более надёжный. [Требуется root или ADB]</string>
+    <string name="pref_captive_fix_summary">Android не хочет использовать некоторые сети Wi-Fi из-за некорректного поведения провайдера. Включите эту опцию, чтобы глобально изменить адрес проверки на более надёжный. [Требуется root или компьютер]</string>
+    <string name="pref_captive_notification">Обнаружен midsession! Нажмите &gt;сюда&lt;, если Android не хочет использовать эту сеть Wi-Fi.</string>
+    <string name="midsession_dialog">Чтобы заставить Android подключаться к Wi-Fi в обход midsession, выполните одно из следующих действий:\n\n1) Нажмите на уведомление \"Подключение к Wi-Fi\" и в верхней панели выберите опцию \"Использовать эту сеть\" (нужно выполнять при каждом подключении);\n\n2) Установите галочку \"Исправить системную проверку\" в настройках (требуется root или компьютер, но только один раз);\n\n3) Установите галочку \"Обработка midsession\" в настройках (может не сработать в зависимости от провайдера).</string>
 </resources>

@@ -283,10 +283,12 @@
     <string name="remind_less_frequently">Remind less</string>
     <string name="do_not_show">Do not show</string>
     <string name="root_unavailable">Root is unavailable</string>
-    <string name="captive_fix_message">You need to have root permissions or a PC with ADB to apply this fix. This is only needed to be done once.</string>
-    <string name="captive_fix_open_manual">ADB guide</string>
+    <string name="captive_fix_message">You need to have root permissions or a PC to apply this fix. This is only needed to be done once.</string>
+    <string name="captive_fix_open_manual">Guide for PC</string>
     <string name="captive_fix_manual_url" translatable="false">https://git.io/JR9Tl</string>
     <string name="pref_captive_fix">Fix system-wide check</string>
-    <string name="pref_captive_fix_summary">Android does not want to use some Wi-Fi networks because of incorrect responses from the provider. Enable this option to change the system-wide connectivity check URL to a more reliable one. [Requires root or ADB]</string>
+    <string name="pref_captive_fix_summary">Android does not want to use some Wi-Fi networks because of incorrect responses from the provider. Enable this option to change the system-wide connectivity check URL to a more reliable one. [Requires root or PC]</string>
     <string name="captive" translatable="false">Captive Portal</string>
+    <string name="pref_captive_notification">Midsession detected! Press &gt;here&lt; if Android doesn\'t want to use the Wi-Fi network.</string>
+    <string name="midsession_dialog">To make Android ignore the midsession, please try one of these options:\n\n1) Tap on the \"Sign in to Wi-Fi network\" notification and choose \"Use this network as is\" in the menu bar;\n\n2) Enable \"Fix system-wide check\" in preferences (requires root or a PC, but needs to be done only once);\n\n3) Enable \"Handle midsession\" in preferences (might not work depending on the internet provider).</string>
 </resources>

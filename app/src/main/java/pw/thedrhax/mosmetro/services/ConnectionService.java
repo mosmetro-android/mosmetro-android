@@ -24,22 +24,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ClickableSpan;
+import android.view.View;
 
-import java.io.IOException;
-import java.text.ParseException;
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.DebugActivity;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
+import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.authenticator.Gen204;
 import pw.thedrhax.mosmetro.authenticator.Provider;
 import pw.thedrhax.mosmetro.authenticator.Gen204.Gen204Result;
-import pw.thedrhax.mosmetro.authenticator.Task;
-import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
-import pw.thedrhax.mosmetro.httpclient.Client;
-import pw.thedrhax.mosmetro.httpclient.HttpResponse;
+import pw.thedrhax.util.CaptivePortalFix;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Notify;
@@ -67,6 +69,7 @@ public class ConnectionService extends IntentService {
 
     // Preferences
     private WifiUtils wifi;
+    private CaptivePortalFix cpf;
     private SharedPreferences settings;
     private int pref_retry_count;
     private int pref_ip_wait;
@@ -93,6 +96,7 @@ public class ConnectionService extends IntentService {
                 return from_shortcut || super.isConnected(SSID);
             }
         };
+        cpf = new CaptivePortalFix(this);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         pref_retry_count = Util.getIntPreference(this, "pref_retry_count", 3);
         pref_ip_wait = Util.getIntPreference(this, "pref_ip_wait", 0);
@@ -352,6 +356,44 @@ public class ConnectionService extends IntentService {
 
     private boolean ignore_midsession = false;
 
+    private boolean handleMidsession(Gen204 gen_204, Gen204Result res_204) {
+        Provider midsession = Provider.find(this, res_204.getFalseNegative())
+                .setRunningListener(running)
+                .setGen204(gen_204);
+
+        midsession.add(vars -> {
+            if (gen_204.getLastResult().isFalseNegative()) {
+                vars.put("result", Provider.RESULT.ERROR);
+            }
+
+            return false;
+        });
+
+        Logger.log(Logger.LEVEL.DEBUG, "Midsession | Detected (" + midsession.getName() + ")");
+        Logger.log(getString(R.string.algorithm_name, midsession.getName()));
+
+        midsession.start(new HashMap<String, Object>() {{
+            put("midsession", true);
+        }});
+
+        if (!running.sleep(3000)) return false;
+
+        res_204 = gen_204.check();
+
+        if (!res_204.isConnected()) {
+            Logger.log(this, "Midsession | Connection lost, aborting...");
+        } else if (!res_204.isFalseNegative()) {
+            Logger.log(this, "Midsession | Solved successfully");
+            if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
+            ignore_midsession = false;
+            return true;
+        } else {
+            Logger.log(this, "Midsession | Unable to solve, ignoring...");
+        }
+
+        return false;
+    }
+
     private boolean isConnected(Gen204 gen_204) {
         return isConnected(gen_204, null);
     }
@@ -366,75 +408,39 @@ public class ConnectionService extends IntentService {
             return false;
         }
 
-        if (pref_midsession && !ignore_midsession && res_204.isFalseNegative()) {
-            Provider midsession = Provider.find(this, res_204.getFalseNegative())
-                    .setRunningListener(running)
-                    .setGen204(gen_204);
+        if (ignore_midsession || !res_204.isFalseNegative()) {
+            return res_204.isConnected();
+        }
 
-            midsession.add(new Task() {
-                @Override
-                public boolean run(HashMap<String, Object> vars) {
-                    return !gen_204.getLastResult().isFalseNegative();
-                }
-            });
+        ignore_midsession = true;
 
-            Logger.log(Logger.LEVEL.DEBUG,
-                "Midsession | Detected (" + midsession.getName() + ")"
-            );
+        if (cpf.isApplied()) {
+            Logger.log(this, "Midsession | Captive Portal fix is applied");
+            return res_204.isConnected();
+        }
 
-            if (midsession instanceof Unknown) {
-                Logger.log(Logger.LEVEL.DEBUG,
-                    "Midsession | Attempting to solve without algorithm"
-                );
+        if (pref_midsession) {
+            boolean solved = handleMidsession(gen_204, res_204);
+            res_204 = gen_204.getLastResult();
 
-                Client client = midsession.getClient();
-                client.setFollowRedirects(false);
-
-                try {
-                    HttpResponse res = res_204.getFalseNegative();
-                    Logger.log(Logger.LEVEL.DEBUG, res.toString());
-
-                    String next_redirect = res.parseAnyRedirect();
-
-                    while (running.get()) {
-                        Logger.log(Logger.LEVEL.DEBUG,
-                            "Midsession | Requesting " + next_redirect
-                        );
-
-                        res = client.get(next_redirect).retry().execute();
-                        Logger.log(Logger.LEVEL.DEBUG, res.toString());
-
-                        next_redirect = res.parseAnyRedirect();
-                    }
-                } catch (IOException | ParseException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                }
-
-                client.setFollowRedirects(true);
-            } else {
-                Logger.log(Logger.LEVEL.DEBUG, "Midsession | Attempting to solve");
-                Logger.log(getString(R.string.algorithm_name, midsession.getName()));
-                midsession.start(new HashMap<String, Object>() {{
-                    put("midsession", true);
-                }});
-            }
-
-            if (!running.sleep(3000)) return false;
-
-            res_204 = gen_204.check();
-
-            if (!res_204.isConnected()) {
-                Logger.log(this, "Midsession | Connection lost, aborting...");
-                ignore_midsession = true;
-                return false;
-            } else if (!res_204.isFalseNegative()) {
-                Logger.log(this, "Midsession | Solved successfully");
-                if (Build.VERSION.SDK_INT >= 21) wifi.report(true);
-            } else {
-                Logger.log(this, "Midsession | Unable to solve, ignoring...");
-                ignore_midsession = true;
+            if (solved || !res_204.isConnected()) {
+                return res_204.isConnected();
             }
         }
+
+        String msg = getString(R.string.pref_captive_notification);
+        SpannableString spanmsg = new SpannableString(msg);
+        spanmsg.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                startActivity(
+                        new Intent(ConnectionService.this, SettingsActivity.class)
+                                .setAction(SettingsActivity.ACTION_MIDSESSION)
+                );
+            }
+        }, msg.indexOf('>'), msg.indexOf('<') + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        Logger.log(spanmsg);
 
         return res_204.isConnected();
     }
