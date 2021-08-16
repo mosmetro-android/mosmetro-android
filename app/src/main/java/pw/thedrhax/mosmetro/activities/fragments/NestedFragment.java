@@ -57,8 +57,9 @@ public class NestedFragment extends PreferenceFragment {
             Preference scrollTo = findPreference(args.getString(ARG_SCROLL_TO));
             ListView list = getView().findViewById(android.R.id.list);
 
-            if (list != null && scrollTo != null)
-                list.setSelection(scrollTo.getOrder());
+            if (list != null && scrollTo != null) {
+                list.post(() -> list.smoothScrollToPositionFromTop(scrollTo.getOrder(), 0));
+            }
         }
     }
 }
