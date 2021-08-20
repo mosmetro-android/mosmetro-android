@@ -105,6 +105,7 @@ public class DebugActivity extends Activity {
         logger_callback = new Logger.Callback() {
             @Override
             public void log(Logger.LEVEL level, CharSequence message) {
+                if (level != text_messages_adapter.getLevel()) return;
                 text_messages_adapter.refresh();
             }
         };
@@ -269,8 +270,12 @@ public class DebugActivity extends Activity {
             return getDataset().size();
         }
 
+        private Logger.LEVEL getLevel() {
+            return show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO;
+        }
+
         private LinkedList<CharSequence> getDataset() {
-            return Logger.read(show_debug ? Logger.LEVEL.DEBUG : Logger.LEVEL.INFO);
+            return Logger.read(getLevel());
         }
 
         void showDebug(boolean enabled) {

@@ -185,7 +185,7 @@ public class Logger {
 
     public static LinkedList<CharSequence> read(LEVEL level) {
         synchronized (logs) {
-            return new LinkedList<>(logs.get(level));
+            return logs.get(level);
         }
     }
 

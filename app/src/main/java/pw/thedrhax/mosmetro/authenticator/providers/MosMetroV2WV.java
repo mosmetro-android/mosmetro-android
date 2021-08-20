@@ -21,6 +21,10 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.text.SpannableString;
+import android.text.style.ClickableSpan;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -263,6 +267,24 @@ public class MosMetroV2WV extends WebViewProvider {
             private final boolean pref_internet_check = settings.getBoolean("pref_internet_check", true);
             private final int interval = Util.getIntPreference(context, "pref_internet_check_interval", 10);
             private int counter = 0;
+
+            @Override
+            public boolean run(HashMap<String, Object> vars) {
+                String msg = context.getString(R.string.logaction_mmv2wv_toggle);
+                SpannableString waitmsg = new SpannableString(msg);
+                waitmsg.setSpan(new ClickableSpan() {
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        Logger.log(Logger.LEVEL.DEBUG, "Disabling MosMetroV2WV and restarting");
+                        settings.edit().putBoolean("pref_mosmetro_v2_wv", false).apply();
+                        vars.put("result", RESULT.RESTART);
+                        running.set(false);
+                    }
+                }, msg.indexOf('>'), msg.indexOf('<') + 1, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                Logger.log(waitmsg);
+                return super.run(vars);
+            }
 
             @Override
             public boolean until(HashMap<String, Object> vars) {

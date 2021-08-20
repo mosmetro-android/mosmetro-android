@@ -516,6 +516,9 @@ public class ConnectionService extends IntentService {
                 isConnected(gen_204, gen_204.getLastResult());
 
                 if (!from_shortcut || pref_manual_connection_monitoring) break;
+            case RESTART:
+                Logger.log(this, "Restarting by result (" + result.name() + ")");
+                return;
             default:
                 Logger.log(this, "Stopping by result (" + result.name() + ")");
                 running.set(false);

@@ -164,7 +164,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
     public enum RESULT {
         CONNECTED, ALREADY_CONNECTED,           // Success
         NOT_REGISTERED, ERROR, NOT_SUPPORTED,   // Error
-        INTERRUPTED                             // Stopped
+        INTERRUPTED, RESTART,                   // Stopped
     }
 
     /**
