@@ -95,7 +95,16 @@ public class Gen204 {
                 Logger.log(this, url + " | " + ex.toString());
                 last_ex = ex;
 
-                if (ex instanceof SSLPeerUnverifiedException || ex instanceof SSLHandshakeException) {
+                if (ex instanceof SSLPeerUnverifiedException) break;
+
+                if (ex instanceof SSLHandshakeException) {
+                    String message = ex.getMessage();
+
+                    if (message == null) break;
+
+                    // Ignore "I/O error during system call, Connection reset by peer"
+                    if (message.contains("Connection reset by peer")) continue;
+
                     break;
                 }
             }
