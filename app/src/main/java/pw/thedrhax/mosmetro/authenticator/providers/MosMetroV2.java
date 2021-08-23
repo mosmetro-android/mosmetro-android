@@ -296,14 +296,6 @@ public class MosMetroV2 extends Provider {
             }
         });
 
-        if (!settings.getBoolean("pref_delay_always", false))
-        add(new NamedTask(context.getString(R.string.notification_progress_waiting)) {
-            @Override
-            public boolean run(HashMap<String, Object> vars) {
-                random.delay(running); return true;
-            }
-        });
-
         /**
          * Sending login form
          * ⇒ POST http://auth.wi-fi.ru/auth/init?... < redirect, segment, TODO: mode=?

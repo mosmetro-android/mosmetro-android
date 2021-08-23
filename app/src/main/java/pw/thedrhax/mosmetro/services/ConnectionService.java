@@ -458,16 +458,6 @@ public class ConnectionService extends IntentService {
             return;
         }
 
-        // Apply random delay
-        if (!from_shortcut && !settings.getBoolean("pref_delay_always", false)) {
-            Logger.log(getString(R.string.notification_progress_waiting));
-            notify.title(getString(R.string.notification_progress_waiting))
-                    .progress(0, true)
-                    .show();
-
-            if (!new Randomizer(this).delay(running)) return;
-        }
-
         new Notify(this).id(2).hide(); // hide error notification
 
         notify.title(getString(R.string.auth_connecting, SSID))

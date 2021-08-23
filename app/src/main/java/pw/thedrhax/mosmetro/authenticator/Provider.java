@@ -311,7 +311,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
     public Provider setClient(Client client) {
         this.client = client
                 .setRunningListener(running)
-                .setDelaysEnabled(settings.getBoolean("pref_delay_always", false));
+                .setDelaysEnabled(settings.getBoolean("pref_delay_enabled", false));
         return this;
     }
 

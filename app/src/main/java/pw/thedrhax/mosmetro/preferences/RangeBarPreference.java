@@ -61,7 +61,7 @@ public class RangeBarPreference extends DialogPreference {
     private String key_min = getKey() + "_min";
     private String key_max = getKey() + "_max";
 
-    private int defaultMin, defaultMax, min, max;
+    private int defaultMin, defaultMax, min, max, step;
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RangeBarPreference, 0, 0);
@@ -70,6 +70,7 @@ public class RangeBarPreference extends DialogPreference {
         defaultMax = ta.getInt(R.styleable.RangeBarPreference_defaultMax, 10);
         min = ta.getInt(R.styleable.RangeBarPreference_min, 1);
         max = ta.getInt(R.styleable.RangeBarPreference_max, 10);
+        step = ta.getInt(R.styleable.RangeBarPreference_step, 1);
 
         ta.recycle();
     }
@@ -82,7 +83,7 @@ public class RangeBarPreference extends DialogPreference {
         final View view = View.inflate(getContext(), R.layout.rangebar_preference, null);
         final RangeBar rangebar = (RangeBar) view.findViewById(R.id.rangebar);
 
-        rangebar.setTickCount(max - min + 1);
+        rangebar.setTickCount((max - min) / step + 1);
         rangebar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             private TextView rangetext = (TextView) view.findViewById(R.id.rangetext);
 
@@ -96,7 +97,7 @@ public class RangeBarPreference extends DialogPreference {
                     rangeBar.setRight(max); return;
                 }
 
-                rangetext.setText("" + (left + min) + " - " + (right + min));
+                rangetext.setText("" + (left + min) * step + " - " + (right + min) * step);
             }
         });
 
@@ -108,14 +109,14 @@ public class RangeBarPreference extends DialogPreference {
         if (current_max > max)
             current_max = max;
 
-        rangebar.setThumbIndices(current_min, current_max);
+        rangebar.setThumbIndices(current_min / step, current_max / step);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 settings.edit()
-                        .putInt(key_min, rangebar.getLeftIndex() + min)
-                        .putInt(key_max, rangebar.getRightIndex() + min)
+                        .putInt(key_min, rangebar.getLeftIndex() * step + min)
+                        .putInt(key_max, rangebar.getRightIndex() * step + min)
                         .apply();
             }
         });

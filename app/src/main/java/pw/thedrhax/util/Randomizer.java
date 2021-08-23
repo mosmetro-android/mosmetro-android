@@ -38,9 +38,10 @@ public class Randomizer {
     public Randomizer(Context context) {
         this.context = context;
 
-        delay_min = Util.getIntPreference(context, "pref_random_delay_min", 5);
-        delay_max = Util.getIntPreference(context, "pref_random_delay_max", 10);
-        if (delay_min > delay_max) { // User tries to break everything again...
+        delay_min = Util.getIntPreference(context, "pref_delay_range_min", 500);
+        delay_max = Util.getIntPreference(context, "pref_delay_range_max", 1000);
+
+        if (delay_min > delay_max) {
             int temp = delay_max;
             delay_max = delay_min;
             delay_min = temp;
@@ -49,8 +50,8 @@ public class Randomizer {
 
     public boolean delay(Listener<Boolean> running) {
         double a = (delay_max + delay_min) / 2;
-        double s = Math.sqrt((delay_max - a)) / 3;
-        int delay = (int) ((random.nextGaussian() * s + a) * 1000);
+        double s = Math.sqrt(delay_max - a) / 3;
+        int delay = (int) (random.nextGaussian() * s + a);
         return running.sleep(delay);
     }
 
