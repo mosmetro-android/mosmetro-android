@@ -397,7 +397,7 @@ public class MosMetroV2 extends Provider {
             public String getInitialRedirect(HashMap<String, Object> vars) {
                 return (String) vars.get("post_auth_redirect");
             }
-        });
+        }.setIgnoreErrors(true));
 
         add(new FinalConnectionCheckTask(this));
     }

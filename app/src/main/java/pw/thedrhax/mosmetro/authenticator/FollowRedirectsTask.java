@@ -32,6 +32,7 @@ import pw.thedrhax.util.Logger;
 
 public abstract class FollowRedirectsTask extends NamedTask {
     private final Provider p;
+    private boolean ignoreErrors = false;
 
     public FollowRedirectsTask(Provider p) {
         super(p.context.getString(R.string.auth_redirect));
@@ -69,7 +70,7 @@ public abstract class FollowRedirectsTask extends NamedTask {
             throw new IOException("Too many redirects");
         } catch (IOException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            return false;
+            return ignoreErrors;
         } catch (ParseException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
         } finally {
@@ -77,5 +78,9 @@ public abstract class FollowRedirectsTask extends NamedTask {
         }
 
         return true;
+    }
+
+    public FollowRedirectsTask setIgnoreErrors(boolean ignore) {
+        this.ignoreErrors = ignore; return this;
     }
 }
