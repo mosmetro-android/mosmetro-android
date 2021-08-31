@@ -28,6 +28,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -76,7 +77,6 @@ public class ConnectionService extends IntentService {
     private int pref_internet_check_interval;
     private boolean pref_internet_check;
     private boolean pref_manual_connection_monitoring;
-    private boolean pref_midsession;
     private boolean pref_notify_foreground;
 
     // Notifications
@@ -103,7 +103,6 @@ public class ConnectionService extends IntentService {
         pref_notify_foreground = settings.getBoolean("pref_notify_foreground", true);
         pref_internet_check = settings.getBoolean("pref_internet_check", true);
         pref_manual_connection_monitoring = settings.getBoolean("pref_manual_connection_monitoring", true);
-        pref_midsession = settings.getBoolean("pref_internet_midsession", false);
         pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
 
         final PendingIntent stop_intent = PendingIntent.getService(
@@ -369,6 +368,7 @@ public class ConnectionService extends IntentService {
             return false;
         });
 
+        Logger.log(getString(R.string.auth_midsession_start));
         Logger.log(Logger.LEVEL.DEBUG, "Midsession | Detected (" + midsession.getName() + ")");
         Logger.log(getString(R.string.algorithm_name, midsession.getName()));
 
@@ -389,6 +389,17 @@ public class ConnectionService extends IntentService {
             return true;
         } else {
             Logger.log(this, "Midsession | Unable to solve, ignoring...");
+
+            String msg = getString(R.string.auth_midsession_fail);
+            SpannableString message = new SpannableString(msg);
+            message.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View widget) {
+                    settings.edit().putBoolean("pref_internet_midsession", false).apply();
+                    Toast.makeText(ConnectionService.this, R.string.done, Toast.LENGTH_SHORT).show();
+                }
+            }, msg.indexOf('>'), msg.indexOf('<') + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            Logger.log(message);
         }
 
         return false;
@@ -419,7 +430,7 @@ public class ConnectionService extends IntentService {
             return res_204.isConnected();
         }
 
-        if (pref_midsession) {
+        if (settings.getBoolean("pref_internet_midsession", false)) {
             boolean solved = handleMidsession(gen_204, res_204);
             res_204 = gen_204.getLastResult();
 

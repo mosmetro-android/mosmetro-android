@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +48,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.Util;
 
@@ -279,6 +281,7 @@ public class MosMetroV2WV extends WebViewProvider {
                         settings.edit().putBoolean("pref_mosmetro_v2_wv", false).apply();
                         vars.put("result", RESULT.RESTART);
                         running.set(false);
+                        Toast.makeText(context, R.string.done, Toast.LENGTH_SHORT).show();
                     }
                 }, msg.indexOf('>'), msg.indexOf('<') + 1, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
 

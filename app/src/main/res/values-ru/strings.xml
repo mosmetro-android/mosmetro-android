@@ -266,4 +266,7 @@
     <string name="pref_captive_notification">Обнаружен midsession! Нажмите &gt;сюда&lt;, если Android не хочет использовать эту сеть Wi-Fi.</string>
     <string name="midsession_dialog">Чтобы заставить Android подключаться к Wi-Fi в обход midsession, выполните одно из следующих действий:\n\n1) Нажмите на уведомление \"Подключение к Wi-Fi\" и в верхней панели выберите опцию \"Использовать эту сеть\" (нужно выполнять при каждом подключении);\n\n2) Установите галочку \"Исправить системную проверку\" в настройках (требуется root или компьютер, но только один раз);\n\n3) Установите галочку \"Обработка midsession\" в настройках (может не сработать в зависимости от провайдера).</string>
     <string name="logaction_mmv2wv_toggle">Слишком медленно? Нажмите &gt;сюда&lt;, чтобы отключить MosMetroV2WV и перейти на более быстрый алгоритм MosMetroV2</string>
+    <string name="done">Готово!</string>
+    <string name="auth_midsession_fail">Обработка midsession не сработала. Если это сообщение появляется слишком часто, нажмите &gt;сюда&lt;, чтобы отключить эту функцию.</string>
+    <string name="auth_midsession_start">Пытаюсь обойти midsession</string>
 </resources>
