@@ -193,4 +193,16 @@ public class WifiUtils {
         else
             cm.reportBadNetwork(network);
     }
+
+    /*
+     * External access
+     */
+
+    public ConnectivityManager getConnectivityManager() {
+        return cm;
+    }
+
+    public WifiManager getWifiManager() {
+        return wm;
+    }
 }

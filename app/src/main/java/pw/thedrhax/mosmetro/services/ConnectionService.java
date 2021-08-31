@@ -22,6 +22,11 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
@@ -32,6 +37,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.net.NetworkInterface;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -67,6 +73,14 @@ public class ConnectionService extends IntentService {
     private static String SSID = WifiUtils.UNKNOWN_SSID;
     private boolean from_shortcut = false;
     private boolean from_debug = false;
+
+    private ConnectivityManager.NetworkCallback networkCallback = null;
+    private Listener<Boolean> isWifi = new Listener<Boolean>(false) {
+        @Override
+        public void onChange(Boolean new_value) {
+            Logger.log(Logger.LEVEL.DEBUG, "Default network: " + (new_value ? "Wi-Fi" : "Mobile"));
+        }
+    };
 
     // Preferences
     private WifiUtils wifi;
@@ -135,6 +149,20 @@ public class ConnectionService extends IntentService {
                 ))
                 .onDelete(stop_intent)
                 .locked(pref_notify_foreground);
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            ConnectivityManager cm = wifi.getConnectivityManager();
+
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@NonNull Network network) {
+                    NetworkInfo info = cm.getNetworkInfo(network);
+                    if (info != null) isWifi.set(info.getType() == ConnectivityManager.TYPE_WIFI);
+                }
+            };
+
+            cm.registerDefaultNetworkCallback(networkCallback);
+        }
     }
 
     private void notify (Provider.RESULT result) {
@@ -439,6 +467,10 @@ public class ConnectionService extends IntentService {
             }
         }
 
+        if (isWifi.get()) {
+            return res_204.isConnected();
+        }
+
         String msg = getString(R.string.pref_captive_notification);
         SpannableString spanmsg = new SpannableString(msg);
         spanmsg.setSpan(new ClickableSpan() {
@@ -554,6 +586,15 @@ public class ConnectionService extends IntentService {
 
     public static boolean isRunning() {
         return running.get();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (Build.VERSION.SDK_INT >= 21 && networkCallback != null) {
+            wifi.getConnectivityManager().unregisterNetworkCallback(networkCallback);
+        }
+
+        super.onDestroy();
     }
 
     @Override
