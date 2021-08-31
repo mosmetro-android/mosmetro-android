@@ -337,13 +337,6 @@ public class MosMetroV2 extends Provider {
                         vars.put("result", RESULT.NOT_REGISTERED);
                         return false;
                     }
-
-                    boolean error = Boolean.FALSE.equals(data.read("$.result", Boolean.class));
-                    error |= "fail".equals(data.read("$.auth_status"));
-
-                    if (error) {
-                        throw new IOException("Server returned an error");
-                    }
                 } catch (ProtocolException ignored) { // Too many follow-up requests
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
