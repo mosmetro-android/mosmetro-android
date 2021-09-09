@@ -61,6 +61,19 @@ public class ConnectionSettingsFragment extends NestedFragment {
                 return true;
             }
         });
+        
+        final CheckBoxPreference pref_bmstu_lb = (CheckBoxPreference)
+                screen.findPreference("pref_bmstu_lb");
+        final LoginFormPreference pref_bmstu_lb_creds = (LoginFormPreference)
+                screen.findPreference("pref_bmstu_lb_credentials");
+        pref_bmstu_lb_creds.setEnabled(pref_mainet.isChecked());
+        pref_bmstu_lb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                pref_bmstu_lb_creds.setEnabled((Boolean) newValue);
+                return true;
+            }
+        });
 
         final CheckBoxPreference mmv2 = (CheckBoxPreference)
                 screen.findPreference("pref_mosmetro_v2_wv");

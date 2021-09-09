@@ -135,6 +135,9 @@
     <string name="auth_error_mainet_credentials">
         Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"Настройки MAInet\" в меню \"Настройки подключения\".
     </string>
+    <string name="auth_error_bmstu_lb_credentials">
+        Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"Настройки bmstu_lb\" в меню \"Настройки подключения\".
+    </string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
     <string name="auth_error_provider_unsupported" formatted="false">
@@ -224,6 +227,9 @@
     <string name="pref_mainet_summary">Этот алгоритм используется для авторизации в сети MAInet_public Московского авиационного института.</string>
     <string name="pref_mainet_credentials">Настройки MAInet</string>
     <string name="pref_mainet_credentials_summary">Здесь вы можете настроить данные для входа в сеть MAInet_public.</string>
+    <string name="pref_bmstu_lb_summary">Этот алгоритм используется для авторизации в сети bmstu_lb МГТУ им. Н. Э. Баумана</string>
+    <string name="pref_bmstu_lb_credentials">Настройки bmstu_lb</string>
+    <string name="pref_bmstu_lb_credentials_summary">Здесь вы можете настроить данные для входа в сеть bmstu_lb.</string>
     <string name="auth_algorithm_continue" formatted="false">Переключаюсь обратно на алгоритм %s</string>
     <string name="pref_debug_last_log">Отправлять последний лог</string>
     <string name="pref_debug_last_log_summary">Лог будет отправляться вместе с отчетами ACRA в случае сбоя.</string>

@@ -144,6 +144,9 @@
     <string name="auth_error_mainet_credentials">
         Login and password are required to connect to this network. Please check \"MAInet settings\" in \"Connection settings\" menu.
     </string>
+    <string name="auth_error_bmstu_lb_credentials">
+        Login and password are required to connect to this network. Please check \"bmstu_lb settings\" in \"Connection settings\" menu.
+    </string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
     <string name="auth_error_provider_unsupported" formatted="false">
@@ -245,6 +248,10 @@
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
     <string name="pref_mainet_credentials">MAInet settings</string>
     <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
+    <string name="pref_bmstu_lb" translatable="false">bmstu_lb (lbpfs.bmstu.ru)</string>
+    <string name="pref_bmstu_lb_summary">This algorithm is required to connect to bmstu_lb — public Wi-Fi network of Bauman Moscow State Technical University.</string>
+    <string name="pref_bmstu_lb_credentials">bmstu_lb settings</string>
+    <string name="pref_bmstu_lb_credentials_summary">Here you can configure captive portal credentials for bmstu_lb Wi-Fi network.</string>
     <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
     <string name="pref_debug_last_log">Send the last log</string>
     <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>

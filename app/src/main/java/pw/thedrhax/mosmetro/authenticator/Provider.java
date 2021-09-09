@@ -63,6 +63,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "Air_WiFi_Free",
             "MAInet_public",
             "Moscow_WiFi_Free"
+            "bmstu_lb"
     };
 
     protected Context context;
@@ -92,6 +93,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
         else if (MAInet.match(response) && settings.getBoolean("pref_mainet", true)) return new MAInet(context, response);
+        else if (BMSTU_lb.match(Response) && settings.getBoolean("pref_bmstu_lb", true)) return new BMSTU_lb(context, response);
         else return new Unknown(context, response);
     }
 
