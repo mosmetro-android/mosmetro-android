@@ -42,7 +42,7 @@ import pw.thedrhax.util.Logger;
  */
 
 public class bmstu_lb extends Provider {
-    private String redirect = "https://lbpfs.bmstu.ru:8003/index.php";
+    private String redirect = "https://lbpfs.bmstu.ru:8003/index.php?zone=bmstu_lb";
 
     public bmstu_lb(Context context, HttpResponse res) {
         super(context);
@@ -56,8 +56,8 @@ public class bmstu_lb extends Provider {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
-                    redirect = response.parseAnyRedirect();
-                    Logger.log(Logger.LEVEL.DEBUG, redirect);
+                    String redirect_fake = response.parseAnyRedirect();
+                    Logger.log(Logger.LEVEL.DEBUG, redirect_fake);
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
                     Logger.log(Logger.LEVEL.DEBUG, "Redirect not found in response, using default");
@@ -87,12 +87,7 @@ public class bmstu_lb extends Provider {
                 }
 
                 try {
-                    HttpResponse response = client.post(redirect, new HashMap<String, String>() {{
-                        put("accept", "Continue");
-                        put("redirurl", "http://google.com/generate_204");
-                        put("auth_user", login);
-                        put("auth_pass", password);
-                    }}).retry().execute();
+                    HttpResponse response = client.post(redirect, "redirurl=&auth_user=" + login + "&auth_pass=" + password + "&accept=Continue", "application/x-www-form-urlencoded").retry().execute();
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
