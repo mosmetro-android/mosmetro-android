@@ -33,7 +33,7 @@ import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
- * The BMSTU_lb class implements support for the public Wi-Fi network of BMSTU (bmstu_lb).
+ * The bmstu_lb class implements support for the public Wi-Fi network of BMSTU (bmstu_lb).
  *
  * Detection: Meta or Location redirect contains "lbpfs.bmstu.ru".
  *
@@ -41,10 +41,10 @@ import pw.thedrhax.util.Logger;
  * @see Provider
  */
 
-public class BMSTU_lb extends Provider {
+public class bmstu_lb extends Provider {
     private String redirect = "https://lbpfs.bmstu.ru:8003/index.php";
 
-    public BMSTU_lb(Context context, HttpResponse res) {
+    public bmstu_lb(Context context, HttpResponse res) {
         super(context);
 
         /**
