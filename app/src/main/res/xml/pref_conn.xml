@@ -29,7 +29,7 @@
     <CheckBoxPreference
         android:key="pref_bmstu_lb"
         android:title="@string/pref_bmstu_lb"
-        android:summary="@string/pref_bmstu_lb"
+        android:summary="@string/pref_bmstu_lb_summary"
         android:defaultValue="true" />
 
     <pw.thedrhax.mosmetro.preferences.LoginFormPreference
