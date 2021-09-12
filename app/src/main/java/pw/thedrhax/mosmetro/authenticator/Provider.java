@@ -30,7 +30,7 @@ import java.util.LinkedList;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
-import pw.thedrhax.mosmetro.authenticator.providers.bmstu_lb;
+import pw.thedrhax.mosmetro.authenticator.providers.Bmstu;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2WV;
@@ -94,7 +94,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
         else if (MAInet.match(response) && settings.getBoolean("pref_mainet", true)) return new MAInet(context, response);
-        else if (bmstu_lb.match(response) && settings.getBoolean("pref_bmstu_lb", true)) return new bmstu_lb(context, response);
+        else if (Bmstu.match(response) && settings.getBoolean("pref_bmstu", true)) return new Bmstu(context, response);
         else return new Unknown(context, response);
     }
 

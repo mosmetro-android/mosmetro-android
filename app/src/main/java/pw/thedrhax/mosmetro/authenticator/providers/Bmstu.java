@@ -33,7 +33,7 @@ import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
 /**
- * The bmstu_lb class implements support for the public Wi-Fi network of BMSTU (bmstu_lb).
+ * The Bmstu class implements support for the public Wi-Fi network of BMSTU (bmstu_lb).
  *
  * Detection: Meta or Location redirect contains "lbpfs.bmstu.ru".
  *
@@ -41,10 +41,10 @@ import pw.thedrhax.util.Logger;
  * @see Provider
  */
 
-public class bmstu_lb extends Provider {
+public class Bmstu extends Provider {
     private String redirect = "https://lbpfs.bmstu.ru:8003/index.php?zone=bmstu_lb";
 
-    public bmstu_lb(Context context, HttpResponse res) {
+    public Bmstu(Context context, HttpResponse res) {
         super(context);
 
         /**
@@ -75,12 +75,12 @@ public class bmstu_lb extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String login = settings.getString("pref_bmstu_lb_credentials_login", "");
-                String password = settings.getString("pref_bmstu_lb_credentials_password", "");
+                String login = settings.getString("pref_bmstu_credentials_login", "");
+                String password = settings.getString("pref_bmstu_credentials_password", "");
 
                 if (login.isEmpty() || password.isEmpty()) {
                     Logger.log(context.getString(R.string.error, 
-                            context.getString(R.string.auth_error_bmstu_lb_credentials)
+                            context.getString(R.string.auth_error_bmstu_credentials)
                     ));
                     vars.put("result", RESULT.ERROR);
                     return false;
