@@ -171,7 +171,7 @@ public abstract class Client {
     }
 
     public HttpRequest get(String link, Map<String,String> form) {
-        return new HttpRequest(this, METHOD.GET, link + requestToString(form));
+        return new HttpRequest(this, METHOD.GET, link + "?" + requestToString(form));
     }
 
     public HttpRequest post(String link, String body, String type) {
@@ -219,16 +219,20 @@ public abstract class Client {
     public abstract void stop();
 
     // Convert methods
-    protected static String requestToString (Map<String,String> params) {
+    protected static String requestToString(Map<String,String> params) {
+        if (params == null) return "";
+
         StringBuilder params_string = new StringBuilder();
 
-        if (params != null)
-            for (Map.Entry<String,String> entry : params.entrySet())
-                params_string
-                        .append(params_string.length() == 0 ? "?" : "&")
-                        .append(entry.getKey())
-                        .append("=")
-                        .append(URLEncoder.encode(entry.getValue()));
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (params_string.length() > 0)
+                params_string.append("&");
+
+            params_string
+                    .append(URLEncoder.encode(entry.getKey()))
+                    .append("=")
+                    .append(URLEncoder.encode(entry.getValue()));
+        }
 
         return params_string.toString();
     }

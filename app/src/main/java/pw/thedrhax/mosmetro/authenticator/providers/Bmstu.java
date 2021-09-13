@@ -87,7 +87,12 @@ public class Bmstu extends Provider {
                 }
 
                 try {
-                    HttpResponse response = client.post(redirect, "redirurl=&auth_user=" + login + "&auth_pass=" + password + "&accept=Continue", "application/x-www-form-urlencoded").retry().execute();
+                    HttpResponse response = client.post(redirect, new HashMap<String,String>() {{
+                        put("redirurl", "");
+                        put("auth_user", login);
+                        put("auth_pass", password);
+                        put("accept", "Continue");
+                    }}).retry().execute();
 
                     Logger.log(Logger.LEVEL.DEBUG, response.toString());
                 } catch (IOException ex) {
