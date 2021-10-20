@@ -142,10 +142,10 @@
         Registration is required by MaximaTelecom ISP (http://maximatelecom.ru).
     </string>
     <string name="auth_error_mainet_credentials">
-        Login and password are required to connect to this network. Please check \"MAInet settings\" in \"Connection settings\" menu.
+        Login and password are required to connect to this network. Please check \"MAInet (wifi.mai.ru)\" in \"Connection settings\" menu.
     </string>
     <string name="auth_error_bmstu_credentials">
-        Login and password are required to connect to this network. Please check \"bmstu settings\" in \"Connection settings\" menu.
+        Login and password are required to connect to this network. Please check \"bmstu_lb (lbpfs.bmstu.ru)\" in \"Connection settings\" menu.
     </string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
@@ -245,13 +245,9 @@
     <string name="pref_mosmetro_v3" translatable="false">MosMetroV3 (welcome.wi-fi.ru)</string>
     <string name="pref_mosmetro_v3_summary">This algorithm was used during the 2018 FIFA World Cup in Moscow and St. Petersburg. It is currently disabled, so most likely this setting will not affect anything.</string>
     <string name="pref_mainet" translatable="false">MAInet (wifi.mai.ru)</string>
-    <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute.</string>
-    <string name="pref_mainet_credentials">MAInet settings</string>
-    <string name="pref_mainet_credentials_summary">Here you can configure captive portal credentials for MAInet_public Wi-Fi network.</string>
+    <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute</string>
     <string name="pref_bmstu" translatable="false">bmstu_lb (lbpfs.bmstu.ru)</string>
     <string name="pref_bmstu_summary">This algorithm is required to connect to bmstu_lb — public Wi-Fi network of Bauman Moscow State Technical University.</string>
-    <string name="pref_bmstu_credentials">bmstu_lb settings</string>
-    <string name="pref_bmstu_credentials_summary">Here you can configure captive portal credentials for bmstu Wi-Fi network.</string>
     <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
     <string name="pref_debug_last_log">Send the last log</string>
     <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>

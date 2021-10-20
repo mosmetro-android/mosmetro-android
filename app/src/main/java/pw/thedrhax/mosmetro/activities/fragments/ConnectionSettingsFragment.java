@@ -49,32 +49,6 @@ public class ConnectionSettingsFragment extends NestedFragment {
 
         PreferenceScreen screen = getPreferenceScreen();
 
-        final CheckBoxPreference pref_mainet = (CheckBoxPreference)
-                screen.findPreference("pref_mainet");
-        final LoginFormPreference pref_mainet_creds = (LoginFormPreference)
-                screen.findPreference("pref_mainet_credentials");
-        pref_mainet_creds.setEnabled(pref_mainet.isChecked());
-        pref_mainet.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                pref_mainet_creds.setEnabled((Boolean) newValue);
-                return true;
-            }
-        });
-        
-        final CheckBoxPreference pref_bmstu = (CheckBoxPreference)
-                screen.findPreference("pref_bmstu");
-        final LoginFormPreference pref_bmstu_creds = (LoginFormPreference)
-                screen.findPreference("pref_bmstu_credentials");
-        pref_bmstu_creds.setEnabled(pref_mainet.isChecked());
-        pref_bmstu.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                pref_bmstu_creds.setEnabled((Boolean) newValue);
-                return true;
-            }
-        });
-
         final CheckBoxPreference mmv2 = (CheckBoxPreference)
                 screen.findPreference("pref_mosmetro_v2_wv");
         mmv2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

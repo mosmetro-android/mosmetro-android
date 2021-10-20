@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -42,6 +43,8 @@ import pw.thedrhax.util.Logger;
  */
 
 public class Bmstu extends Provider {
+    private static final String CREDS_KEY = "pref_bmstu_credentials";
+
     private String redirect = "https://lbpfs.bmstu.ru:8003/index.php?zone=bmstu_lb";
 
     public Bmstu(Context context, HttpResponse res) {
@@ -75,8 +78,8 @@ public class Bmstu extends Provider {
         add(new NamedTask(context.getString(R.string.auth_auth_form)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                String login = settings.getString("pref_bmstu_credentials_login", "");
-                String password = settings.getString("pref_bmstu_credentials_password", "");
+                String login = settings.getString(CREDS_KEY + "_login", "");
+                String password = settings.getString(CREDS_KEY + "_password", "");
 
                 if (login.isEmpty() || password.isEmpty()) {
                     Logger.log(context.getString(R.string.error, 

@@ -94,8 +94,8 @@ public abstract class Provider extends LinkedList<Task> implements Task {
         else if (MosMetroV2WV.match(response, settings)) return new MosMetroV2WV(context, response);
         else if (MosMetroV2.match(response)) return new MosMetroV2(context, response);
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
-        else if (MAInet.match(response) && settings.getBoolean("pref_mainet", true)) return new MAInet(context, response);
-        else if (Bmstu.match(response) && settings.getBoolean("pref_bmstu", true)) return new Bmstu(context, response);
+        else if (MAInet.match(response)) return new MAInet(context, response);
+        else if (Bmstu.match(response)) return new Bmstu(context, response);
         else return new Unknown(context, response);
     }
 

@@ -15,27 +15,15 @@
         android:summary="@string/pref_mosmetro_v3_summary"
         android:defaultValue="true" />
 
-    <CheckBoxPreference
-        android:key="pref_mainet"
-        android:title="@string/pref_mainet"
-        android:summary="@string/pref_mainet_summary"
-        android:defaultValue="true" />
-
     <pw.thedrhax.mosmetro.preferences.LoginFormPreference
         android:key="pref_mainet_credentials"
-        android:title="@string/pref_mainet_credentials"
-        android:summary="@string/pref_mainet_credentials_summary" />
-    
-    <CheckBoxPreference
-        android:key="pref_bmstu"
-        android:title="@string/pref_bmstu"
-        android:summary="@string/pref_bmstu_summary"
-        android:defaultValue="true" />
+        android:title="@string/pref_mainet"
+        android:summary="@string/pref_mainet_summary" />
 
     <pw.thedrhax.mosmetro.preferences.LoginFormPreference
         android:key="pref_bmstu_credentials"
-        android:title="@string/pref_bmstu_credentials"
-        android:summary="@string/pref_bmstu_credentials_summary" />
+        android:title="@string/pref_bmstu"
+        android:summary="@string/pref_bmstu_summary" />
 
     <PreferenceCategory android:title="@string/pref_category_wifi" />
 
