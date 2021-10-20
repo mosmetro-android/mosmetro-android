@@ -578,9 +578,10 @@ public class ConnectionService extends IntentService {
         notify.hide();
 
         // Try to reconnect the Wi-Fi network
-        if (settings.getBoolean("pref_wifi_reconnect", false)) {
+        if (settings.getBoolean("pref_wifi_reconnect", false) && Build.VERSION.SDK_INT < 29) {
             Logger.log(this, "Reconnecting to Wi-Fi");
-            wifi.reconnect(SSID);
+            wifi.getWifiManager().reassociate();
+            wifi.getWifiManager().reconnect();
         }
 	}
 

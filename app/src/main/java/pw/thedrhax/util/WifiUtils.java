@@ -69,7 +69,7 @@ public class WifiUtils {
 
     // Get WifiInfo from Intent or, if not available, from WifiManager
     public WifiInfo getWifiInfo(Intent intent) {
-        if (intent != null && Build.VERSION.SDK_INT >= 14) {
+        if (intent != null) {
             WifiInfo result = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
             if (result != null) return result;
         }
@@ -135,18 +135,6 @@ public class WifiUtils {
     /*
      * Control methods
      */
-
-    // Reconnect to SSID (only if already configured)
-    public void reconnect(String SSID) {
-        try {
-            for (WifiConfiguration network : wm.getConfiguredNetworks()) {
-                if (clear(network.SSID).equals(SSID)) {
-                    wm.enableNetwork(network.networkId, true);
-                    wm.reassociate();
-                }
-            }
-        } catch (NullPointerException ignored) {}
-    }
 
     // Bind to Network
     @RequiresApi(21)

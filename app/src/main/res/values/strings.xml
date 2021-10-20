@@ -46,10 +46,10 @@
 
     <string name="pref_wifi_reconnect">Reconnect to Wi-Fi</string>
     <string name="pref_wifi_reconnect_summary">
-        Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset.
+        Try to reconnect to Wi-Fi network automatically when Wi-Fi signal is lost or connection is reset. (Android &lt; 10)
     </string>
     <string name="pref_wifi_bind">Bind process to the network</string>
-    <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network. (Android 5.0+)</string>
+    <string name="pref_wifi_bind_summary">Prevents leaking traffic to mobile network or VPN. (Android ≥ 5)</string>
 
     <string name="pref_internet_check">Connection monitoring</string>
     <string name="pref_internet_check_summary">Check Internet connection every 10 seconds and restart connection on error.</string>
