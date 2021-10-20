@@ -275,4 +275,5 @@
     <string name="done">Готово!</string>
     <string name="auth_midsession_fail">Обработка midsession не сработала. Если это сообщение появляется слишком часто, нажмите &gt;сюда&lt;, чтобы отключить эту функцию.</string>
     <string name="auth_midsession_start">Пытаюсь обойти midsession</string>
+    <string name="vpn_warning">Обнаружен VPN! Некоторые VPN или фильтры трафика могут мешать работе приложения, даже если оно находится в списке исключений. Пожалуйста, попробуйте отключить VPN и снова запустить подключение.</string>
 </resources>

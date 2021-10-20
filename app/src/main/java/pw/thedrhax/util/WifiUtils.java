@@ -132,6 +132,11 @@ public class WifiUtils {
         return null;
     }
 
+    public boolean isVpnConnected() {
+        if (Build.VERSION.SDK_INT < 21) return false;
+        return getNetwork(ConnectivityManager.TYPE_VPN) != null;
+    }
+
     /*
      * Control methods
      */

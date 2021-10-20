@@ -501,6 +501,10 @@ public class ConnectionService extends IntentService {
             return;
         }
 
+        if (wifi.isVpnConnected()) {
+            Logger.log(Logger.LEVEL.DEBUG, "Warning: VPN detected!");
+        }
+
         new Notify(this).id(2).hide(); // hide error notification
 
         notify.title(getString(R.string.auth_connecting, SSID))
@@ -536,6 +540,10 @@ public class ConnectionService extends IntentService {
             notify(result);
         } else {
             return;
+        }
+
+        if (wifi.isVpnConnected() && (result == Provider.RESULT.NOT_SUPPORTED || result == Provider.RESULT.ERROR)) {
+            Logger.log(getString(R.string.vpn_warning));
         }
 
         // Stop the service if connection were unsuccessful or started from shortcut
