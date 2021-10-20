@@ -132,17 +132,6 @@ public class WifiUtils {
         return null;
     }
 
-    // Get VPN (if active) or Wi-Fi Network object
-    @Nullable
-    @RequiresApi(21)
-    public Network getNetwork() {
-        Network result = getNetwork(ConnectivityManager.TYPE_VPN);
-        if (result == null) {
-            result = getNetwork(ConnectivityManager.TYPE_WIFI);
-        }
-        return result;
-    }
-
     /*
      * Control methods
      */
@@ -179,13 +168,13 @@ public class WifiUtils {
         if (Build.VERSION.SDK_INT < 21)
             cm.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
         else
-            bindToNetwork(getNetwork());
+            bindToNetwork(getNetwork(ConnectivityManager.TYPE_WIFI));
     }
 
     // Report connectivity status to system
     @RequiresApi(21)
     public void report(boolean status) {
-        Network network = getNetwork();
+        Network network = getNetwork(ConnectivityManager.TYPE_WIFI);
         if (network == null) return;
 
         if (Build.VERSION.SDK_INT >= 23)
