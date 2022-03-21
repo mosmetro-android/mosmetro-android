@@ -27,7 +27,6 @@ node('android') {
                 apksToSign: "bin/*-unsigned.apk",
                 archiveSignedApks: true
         )
-        androidLint()
     }
 
     stage('Notify') {
