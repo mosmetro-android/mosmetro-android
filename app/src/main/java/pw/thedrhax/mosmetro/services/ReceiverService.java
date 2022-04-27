@@ -71,6 +71,16 @@ public class ReceiverService extends Service {
             }
         };
 
+        registerReceiver(
+                connection_receiver,
+                new IntentFilter(ConnectionService.ACTION_EVENT)
+        );
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+        registerReceiver(receiver, filter);
+
         PermissionUtils pu = new PermissionUtils(this);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -86,16 +96,6 @@ public class ReceiverService extends Service {
         if (!ConnectionService.isRunning()) {
             notify.show();
         }
-
-        registerReceiver(
-                connection_receiver,
-                new IntentFilter(ConnectionService.ACTION_EVENT)
-        );
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        filter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        registerReceiver(receiver, filter);
 
         return super.onStartCommand(intent, flags, startId);
     }
