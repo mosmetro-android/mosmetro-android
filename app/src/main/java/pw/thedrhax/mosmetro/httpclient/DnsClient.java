@@ -104,9 +104,11 @@ public class DnsClient implements Dns {
         Lookup req;
         try {
             req = new Lookup(hostname, Type.A);
-        } catch (TextParseException ex) {
+        } catch (TextParseException|ExceptionInInitializerError ex) {
+            Logger.log(Logger.LEVEL.DEBUG, ex);
             throw new UnknownHostException(hostname);
         }
+
         req.setResolver(dns);
 
         Record[] res = req.run();
