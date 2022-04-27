@@ -486,6 +486,7 @@ public class ConnectionService extends IntentService {
                 startActivity(
                         new Intent(ConnectionService.this, SettingsActivity.class)
                                 .setAction(SettingsActivity.ACTION_MIDSESSION)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 );
             }
         }, msg.indexOf('>'), msg.indexOf('<') + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
