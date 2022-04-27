@@ -161,7 +161,14 @@ public class ConnectionService extends IntentService {
                 }
             };
 
-            cm.registerDefaultNetworkCallback(networkCallback);
+            // Ignore system bug https://issuetracker.google.com/issues/175055271
+            try {
+                cm.registerDefaultNetworkCallback(networkCallback);
+            } catch (SecurityException ex) {
+                networkCallback = null;
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+                Logger.log(Logger.LEVEL.DEBUG, "Warning: Unable to register network callback");
+            }
         }
     }
 
