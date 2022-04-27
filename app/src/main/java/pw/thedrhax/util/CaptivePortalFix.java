@@ -71,11 +71,15 @@ public class CaptivePortalFix {
             String server = Settings.Global.getString(resolver, CAPTIVE_PORTAL_SERVER);
             if (server == null || !GEN204_DOMAINS.contains(server)) return false;
 
-            String http_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTP_URL);
-            if (http_url == null || !GEN204_URLS.contains(http_url.substring(7))) return false;
+            try {
+                String http_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTP_URL);
+                if (http_url == null || !GEN204_URLS.contains(http_url.substring(7))) return false;
 
-            String https_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTPS_URL);
-            if (https_url == null || !GEN204_URLS.contains(https_url.substring(8))) return false;
+                String https_url = Settings.Global.getString(resolver, CAPTIVE_PORTAL_HTTPS_URL);
+                if (https_url == null || !GEN204_URLS.contains(https_url.substring(8))) return false;
+            } catch (StringIndexOutOfBoundsException ex) {
+                return false;
+            }
 
             return true;
         } else {
