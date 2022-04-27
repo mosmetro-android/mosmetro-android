@@ -23,7 +23,7 @@ android {
         buildConfigField "String", "TRACEPOT_ID", "\"7c36f095\""
 
         // GitHub Pages
-        buildConfigField "String", "\$GITHUB", "\"https://mosmetro-android.github.io\""
+        buildConfigField "String", "\$GITHUB", "\"https://raw.githubusercontent.com/mosmetro-android/mosmetro-android.github.io/master\""
         buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
         buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
 
