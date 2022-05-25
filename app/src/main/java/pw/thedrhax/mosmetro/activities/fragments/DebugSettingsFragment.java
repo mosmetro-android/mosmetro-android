@@ -54,7 +54,7 @@ public class DebugSettingsFragment extends NestedFragment {
         CheckBoxPreference pref_debug_last_log = (CheckBoxPreference)
                 getPreferenceScreen().findPreference("pref_debug_last_log");
         CheckBoxPreference pref_debug_testing = (CheckBoxPreference)
-                getPreferenceScreen().findPreference("pref_debug_testing");
+                getPreferenceScreen().findPreference("pref_debug_testing_experimental");
         CheckBoxPreference pref_debug_logcat = (CheckBoxPreference)
                 getPreferenceScreen().findPreference("pref_debug_logcat");
 

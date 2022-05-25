@@ -86,7 +86,7 @@ public class Logger {
     public static void configure(Context context) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         pref_debug_logcat = settings.getBoolean("pref_debug_logcat", false);
-        pref_debug_testing = settings.getBoolean("pref_debug_testing", false);
+        pref_debug_testing = settings.getBoolean("pref_debug_testing_experimental", true);
 
         for (LEVEL level : LEVEL.values()) {
             if (logs.containsKey(level)) {
