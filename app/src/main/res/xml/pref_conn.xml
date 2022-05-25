@@ -29,6 +29,12 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="pref_wifi_any_ssid"
+        android:title="@string/pref_wifi_any_ssid"
+        android:summary="@string/pref_wifi_any_ssid_summary" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="pref_wifi_reconnect"
         android:summary="@string/pref_wifi_reconnect_summary"
         android:title="@string/pref_wifi_reconnect" />

@@ -299,4 +299,6 @@
     <string name="auth_midsession_fail">Unable to handle midsession. If you see this message too often, tap &gt;here&lt; to disable this function.</string>
     <string name="auth_midsession_start">Attempting to bypass the midsession</string>
     <string name="vpn_warning">VPN detected! Some VPN apps or traffic filters may interfere with this app even if it was added to blacklist. Please disable the VPN and try again.</string>
+    <string name="pref_wifi_any_ssid">Check every network</string>
+    <string name="pref_wifi_any_ssid_summary">Perform quick DNS check in every unknown Wi-Fi network in attempt to find signs of any supported algorithm.</string>
 </resources>

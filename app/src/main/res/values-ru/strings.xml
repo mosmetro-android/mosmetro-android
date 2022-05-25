@@ -272,4 +272,6 @@
     <string name="auth_midsession_fail">Обработка midsession не сработала. Если это сообщение появляется слишком часто, нажмите &gt;сюда&lt;, чтобы отключить эту функцию.</string>
     <string name="auth_midsession_start">Пытаюсь обойти midsession</string>
     <string name="vpn_warning">Обнаружен VPN! Некоторые VPN или фильтры трафика могут мешать работе приложения, даже если оно находится в списке исключений. Пожалуйста, попробуйте отключить VPN и снова запустить подключение.</string>
+    <string name="pref_wifi_any_ssid">Проверять все сети</string>
+    <string name="pref_wifi_any_ssid_summary">Искать признаки поддерживаемых алгоритмов с помощью быстрой проверки через DNS в сетях Wi-Fi с незнакомым названием.</string>
 </resources>

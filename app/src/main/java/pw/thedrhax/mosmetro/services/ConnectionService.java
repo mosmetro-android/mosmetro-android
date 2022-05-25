@@ -92,6 +92,7 @@ public class ConnectionService extends IntentService {
     private boolean pref_internet_check;
     private boolean pref_manual_connection_monitoring;
     private boolean pref_notify_foreground;
+    private boolean pref_wifi_any_ssid;
 
     // Notifications
     private Notify notify;
@@ -118,6 +119,7 @@ public class ConnectionService extends IntentService {
         pref_internet_check = settings.getBoolean("pref_internet_check", true);
         pref_manual_connection_monitoring = settings.getBoolean("pref_manual_connection_monitoring", true);
         pref_internet_check_interval = Util.getIntPreference(this, "pref_internet_check_interval", 10);
+        pref_wifi_any_ssid = settings.getBoolean("pref_wifi_any_ssid", false);
 
         final PendingIntent stop_intent = PendingIntent.getService(
                 this, 0,
@@ -249,7 +251,7 @@ public class ConnectionService extends IntentService {
     }
 
     private boolean waitForIP() {
-        if (wifi.getIP() != 0) return true;
+        if (wifi.getIP() != 0 && !wifi.getDns().isEmpty()) return true;
 
         int count = 0;
 
@@ -258,7 +260,7 @@ public class ConnectionService extends IntentService {
                 .progress(0, true)
                 .show();
 
-        while (wifi.getIP() == 0) {
+        while (wifi.getIP() == 0 || wifi.getDns().isEmpty()) {
             if (!running.sleep(1000)) return false;
 
             if (pref_ip_wait != 0 && count++ == pref_ip_wait) {
@@ -345,13 +347,14 @@ public class ConnectionService extends IntentService {
             return START_NOT_STICKY;
         }
 
-        if (!Provider.isSSIDSupported(SSID) && !from_shortcut) {
+        if (Provider.isSSIDSupported(SSID) || from_shortcut ||
+                WifiUtils.UNKNOWN_SSID.equals(SSID) || pref_wifi_any_ssid) {
+            Logger.log(this, source);
+            onStart(intent, startId);
+        } else {
             Logger.log(this, "Not starting: SSID is not supported (" + SSID + ")");
-            return START_NOT_STICKY;
         }
 
-        Logger.log(this, source);
-        onStart(intent, startId);
         return START_NOT_STICKY;
     }
 
@@ -500,6 +503,8 @@ public class ConnectionService extends IntentService {
         notify.icon(R.drawable.ic_notification_connecting_colored,
                     R.drawable.ic_notification_connecting);
 
+        new Notify(this).id(2).hide(); // hide error notification
+
         // Wait for IP before detecting the Provider
         if (!waitForIP()) {
             if (running.get()) {
@@ -513,7 +518,14 @@ public class ConnectionService extends IntentService {
             Logger.log(Logger.LEVEL.DEBUG, "Warning: VPN detected!");
         }
 
-        new Notify(this).id(2).hide(); // hide error notification
+        // DNS probe in unknown Wi-Fi networks
+        if (!from_shortcut && !Provider.isSSIDSupported(SSID)) {
+            if (!Provider.dnsCheck(this)) {
+                Logger.log(this, "Stopping by dns probe (unknown network)");
+                running.set(false);
+                return;
+            }
+        }
 
         notify.title(getString(R.string.auth_connecting, SSID))
                 .text(getString(R.string.auth_provider_check))

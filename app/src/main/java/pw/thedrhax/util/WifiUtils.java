@@ -19,6 +19,9 @@
 package pw.thedrhax.util;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -91,9 +95,8 @@ public class WifiUtils {
         return wm.getConnectionInfo().getIpAddress();
     }
 
-    @Nullable
+    @RequiresApi(21)
     public LinkProperties getLinkProperies() {
-        if (Build.VERSION.SDK_INT < 28) return null;
         Network network = getNetwork(ConnectivityManager.TYPE_WIFI);
         if (network == null) return null;
         return cm.getLinkProperties(network);
@@ -101,9 +104,28 @@ public class WifiUtils {
 
     // Get IP addresses of DNS servers from DHCP
     public List<InetAddress> getDns() {
-        LinkProperties props = getLinkProperies();
-        if (props == null) return new LinkedList<InetAddress>();
-        return new LinkedList<InetAddress>(props.getDnsServers());
+        if (Build.VERSION.SDK_INT >= 21) {
+            LinkProperties props = getLinkProperies();
+            if (props != null) {
+                List<InetAddress> dns = props.getDnsServers();
+                if (!dns.isEmpty()) {
+                    return dns;
+                }
+            }
+        }
+
+        DhcpInfo dhcp = wm.getDhcpInfo();
+        List<InetAddress> result = new LinkedList<>();
+
+        try {
+            if (dhcp.dns1 != 0)
+                result.add(Util.intToAddr(dhcp.dns1));
+
+            if (dhcp.dns2 != 0)
+                result.add(Util.intToAddr(dhcp.dns2));
+        } catch (UnknownHostException ignored) {}
+
+        return result;
     }
 
     // Get main Wi-Fi state

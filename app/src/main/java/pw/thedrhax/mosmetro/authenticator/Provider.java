@@ -25,8 +25,11 @@ import androidx.annotation.NonNull;
 
 import org.acra.ACRA;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
@@ -37,6 +40,7 @@ import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV2WV;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV3;
 import pw.thedrhax.mosmetro.authenticator.providers.Unknown;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.DnsClient;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Listener;
@@ -68,6 +72,13 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "bmstu_lb"
     };
 
+    /**
+     * List of domains for DNS probing
+     */
+    protected static final String[] DOMAINS = {
+            "auth.wi-fi.ru"
+    };
+
     protected Context context;
     protected SharedPreferences settings;
     protected Randomizer random;
@@ -78,6 +89,38 @@ public abstract class Provider extends LinkedList<Task> implements Task {
      * Default Client used for all network operations
      */
     protected Client client;
+
+    /**
+     * Check if current network is supported by sending simple DNS requests.
+     * @return True if any of responses contains a site-local IP.
+     */
+    public static boolean dnsCheck(Context context) {
+        Logger.log(Logger.LEVEL.DEBUG, "Performing DNS check...");
+
+        DnsClient dns = new DnsClient(context);
+
+        for (String domain : DOMAINS) {
+            List<InetAddress> res;
+
+            try {
+                res = dns.lookup(domain);
+            } catch (UnknownHostException ex) {
+                Logger.log(dns, "Unable to resolve " + domain);
+                continue;
+            }
+
+            for (InetAddress addr : res) {
+                Logger.log(dns, addr.toString());
+
+                if (addr.isSiteLocalAddress()) {
+                    Logger.log(Logger.LEVEL.DEBUG, "Found site-local address " + addr);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Find Provider using already received response from server.
