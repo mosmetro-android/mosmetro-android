@@ -250,15 +250,17 @@ public class ConnectionService extends IntentService {
                 .locked(pref_notify_foreground);
     }
 
-    private boolean waitForIP() {
+    private boolean waitForIP(boolean silent) {
         if (wifi.getIP() != 0 && !wifi.getDns().isEmpty()) return true;
 
         int count = 0;
 
         Logger.log(getString(R.string.ip_wait));
-        notify.title(getString(R.string.ip_wait))
-                .progress(0, true)
-                .show();
+
+        if (!silent)
+            notify.title(getString(R.string.ip_wait))
+                    .progress(0, true)
+                    .show();
 
         while (wifi.getIP() == 0 || wifi.getDns().isEmpty()) {
             if (!running.sleep(1000)) return false;
@@ -505,8 +507,10 @@ public class ConnectionService extends IntentService {
 
         new Notify(this).id(2).hide(); // hide error notification
 
+        boolean unknownNetwork = !from_shortcut && !Provider.isSSIDSupported(SSID);
+
         // Wait for IP before detecting the Provider
-        if (!waitForIP()) {
+        if (!waitForIP(unknownNetwork)) {
             if (running.get()) {
                 notify(Provider.RESULT.ERROR);
                 running.set(false);
@@ -518,8 +522,7 @@ public class ConnectionService extends IntentService {
             Logger.log(Logger.LEVEL.DEBUG, "Warning: VPN detected!");
         }
 
-        // DNS probe in unknown Wi-Fi networks
-        if (!from_shortcut && !Provider.isSSIDSupported(SSID)) {
+        if (unknownNetwork) {
             if (!Provider.dnsCheck(this)) {
                 Logger.log(this, "Stopping by dns probe (unknown network)");
                 running.set(false);
