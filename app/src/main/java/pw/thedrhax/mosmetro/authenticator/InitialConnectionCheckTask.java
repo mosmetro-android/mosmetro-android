@@ -40,7 +40,7 @@ public abstract class InitialConnectionCheckTask implements Task {
 
         if (!first_start) {
             Logger.log(p.context.getString(R.string.auth_checking_connection));
-            response = p.gen_204.check().getResponse();
+            response = p.gen_204.check(false).getResponse();
         }
 
         first_start = false;

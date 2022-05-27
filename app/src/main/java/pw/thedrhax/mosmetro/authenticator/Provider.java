@@ -108,9 +108,8 @@ public abstract class Provider extends LinkedList<Task> implements Task {
      */
     @NonNull public static Provider find(Context context, Listener<Boolean> running) {
         Logger.log(context.getString(R.string.auth_provider_check));
-        HttpResponse response = new Gen204(context, running).check().getResponse();
-        Provider result = Provider.find(context, response);
-        return result;
+        HttpResponse response = new Gen204(context, running).check(false).getResponse();
+        return Provider.find(context, response);
     }
 
     /**
@@ -146,7 +145,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
      * @return True if internet access is available; otherwise, false is returned.
      */
     public boolean isConnected() {
-        return isConnected(gen_204.check().getResponse());
+        return isConnected(gen_204.check(true).getResponse());
     }
 
     /**

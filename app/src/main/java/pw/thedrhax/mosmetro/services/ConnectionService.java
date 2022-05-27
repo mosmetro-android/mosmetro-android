@@ -396,7 +396,9 @@ public class ConnectionService extends IntentService {
                 .setGen204(gen_204);
 
         midsession.add(vars -> {
-            if (gen_204.getLastResult().isFalseNegative()) {
+            Gen204Result last_result = gen_204.getLastResult();
+
+            if (last_result != null && last_result.isFalseNegative()) {
                 vars.put("result", Provider.RESULT.ERROR);
             }
 
@@ -413,7 +415,7 @@ public class ConnectionService extends IntentService {
 
         if (!running.sleep(3000)) return false;
 
-        res_204 = gen_204.check();
+        res_204 = gen_204.check(true);
 
         if (!res_204.isConnected()) {
             Logger.log(this, "Midsession | Connection lost, aborting...");
@@ -447,7 +449,7 @@ public class ConnectionService extends IntentService {
     private boolean isConnected(Gen204 gen_204, Gen204Result res_204) {
         if (res_204 == null) {
             Logger.log(this, "Checking internet connection");
-            res_204 = gen_204.check();
+            res_204 = gen_204.check(true);
         }
 
         if (!res_204.isConnected()) {
@@ -468,6 +470,10 @@ public class ConnectionService extends IntentService {
         if (settings.getBoolean("pref_internet_midsession", false)) {
             boolean solved = handleMidsession(gen_204, res_204);
             res_204 = gen_204.getLastResult();
+
+            if (res_204 == null) {
+                res_204 = gen_204.check(true);
+            }
 
             if (solved || !res_204.isConnected()) {
                 return res_204.isConnected();
