@@ -44,7 +44,7 @@ import pw.thedrhax.util.WifiUtils;
 public class DnsClient implements Dns {
     private final WifiUtils wifi;
     private ExtendedResolver dns;
-    private final boolean pref_dnsjava;
+    private boolean pref_dnsjava;
 
     private String[] getServers() {
         Set<String> servers = new HashSet<String>();
@@ -87,6 +87,11 @@ public class DnsClient implements Dns {
             Logger.log(this, "Unable to initialize, using system resolver");
             dns = null;
         }
+    }
+
+    public DnsClient useCustomClient(boolean enabled) {
+        pref_dnsjava = enabled;
+        return this;
     }
 
     @Override

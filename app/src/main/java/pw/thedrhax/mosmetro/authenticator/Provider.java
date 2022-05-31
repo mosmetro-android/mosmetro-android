@@ -97,7 +97,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
     public static boolean dnsCheck(Context context) {
         Logger.log(Logger.LEVEL.DEBUG, "Performing DNS check...");
 
-        DnsClient dns = new DnsClient(context);
+        DnsClient dns = new DnsClient(context).useCustomClient(true);
 
         for (String domain : DOMAINS) {
             List<InetAddress> res;
