@@ -126,6 +126,7 @@ public class DnsClient implements Dns {
         }
 
         req.setResolver(dns);
+        wifi.bindToWifi();
 
         Record[] res = req.run();
         List<InetAddress> result = new LinkedList<>();
