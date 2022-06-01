@@ -19,6 +19,7 @@
 package pw.thedrhax.mosmetro.httpclient;
 
 import org.xbill.DNS.ARecord;
+import org.xbill.DNS.Cache;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.ResolverConfig;
@@ -45,6 +46,7 @@ public class DnsClient implements Dns {
     private final WifiUtils wifi;
     private ExtendedResolver dns;
     private boolean pref_dnsjava;
+    private boolean global_cache = true;
 
     private String[] getServers() {
         Set<String> servers = new HashSet<String>();
@@ -94,6 +96,11 @@ public class DnsClient implements Dns {
         return this;
     }
 
+    public DnsClient useGlobalCache(boolean enabled) {
+        global_cache = enabled;
+        return this;
+    }
+
     @Override
     public List<InetAddress> lookup(String hostname) throws UnknownHostException {
         if (dns == null) {
@@ -112,6 +119,10 @@ public class DnsClient implements Dns {
         } catch (TextParseException|ExceptionInInitializerError ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             throw new UnknownHostException(hostname);
+        }
+
+        if (!global_cache) {
+            req.setCache(new Cache());
         }
 
         req.setResolver(dns);
