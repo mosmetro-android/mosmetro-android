@@ -72,13 +72,6 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "bmstu_lb"
     };
 
-    /**
-     * List of domains for DNS probing
-     */
-    protected static final String[] DOMAINS = {
-            "auth.wi-fi.ru"
-    };
-
     protected Context context;
     protected SharedPreferences settings;
     protected Randomizer random;
@@ -90,6 +83,23 @@ public abstract class Provider extends LinkedList<Task> implements Task {
      */
     protected Client client;
 
+    protected static List<String> getDnsCheckDomains(Context context) {
+        LinkedList<String> result = new LinkedList<>();
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+        result.add("auth.wi-fi.ru");
+
+        if (!settings.getString("pref_bmstu_credentials_login", "").isEmpty()) {
+            result.add("lbpfs.bmstu.ru");
+        }
+
+        if (!settings.getString("pref_mainet_credentials_login", "").isEmpty()) {
+            result.add("wifi.mai.ru");
+        }
+
+        return result;
+    }
+
     /**
      * Check if current network is supported by sending simple DNS requests.
      * @return True if any of responses contains a site-local IP.
@@ -99,7 +109,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
 
         DnsClient dns = new DnsClient(context).useCustomClient(true).useGlobalCache(false);
 
-        for (String domain : DOMAINS) {
+        for (String domain : getDnsCheckDomains(context)) {
             List<InetAddress> res;
 
             try {
