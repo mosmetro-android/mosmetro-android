@@ -27,9 +27,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public final class Util {
     private Util() {}
+
+    public static InetAddress intToAddr(int hex) throws UnknownHostException {
+        byte[] b = new byte[4];
+
+        b[3] = (byte) ((hex & 0xFF000000) >> 24);
+        b[2] = (byte) ((hex & 0x00FF0000) >> 16);
+        b[1] = (byte) ((hex & 0x0000FF00) >> 8);
+        b[0] = (byte) (hex & 0x000000FF);
+
+        return InetAddress.getByAddress(b);
+    }
 
     // Source: https://stackoverflow.com/a/26779342
     public static int countLines(String input) {
