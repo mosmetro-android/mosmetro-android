@@ -293,7 +293,7 @@ public class MosMetroV2WV extends WebViewProvider {
             public boolean until(HashMap<String, Object> vars) {
                 if (pref_internet_check && ++counter == interval * 10) {
                     counter = 0;
-                    Gen204Result res_204 = gen_204.check();
+                    Gen204Result res_204 = gen_204.check(true);
                     return res_204.isConnected() && !res_204.isFalseNegative();
                 }
 

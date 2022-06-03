@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -79,21 +81,17 @@ public class Gen204 {
     /**
      * Perform logged request to specified URL.
      */
-    private HttpResponse request(String schema, String[] urls) throws IOException {
-        HttpResponse res = HttpResponse.EMPTY(client);
-        IOException last_ex = null;
-
+    @Nullable
+    private HttpResponse request(String schema, String[] urls) {
         for (int i = 0; i < 3; i++) {
             String url = schema + "://" + random.choose(urls);
 
             try {
-                res = client.get(url).execute();
-                last_ex = null;
+                HttpResponse res = client.get(url).execute();
                 Logger.log(this, url + " | " + res.getResponseCode());
-                break;
+                return res;
             } catch (IOException ex) {
-                Logger.log(this, url + " | " + ex.toString());
-                last_ex = ex;
+                Logger.log(this, url + " | " + ex);
 
                 if (ex instanceof SSLPeerUnverifiedException) break;
 
@@ -110,39 +108,55 @@ public class Gen204 {
             }
         }
 
-        if (last_ex != null) {
-            throw last_ex;
-        }
-
-        return res;
+        return null;
     }
 
-    private Gen204Result tripleCheck() {
+    public Gen204Result check(boolean expectPositive) {
+        HttpResponse rel, unrel;
+
+        if (expectPositive) {
+            rel = request("https", URL_RELIABLE);
+        } else {
+            rel = request("http", URL_RELIABLE);
+
+            if (rel != null && rel.getResponseCode() != 204) {
+                return new Gen204Result(rel); // negative
+            }
+        }
+
+        unrel = request("http", URL_DEFAULT);
+
+        if (rel == null) {
+            return new Gen204Result(unrel); // probably negative
+        } else {
+            Gen204Result res = new Gen204Result(rel, unrel);
+
+            if (res.isFalseNegative() && (last_result == null || !last_result.isFalseNegative())) {
+                Logger.log(this, "False negative detected");
+            }
+
+            return res; // positive with possible false negative
+        }
+    }
+
+    public Gen204Result check() {
         HttpResponse unrel, rel_https, rel_http;
 
         // Unreliable HTTP check (needs to be rechecked by HTTPS)
-        try {
-            unrel = request("http", URL_DEFAULT);
-        } catch (IOException ex) {
+        unrel = request("http", URL_DEFAULT);
+
+        if (unrel == null) {
             // network is most probably unreachable
-            return new Gen204Result(HttpResponse.EMPTY(client));
+            return new Gen204Result();
         }
 
         // Reliable HTTPS check
-        try {
-            rel_https = request("https", URL_RELIABLE);
-        } catch (IOException ex) {
-            rel_https = null;
-        }
+        rel_https = request("https", URL_RELIABLE);
 
         if (unrel.getResponseCode() == 204) {
             if (rel_https == null || rel_https.getResponseCode() != 204) {
                 // Reliable HTTP check
-                try {
-                    rel_http = request("http", URL_RELIABLE);
-                } catch (IOException ex) {
-                    rel_http = null;
-                }
+                rel_http = request("http", URL_RELIABLE);
 
                 if (rel_http != null && rel_http.getResponseCode() != 204) {
                     Logger.log(this, "False positive detected");
@@ -163,17 +177,12 @@ public class Gen204 {
         }
 
         Logger.log(this, "Unexpected state");
-        return new Gen204Result(HttpResponse.EMPTY(client));
+        return new Gen204Result();
     }
 
-    public Gen204Result check() {
-        Gen204Result res = tripleCheck();
-        last_result = res;
-        return res;
-    }
-
+    @Nullable
     public Gen204Result getLastResult() {
-        return last_result != null ? last_result : check();
+        return last_result;
     }
 
     public class Gen204Result {
@@ -181,12 +190,23 @@ public class Gen204 {
         private final HttpResponse falseNegative;
 
         public Gen204Result(HttpResponse response, HttpResponse falseNegative) {
-            this.response = response;
-            this.falseNegative = falseNegative;
+            if (response == null) {
+                this.response = HttpResponse.EMPTY(client);
+                this.falseNegative = null;
+            } else {
+                this.response = response;
+                this.falseNegative = falseNegative;
+            }
+
+            last_result = this;
         }
 
         public Gen204Result(HttpResponse response) {
             this(response, null);
+        }
+
+        public Gen204Result() {
+            this(null);
         }
 
         public HttpResponse getResponse() {
