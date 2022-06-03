@@ -118,8 +118,8 @@ public class SettingsActivity extends Activity {
                         ).show();
                         break;
 
-                    case 3: // Ethereum
-                        clip = ClipData.newPlainText("", getString(R.string.donate_ethereum_data));
+                    case 3: // FPS
+                        clip = ClipData.newPlainText("", getString(R.string.donate_sbp_data));
                         clipboard.setPrimaryClip(clip);
 
                         Toast.makeText(SettingsActivity.this,
