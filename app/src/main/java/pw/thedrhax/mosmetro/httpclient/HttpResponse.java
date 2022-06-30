@@ -33,6 +33,7 @@ import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -229,12 +230,37 @@ public class HttpResponse {
     }
 
     @NonNull
+    public String parseSingleLink() throws ParseException {
+        if (document == null) {
+            throw new ParseException("Unable to parse HTML", 0);
+        }
+
+        Elements links = document.getElementsByTag("a");
+
+        if (links.size() != 1) {
+            throw new ParseException("Found " + links.size() + " links instead of 1", 0);
+        }
+
+        Element link = links.first();
+
+        return absolutePathToUrl(getUrl(), link.attr("href"));
+    }
+
+    @NonNull
     public String parseAnyRedirect() throws ParseException {
         try {
             return parseMetaRedirect();
-        } catch (ParseException ex1) {
+        } catch (ParseException ignored) {}
+
+        try {
             return get300Redirect();
-        }
+        } catch (ParseException ignored) {}
+
+        try {
+            return parseSingleLink();
+        } catch (ParseException ignored) {}
+
+        throw new ParseException("No redirects found", 0);
     }
 
     @NonNull
