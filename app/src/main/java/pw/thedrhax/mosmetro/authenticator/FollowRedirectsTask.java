@@ -33,6 +33,7 @@ import pw.thedrhax.util.Logger;
 public abstract class FollowRedirectsTask extends NamedTask {
     private final Provider p;
     private boolean ignoreErrors = false;
+    private boolean switchProviders = false;
 
     public FollowRedirectsTask(Provider p) {
         super(p.context.getString(R.string.auth_redirect));
@@ -41,6 +42,8 @@ public abstract class FollowRedirectsTask extends NamedTask {
 
     @Nullable
     public abstract String getInitialRedirect(HashMap<String, Object> vars);
+
+    public abstract void getLastRedirect(String url);
 
     @Override
     public boolean run(HashMap<String, Object> vars) {
@@ -57,13 +60,16 @@ public abstract class FollowRedirectsTask extends NamedTask {
                 HttpResponse res = req.execute(); // throws IOException
                 Logger.log(Logger.LEVEL.DEBUG, res.toString());
 
-                Provider nested = Provider.find(p.context, res);
+                redirect = res.parseAnyRedirect(); // throws ParseException
 
-                if (nested instanceof Unknown) {
-                    redirect = res.parseAnyRedirect(); // throws ParseException
-                } else {
-                    p.add(p.indexOf(this) + 1, nested);
-                    return true;
+                if (switchProviders) {
+                    Provider nested = Provider.find(p.context, res);
+
+                    if (!(nested instanceof Unknown)) {
+                        p.add(p.indexOf(this) + 1, nested);
+                        getLastRedirect(redirect);
+                        return true;
+                    }
                 }
             }
 
@@ -77,10 +83,17 @@ public abstract class FollowRedirectsTask extends NamedTask {
             p.client.setFollowRedirects(true);
         }
 
+        getLastRedirect(redirect);
         return true;
     }
 
     public FollowRedirectsTask setIgnoreErrors(boolean ignore) {
-        this.ignoreErrors = ignore; return this;
+        this.ignoreErrors = ignore;
+        return this;
+    }
+
+    public FollowRedirectsTask setSwitchProviders(boolean enabled) {
+        this.switchProviders = enabled;
+        return this;
     }
 }

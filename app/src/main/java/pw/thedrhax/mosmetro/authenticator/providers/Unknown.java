@@ -71,7 +71,12 @@ public class Unknown extends Provider {
             public String getInitialRedirect(HashMap<String, Object> vars) {
                 return redirect;
             }
-        });
+
+            @Override
+            public void getLastRedirect(String url) {
+
+            }
+        }.setSwitchProviders(true));
 
         add(new FinalConnectionCheckTask(this));
     }
