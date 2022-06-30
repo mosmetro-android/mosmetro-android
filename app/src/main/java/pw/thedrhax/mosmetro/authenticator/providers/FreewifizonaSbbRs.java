@@ -40,6 +40,7 @@ public class FreewifizonaSbbRs extends Provider {
 
     public FreewifizonaSbbRs(Context context, HttpResponse res) {
         super(context);
+        client.trustAllCerts();
 
         add(new InitialConnectionCheckTask(this, res) {
             @Override
