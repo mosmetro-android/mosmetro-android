@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pw.thedrhax.mosmetro.R;
+import pw.thedrhax.mosmetro.authenticator.providers.FreewifizonaSbbRs;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.Bmstu;
 import pw.thedrhax.mosmetro.authenticator.providers.MosMetroV1;
@@ -69,7 +70,8 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "MAInet_public",
             "Moscow_WiFi_Free",
             "Moscow_WIFI_Free",
-            "bmstu_lb"
+            "bmstu_lb",
+            "Free Wi-Fi Zona"
     };
 
     protected Context context;
@@ -96,6 +98,8 @@ public abstract class Provider extends LinkedList<Task> implements Task {
         if (!settings.getString("pref_mainet_credentials_login", "").isEmpty()) {
             result.add("wifi.mai.ru");
         }
+
+        result.add("freewifizona.sbb.rs");
 
         return result;
     }
@@ -149,6 +153,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
         else if (MosMetroV1.match(response)) return new MosMetroV1(context, response);
         else if (MAInet.match(response)) return new MAInet(context, response);
         else if (Bmstu.match(response)) return new Bmstu(context, response);
+        else if (FreewifizonaSbbRs.match(response)) return new FreewifizonaSbbRs(context, response);
         else return new Unknown(context, response);
     }
 
