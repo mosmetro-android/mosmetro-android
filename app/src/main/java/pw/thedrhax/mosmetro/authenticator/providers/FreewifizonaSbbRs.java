@@ -65,7 +65,12 @@ public class FreewifizonaSbbRs extends Provider {
             public String getInitialRedirect(HashMap<String, Object> vars) {
                 return redirect;
             }
-        });
+
+            @Override
+            public void getLastRedirect(String url) {
+                redirect = url;
+            }
+        }.setIgnoreErrors(true));
 
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
