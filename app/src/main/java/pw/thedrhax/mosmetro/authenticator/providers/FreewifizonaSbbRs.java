@@ -20,6 +20,8 @@ package pw.thedrhax.mosmetro.authenticator.providers;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
@@ -29,6 +31,7 @@ import java.util.HashMap;
 
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
+import pw.thedrhax.mosmetro.authenticator.FollowRedirectsTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
@@ -46,7 +49,7 @@ public class FreewifizonaSbbRs extends Provider {
             @Override
             public boolean handle_response(HashMap<String, Object> vars, HttpResponse response) {
                 try {
-                    redirect = response.parseMetaRedirect();
+                    redirect = response.parseAnyRedirect();
                     Logger.log(Logger.LEVEL.DEBUG, redirect);
                 } catch (ParseException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -57,15 +60,16 @@ public class FreewifizonaSbbRs extends Provider {
             }
         });
 
+        add(new FollowRedirectsTask(this) {
+            @Nullable @Override
+            public String getInitialRedirect(HashMap<String, Object> vars) {
+                return redirect;
+            }
+        });
+
         add(new NamedTask(context.getString(R.string.auth_auth_page)) {
             @Override
             public boolean run(HashMap<String, Object> vars) {
-                try {
-                    client.get(redirect).execute();
-                } catch (IOException ex) {
-                    Logger.log(Logger.LEVEL.DEBUG, ex);
-                }
-
                 redirect = HttpResponse.removePathFromUrl(redirect);
                 HttpResponse res;
 
@@ -134,7 +138,7 @@ public class FreewifizonaSbbRs extends Provider {
 
     public static boolean match(HttpResponse response) {
         try {
-            return response.parseMetaRedirect().contains("freewifizona.sbb.rs");
+            return response.parseAnyRedirect().contains("freewifizona.sbb.rs");
         } catch (ParseException ex) {
             return false;
         }
