@@ -28,7 +28,7 @@ android {
         buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
 
         // Default stat URL
-        buildConfigField "String", "API_URL_DEFAULT", "\"https://mosmetro.duckdns.org\""
+        buildConfigField "String", "API_URL_DEFAULT", "\"https://mosmetro.my.to\""
 
         // Relative URLs for stat server
         buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
