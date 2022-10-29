@@ -55,7 +55,7 @@ public class BackendRequest {
         String url;
 
         try {
-            url = client.get(BuildConfig.API_URL_SOURCE).execute().getPage();
+            url = client.get(BuildConfig.API_URL_SOURCE).execute().getPage().trim();
         } catch (IOException ex) {
             return false;
         }
