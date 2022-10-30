@@ -28,7 +28,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import androidx.core.content.FileProvider;
 
-import android.text.SpannableString;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -46,8 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.acra.ACRA;
-
+import io.sentry.Sentry;
 import pw.thedrhax.mosmetro.R;
 
 public class Logger {
@@ -176,7 +174,7 @@ public class Logger {
     public static void report(String message) {
         if (!pref_debug_testing) return;
         Logger.log(LEVEL.DEBUG, "Sending automated report | " + message);
-        ACRA.getErrorReporter().handleSilentException(new Exception(message));
+        Sentry.captureException(new Exception(message));
     }
 
     /*

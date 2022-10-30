@@ -19,35 +19,25 @@
 package pw.thedrhax.mosmetro;
 
 import android.app.Application;
-import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
 
-import org.acra.ACRA;
-import org.acra.annotation.AcraCore;
-
-import pw.thedrhax.mosmetro.acra.CustomHttpSenderFactory;
+import io.sentry.Attachment;
+import io.sentry.Sentry;
+import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.User;
 import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.util.Logger;
-
-import static org.acra.ReportField.*;
+import pw.thedrhax.util.UUID;
+import pw.thedrhax.util.Version;
 
 import com.topjohnwu.superuser.Shell;
 
-@AcraCore(
-        reportContent = {
-            // Required by Tracepot
-            ANDROID_VERSION, APP_VERSION_CODE, APP_VERSION_NAME,
-            PACKAGE_NAME, REPORT_ID, STACK_TRACE, USER_APP_START_DATE,
-            USER_CRASH_DATE,
+import java.util.List;
 
-            // Additional info
-            INSTALLATION_ID, BUILD_CONFIG, PHONE_MODEL, CUSTOM_DATA,
-            APPLICATION_LOG
-        },
-        reportSenderFactoryClasses = {CustomHttpSenderFactory.class},
-        applicationLogFile = "log-debug.txt",
-        applicationLogFileLines = 1000)
 public class MosMetroApp extends Application {
     static {
         Shell.setDefaultBuilder(Shell.Builder.create()
@@ -58,21 +48,42 @@ public class MosMetroApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Logger.configure(this);
         WorkManager.initialize(this,
                 new Configuration.Builder()
                         .setMinimumLoggingLevel(android.util.Log.DEBUG)
                         .build()
         );
         BackendWorker.configure(this);
-    }
 
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        ACRA.init(this);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (!ACRA.isACRASenderServiceProcess()) {
-            Logger.configure(base);
-        }
+        SentryAndroid.init(this, options -> {
+            options.setDsn("https://13509f0e75f74081845cfe990b9840f3@o1176364.ingest.sentry.io/4504074406199296");
+            options.setRelease(Version.getFormattedVersion());
+            options.setTag("branch", Version.getBranch());
+            options.setTag("build", "" + Version.getBuildNumber());
+
+            options.setBeforeSend((event, hint) -> {
+                if (!settings.getBoolean("acra.enable", true)) {
+                    return null;
+                }
+
+                StringBuilder cropped_log = new StringBuilder();
+                List<CharSequence> full_log = Logger.read(Logger.LEVEL.DEBUG);
+                int cut = full_log.lastIndexOf(Logger.CUT);
+
+                for (CharSequence line : full_log.subList(cut + 1, full_log.size())) {
+                    cropped_log.append(line).append('\n');
+                }
+
+                hint.addAttachment(new Attachment(cropped_log.toString().getBytes(), "log-debug.txt"));
+                return event;
+            });
+        });
+
+        User user = new User();
+        user.setId(UUID.get(this));
+        Sentry.setUser(user);
     }
 }

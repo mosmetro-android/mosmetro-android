@@ -250,7 +250,7 @@
     <string name="pref_bmstu_summary">This algorithm is required to connect to bmstu_lb — public Wi-Fi network of Bauman Moscow State Technical University.</string>
     <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
     <string name="pref_debug_last_log">Send the last log</string>
-    <string name="pref_debug_last_log_summary">Log will be sent along with ACRA reports in case of crash.</string>
+    <string name="pref_debug_last_log_summary">Log will be sent along with Sentry reports in case of crash.</string>
     <string name="auth_algorithm_failure">algorithm initialization failed</string>
     <string name="location_permission">Location permission</string>
     <string name="location_permission_saving">Android 9+ requires location access in order to get the name of the Wi-Fi network. Without this permission app will not start automatically, but you can still connect manually through main menu or shortcuts.</string>

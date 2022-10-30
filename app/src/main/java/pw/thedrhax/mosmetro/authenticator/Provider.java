@@ -23,14 +23,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
-import org.acra.ACRA;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.sentry.Sentry;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.authenticator.providers.MAInet;
 import pw.thedrhax.mosmetro.authenticator.providers.Bmstu;
@@ -316,7 +315,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
                 Logger.log(context.getString(R.string.error,
                         context.getString(R.string.auth_error_fatal)
                 ));
-                ACRA.getErrorReporter().handleSilentException(ex);
+                Sentry.captureException(ex);
                 break;
             }
         }
