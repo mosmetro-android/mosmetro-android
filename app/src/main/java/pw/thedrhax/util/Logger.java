@@ -174,7 +174,7 @@ public class Logger {
     public static void report(String message) {
         if (!pref_debug_testing) return;
         Logger.log(LEVEL.DEBUG, "Sending automated report | " + message);
-        Sentry.captureException(new Exception(message));
+        Sentry.captureMessage(message);
     }
 
     /*

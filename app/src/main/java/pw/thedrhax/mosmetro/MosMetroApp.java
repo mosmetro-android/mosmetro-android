@@ -28,6 +28,7 @@ import androidx.work.WorkManager;
 import io.sentry.Attachment;
 import io.sentry.Sentry;
 import io.sentry.android.core.SentryAndroid;
+import io.sentry.protocol.Message;
 import io.sentry.protocol.User;
 import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.util.Logger;
@@ -66,7 +67,7 @@ public class MosMetroApp extends Application {
             options.setTag("build", "" + Version.getBuildNumber());
 
             options.setBeforeSend((event, hint) -> {
-                if (!settings.getBoolean("acra.enable", true)) {
+                if (!"true".equals(event.getTag("manual")) && !settings.getBoolean("acra.enable", true)) {
                     return null;
                 }
 

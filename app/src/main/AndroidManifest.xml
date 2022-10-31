@@ -106,6 +106,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activities.FeedbackActivity"
+            android:label="@string/report"
+            android:theme="@style/AppBaseTheme.Dialog">
+            <intent-filter>
+                <action android:name="pw.thedrhax.mosmetro.activities.FeedbackActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- Services -->
 
         <service
