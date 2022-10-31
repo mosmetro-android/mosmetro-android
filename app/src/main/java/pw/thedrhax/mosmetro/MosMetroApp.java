@@ -60,6 +60,7 @@ public class MosMetroApp extends Application {
 
         SentryAndroid.init(this, options -> {
             options.setDsn("https://13509f0e75f74081845cfe990b9840f3@o1176364.ingest.sentry.io/4504074406199296");
+            options.setEnableAutoSessionTracking(false);
             options.setRelease(Version.getFormattedVersion());
             options.setTag("branch", Version.getBranch());
             options.setTag("build", "" + Version.getBuildNumber());
