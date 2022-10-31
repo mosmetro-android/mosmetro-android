@@ -28,7 +28,6 @@ import androidx.work.WorkManager;
 import io.sentry.Attachment;
 import io.sentry.Sentry;
 import io.sentry.android.core.SentryAndroid;
-import io.sentry.protocol.Message;
 import io.sentry.protocol.User;
 import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.util.Logger;
@@ -67,19 +66,24 @@ public class MosMetroApp extends Application {
             options.setTag("build", "" + Version.getBuildNumber());
 
             options.setBeforeSend((event, hint) -> {
-                if (!"true".equals(event.getTag("manual")) && !settings.getBoolean("acra.enable", true)) {
+                boolean manual = "true".equals(event.getTag("manual"));
+
+                if (!manual && !settings.getBoolean("acra.enable", true)) {
                     return null;
                 }
 
-                StringBuilder cropped_log = new StringBuilder();
-                List<CharSequence> full_log = Logger.read(Logger.LEVEL.DEBUG);
-                int cut = full_log.lastIndexOf(Logger.CUT);
+                if (manual || settings.getBoolean("pref_debug_last_log", true)) {
+                    StringBuilder cropped_log = new StringBuilder();
+                    List<CharSequence> full_log = Logger.read(Logger.LEVEL.DEBUG);
+                    int cut = full_log.lastIndexOf(Logger.CUT);
 
-                for (CharSequence line : full_log.subList(cut + 1, full_log.size())) {
-                    cropped_log.append(line).append('\n');
+                    for (CharSequence line : full_log.subList(cut + 1, full_log.size())) {
+                        cropped_log.append(line).append('\n');
+                    }
+
+                    hint.addAttachment(new Attachment(cropped_log.toString().getBytes(), "log-debug.txt"));
                 }
 
-                hint.addAttachment(new Attachment(cropped_log.toString().getBytes(), "log-debug.txt"));
                 return event;
             });
         });
