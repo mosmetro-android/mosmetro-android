@@ -49,10 +49,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.acra.ACRA;
-
 import java.util.Map;
 
+import io.sentry.Sentry;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.fragments.AboutFragment;
 import pw.thedrhax.mosmetro.activities.fragments.BranchFragment;
@@ -378,7 +377,7 @@ public class SettingsActivity extends Activity {
                     .addToBackStack(id)
                     .commit();
         } catch (IllegalStateException ex) { // https://stackoverflow.com/q/7575921
-            ACRA.getErrorReporter().handleException(ex);
+            Sentry.captureException(ex);
         }
     }
 

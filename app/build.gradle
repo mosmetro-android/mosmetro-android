@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
-        minSdkVersion 14
+        minSdkVersion 16
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 25
         versionCode 77
@@ -18,9 +18,6 @@ android {
         buildConfigField "String", "BRANCH_NAME", "\"$branch_name\""
         buildConfigField "Integer", "BUILD_NUMBER", System.getenv("BUILD_NUMBER") ?: "0"
         resValue "string", "build_branch_name", "\"$branch_name\""
-
-        // ACRA Config
-        buildConfigField "String", "TRACEPOT_ID", "\"7c36f095\""
 
         // GitHub Pages
         buildConfigField "String", "\$GITHUB", "\"https://raw.githubusercontent.com/mosmetro-android/mosmetro-android.github.io/master\""
@@ -78,7 +75,7 @@ android {
         }
     }
 
-    compileOptions { // For ACRA
+    compileOptions { // For Sentry
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -115,11 +112,7 @@ dependencies {
     implementation 'dnsjava:dnsjava:2.1.9'
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
     implementation 'com.github.topjohnwu.libsu:core:3.1.2'
-
-    // ACRA
-    def acraVersion = '5.7.0'
-    implementation "ch.acra:acra-core:$acraVersion"
-    implementation "ch.acra:acra-http:$acraVersion"
+    implementation 'io.sentry:sentry-android:6.6.0'
 }
 
 /*

@@ -26,6 +26,7 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
 	    <meta-data android:name="android.max_aspect" android:value="2.1" />
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
 
         <!-- Main Activities -->
 
