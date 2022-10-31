@@ -60,24 +60,30 @@ public class MosMetroApp extends Application {
 
         SentryAndroid.init(this, options -> {
             options.setDsn("https://13509f0e75f74081845cfe990b9840f3@o1176364.ingest.sentry.io/4504074406199296");
+            options.setEnableAutoSessionTracking(false);
             options.setRelease(Version.getFormattedVersion());
             options.setTag("branch", Version.getBranch());
             options.setTag("build", "" + Version.getBuildNumber());
 
             options.setBeforeSend((event, hint) -> {
-                if (!settings.getBoolean("acra.enable", true)) {
+                boolean manual = "true".equals(event.getTag("manual"));
+
+                if (!manual && !settings.getBoolean("acra.enable", true)) {
                     return null;
                 }
 
-                StringBuilder cropped_log = new StringBuilder();
-                List<CharSequence> full_log = Logger.read(Logger.LEVEL.DEBUG);
-                int cut = full_log.lastIndexOf(Logger.CUT);
+                if (manual || settings.getBoolean("pref_debug_last_log", true)) {
+                    StringBuilder cropped_log = new StringBuilder();
+                    List<CharSequence> full_log = Logger.read(Logger.LEVEL.DEBUG);
+                    int cut = full_log.lastIndexOf(Logger.CUT);
 
-                for (CharSequence line : full_log.subList(cut + 1, full_log.size())) {
-                    cropped_log.append(line).append('\n');
+                    for (CharSequence line : full_log.subList(cut + 1, full_log.size())) {
+                        cropped_log.append(line).append('\n');
+                    }
+
+                    hint.addAttachment(new Attachment(cropped_log.toString().getBytes(), "log-debug.txt"));
                 }
 
-                hint.addAttachment(new Attachment(cropped_log.toString().getBytes(), "log-debug.txt"));
                 return event;
             });
         });

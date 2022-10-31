@@ -152,34 +152,32 @@ public class DebugActivity extends Activity {
 
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_report:
+                startActivity(new Intent(this, FeedbackActivity.class));
+                return true;
+
             case R.id.action_share:
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-                if (!settings.getBoolean("pref_share_warning", false))
+                if (!settings.getBoolean("pref_share_warning", false)) {
                     new AlertDialog.Builder(this)
                             .setTitle(R.string.pref_share_warning)
                             .setMessage(R.string.pref_share_warning_summary)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Logger.share(DebugActivity.this);
-                                }
-                            })
+                            .setPositiveButton(R.string.ok, (dialog, which) -> Logger.share(DebugActivity.this))
                             .setNegativeButton(R.string.cancel, null)
-                            .setNeutralButton(R.string.do_not_warn, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    PreferenceManager.getDefaultSharedPreferences(DebugActivity.this)
-                                            .edit().putBoolean("pref_share_warning", true).apply();
-                                    Logger.share(DebugActivity.this);
-                                }
+                            .setNeutralButton(R.string.do_not_warn, (dialog, which) -> {
+                                PreferenceManager.getDefaultSharedPreferences(DebugActivity.this)
+                                        .edit().putBoolean("pref_share_warning", true).apply();
+                                Logger.share(DebugActivity.this);
                             })
                             .show();
-                else
+                } else {
                     Logger.share(this);
+                }
 
                 return true;
 
@@ -190,19 +188,11 @@ public class DebugActivity extends Activity {
             case R.id.action_clear:
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.log_wipe_confirmation)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Logger.wipe();
-                                text_messages_adapter.refresh();
-                            }
+                        .setPositiveButton(R.string.ok, (dialog, which) -> {
+                            Logger.wipe();
+                            text_messages_adapter.refresh();
                         })
-                        .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        })
+                        .setNeutralButton(R.string.cancel, (dialog, which) -> {})
                         .show();
                 return true;
 

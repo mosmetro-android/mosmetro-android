@@ -2,15 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-            android:id="@+id/action_share"
+            android:id="@+id/action_report"
             android:icon="@drawable/ic_mail_outline"
             android:title="@string/report"
             android:showAsAction="ifRoom" />
 
     <item
+            android:id="@+id/action_share"
+            android:title="@string/share" />
+
+    <item
             android:id="@+id/action_clear"
-            android:icon="@drawable/ic_menu_delete"
-            android:title="@string/screen_clear"
-            android:showAsAction="ifRoom" />
+            android:title="@string/screen_clear" />
 
 </menu>
