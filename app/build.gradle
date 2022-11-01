@@ -112,7 +112,7 @@ dependencies {
     implementation 'dnsjava:dnsjava:2.1.9'
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
     implementation 'com.github.topjohnwu.libsu:core:3.1.2'
-    implementation 'io.sentry:sentry-android:6.6.0'
+    implementation 'io.sentry:sentry-android-core:6.6.0'
 }
 
 /*
