@@ -19,18 +19,8 @@ android {
         buildConfigField "Integer", "BUILD_NUMBER", System.getenv("BUILD_NUMBER") ?: "0"
         resValue "string", "build_branch_name", "\"$branch_name\""
 
-        // GitHub Pages
-        buildConfigField "String", "\$GITHUB", "\"https://raw.githubusercontent.com/mosmetro-android/mosmetro-android.github.io/master\""
-        buildConfigField "String", "NEWS_URL", "\$GITHUB + \"/news.json\""
-        buildConfigField "String", "API_URL_SOURCE", "\$GITHUB + \"/base-url\""
-
-        // Default stat URL
-        buildConfigField "String", "API_URL_DEFAULT", "\"https://mosmetro.my.to\""
-
-        // Relative URLs for stat server
-        buildConfigField "String", "API_REL_STATISTICS", "\"/api/v2/stats\""
-        buildConfigField "String", "API_REL_BRANCHES", "\"/api/v1/branches.php\""
-        buildConfigField "String", "API_REL_DOWNLOAD", "\"/api/v2/download\""
+        buildConfigField "String", "API_URL_DATA", "\"https://raw.githubusercontent.com/mosmetro-android/builds/data/data.json\""
+        buildConfigField "String", "API_URL_STATS", "\"https://mosmetro.duckdns.org/api/v2/stats\""
     }
 
     compileOptions {
@@ -112,7 +102,7 @@ dependencies {
     implementation 'dnsjava:dnsjava:2.1.9'
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
     implementation 'com.github.topjohnwu.libsu:core:3.1.2'
-    implementation 'io.sentry:sentry-android:6.6.0'
+    implementation 'io.sentry:sentry-android-core:6.6.0'
 }
 
 /*

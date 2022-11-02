@@ -22,6 +22,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
+import com.jayway.jsonpath.Option;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,6 +35,7 @@ import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 
 public final class Util {
     private Util() {}
@@ -80,4 +87,25 @@ public final class Util {
         reader.close();
         return sb.toString();
     }
+
+    public final static Configuration JSONPATH_CONFIG = Configuration
+            .defaultConfiguration()
+            .addOptions(
+                    Option.SUPPRESS_EXCEPTIONS,
+                    Option.DEFAULT_PATH_LEAF_TO_NULL
+            );
+
+    public final static DocumentContext JSONPATH_EMPTY = JsonPath.using(JSONPATH_CONFIG).parse("{}");
+
+    public static DocumentContext jsonpath(String json) throws ParseException {
+        try {
+            DocumentContext data = JsonPath.using(JSONPATH_CONFIG).parse(json);
+            data.jsonString(); // throws UnsupportedOperationException
+            return data;
+        } catch (IllegalArgumentException|JsonPathException|UnsupportedOperationException ex) {
+            throw new ParseException(ex.toString(), 0);
+        }
+    }
+
+
 }

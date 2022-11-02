@@ -40,9 +40,11 @@ import pw.thedrhax.util.WifiUtils;
 
 class ProviderMetrics {
     private final Provider p;
+    private final BackendRequest backreq;
 
     ProviderMetrics(Provider provider) {
         this.p = provider;
+        this.backreq = new BackendRequest(provider.context);
     }
 
     private Long start_ts = null;
@@ -100,17 +102,19 @@ class ProviderMetrics {
             params.put("branch", (String) vars.get("branch"));
         }
 
-        String STATISTICS_URL = p.settings.getString(
-                BackendRequest.PREF_BACKEND_URL,
-                BuildConfig.API_URL_DEFAULT
-        ) + BuildConfig.API_REL_STATISTICS;
+        String STATISTICS_URL = backreq.getCachedData(true).read("$.urls.stats").toString();
+
+        if (STATISTICS_URL == null) {
+            STATISTICS_URL = BuildConfig.API_URL_STATS;
+        }
 
         try {
             new OkHttp(p.context).post(STATISTICS_URL, params).execute();
         } catch (IOException ignored) {}
 
-        if (System.currentTimeMillis() - 6*60*60*1000 > p.settings.getLong("pref_worker_timestamp", 0)) {
-            new BackendRequest(p.context).run();
+        // Run only if BackendWorker skipped two cycles
+        if (backreq.getLastRun() > 12*60*60*1000) {
+            backreq.run();
         }
 
         boolean pref_notify_donate = p.settings.getBoolean("pref_notify_donate", true);

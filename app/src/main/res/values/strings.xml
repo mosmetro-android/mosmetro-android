@@ -149,11 +149,6 @@
     </string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
-    <string name="auth_error_provider_unsupported" formatted="false">
-        provider %s is not supported by application yet. Maybe the network is maintained by two providers
-        one of which is not supported yet. We apologize for inconvenience.
-    </string>
-    <string name="auth_error_regex" formatted="false">can\'t compile RegEx: %s</string>
     <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>
     <string name="auth_error_fatal">unexpected exception in Provider</string>
 
@@ -220,7 +215,6 @@
     <string name="pref_notify_success">Connected successfully</string>
     <string name="pref_notify_success_summary">Notify on successful connection</string>
     <string name="error_log_file">failed to save log to file</string>
-    <string name="auth_ban_message">You were temporarily banned by provider :(</string>
     <string name="pref_internet_check_interval">Interval of checks</string>
     <string name="pref_internet_check_interval_summary">Amount of seconds between internet checks. Affects traffic and power consumption.</string>
     <string name="pref_delay_range">Delay range (milliseconds)</string>
@@ -248,10 +242,8 @@
     <string name="pref_mainet_summary">This algorithm is required to connect to MAInet_public — public Wi-Fi network of Moscow Aviation Institute</string>
     <string name="pref_bmstu" translatable="false">bmstu_lb (lbpfs.bmstu.ru)</string>
     <string name="pref_bmstu_summary">This algorithm is required to connect to bmstu_lb — public Wi-Fi network of Bauman Moscow State Technical University.</string>
-    <string name="auth_algorithm_continue" formatted="false">Switching back to algorithm %s</string>
     <string name="pref_debug_last_log">Send the last log</string>
     <string name="pref_debug_last_log_summary">Log will be sent along with Sentry reports in case of crash.</string>
-    <string name="auth_algorithm_failure">algorithm initialization failed</string>
     <string name="location_permission">Location permission</string>
     <string name="location_permission_saving">Android 9+ requires location access in order to get the name of the Wi-Fi network. Without this permission app will not start automatically, but you can still connect manually through main menu or shortcuts.</string>
     <string name="log_wipe_confirmation">Clear log file?</string>
