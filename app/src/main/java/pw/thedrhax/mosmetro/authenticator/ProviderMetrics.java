@@ -102,7 +102,11 @@ class ProviderMetrics {
             params.put("branch", (String) vars.get("branch"));
         }
 
-        String STATISTICS_URL = backreq.getCachedData(true).read("$.urls.stats").toString();
+        String STATISTICS_URL = null;
+
+        try {
+            STATISTICS_URL = backreq.getCachedData(true).read("$.urls.stats");
+        } catch (ClassCastException ignored) {}
 
         if (STATISTICS_URL == null) {
             STATISTICS_URL = BuildConfig.API_URL_STATS;
