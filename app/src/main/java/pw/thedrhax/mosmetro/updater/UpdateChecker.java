@@ -34,20 +34,18 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import androidx.annotation.Nullable;
+
+import com.jayway.jsonpath.DocumentContext;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
-import pw.thedrhax.mosmetro.httpclient.CachedRetriever;
 import pw.thedrhax.util.Logger;
-import pw.thedrhax.util.UUID;
+import pw.thedrhax.util.Util;
 import pw.thedrhax.util.Version;
 
 public class UpdateChecker {
@@ -55,7 +53,6 @@ public class UpdateChecker {
     private final Context context;
     private final DownloadManager dm;
     private final SharedPreferences settings;
-    private final CachedRetriever retriever;
 
     // Updater state
     private boolean update_failed = false;
@@ -67,7 +64,6 @@ public class UpdateChecker {
         this.context = context;
         this.dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
-        this.retriever = new CachedRetriever(context);
     }
 
     private final BroadcastReceiver onComplete = new BroadcastReceiver() {
@@ -135,41 +131,39 @@ public class UpdateChecker {
     }
 
     public Result check() {
-        // Generate base URL
-        String UPDATE_INFO_URL = settings.getString(
-                BackendRequest.PREF_BACKEND_URL,
-                BuildConfig.API_URL_DEFAULT
-        ) + BuildConfig.API_REL_BRANCHES + "?uuid=" + UUID.get(context);
+        DocumentContext data = new BackendRequest(context).getData(force_check);
+        return check(data);
+    }
 
-        // Clear branch cache
-        if (force_check) retriever.remove(UPDATE_INFO_URL);
-
-        // Retrieve info from server
-        String content = retriever.get(UPDATE_INFO_URL, 60*60,
-                "{\"" + Version.getBranch() + "\":" +
-                "{\"url\":\"none\",\"by_build\":\"0\",\"version\":\"" + Version.getVersionCode() +
-                "\",\"message\":\"none\",\"description\":\"Connection error\",\"stable\":true}}",
-                CachedRetriever.Type.JSON
-        );
-
-        // Parse server answer
-        JSONObject branches_json;
-        try {
-            branches_json = (JSONObject) new JSONParser().parse(content);
-        } catch (ParseException ex) {
+    public Result check(DocumentContext data) {
+        if (data == Util.JSONPATH_EMPTY) {
             update_failed = true;
             return null;
         }
 
-        Map<String, Branch> branches = new HashMap<>();
-        Branch current_branch = null;
+        Map<String,Map<String,Object>> branches_json;
 
-        for (Object key : branches_json.keySet()) {
+        try {
+            branches_json = data.read("$.branches");
+        } catch (ClassCastException ex) {
+            update_failed = true;
+            return null;
+        }
+
+        if (branches_json == null) {
+            update_failed = true;
+            return null;
+        }
+
+        Branch current_branch = null;
+        Map<String, Branch> branches = new HashMap<>();
+
+        for (Map.Entry<String, Map<String, Object>> item : branches_json.entrySet()) {
             Branch branch;
 
             try {
-                branch = new Branch((String) key, (JSONObject) branches_json.get(key));
-            } catch (NumberFormatException ex) {
+                branch = new Branch(item.getKey(), item.getValue());
+            } catch (NumberFormatException | ClassCastException ex) {
                 Logger.log(Logger.LEVEL.DEBUG, ex);
                 continue;
             }
@@ -186,7 +180,7 @@ public class UpdateChecker {
             return null;
         }
 
-        // Check if selected branch is deleted
+        // Check if active branch is deleted
         if (current_branch == null && !Version.getBranch().startsWith("_")) { // Fallback to master
             settings.edit().putInt("pref_updater_ignore", 0).apply();
 
@@ -217,13 +211,13 @@ public class UpdateChecker {
                 callback.onStart();
             };
 
-            @Override
+            @Override @Nullable
             protected Result doInBackground(Void... aVoid) {
                 return check();
             }
 
             @Override
-            protected void onPostExecute(Result result) {
+            protected void onPostExecute(@Nullable Result result) {
                 callback.onResult(result);
             };
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -286,15 +280,15 @@ public class UpdateChecker {
         private final int version;
         private final boolean by_build; // Check by build number instead of version code
 
-        public Branch (String name, JSONObject data) {
+        public Branch (String name, Map<String, Object> data) {
             this.name = name;
-            this.by_build = "1".equals(data.get("by_build"));
-            this.version = Integer.parseInt((String)data.get(by_build ? "build" : "version"));
-            this.message = ((String)data.get("message")).replace("<br>", "");
-            this.description = (String)data.get("description");
-            this.stable = data.containsKey("stable") && (Boolean)data.get("stable");
-            this.url = (String)data.get("url");
-            this.filename = (String)data.get("filename");
+            this.by_build = (Boolean) data.get("by_build");
+            this.version = (Integer) data.get(by_build ? "build" : "version");
+            this.message = ((String) data.get("message")).replace("<br>", "");
+            this.description = (String) data.get("description");
+            this.stable = data.containsKey("stable") && (Boolean) data.get("stable");
+            this.url = (String) data.get("url");
+            this.filename = (String) data.get("filename");
         }
 
         public String id() {
@@ -325,10 +319,7 @@ public class UpdateChecker {
         }
 
         public void install() {
-            Uri uri = Uri.parse(settings.getString(
-                    BackendRequest.PREF_BACKEND_URL,
-                    BuildConfig.API_URL_DEFAULT
-            ) + BuildConfig.API_REL_DOWNLOAD + "/" + name + "?uuid=" + UUID.get(context));
+            Uri uri = Uri.parse(url);
 
             File apk = new File(context.getExternalFilesDir(null), "update.apk");
             if (apk.exists()) {
@@ -337,6 +328,7 @@ public class UpdateChecker {
 
             DownloadManager.Request req = new DownloadManager.Request(uri)
                     .setTitle(filename)
+                    .setMimeType("application/vnd.android.package-archive")
                     .setDestinationUri(Uri.fromFile(apk))
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 

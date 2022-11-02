@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pw.thedrhax.util.Logger;
+import pw.thedrhax.util.Util;
 
 public class HttpResponse {
     public static final LinkedList<String> PARSED_TYPES = new LinkedList<String>() {{
@@ -242,22 +243,13 @@ public class HttpResponse {
         return (JSONObject) new JSONParser().parse(getPage());
     }
 
-    private final static Configuration JSONPATH_CONFIG = Configuration
-            .defaultConfiguration()
-            .addOptions(
-                    Option.SUPPRESS_EXCEPTIONS,
-                    Option.DEFAULT_PATH_LEAF_TO_NULL
-            );
-
     @NonNull
     public DocumentContext jsonpath() {
         try {
-            DocumentContext data = JsonPath.using(JSONPATH_CONFIG).parse(getPage());
-            data.jsonString(); // throws UnsupportedOperationException
-            return data;
-        } catch (IllegalArgumentException|JsonPathException|UnsupportedOperationException ex) {
+            return Util.jsonpath(getPage());
+        } catch (ParseException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
-            return JsonPath.using(JSONPATH_CONFIG).parse("{}");
+            return Util.JSONPATH_EMPTY;
         }
     }
 

@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -41,6 +42,7 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import android.provider.Settings;
@@ -60,8 +62,10 @@ import pw.thedrhax.mosmetro.activities.fragments.DebugSettingsFragment;
 import pw.thedrhax.mosmetro.activities.fragments.NestedFragment;
 import pw.thedrhax.mosmetro.activities.fragments.NotificationSettingsFragment;
 import pw.thedrhax.mosmetro.activities.fragments.SettingsFragment;
+import pw.thedrhax.mosmetro.services.BackendWorker;
 import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.services.ReceiverService;
+import pw.thedrhax.mosmetro.updater.BackendRequest;
 import pw.thedrhax.mosmetro.updater.UpdateChecker;
 import pw.thedrhax.util.Listener;
 import pw.thedrhax.util.PermissionUtils;
@@ -175,32 +179,44 @@ public class SettingsActivity extends Activity {
         updater = new UpdateChecker(SettingsActivity.this);
         updater.init();
 
-        Preference.OnPreferenceClickListener click = new Preference.OnPreferenceClickListener() {
-            @SuppressLint("StaticFieldLeak")
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                boolean manual = preference != null;
-                updater.ignore(!manual).force(manual);
+        UpdateChecker.Result cached_result = updater.check(new BackendRequest(this).getCachedData(true));
 
-                updater.async_check(new UpdateChecker.Callback() {
-                    @Override
-                    public void onStart() {
-                        pref_updater_check.setEnabled(false);
+        if (cached_result != null) {
+            branches.set(cached_result.getBranches());
+        }
+
+        Preference.OnPreferenceClickListener click = preference -> {
+            boolean manual = preference != null;
+            updater.ignore(!manual).force(manual);
+
+            updater.async_check(new UpdateChecker.Callback() {
+                @Override
+                public void onStart() {
+                    pref_updater_check.setEnabled(false);
+                }
+
+                @Override
+                public void onResult(@Nullable UpdateChecker.Result result) {
+                    pref_updater_check.setEnabled(true);
+
+                    if (result == null) {
+                        Toast.makeText(
+                                SettingsActivity.this,
+                                getString(R.string.error, getString(R.string.auth_error_server)),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
                     }
 
-                    @Override
-                    public void onResult(UpdateChecker.Result result) {
-                        pref_updater_check.setEnabled(true);
-                        branches.set(result.getBranches());
+                    branches.set(result.getBranches());
 
-                        if (result.hasUpdate() || manual) {
-                            result.showDialog();
-                        }
+                    if (result.hasUpdate() || manual) {
+                        result.showDialog();
                     }
-                });
+                }
+            });
 
-                return false;
-            }
+            return false;
         };
 
         // Force check
