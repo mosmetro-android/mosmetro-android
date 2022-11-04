@@ -56,12 +56,20 @@ class ProviderMetrics {
 
     @SuppressLint("StaticFieldLeak")
     public boolean end(HashMap<String, Object> vars) {
-        boolean connected;
+        boolean connected = false;
+        boolean error = false;
         boolean midsession = false;
 
         switch ((Provider.RESULT) vars.get("result")) {
-            case CONNECTED: connected = true; break;
-            case ALREADY_CONNECTED: connected = false; break;
+            case CONNECTED:
+                connected = true;
+            case ALREADY_CONNECTED:
+                break;
+
+            case ERROR:
+                error = true;
+                break;
+
             default: return false;
         }
 
@@ -69,6 +77,7 @@ class ProviderMetrics {
 
         final HashMap<String, String> params = new HashMap<>();
 
+        params.put("timestamp", "" + (System.currentTimeMillis() / 1000L));
         params.put("uuid", UUID.get(p.context));
         params.put("version_name", Version.getVersionName());
         params.put("version_code", "" + Version.getVersionCode());
@@ -76,11 +85,12 @@ class ProviderMetrics {
         params.put("build_number", "" + Version.getBuildNumber());
         params.put("api_level", "" + Build.VERSION.SDK_INT);
 
+        params.put("success", connected ? "true" : "false");
+        params.put("error", error ? "true" : "false");
+
         if (vars.containsKey("midsession")) {
             params.put("success", "midsession");
             midsession = true;
-        } else {
-            params.put("success", connected ? "true" : "false");
         }
 
         params.put("ssid", wifi.getSSID());
