@@ -35,7 +35,9 @@ import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
+import pw.thedrhax.mosmetro.authenticator.ProviderMetrics;
 import pw.thedrhax.mosmetro.httpclient.Client;
+import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.Util;
@@ -173,8 +175,56 @@ public class BackendRequest {
         return ts - last_ts;
     }
 
+    private void sendMetrics() {
+        DocumentContext data = getCachedData(true);
+        org.json.simple.JSONArray queue = ProviderMetrics.getQueue(settings);
+
+        int errors = 0;
+        String url;
+
+        try {
+            url = data.read("$.urls.stats");
+        } catch (ClassCastException ex) {
+            url = null;
+        }
+
+        if (url == null) {
+            url = BuildConfig.API_URL_STATS;
+        }
+
+        for (int i = queue.size() - 1; i >= 0; i--) {
+            HttpResponse res;
+            Map<String, String> item;
+
+            try {
+                item = (Map<String, String>) queue.get(i);
+            } catch (ClassCastException ex) {
+                queue.remove(i);
+                continue;
+            }
+
+            try {
+                res = client.post(url, item).execute();
+
+                if (res.getResponseCode() >= 200 && res.getResponseCode() < 300) {
+                    queue.remove(i);
+                } else if (++errors >= 3) {
+                    break;
+                }
+            } catch (IOException ex) {
+                break;
+            }
+        }
+
+        ProviderMetrics.saveQueue(settings, queue);
+    }
+
     public boolean run() {
         DocumentContext data = getData(false);
+
+        if (settings.getBoolean("pref_debug_stats", true)) {
+            sendMetrics();
+        }
 
         if (data == Util.JSONPATH_EMPTY) {
             return false;

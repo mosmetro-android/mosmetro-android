@@ -21,24 +21,26 @@ package pw.thedrhax.mosmetro.authenticator;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 
-import java.io.IOException;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.util.HashMap;
 import java.util.Locale;
 
-import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.activities.SilentActionActivity;
-import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.UUID;
 import pw.thedrhax.util.Version;
 import pw.thedrhax.util.WifiUtils;
 
-class ProviderMetrics {
+public class ProviderMetrics {
     private final Provider p;
     private final BackendRequest backreq;
 
@@ -112,20 +114,12 @@ class ProviderMetrics {
             params.put("branch", (String) vars.get("branch"));
         }
 
-        String STATISTICS_URL = null;
-
-        try {
-            STATISTICS_URL = backreq.getCachedData(true).read("$.urls.stats");
-        } catch (ClassCastException ignored) {}
-
-        if (STATISTICS_URL == null) {
-            STATISTICS_URL = BuildConfig.API_URL_STATS;
+        JSONArray queue = getQueue(p.settings);
+        queue.add(params);
+        while (queue.size() > 100) {
+            queue.remove(0);
         }
-
-        try {
-            if (p.settings.getBoolean("pref_debug_stats", true))
-                new OkHttp(p.context).post(STATISTICS_URL, params).execute();
-        } catch (IOException ignored) {}
+        saveQueue(p.settings, queue);
 
         // Run only if BackendWorker skipped two cycles
         if (backreq.getLastRun() > 12*60*60*1000) {
@@ -176,5 +170,19 @@ class ProviderMetrics {
         }
 
         return false;
+    }
+
+    public static JSONArray getQueue(SharedPreferences settings) {
+        String json = settings.getString("stats_queue", "[]");
+
+        try {
+            return (JSONArray) new JSONParser().parse(json);
+        } catch (ParseException ex) {
+            return new JSONArray();
+        }
+    }
+
+    public static synchronized void saveQueue(SharedPreferences settings, JSONArray queue) {
+        settings.edit().putString("stats_queue", queue.toJSONString()).apply();
     }
 }
