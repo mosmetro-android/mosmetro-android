@@ -96,7 +96,7 @@ dependencies {
         exclude module: 'junit'
     }
     implementation 'com.edmodo:rangebar:1.0.0'
-    implementation 'dnsjava:dnsjava:3.5.1'
+    implementation 'dnsjava:dnsjava:2.1.9'
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
     implementation 'com.github.topjohnwu.libsu:core:3.1.2'
     implementation 'io.sentry:sentry-android-core:6.6.0'
