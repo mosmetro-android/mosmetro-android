@@ -296,4 +296,6 @@
     <string name="send">Send</string>
     <string name="feedback_description">Problem description (not required)</string>
     <string name="share">Share</string>
+    <string name="pref_debug_stats">Participation in statistics</string>
+    <string name="pref_debug_stats_summary">App will collect anonymous metrics about connections. In addition to fully internal metrics (app version, algorithm, etc.) reports may include OS version and the name of the Wi-Fi network.</string>
 </resources>

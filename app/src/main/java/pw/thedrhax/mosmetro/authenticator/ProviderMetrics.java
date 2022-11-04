@@ -123,7 +123,8 @@ class ProviderMetrics {
         }
 
         try {
-            new OkHttp(p.context).post(STATISTICS_URL, params).execute();
+            if (p.settings.getBoolean("pref_debug_stats", true))
+                new OkHttp(p.context).post(STATISTICS_URL, params).execute();
         } catch (IOException ignored) {}
 
         // Run only if BackendWorker skipped two cycles

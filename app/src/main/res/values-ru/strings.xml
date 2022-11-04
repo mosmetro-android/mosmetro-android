@@ -269,4 +269,6 @@
     <string name="send">Отправить</string>
     <string name="feedback_description">Описание проблемы (не обязательно)</string>
     <string name="share">Поделиться</string>
+    <string name="pref_debug_stats">Участие в статистике</string>
+    <string name="pref_debug_stats_summary">Приложение будет собирать анонимную статистику о подключениях. Кроме внутренних метрик (версия, алгоритм и т.д.), в отчёты включаются название сети Wi-Fi и версия Android.</string>
 </resources>
