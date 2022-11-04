@@ -32,11 +32,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import okhttp3.Dns;
 import pw.thedrhax.util.Logger;
@@ -48,19 +47,17 @@ public class DnsClient implements Dns {
     private boolean pref_dnsjava;
     private boolean global_cache = true;
 
-    private String[] getServers() {
-        Set<String> servers = new HashSet<String>();
-
+    private List<InetSocketAddress> getServers() {
+        List<InetSocketAddress> servers = new LinkedList<>();
         for (InetAddress t : wifi.getDns()) {
-            servers.add(t.getHostAddress());
+            servers.add(new InetSocketAddress(t, 53));
         }
-
-        return servers.toArray(new String[0]);
+        return servers;
     }
 
-    private String[] getDefaultServers() {
-        String[] config = ResolverConfig.getCurrentConfig().servers();
-        return config != null ? config : new String[0];
+    private List<InetSocketAddress> getDefaultServers() {
+        List<InetSocketAddress> config = ResolverConfig.getCurrentConfig().servers();
+        return config != null ? config : new LinkedList<>();
     }
 
     public DnsClient(Context context) {
@@ -69,21 +66,27 @@ public class DnsClient implements Dns {
 
         wifi = new WifiUtils(context);
 
-        String[] servers = getServers();
+        List<InetSocketAddress> servers = getServers();
 
-        if (servers.length == 0) {
+        if (servers.size() == 0) {
             Logger.log(this, "Unable to get servers from Android API");
             servers = getDefaultServers();
         }
 
-        if (servers.length == 0) {
+        if (servers.size() == 0) {
             Logger.log(this, "No servers found, using system resolver");
             dns = null;
             return;
         }
 
+        List<String> hosts = new LinkedList<>();
+
+        for (InetSocketAddress addr : servers) {
+            hosts.add(addr.getAddress().getHostAddress());
+        }
+
         try {
-            dns = new ExtendedResolver(servers);
+            dns = new ExtendedResolver(hosts.toArray(new String[0]));
         } catch (UnknownHostException ex) {
             Logger.log(Logger.LEVEL.DEBUG, ex);
             Logger.log(this, "Unable to initialize, using system resolver");
