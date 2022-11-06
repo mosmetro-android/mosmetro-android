@@ -31,6 +31,8 @@ import com.jayway.jsonpath.DocumentContext;
 
 import net.minidev.json.JSONArray;
 
+import org.json.simple.JSONObject;
+
 import pw.thedrhax.mosmetro.BuildConfig;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SafeViewActivity;
@@ -40,6 +42,7 @@ import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.mosmetro.httpclient.clients.OkHttp;
 import pw.thedrhax.util.Notify;
+import pw.thedrhax.util.UUID;
 import pw.thedrhax.util.Util;
 
 public class BackendRequest {
@@ -175,11 +178,19 @@ public class BackendRequest {
         return ts - last_ts;
     }
 
+    @SuppressWarnings("unchecked")
     private void sendMetrics() {
         DocumentContext data = getCachedData(true);
         org.json.simple.JSONArray queue = ProviderMetrics.getQueue(settings);
 
-        int errors = 0;
+        if (queue.size() == 0) {
+            return;
+        }
+
+        JSONObject body = new JSONObject();
+        body.put("uuid", UUID.get(context));
+        body.put("events", queue);
+
         String url;
 
         try {
@@ -192,31 +203,18 @@ public class BackendRequest {
             url = BuildConfig.API_URL_STATS;
         }
 
-        for (int i = queue.size() - 1; i >= 0; i--) {
-            HttpResponse res;
-            Map<String, String> item;
+        HttpResponse res;
 
-            try {
-                item = (Map<String, String>) queue.get(i);
-            } catch (ClassCastException ex) {
-                queue.remove(i);
-                continue;
-            }
-
-            try {
-                res = client.post(url, item).execute();
-
-                if (res.getResponseCode() >= 200 && res.getResponseCode() < 300) {
-                    queue.remove(i);
-                } else if (++errors >= 3) {
-                    break;
-                }
-            } catch (IOException ex) {
-                break;
-            }
+        try {
+            res = client.post(url, body.toJSONString(), "application/json").execute();
+        } catch (IOException ex) {
+            return;
         }
 
-        ProviderMetrics.saveQueue(settings, queue);
+        if (res.getResponseCode() == 200) {
+            queue.clear();
+            ProviderMetrics.saveQueue(settings, queue);
+        }
     }
 
     public boolean run() {
