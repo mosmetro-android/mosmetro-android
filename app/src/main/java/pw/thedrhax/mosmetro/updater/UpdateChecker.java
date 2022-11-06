@@ -136,6 +136,8 @@ public class UpdateChecker {
     }
 
     public Result check(DocumentContext data) {
+        update_failed = false;
+
         if (data == Util.JSONPATH_EMPTY) {
             update_failed = true;
             return null;
