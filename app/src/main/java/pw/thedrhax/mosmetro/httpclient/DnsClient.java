@@ -29,8 +29,10 @@ import org.xbill.DNS.Type;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.InetAddresses;
 import android.preference.PreferenceManager;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -104,8 +106,17 @@ public class DnsClient implements Dns {
         return this;
     }
 
+    private static final String REGEX_OCTET = "(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})";
+    private static final String REGEX_IPv4 = "^" + REGEX_OCTET + "(\\." + REGEX_OCTET + "){3}$";
+
     @Override
     public List<InetAddress> lookup(String hostname) throws UnknownHostException {
+        if (hostname.matches(REGEX_IPv4)) {
+            List<InetAddress> res = new LinkedList<>();
+            res.add(Inet4Address.getByName(hostname));
+            return res;
+        }
+
         if (dns == null) {
             return Dns.SYSTEM.lookup(hostname);
         }
