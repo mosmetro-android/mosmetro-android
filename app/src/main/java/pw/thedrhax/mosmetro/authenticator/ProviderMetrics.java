@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -34,6 +35,7 @@ import java.util.Locale;
 import pw.thedrhax.mosmetro.R;
 import pw.thedrhax.mosmetro.activities.SettingsActivity;
 import pw.thedrhax.mosmetro.activities.SilentActionActivity;
+import pw.thedrhax.mosmetro.services.ConnectionService;
 import pw.thedrhax.mosmetro.updater.BackendRequest;
 import pw.thedrhax.util.Notify;
 import pw.thedrhax.util.UUID;
@@ -57,10 +59,11 @@ public class ProviderMetrics {
     }
 
     @SuppressLint("StaticFieldLeak")
+    @SuppressWarnings("unchecked")
     public boolean end(HashMap<String, Object> vars) {
         boolean connected = false;
         boolean error = false;
-        boolean midsession = false;
+        boolean midsession = vars.containsKey("midsession");
 
         switch ((Provider.RESULT) vars.get("result")) {
             case CONNECTED:
@@ -72,47 +75,37 @@ public class ProviderMetrics {
                 error = true;
                 break;
 
-            default: return false;
+            default:
+                return false;
         }
 
         WifiUtils wifi = new WifiUtils(p.context);
 
-        final HashMap<String, String> params = new HashMap<>();
+        final JSONObject version = new JSONObject();
+        version.put("branch", Version.getBranch());
+        version.put("build", Version.getBuildNumber());
+        version.put("name", Version.getVersionName());
+        version.put("code", Version.getVersionCode());
+        version.put("android", Build.VERSION.SDK_INT);
 
-        params.put("timestamp", "" + (System.currentTimeMillis() / 1000L));
-        params.put("uuid", UUID.get(p.context));
-        params.put("version_name", Version.getVersionName());
-        params.put("version_code", "" + Version.getVersionCode());
-        params.put("build_branch", Version.getBranch());
-        params.put("build_number", "" + Version.getBuildNumber());
-        params.put("api_level", "" + Build.VERSION.SDK_INT);
+        String ssid = wifi.getSSID();
+        ssid = WifiUtils.UNKNOWN_SSID.equals(ssid) ? null : ssid;
 
-        params.put("success", connected ? "true" : "false");
-        params.put("error", error ? "true" : "false");
+        final JSONObject result = new JSONObject();
+        result.put("provider", p.getName());
+        result.put("segment", vars.get("segment"));
+        result.put("branch", vars.get("branch"));
+        result.put("switch", vars.get("switch"));
+        result.put("duration", start_ts != null ? System.currentTimeMillis() - start_ts : null);
+        result.put("ssid", ssid);
+        result.put("success", connected);
+        result.put("error", error);
+        result.put("midsession", midsession);
 
-        if (vars.containsKey("midsession")) {
-            params.put("success", "midsession");
-            midsession = true;
-        }
-
-        params.put("ssid", wifi.getSSID());
-        params.put("provider", p.getName());
-
-        if (start_ts != null) {
-            params.put("duration", "" + (System.currentTimeMillis() - start_ts));
-        }
-
-        if (vars.containsKey("switch")) {
-            params.put("switch", (String) vars.get("switch"));
-        }
-
-        if (vars.containsKey("segment")) {
-            params.put("segment", (String) vars.get("segment"));
-        }
-
-        if (vars.containsKey("branch")) {
-            params.put("branch", (String) vars.get("branch"));
-        }
+        final JSONObject params = new JSONObject();
+        params.put("timestamp", System.currentTimeMillis() / 1000L);
+        params.put("version", version);
+        params.put("result", result);
 
         JSONArray queue = getQueue(p.settings);
         queue.add(params);
@@ -173,7 +166,11 @@ public class ProviderMetrics {
     }
 
     public static JSONArray getQueue(SharedPreferences settings) {
-        String json = settings.getString("stats_queue", "[]");
+        if (settings.contains("stats_queue")) {
+            settings.edit().remove("stats_queue").apply();
+        }
+
+        String json = settings.getString("stats_queue_v2", "[]");
 
         try {
             return (JSONArray) new JSONParser().parse(json);
@@ -183,6 +180,6 @@ public class ProviderMetrics {
     }
 
     public static synchronized void saveQueue(SharedPreferences settings, JSONArray queue) {
-        settings.edit().putString("stats_queue", queue.toJSONString()).apply();
+        settings.edit().putString("stats_queue_v2", queue.toJSONString()).apply();
     }
 }
