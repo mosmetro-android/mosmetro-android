@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'androidsvgdrawable'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    namespace 'pw.thedrhax.mosmetro'
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId 'pw.thedrhax.mosmetro'
@@ -21,9 +21,15 @@ android {
 
         buildConfigField "String", "API_URL_DATA", "\"https://raw.githubusercontent.com/mosmetro-android/builds/data/data.json\""
         buildConfigField "String", "API_URL_STATS", "\"https://mosmetro.duckdns.org/api/v2/stats\""
+
+        // Required when setting minSdkVersion to 20 or lower
+        multiDexEnabled true
     }
 
     compileOptions {
+        // Flag to enable support for the new language APIs, needs multiDex
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -65,12 +71,7 @@ android {
         }
     }
 
-    compileOptions { // For Sentry
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    lintOptions {
+    lint {
         abortOnError false
     }
 }
@@ -80,19 +81,15 @@ task svgToDrawablePng(type: SvgDrawableTask) {
     from = files('src/main/res-svg/drawable')
     to = file('build/generated/res/main')
     createMissingDirectories = true
-    overwriteMode = 'ifModified'
     targetedDensities = ['ldpi', 'hdpi', 'mdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
     outputFormat = 'PNG'
     outputType = 'drawable'
 }
 
 dependencies {
-    // Runtime dependencies.
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.annotation:annotation:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'androidx.work:work-runtime:2.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.work:work-runtime:2.7.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation ('com.googlecode.json-simple:json-simple:1.1.1') {
@@ -103,6 +100,9 @@ dependencies {
     implementation 'com.jayway.jsonpath:json-path:2.6.0'
     implementation 'com.github.topjohnwu.libsu:core:3.1.2'
     implementation 'io.sentry:sentry-android-core:6.6.0'
+
+    // https://developer.android.com/studio/write/java8-support#library-desugaring-versions
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.0'
 }
 
 /*
@@ -127,8 +127,8 @@ configurations {
 eclipse {
     classpath {
         plusConfigurations += [
-            configurations.compile,
-            configurations.testCompile,
+            configurations.implementation,
+            configurations.testImplementation,
             configurations.eclipseConfig,
             configurations.eclipseTestConfig,
         ]
