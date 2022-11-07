@@ -90,6 +90,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation ('com.googlecode.json-simple:json-simple:1.1.1') {

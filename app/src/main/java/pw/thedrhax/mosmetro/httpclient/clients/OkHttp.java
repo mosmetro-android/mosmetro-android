@@ -57,11 +57,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.TlsVersion;
 import pw.thedrhax.mosmetro.httpclient.Client;
 import pw.thedrhax.mosmetro.httpclient.DnsClient;
 import pw.thedrhax.mosmetro.httpclient.Headers;
 import pw.thedrhax.mosmetro.httpclient.HttpRequest;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
+import pw.thedrhax.mosmetro.httpclient.Tls12SocketFactory;
 import pw.thedrhax.util.Logger;
 import pw.thedrhax.util.WifiUtils;
 
@@ -70,11 +72,37 @@ public class OkHttp extends Client {
     private WifiUtils wifi;
     private Call last_call = null;
 
+    // Source: https://github.com/square/okhttp/issues/2372#issuecomment-244807676
+    private static OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
+        if (Build.VERSION.SDK_INT < 22) {
+            try {
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, null, null);
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()));
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List<ConnectionSpec> specs = new ArrayList<>();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                client.connectionSpecs(specs);
+            } catch (Exception ex) {
+                Logger.log(Logger.LEVEL.DEBUG, ex);
+            }
+        }
+
+        return client;
+    }
+
     public OkHttp(Context context) {
         super(context);
         wifi = new WifiUtils(context);
 
-        client = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .dns(new DnsClient(context))
                 .followRedirects(false)
                 .followSslRedirects(false)
@@ -87,8 +115,11 @@ public class OkHttp extends Client {
                             .allEnabledCipherSuites()
                             .build());
                 }})
-                .cookieJar(new InterceptedCookieJar())
-                .build();
+                .cookieJar(new InterceptedCookieJar());
+
+        enableTls12OnPreLollipop(builder);
+
+        client = builder.build();
 
         configure();
     }

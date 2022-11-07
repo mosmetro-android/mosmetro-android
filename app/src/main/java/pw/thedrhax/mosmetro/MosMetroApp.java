@@ -18,12 +18,10 @@
 
 package pw.thedrhax.mosmetro;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import androidx.work.Configuration;
-import androidx.work.WorkManager;
+import androidx.multidex.MultiDexApplication;
 
 import io.sentry.Attachment;
 import io.sentry.Sentry;
@@ -38,7 +36,7 @@ import com.topjohnwu.superuser.Shell;
 
 import java.util.List;
 
-public class MosMetroApp extends Application {
+public class MosMetroApp extends MultiDexApplication {
     static {
         Shell.setDefaultBuilder(Shell.Builder.create()
                 .setFlags(Shell.FLAG_REDIRECT_STDERR)
