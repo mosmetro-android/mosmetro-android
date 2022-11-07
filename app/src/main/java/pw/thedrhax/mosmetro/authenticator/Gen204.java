@@ -218,7 +218,7 @@ public class Gen204 {
         }
 
         public boolean isFalseNegative() {
-            return falseNegative != null;
+            return falseNegative != null && falseNegative.getResponseCode() != 204;
         }
 
         public HttpResponse getFalseNegative() {
