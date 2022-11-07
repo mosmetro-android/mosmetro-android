@@ -49,11 +49,6 @@ public class MosMetroApp extends Application {
     public void onCreate() {
         super.onCreate();
         Logger.configure(this);
-        WorkManager.initialize(this,
-                new Configuration.Builder()
-                        .setMinimumLoggingLevel(android.util.Log.DEBUG)
-                        .build()
-        );
         BackendWorker.configure(this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
