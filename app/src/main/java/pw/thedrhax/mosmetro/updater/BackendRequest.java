@@ -138,7 +138,7 @@ public class BackendRequest {
     }
 
     public DocumentContext getCachedData(boolean force) {
-        if (getLastRun() > 6*60*60*1000 || force) {
+        if (getLastRun() < 6*60*60*1000 || force) {
             try {
                 return Util.jsonpath(settings.getString("worker_cache_data", ""));
             } catch (java.text.ParseException ignored) {}
