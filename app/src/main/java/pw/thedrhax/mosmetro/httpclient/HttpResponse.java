@@ -271,7 +271,15 @@ public class HttpResponse {
 
     public static String removePathFromUrl(String url) {
         Uri base_uri = Uri.parse(url);
-        return base_uri.getScheme() + "://" + base_uri.getHost();
+        StringBuilder base = new StringBuilder();
+
+        base.append(base_uri.getScheme()).append("://").append(base_uri.getHost());
+
+        if (base_uri.getPort() != -1) {
+            base.append(':').append(base_uri.getPort());
+        }
+
+        return base.toString();
     }
 
     public static String absolutePathToUrl(String baseUrl, String path) throws ParseException {
