@@ -41,7 +41,7 @@ import pw.thedrhax.util.Logger;
  * The ByFly class implements support for the public Wi-Fi networks "BELTELECOM"
  * and "byfly WIFI" in Belarus.
  *
- * Detection: Meta or Location redirect contains "ciscowifi.beltelecom.by".
+ * Detection: Location redirect contains "ciscowifi.beltelecom.by".
  *
  * @author Dmitry Karikh <the.dr.hax@gmail.com>
  * @see Provider
@@ -75,6 +75,7 @@ public class ByFly extends Provider {
                 HttpResponse res;
 
                 try {
+                    client.setCookie(redirect, "safe", "1");
                     res = client.get(redirect).retry().execute();
                 } catch (IOException ex) {
                     Logger.log(Logger.LEVEL.DEBUG, ex);
@@ -155,7 +156,7 @@ public class ByFly extends Provider {
      */
     public static boolean match(HttpResponse response) {
         try {
-            return response.parseAnyRedirect().contains("ciscowifi.beltelecom.by");
+            return response.get300Redirect().contains("ciscowifi.beltelecom.by");
         } catch (ParseException ex) {
             return false;
         }
