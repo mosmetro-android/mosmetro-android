@@ -138,6 +138,9 @@
     <string name="auth_error_bmstu_credentials">
         Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"bmstu_lb (lbpfs.bmstu.ru)\" в меню \"Настройки подключения\".
     </string>
+    <string name="auth_error_byfly_credentials">
+        Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"ByFly (Белтелеком)\" в меню \"Настройки подключения\".
+    </string>
     <string name="auth_error_form">форма не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
@@ -272,4 +275,6 @@
     <string name="share">Поделиться</string>
     <string name="pref_debug_stats">Участие в статистике</string>
     <string name="pref_debug_stats_summary">Приложение будет собирать анонимную статистику о подключениях. Кроме внутренних метрик (версия, алгоритм и т.д.), в отчёты включаются название сети Wi-Fi и версия Android.</string>
+    <string name="pref_byfly_summary">Этот алгоритм используется для подключения к \"BELTELECOM\" и \"byfly WIFI\" — платным сетям Wi-Fi в Беларуси.</string>
+    <string name="pref_byfly">ByFly (Белтелеком)</string>
 </resources>
