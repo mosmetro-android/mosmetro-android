@@ -301,9 +301,7 @@ public class HttpResponse {
 
         for (Element input : form.getElementsByTag("input")) {
             String value = input.attr("value");
-
-            if (value != null && !value.isEmpty())
-                result.put(input.attr("name"), value);
+            result.put(input.attr("name"), value != null ? value : "");
         }
 
         return result;
