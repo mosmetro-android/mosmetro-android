@@ -31,6 +31,7 @@ import pw.thedrhax.mosmetro.authenticator.FinalConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.InitialConnectionCheckTask;
 import pw.thedrhax.mosmetro.authenticator.NamedTask;
 import pw.thedrhax.mosmetro.authenticator.Provider;
+import pw.thedrhax.mosmetro.httpclient.HtmlForm;
 import pw.thedrhax.mosmetro.httpclient.HttpResponse;
 import pw.thedrhax.util.Logger;
 
@@ -100,7 +101,18 @@ public class MosMetroV1 extends Provider {
                     vars.put("result", RESULT.NOT_REGISTERED);
                     return false;
                 }
-                vars.put("form", HttpResponse.parseForm(forms.first()));
+
+                try {
+                    HtmlForm form = new HtmlForm(redirect, forms.first());
+                    vars.put("form", form);
+                } catch (ParseException ex) {
+                    Logger.log(Logger.LEVEL.DEBUG, ex);
+                    Logger.log(context.getString(R.string.error,
+                            context.getString(R.string.auth_error_form)
+                    ));
+                    return false;
+                }
+
                 return true;
             }
         });
@@ -113,7 +125,7 @@ public class MosMetroV1 extends Provider {
             @Override
             public boolean run(HashMap<String, Object> vars) {
                 try {
-                    HashMap<String,String> form = (HashMap<String,String>)vars.get("form");
+                    HtmlForm form = (HtmlForm) vars.get("form");
                     client.post(redirect, form).retry().execute();
                     return true;
                 } catch (IOException ex) {

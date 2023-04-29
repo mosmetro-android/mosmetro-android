@@ -147,6 +147,7 @@
     <string name="auth_error_bmstu_credentials">
         Login and password are required to connect to this network. Please check \"bmstu_lb (lbpfs.bmstu.ru)\" in \"Connection settings\" menu.
     </string>
+    <string name="auth_error_form">auth form not found</string>
     <string name="auth_error_server">server does not respond or responds with error</string>
     <string name="auth_error_provider">unable to identify the provider</string>
     <string name="auth_error_mosmetrov3_loop">expected redirect to another algorithm, received redirect to MosMetroV3 (infinite loop)</string>

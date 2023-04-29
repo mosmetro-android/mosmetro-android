@@ -296,17 +296,6 @@ public class HttpResponse {
         }
     }
 
-    public static Map<String,String> parseForm (Element form) {
-        Map<String,String> result = new LinkedHashMap<>();
-
-        for (Element input : form.getElementsByTag("input")) {
-            String value = input.attr("value");
-            result.put(input.attr("name"), value != null ? value : "");
-        }
-
-        return result;
-    }
-
     public String toHeaderString() {
         StringBuilder builder = new StringBuilder();
 

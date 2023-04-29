@@ -183,6 +183,14 @@ public abstract class Client {
                 .setBody(requestToString(form), "application/x-www-form-urlencoded");
     }
 
+    public HttpRequest submit(HtmlForm form) {
+        if (form.getMethod() == METHOD.POST) {
+            return post(form.getAction(), form);
+        } else {
+            return get(form.getAction(), form);
+        }
+    }
+
     public HttpResponse execute(HttpRequest request) throws IOException {
         HttpResponse res = interceptedRequest(request);
 

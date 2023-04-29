@@ -138,6 +138,7 @@
     <string name="auth_error_bmstu_credentials">
         Для подключения к этой сети необходимо указать логин и пароль. Пожалуйста проверьте \"bmstu_lb (lbpfs.bmstu.ru)\" в меню \"Настройки подключения\".
     </string>
+    <string name="auth_error_form">форма не найдена</string>
     <string name="auth_error_server">сервер не ответил или вернул ошибку</string>
     <string name="auth_error_provider">провайдер не опознан</string>
     <string name="auth_error_mosmetrov3_loop">ожидалось перенаправление на другой алгоритм, получено перенаправление на MosMetroV3 (бесконечный цикл)</string>
