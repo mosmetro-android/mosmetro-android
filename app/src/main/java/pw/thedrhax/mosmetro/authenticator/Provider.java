@@ -71,6 +71,7 @@ public abstract class Provider extends LinkedList<Task> implements Task {
             "Moscow_WIFI_Free",
             "bmstu_lb",
             "BELTELECOM",
+            "BELTELECOM WIFI",
             "byfly WIFI"
     };
 
