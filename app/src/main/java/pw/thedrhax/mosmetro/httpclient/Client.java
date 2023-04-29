@@ -198,9 +198,13 @@ public abstract class Client {
 
             while (counter++ < 10) {
                 redirect = res.get300Redirect();
+                int code = res.getResponseCode();
 
-                // Keep POST method and request body if response code is not "303 See Other"
-                if (res.getResponseCode() != 303 && tmpReq.getMethod() == METHOD.POST) {
+                Logger.log(this, "Following " + code + " to " + redirect);
+
+                // Keep POST method and request body only if response code is 307 or 308
+                // 303 must be changed to GET, 301 and 302 are ambiguous
+                if ((code == 307 || code == 308) && tmpReq.getMethod() == METHOD.POST) {
                     tmpReq = post(redirect, request.getBody(), request.headers.getContentType());
                 } else {
                     tmpReq = get(redirect);
