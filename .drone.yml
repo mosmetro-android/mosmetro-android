@@ -1,0 +1,91 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+node_selector:
+  drone/mosmetro-android: true
+
+concurrency:
+  limit: 1
+
+clone:
+  disable: true
+
+volumes:
+- name: sdk
+  host:
+    path: /data/drone/workspaces/mosmetro-android/sdk
+- name: gradle
+  host:
+    path: /data/drone/workspaces/mosmetro-android/gradle
+- name: android
+  host:
+    path: /data/drone/workspaces/mosmetro-android/android
+
+steps:
+- name: chown
+  image: alpine
+  pull: if-not-exists
+  volumes:
+  - name: sdk
+    path: /drone/sdk
+  - name: gradle
+    path: /drone/gradle
+  - name: android
+    path: /drone/android
+  commands:
+  - chown 1000:1000 /drone/*
+
+- name: prepare-sdk
+  image: thedrhax/android-sdk:8512546-7.5.1
+  pull: if-not-exists
+  volumes:
+  - name: sdk
+    path: /home/user/sdk
+  commands:
+  - |
+    if [ "$(ls ~/sdk | wc -l)" -eq 0 ]; then
+      cp -ar $ANDROID_SDK_ROOT/* ~/sdk/
+    fi
+
+- name: clone
+  image: alpine/git
+  user: 1000
+  commands:
+  - git clone $DRONE_GIT_HTTP_URL .
+  - git checkout $DRONE_COMMIT
+  - git clone https://github.com/mosmetro-android/builds.git -b master --depth 1 builds-master
+  - |
+    git clone https://github.com/mosmetro-android/builds.git -b data --depth 1 builds-data
+    cd builds-data
+    git remote set-url --push origin git@github.com:mosmetro-android/builds.git
+
+- name: build
+  image: thedrhax/android-sdk:8512546-7.5.1
+  pull: if-not-exists
+  volumes:
+  - name: sdk
+    path: /home/user/android-sdk-linux
+  - name: gradle
+    path: /home/user/.gradle
+  - name: android
+    path: /home/user/.android
+  environment:
+    KEYSTORE:
+      from_secret: keystore
+    PASS_KEYSTORE:
+      from_secret: keystore-pass
+    PASS_KEY:
+      from_secret: key-pass
+    SSH_KEY:
+      from_secret: ssh-key
+  commands:
+  - bash builds-master/build.sh
+  - |
+    mkdir -p ~/.ssh
+    echo "$SSH_KEY" > ~/.ssh/id_rsa
+    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+    chmod 600 ~/.ssh/id_rsa
+
+    cd builds-data
+    git push origin data
