@@ -56,9 +56,15 @@ steps:
   - git checkout $DRONE_COMMIT
   - git clone https://github.com/mosmetro-android/builds.git -b master --depth 1 builds-master
   - |
-    git clone https://github.com/mosmetro-android/builds.git -b data --depth 1 builds-data
+    git clone https://github.com/mosmetro-android/builds.git -b data --depth 3 builds-data
+
     cd builds-data
+
+    # Push over SSH instead of HTTPS
     git remote set-url --push origin git@github.com:mosmetro-android/builds.git
+
+    # Rewrite history to keep only [clone depth] commits
+    FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch
 
 - name: build
   image: thedrhax/android-sdk:8512546-7.5.1
@@ -88,4 +94,4 @@ steps:
     chmod 600 ~/.ssh/id_rsa
 
     cd builds-data
-    git push origin data
+    git push origin +data
