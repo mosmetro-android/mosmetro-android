@@ -18,7 +18,10 @@
 
 package pw.thedrhax.util;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -32,8 +35,10 @@ public class Notify extends NotificationCompat.Builder {
     private Context context;
     private NotificationManager nm;
     private SharedPreferences settings;
+    private String CHANNEL_ID = "MosMetroWIFIServiceChannel";
+    String channelName = "MosMetroWIFI Foreground Service";
 
-    private int id = 0;
+    private int id = 2000;
     private boolean enabled = true;
     private boolean locked = false;
     private boolean big_text = true;
@@ -43,6 +48,14 @@ public class Notify extends NotificationCompat.Builder {
         this.context = context;
         this.nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW);
+        channel.setDescription("MosMetroWIFIServiceChannel for foreground service notification");
+        try {
+            this.nm.createNotificationChannel(channel);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         priority(Util.getIntPreference(context, "pref_notify_priority", 0));
     }
@@ -76,7 +89,7 @@ public class Notify extends NotificationCompat.Builder {
     }
 
     public Notify icon(int colored, int white) {
-        boolean pref_colored = (Build.VERSION.SDK_INT <= 20) ^
+        boolean pref_colored = (Build.VERSION.SDK_INT <= 26) ^
                 settings.getBoolean("pref_notify_alternative", false);
 
         setSmallIcon(pref_colored ? colored : white); return this;
@@ -118,10 +131,11 @@ public class Notify extends NotificationCompat.Builder {
     public Notify show() {
         if (!enabled) return this;
 
-        Notification notification = build();
+        Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID).build();
 
         if (locked && context instanceof Service) {
             ((Service) context).startForeground(id, notification);
+
             return this;
         }
 

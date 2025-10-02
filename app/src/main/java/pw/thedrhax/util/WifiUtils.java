@@ -36,6 +36,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.net.wifi.SupplicantState;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
@@ -130,7 +131,56 @@ public class WifiUtils {
 
     // Get main Wi-Fi state
     public boolean isEnabled() {
-        return wm.isWifiEnabled();
+        boolean isWifiOn = false;
+        switch (wm.getConnectionInfo().getSupplicantState()) {
+            case AUTHENTICATING:
+                Logger.log(this, "SupplicantState is: AUTHENTICATING");
+                isWifiOn = true;
+                break;
+            case ASSOCIATING:
+                Logger.log(this, "SupplicantState is: ASSOCIATING");
+                isWifiOn = true;
+                break;
+            case ASSOCIATED:
+                Logger.log(this, "SupplicantState is: ASSOCIATED");
+                isWifiOn = true;
+                break;
+            case FOUR_WAY_HANDSHAKE:
+                Logger.log(this, "SupplicantState is: FOUR_WAY_HANDSHAKE");
+                isWifiOn = true;
+                break;
+            case GROUP_HANDSHAKE:
+                Logger.log(this, "SupplicantState is: GROUP_HANDSHAKE");
+                isWifiOn = true;
+                break;
+            case COMPLETED:
+                Logger.log(this, "SupplicantState is: COMPLETED");
+                isWifiOn = true;
+                break;
+
+            case UNINITIALIZED:
+                Logger.log(this, "SupplicantState is: UNINITIALIZED");
+                break;
+            case INVALID:
+                Logger.log(this, "SupplicantState is: INVALID");
+                break;
+            case INACTIVE:
+                Logger.log(this, "SupplicantState is: INACTIVE");
+                break;
+            case SCANNING:
+                Logger.log(this, "SupplicantState is: SCANNING");
+                break;
+            case INTERFACE_DISABLED:
+                Logger.log(this, "SupplicantState is: INTERFACE_DISABLED");
+                break;
+            case DISCONNECTED:
+                Logger.log(this, "SupplicantState is: DISCONNECTED");
+                break;
+            case DORMANT:
+                Logger.log(this, "SupplicantState is: DORMANT");
+                break;
+        }
+        return isWifiOn;
     }
 
     // Get Private DNS state (API 28+)

@@ -32,8 +32,11 @@ import android.content.SharedPreferences;
 import android.net.InetAddresses;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,8 +64,12 @@ public class DnsClient implements Dns {
     }
 
     private String[] getDefaultServers() {
-        String[] config = ResolverConfig.getCurrentConfig().servers();
-        return config != null ? config : new String[0];
+        List<InetSocketAddress> servers = ResolverConfig.getCurrentConfig().servers();
+        String[] config = new String[servers.size()];
+        for (int i = 0; i < servers.toArray().length; i++) {
+            config[i] = servers.get(i).toString();
+        }
+        return config;
     }
 
     public DnsClient(Context context) {
@@ -70,6 +77,11 @@ public class DnsClient implements Dns {
         pref_dnsjava = settings.getBoolean("pref_dnsjava", false);
 
         wifi = new WifiUtils(context);
+
+        if (!wifi.isEnabled()) {
+            dns = null;
+            return;
+        }
 
         String[] servers = getServers();
 
@@ -106,6 +118,7 @@ public class DnsClient implements Dns {
     private static final String REGEX_OCTET = "(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})";
     private static final String REGEX_IPv4 = "^" + REGEX_OCTET + "(\\." + REGEX_OCTET + "){3}$";
 
+    @NonNull
     @Override
     public List<InetAddress> lookup(String hostname) throws UnknownHostException {
         if (hostname.matches(REGEX_IPv4)) {

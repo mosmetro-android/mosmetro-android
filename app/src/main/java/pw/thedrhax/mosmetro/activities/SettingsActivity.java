@@ -322,6 +322,7 @@ public class SettingsActivity extends Activity {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (permissions[0]) {
                 case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
+                case Manifest.permission.ACCESS_FINE_LOCATION:
                 case Manifest.permission.ACCESS_COARSE_LOCATION:
                     if (Build.VERSION.SDK_INT >= 29 && pu.isBackgroundLocationGranted()) {
                         changeCheckBox(pref_autoconnect_service, false);
@@ -331,6 +332,7 @@ public class SettingsActivity extends Activity {
             }
         } else {
             switch (permissions[0]) {
+                case Manifest.permission.ACCESS_FINE_LOCATION:
                 case Manifest.permission.ACCESS_COARSE_LOCATION:
                     changeCheckBox(pref_autoconnect, false);
                 case Manifest.permission.ACCESS_BACKGROUND_LOCATION:
@@ -347,7 +349,7 @@ public class SettingsActivity extends Activity {
                 .setPositiveButton(R.string.permission_request, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        pu.requestCoarseLocation(SettingsActivity.this, 0);
+                        pu.requestFineLocation(SettingsActivity.this, 0);
                     }
                 })
                 .setNeutralButton(R.string.open_settings, new DialogInterface.OnClickListener() {
@@ -367,7 +369,7 @@ public class SettingsActivity extends Activity {
                 });
 
         if (!settings.getBoolean("pref_location_ignore", false))
-            if (!pu.isCoarseLocationGranted())
+            if (!pu.isCoarseLocationGranted() && !pu.isFineLocationGranted())
                 dialog.show();
 
         if (!settings.getBoolean("pref_location_ignore_autoconnect", false)

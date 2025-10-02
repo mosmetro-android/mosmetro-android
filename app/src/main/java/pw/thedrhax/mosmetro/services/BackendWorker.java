@@ -51,8 +51,7 @@ public class BackendWorker extends Worker {
     }
 
     public static void configure(Context context) {
-        Constraints constraints = new Constraints();
-        constraints.setRequiredNetworkType(NetworkType.UNMETERED);
+        Constraints constraints = new Constraints(NetworkType.UNMETERED, false, false, false);
 
         PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(BackendWorker.class, 3, TimeUnit.HOURS)
                 .setConstraints(constraints)

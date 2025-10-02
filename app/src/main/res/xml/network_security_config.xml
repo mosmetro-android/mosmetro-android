@@ -7,5 +7,21 @@
             <!-- Additionally trust user added CAs -->  
             <certificates src="user" />  
         </trust-anchors>  
-    </base-config>  
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">www.google.ru</domain>
+        <domain includeSubdomains="true">play.googleapis.com</domain>
+        <domain includeSubdomains="true">connectivitycheck.gstatic.com</domain>
+        <domain includeSubdomains="true">connectivitycheck.android.com</domain>
+        <domain includeSubdomains="true">www.gstatic.com</domain>
+        <domain includeSubdomains="true">clients1.google.com</domain>
+        <domain includeSubdomains="true">google.com</domain>
+        <domain includeSubdomains="true">gstatic.com</domain>
+        <domain includeSubdomains="true">maps.google.com</domain>
+        <domain includeSubdomains="true">mt0.google.com</domain>
+        <domain includeSubdomains="true">mt1.google.com</domain>
+        <domain includeSubdomains="true">mt2.google.com</domain>
+        <domain includeSubdomains="true">mt3.google.com</domain>
+        <domain includeSubdomains="true">www.google.com</domain>
+    </domain-config>
 </network-security-config>

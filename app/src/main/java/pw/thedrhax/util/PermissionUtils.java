@@ -75,6 +75,11 @@ public final class PermissionUtils {
         return p == PackageManager.PERMISSION_GRANTED;
     }
 
+    public boolean isFineLocationGranted() {
+        int p = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        return p == PackageManager.PERMISSION_GRANTED;
+    }
+
     @RequiresApi(29)
     public boolean isBackgroundLocationGranted() {
         int p = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
@@ -86,6 +91,10 @@ public final class PermissionUtils {
         activity.requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
     }
 
+    @RequiresApi(26)
+    public void requestFineLocation(Activity activity, int requestCode) {
+        activity.requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
+    }
     @RequiresApi(29)
     public void requestBackgroundLocation(Activity activity, int requestCode) {
         activity.requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, requestCode);
